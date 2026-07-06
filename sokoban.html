@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 推箱子</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.97);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: inherit;
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .nav-links-wrap {
+    flex: 1;
+    overflow-x: auto;
+    margin: 0 20px;
+    scrollbar-width: none;
+  }
+  .nav-links-wrap::-webkit-scrollbar { display: none; }
+  .nav-links {
+    display: flex;
+    gap: 2px;
+    white-space: nowrap;
+  }
+  .nav-link {
+    padding: 6px 13px; border-radius: 7px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-link:hover { background: var(--card); color: var(--text); }
+  .nav-link.active { background: var(--card); color: var(--gold); }
+  .nav-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.4} }
+  .status-text { font-size: 12px; color: var(--muted); }
+
+  /* ─── 主体三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+  }
+
+  /* ─── 通用面板样式 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: var(--deep);
+    position: relative;
+    overflow: hidden;
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* ─── 关卡选择按钮 ─── */
+  .level-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .level-btn {
+    flex: 1; padding: 9px 6px; border-radius: 8px;
+    text-align: center; font-size: 13px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s;
+    color: var(--muted); font-weight: 600;
+    min-width: 56px;
+  }
+  .level-btn:hover { border-color: rgba(124,58,237,0.5); color: var(--text); }
+  .level-btn.active {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.15);
+    color: var(--gold);
+  }
+  .level-btn.cleared {
+    border-color: rgba(34,197,94,0.5);
+    background: rgba(34,197,94,0.08);
+    color: #22C55E;
+  }
+  .level-btn.cleared.active {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.15);
+    color: var(--gold);
+  }
+
+  /* ─── 奖品配置 ─── */
+  .prize-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+  }
+  .prize-row:last-child { margin-bottom: 0; }
+  .prize-icon { font-size: 18px; min-width: 22px; text-align: center; }
+  .prize-input {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .prize-input:focus { border-color: var(--accent); }
+  .prize-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .prize-threshold {
+    background: rgba(245,200,66,0.1);
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 700;
+    width: 54px;
+    outline: none;
+    text-align: center;
+    -moz-appearance: textfield;
+  }
+  .prize-threshold::-webkit-outer-spin-button,
+  .prize-threshold::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  /* ─── 信息行 ─── */
+  .info-row {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .info-row:last-child { margin-bottom: 0; }
+  .info-val { color: var(--text); font-weight: 600; }
+
+  /* ─── 撤销上限滑块 ─── */
+  .slider-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 8px;
+  }
+  .slider-row input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.15);
+    outline: none;
+    cursor: pointer;
+  }
+  .slider-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(124,58,237,0.6);
+  }
+  .slider-val {
+    font-size: 14px; font-weight: 700;
+    color: var(--gold); width: 28px; text-align: right;
+  }
+
+  /* ─── 游戏统计栏 ─── */
+  .game-stats {
+    display: flex; gap: 10px;
+    width: 100%;
+    margin-bottom: 14px;
+  }
+  .stat-item {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .stat-val {
+    font-size: 22px; font-weight: 800;
+    color: var(--gold); line-height: 1;
+    margin-bottom: 3px;
+  }
+  .stat-label {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* ─── 游戏地图区域 ─── */
+  .game-board-wrap {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+    box-shadow: 0 0 40px rgba(124,58,237,0.25);
+    flex-shrink: 0;
+  }
+
+  /* 推箱子网格 */
+  .sokoban-grid {
+    display: grid;
+    background: #0a051a;
+    gap: 0;
+    line-height: 0;
+    /* 列数由 JS 动态设置 grid-template-columns */
+  }
+
+  /* 单元格 */
+  .cell {
+    width: 52px; height: 52px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    transition: background-color 0.15s;
+  }
+
+  /* 地板 */
+  .cell-floor {
+    background: #0e082a;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+
+  /* 墙 */
+  .cell-wall {
+    background: linear-gradient(145deg, #2a1060, #1a0840);
+    border: 1px solid rgba(124,58,237,0.4);
+    box-shadow: inset 0 0 8px rgba(124,58,237,0.15);
+  }
+  .cell-wall::before {
+    content: '';
+    position: absolute; inset: 3px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(236,72,153,0.1));
+    border: 1px solid rgba(124,58,237,0.2);
+  }
+
+  /* 目标点 */
+  .cell-target {
+    background: #0e082a;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .cell-target::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2.5px solid var(--accent2);
+    opacity: 0.85;
+    box-shadow: 0 0 8px rgba(236,72,153,0.5);
+  }
+
+  /* 箱子（未到目标） */
+  .cell-box {
+    background: #0e082a;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .box-sprite {
+    width: 38px; height: 38px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+    border: 2px solid rgba(167,139,250,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 2px 10px rgba(109,40,217,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+    transition: all 0.12s ease;
+    position: relative;
+  }
+  .box-sprite::before {
+    content: '';
+    position: absolute;
+    top: 4px; left: 4px; right: 4px;
+    height: 2px;
+    border-radius: 1px;
+    background: rgba(255,255,255,0.2);
+  }
+
+  /* 箱子在目标位置（已完成） */
+  .box-on-target {
+    background: #0e082a;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .box-on-target .box-sprite {
+    background: linear-gradient(135deg, #F5C842, #E5A800);
+    border-color: rgba(245,200,66,0.7);
+    box-shadow: 0 2px 16px rgba(245,200,66,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+    animation: boxDone 0.35s ease;
+  }
+  @keyframes boxDone {
+    0% { transform: scale(1.2); }
+    60% { transform: scale(0.92); }
+    100% { transform: scale(1); }
+  }
+
+  /* 人物（CSS 绘制像素风） */
+  .cell-player {
+    background: #0e082a;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .player-sprite {
+    width: 36px; height: 44px;
+    position: relative;
+    display: flex; flex-direction: column; align-items: center;
+    transition: transform 0.08s;
+  }
+  /* 头 */
+  .player-head {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #FBBF24;
+    border: 2px solid #D97706;
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+  }
+  /* 眼睛 */
+  .player-head::before {
+    content: '• •';
+    position: absolute;
+    top: 5px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 5px;
+    color: #1a0a2e;
+    letter-spacing: 2px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  /* 身体 */
+  .player-body {
+    width: 22px; height: 16px;
+    border-radius: 4px 4px 6px 6px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    margin-top: -2px;
+    position: relative;
+  }
+  /* 腿 */
+  .player-legs {
+    display: flex; gap: 4px;
+    margin-top: 1px;
+  }
+  .player-leg {
+    width: 8px; height: 10px;
+    border-radius: 0 0 4px 4px;
+    background: var(--accent);
+  }
+
+  /* 人物在目标点 */
+  .cell-player-on-target {
+    background: #0e082a;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .cell-player-on-target::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2.5px solid var(--accent2);
+    opacity: 0.55;
+  }
+
+  /* ─── 操作按钮 ─── */
+  .action-btns {
+    display: flex; gap: 8px;
+    margin-top: 14px;
+    width: 100%;
+    justify-content: center;
+  }
+  .action-btn {
+    padding: 9px 20px; border-radius: 9px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+  }
+  .action-btn:hover { border-color: rgba(124,58,237,0.5); background: rgba(124,58,237,0.12); }
+  .action-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .action-btn.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-color: transparent;
+    box-shadow: 0 3px 14px rgba(124,58,237,0.35);
+  }
+  .action-btn.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 20px rgba(124,58,237,0.5);
+  }
+
+  /* ─── 键盘提示 ─── */
+  .kb-hint {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--muted);
+    margin-top: 10px;
+  }
+  .kb-key {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    font-size: 10px; font-weight: 700;
+    color: var(--text);
+  }
+
+  /* ─── 覆盖层（通关/开始/失败） ─── */
+  .overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: rgba(10,5,26,0.88);
+    backdrop-filter: blur(4px);
+    border-radius: 12px;
+    transition: opacity 0.3s;
+    z-index: 10;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-icon { font-size: 54px; margin-bottom: 12px; }
+  .overlay-title {
+    font-size: 24px; font-weight: 800;
+    color: var(--gold); margin-bottom: 6px;
+  }
+  .overlay-sub {
+    font-size: 14px; color: var(--muted);
+    margin-bottom: 20px; text-align: center;
+    line-height: 1.6; max-width: 260px;
+  }
+  .overlay-prize {
+    background: rgba(245,200,66,0.12);
+    border: 1px solid rgba(245,200,66,0.35);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 15px; font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .overlay-btn-row { display: flex; gap: 10px; }
+  .overlay-btn {
+    padding: 11px 28px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; font-size: 15px; font-weight: 700;
+    border: none; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .overlay-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(124,58,237,0.55);
+  }
+  .overlay-btn.secondary {
+    background: rgba(255,255,255,0.08);
+    box-shadow: none;
+    border: 1px solid var(--border);
+  }
+
+  /* ─── 通关特效粒子 ─── */
+  .confetti-wrap {
+    position: absolute; inset: 0;
+    pointer-events: none; overflow: hidden;
+    z-index: 9;
+  }
+  .confetti-dot {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    animation: confettiFall 1.2s ease-in forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(500px) rotate(720deg); opacity: 0; }
+  }
+
+  /* ─── 通知气泡 ─── */
+  .notify-bubble {
+    position: fixed; top: 80px; right: 24px;
+    background: rgba(26,10,46,0.95);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 13px; color: var(--text);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    z-index: 200;
+    opacity: 0; pointer-events: none;
+    transform: translateY(-8px);
+    transition: all 0.3s;
+    max-width: 240px;
+  }
+  .notify-bubble.show {
+    opacity: 1; pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  /* ─── 右侧数据面板 ─── */
+  .record-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .record-item:last-child { border-bottom: none; }
+  .record-rank {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--card); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    flex-shrink: 0;
+  }
+  .record-rank.gold { background: rgba(245,200,66,0.15); border-color: rgba(245,200,66,0.4); color: var(--gold); }
+  .record-info { flex: 1; }
+  .record-name { font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .record-detail { font-size: 11px; color: var(--muted); }
+  .record-steps { font-weight: 700; color: var(--gold); font-size: 15px; }
+
+  /* 奖品解锁列表 */
+  .prize-unlock-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    font-size: 13px;
+    transition: all 0.3s;
+  }
+  .prize-unlock-item.unlocked {
+    background: rgba(245,200,66,0.08);
+    border-color: rgba(245,200,66,0.3);
+  }
+  .prize-unlock-icon { font-size: 20px; flex-shrink: 0; }
+  .prize-unlock-info { flex: 1; }
+  .prize-unlock-name { font-weight: 600; margin-bottom: 2px; }
+  .prize-unlock-cond { font-size: 11px; color: var(--muted); }
+  .prize-unlock-status {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .prize-unlock-status.done { color: #22C55E; }
+
+  /* 步数进度条 */
+  .steps-bar-wrap {
+    margin-top: 8px;
+  }
+  .steps-bar-label {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .steps-bar-bg {
+    height: 6px; border-radius: 3px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden;
+  }
+  .steps-bar-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.3s ease;
+  }
+
+  /* ─── 底部状态栏 ─── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 10px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; color: var(--muted);
+    background: rgba(13,7,32,0.97);
+    flex-shrink: 0;
+  }
+
+  /* 撤销次数标签 */
+  .undo-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(124,58,237,0.12);
+    border: 1px solid rgba(124,58,237,0.25);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px; color: var(--accent);
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── 顶部导航栏 ─── -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    🎮 <span>GameHub</span>
+    <span class="nav-badge">中台</span>
+  </a>
+  <div class="nav-links-wrap">
+    <div class="nav-links">
+      <a href="index.html"              class="nav-link">首页</a>
+      <a href="wheel.html"              class="nav-link">大转盘</a>
+      <a href="nine-grid.html"          class="nav-link">九宫格</a>
+      <a href="scratch-card.html"       class="nav-link">刮刮乐</a>
+      <a href="shake-dice.html"         class="nav-link">摇骰子</a>
+      <a href="smash-egg.html"          class="nav-link">砸金蛋</a>
+      <a href="slot-machine.html"       class="nav-link">老虎机</a>
+      <a href="gift-box.html"           class="nav-link">礼盒开箱</a>
+      <a href="whack-mole.html"         class="nav-link">打地鼠</a>
+      <a href="cup-game.html"           class="nav-link">三杯游戏</a>
+      <a href="number-bomb.html"        class="nav-link">数字炸弹</a>
+      <a href="stamp-collect.html"      class="nav-link">集卡集章</a>
+      <a href="vote-pk.html"            class="nav-link">投票PK</a>
+      <a href="gashapon.html"           class="nav-link">扭蛋机</a>
+      <a href="blind-box.html"          class="nav-link">盲盒抽卡</a>
+      <a href="game-2048.html"          class="nav-link">2048</a>
+      <a href="match3.html"             class="nav-link">消消乐</a>
+      <a href="catch-coins.html"        class="nav-link">接金币</a>
+      <a href="grow-tree.html"          class="nav-link">成长树</a>
+      <a href="pinball.html"            class="nav-link">弹珠机</a>
+      <a href="snake.html"              class="nav-link">贪吃蛇</a>
+      <a href="slingshot.html"          class="nav-link">弹弓射击</a>
+      <a href="fruit-cut.html"          class="nav-link">切水果</a>
+      <a href="progress-unlock.html"    class="nav-link">进度解锁</a>
+      <a href="energy-collect.html"     class="nav-link">能量收集</a>
+      <a href="flying-chess.html"       class="nav-link">飞行棋</a>
+      <a href="monopoly.html"           class="nav-link">大富翁</a>
+      <a href="red-packet-rain.html"    class="nav-link">红包雨</a>
+      <a href="claw-machine.html"       class="nav-link">夹娃娃机</a>
+      <a href="flip-match.html"         class="nav-link">翻牌配对</a>
+      <a href="shake.html"              class="nav-link">摇一摇</a>
+      <a href="quiz.html"               class="nav-link">问答闯关</a>
+      <a href="daily-checkin.html"      class="nav-link">每日签到</a>
+      <a href="sokoban.html"            class="nav-link active">推箱子</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span class="status-text">运行中</span>
+  </div>
+</nav>
+
+<!-- ─── 通知气泡 ─── -->
+<div class="notify-bubble" id="notifyBubble"></div>
+
+<!-- ─── 主体三列布局 ─── -->
+<div class="main">
+
+  <!-- ══════════════════════════════
+       左侧配置面板
+  ══════════════════════════════ -->
+  <div class="panel-left">
+    <div class="panel-title">🎮 游戏配置</div>
+
+    <!-- 关卡选择 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>关卡选择</div>
+      <div class="level-btns" id="levelBtns">
+        <button class="level-btn active" onclick="selectLevel(0)" id="lvBtn0">新手</button>
+        <button class="level-btn"        onclick="selectLevel(1)" id="lvBtn1">简单</button>
+        <button class="level-btn"        onclick="selectLevel(2)" id="lvBtn2">中等</button>
+        <button class="level-btn"        onclick="selectLevel(3)" id="lvBtn3">困难</button>
+        <button class="level-btn"        onclick="selectLevel(4)" id="lvBtn4">高手</button>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="info-row">
+          <span>地图大小</span><span class="info-val" id="infoMapSize">5×5</span>
+        </div>
+        <div class="info-row">
+          <span>箱子数量</span><span class="info-val" id="infoBoxCount">1 个</span>
+        </div>
+        <div class="info-row">
+          <span>当前关卡</span><span class="info-val" id="infoLevelName">新手关</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 奖品配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>步数奖品配置</div>
+      <div style="font-size:11px; color:var(--muted); margin-bottom:10px; line-height:1.5;">
+        设置每关通关步数上限，在限定步数内完成可解锁对应奖品。
+      </div>
+
+      <!-- 关卡1 新手 -->
+      <div class="prize-row">
+        <span class="prize-icon">🎁</span>
+        <input type="number" class="prize-threshold" id="thresh0" value="20" min="1">
+        <input type="text" class="prize-input" id="prize0" placeholder="新手关奖品（如：优惠券5元）" value="新手奖励优惠券5元">
+      </div>
+      <!-- 关卡2 简单 -->
+      <div class="prize-row">
+        <span class="prize-icon">🎀</span>
+        <input type="number" class="prize-threshold" id="thresh1" value="40" min="1">
+        <input type="text" class="prize-input" id="prize1" placeholder="简单关奖品" value="积分×100">
+      </div>
+      <!-- 关卡3 中等 -->
+      <div class="prize-row">
+        <span class="prize-icon">🏆</span>
+        <input type="number" class="prize-threshold" id="thresh2" value="60" min="1">
+        <input type="text" class="prize-input" id="prize2" placeholder="中等关奖品" value="无门槛券10元">
+      </div>
+      <!-- 关卡4 困难 -->
+      <div class="prize-row">
+        <span class="prize-icon">💎</span>
+        <input type="number" class="prize-threshold" id="thresh3" value="80" min="1">
+        <input type="text" class="prize-input" id="prize3" placeholder="困难关奖品" value="品牌周边礼品">
+      </div>
+      <!-- 关卡5 高手 -->
+      <div class="prize-row">
+        <span class="prize-icon">👑</span>
+        <input type="number" class="prize-threshold" id="thresh4" value="100" min="1">
+        <input type="text" class="prize-input" id="prize4" placeholder="高手关奖品" value="神秘大奖">
+      </div>
+
+      <div style="margin-top:10px; font-size:11px; color:var(--muted); line-height:1.5;">
+        左侧数字 = 步数上限；超出步数仍通关但无法解锁奖品
+      </div>
+    </div>
+
+    <!-- 撤销次数上限 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>撤销次数上限</div>
+      <div class="slider-row">
+        <input type="range" id="undoLimit" min="0" max="20" value="5"
+               oninput="document.getElementById('undoLimitVal').textContent=this.value">
+        <span class="slider-val" id="undoLimitVal">5</span>
+        <span class="prize-label">次</span>
+      </div>
+      <div style="margin-top:8px; font-size:11px; color:var(--muted);">
+        设为 0 表示无限撤销；撤销会增加步数计数
+      </div>
+    </div>
+
+    <!-- 游戏说明 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>玩法说明</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.8;">
+        🕹️ 方向键 / WASD 控制人物移动<br>
+        📦 将所有箱子推到目标位置（圆圈）<br>
+        🟡 箱子到位后变金色，全部到位通关<br>
+        ↩️ 按 Z 键或点击撤销按钮悔棋<br>
+        🏆 限定步数内通关可解锁奖品
+      </div>
+    </div>
+
+  </div><!-- /panel-left -->
+
+  <!-- ══════════════════════════════
+       中间游戏区
+  ══════════════════════════════ -->
+  <div class="panel-center">
+
+    <!-- 顶部统计栏 -->
+    <div class="game-stats">
+      <div class="stat-item">
+        <div class="stat-val" id="statSteps">0</div>
+        <div class="stat-label">步数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="statUndoLeft">5</div>
+        <div class="stat-label">撤销剩余</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="statBoxDone">0/1</div>
+        <div class="stat-label">完成箱子</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="statLevel">1</div>
+        <div class="stat-label">当前关卡</div>
+      </div>
+    </div>
+
+    <!-- 步数奖品进度 -->
+    <div class="steps-bar-wrap" style="width:100%; margin-bottom:12px;">
+      <div class="steps-bar-label">
+        <span>当前步数</span>
+        <span id="stepsBarText">0 / 20 步（限定奖品步数）</span>
+      </div>
+      <div class="steps-bar-bg">
+        <div class="steps-bar-fill" id="stepsBarFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- 游戏地图 -->
+    <div class="game-board-wrap" id="gameBoardWrap">
+      <div class="sokoban-grid" id="sokobanGrid"></div>
+
+      <!-- 通关特效粒子层 -->
+      <div class="confetti-wrap" id="confettiWrap"></div>
+
+      <!-- 覆盖层：开始提示 -->
+      <div class="overlay" id="overlayStart">
+        <div class="overlay-icon">📦</div>
+        <div class="overlay-title">推箱子</div>
+        <div class="overlay-sub">经典益智闯关游戏<br>将所有箱子推到目标位置即可通关</div>
+        <div class="overlay-btn-row">
+          <button class="overlay-btn" onclick="startGame()">开始游戏</button>
+        </div>
+      </div>
+
+      <!-- 覆盖层：通关 -->
+      <div class="overlay hidden" id="overlayWin">
+        <div class="overlay-icon">🎉</div>
+        <div class="overlay-title">通关成功！</div>
+        <div class="overlay-sub" id="winSubText">恭喜完成关卡！</div>
+        <div class="overlay-prize hidden" id="winPrizeBox">
+          <span>🎁</span><span id="winPrizeName"></span>
+        </div>
+        <div class="overlay-btn-row">
+          <button class="overlay-btn" onclick="nextLevel()">下一关</button>
+          <button class="overlay-btn secondary" onclick="restartLevel()">再玩一次</button>
+        </div>
+      </div>
+
+    </div><!-- /game-board-wrap -->
+
+    <!-- 操作按钮行 -->
+    <div class="action-btns">
+      <button class="action-btn" id="btnUndo" onclick="undoMove()">↩ 撤销</button>
+      <button class="action-btn" onclick="restartLevel()">↺ 重置关卡</button>
+      <button class="action-btn primary" onclick="startGame()">▶ 开始 / 换关</button>
+    </div>
+
+    <!-- 键盘提示 -->
+    <div class="kb-hint" style="margin-top:8px;">
+      <span class="kb-key">W</span>
+      <span class="kb-key">A</span>
+      <span class="kb-key">S</span>
+      <span class="kb-key">D</span>
+      <span style="margin:0 4px;">或</span>
+      <span class="kb-key">↑</span>
+      <span class="kb-key">←</span>
+      <span class="kb-key">↓</span>
+      <span class="kb-key">→</span>
+      <span style="margin:0 4px;">移动</span>
+      <span class="kb-key">Z</span>
+      <span>撤销</span>
+    </div>
+
+  </div><!-- /panel-center -->
+
+  <!-- ══════════════════════════════
+       右侧数据面板
+  ══════════════════════════════ -->
+  <div class="panel-right">
+    <div class="panel-title">📊 数据统计</div>
+
+    <!-- 各关最少步数 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>历史最少步数</div>
+      <div id="bestStepsList">
+        <!-- JS 动态渲染 -->
+      </div>
+    </div>
+
+    <!-- 通关记录 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>通关记录</div>
+      <div id="clearRecordList" style="font-size:13px; color:var(--muted);">
+        暂无通关记录
+      </div>
+    </div>
+
+    <!-- 奖品解锁状态 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品解锁</div>
+      <div id="prizeUnlockList">
+        <!-- JS 动态渲染 -->
+      </div>
+    </div>
+
+  </div><!-- /panel-right -->
+
+</div><!-- /main -->
+
+<!-- ─── 底部状态栏 ─── -->
+<div class="footer">
+  <span>推箱子 · Sokoban · 经典益智闯关</span>
+  <span>方向键/WASD 移动 · Z 撤销 · 箱子推到圆圈位置通关</span>
+  <span id="footerStatus">待开始</span>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     JavaScript 核心逻辑
+══════════════════════════════════════════════ -->
+<script>
+/* ─────────────────────────────────────────────
+   地图元素常量
+   0 = 空地  1 = 墙  2 = 目标点  3 = 箱子  4 = 人物
+   5 = 箱子+目标（在目标上的箱子）  6 = 人物+目标
+───────────────────────────────────────────── */
+const FLOOR  = 0;
+const WALL   = 1;
+const TARGET = 2;
+const BOX    = 3;
+const PLAYER = 4;
+const BOX_ON = 5;   // 箱子在目标点
+const PLY_ON = 6;   // 人物在目标点
+
+/* ─────────────────────────────────────────────
+   5 个内置关卡地图
+   每关都有经典推箱子布局，难度逐步提升
+───────────────────────────────────────────── */
+const LEVELS = [
+  {
+    /* 关卡 1：新手 5×5，1 个箱子 */
+    name: '新手关',
+    size: 5,
+    boxes: 1,
+    map: [
+      [1,1,1,1,1],
+      [1,0,0,0,1],
+      [1,0,3,0,1],
+      [1,0,0,2,1],
+      [1,1,1,1,1],
+    ],
+    playerStart: [2, 1],  // [行, 列]
+  },
+  {
+    /* 关卡 2：简单 7×7，2 个箱子 */
+    name: '简单关',
+    size: 7,
+    boxes: 2,
+    map: [
+      [1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,1],
+      [1,0,3,0,3,0,1],
+      [1,0,0,0,0,0,1],
+      [1,0,2,0,2,0,1],
+      [1,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1],
+    ],
+    playerStart: [1, 1],
+  },
+  {
+    /* 关卡 3：中等 8×8，3 个箱子，有障碍物 */
+    name: '中等关',
+    size: 8,
+    boxes: 3,
+    map: [
+      [1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,1],
+      [1,0,3,1,0,3,0,1],
+      [1,0,0,1,0,0,0,1],
+      [1,0,0,0,3,0,0,1],
+      [1,0,2,0,0,2,0,1],
+      [1,0,0,0,2,0,0,1],
+      [1,1,1,1,1,1,1,1],
+    ],
+    playerStart: [1, 1],
+  },
+  {
+    /* 关卡 4：困难 9×9，4 个箱子，迷宫结构 */
+    name: '困难关',
+    size: 9,
+    boxes: 4,
+    map: [
+      [1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,1,0,0,0,1],
+      [1,0,3,0,0,0,3,0,1],
+      [1,0,0,1,0,1,0,0,1],
+      [1,1,0,0,0,0,0,1,1],
+      [1,0,0,1,0,1,0,0,1],
+      [1,0,3,0,0,0,3,0,1],
+      [1,0,2,0,2,0,2,0,1],
+      [1,1,1,2,1,1,1,1,1],
+    ],
+    playerStart: [1, 1],
+  },
+  {
+    /* 关卡 5：高手 10×10，5 个箱子，复杂路线 */
+    name: '高手关',
+    size: 10,
+    boxes: 5,
+    map: [
+      [1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,1,0,0,0,0,1],
+      [1,0,3,0,0,0,3,0,0,1],
+      [1,0,0,1,0,1,0,3,0,1],
+      [1,1,0,0,3,0,0,0,0,1],
+      [1,0,0,1,0,0,1,0,0,1],
+      [1,0,3,0,0,0,0,1,0,1],
+      [1,0,0,0,2,0,2,0,0,1],
+      [1,0,2,0,0,2,0,0,2,1],
+      [1,1,1,1,1,1,1,1,1,1],
+    ],
+    playerStart: [1, 1],
+  },
+];
+
+const LEVEL_ICONS = ['🌱','😊','🔥','💎','👑'];
+
+/* ─────────────────────────────────────────────
+   游戏状态
+───────────────────────────────────────────── */
+let currentLevelIdx = 0;   // 当前选中关卡索引
+let gameState = null;       // 当前游戏运行状态
+let history = [];           // 撤销历史栈
+let steps = 0;              // 当前步数
+let undoUsed = 0;           // 本局已用撤销次数
+let gameActive = false;     // 游戏是否进行中
+
+/* 持久化数据 */
+let bestSteps = [Infinity, Infinity, Infinity, Infinity, Infinity]; // 各关最佳步数
+let clearedLevels = [false, false, false, false, false];            // 通关记录
+let unlockedPrizes = [false, false, false, false, false];           // 奖品解锁
+let clearRecords = [];                                               // 通关历史记录
+
+/* ─────────────────────────────────────────────
+   工具函数：深拷贝二维数组
+───────────────────────────────────────────── */
+function deepCopyMap(map) {
+  return map.map(row => [...row]);
+}
+
+/* ─────────────────────────────────────────────
+   选择关卡
+───────────────────────────────────────────── */
+function selectLevel(idx) {
+  currentLevelIdx = idx;
+  // 更新按钮 active 状态
+  document.querySelectorAll('.level-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === idx);
+  });
+  // 更新关卡信息
+  const lv = LEVELS[idx];
+  document.getElementById('infoMapSize').textContent   = `${lv.size}×${lv.size}`;
+  document.getElementById('infoBoxCount').textContent  = `${lv.boxes} 个`;
+  document.getElementById('infoLevelName').textContent = lv.name;
+  // 不自动开始，更新右侧数据面板
+  renderRightPanel();
+}
+
+/* ─────────────────────────────────────────────
+   开始游戏（初始化当前关卡）
+───────────────────────────────────────────── */
+function startGame() {
+  const lv = LEVELS[currentLevelIdx];
+  gameState = deepCopyMap(lv.map);
+
+  // 确保玩家位置正确：把玩家放入地图
+  const [pr, pc] = lv.playerStart;
+  // 若地图中有 PLAYER，先清除（避免重复）
+  for (let r = 0; r < lv.size; r++) {
+    for (let c = 0; c < lv.size; c++) {
+      if (gameState[r][c] === PLAYER) gameState[r][c] = FLOOR;
+      if (gameState[r][c] === PLY_ON) gameState[r][c] = TARGET;
+    }
+  }
+  // 设置玩家起始位置
+  if (gameState[pr][pc] === TARGET) {
+    gameState[pr][pc] = PLY_ON;
+  } else {
+    gameState[pr][pc] = PLAYER;
+  }
+
+  steps = 0;
+  undoUsed = 0;
+  history = [];
+  gameActive = true;
+
+  // 隐藏所有覆盖层
+  document.getElementById('overlayStart').classList.add('hidden');
+  document.getElementById('overlayWin').classList.add('hidden');
+  document.getElementById('confettiWrap').innerHTML = '';
+
+  updateStats();
+  renderGrid();
+  renderRightPanel();
+  updateFooter('进行中');
+}
+
+/* ─────────────────────────────────────────────
+   重置关卡（重新开始当前关）
+───────────────────────────────────────────── */
+function restartLevel() {
+  if (!gameActive && history.length === 0) {
+    startGame();
+    return;
+  }
+  startGame();
+}
+
+/* ─────────────────────────────────────────────
+   下一关
+───────────────────────────────────────────── */
+function nextLevel() {
+  const nextIdx = (currentLevelIdx + 1) % LEVELS.length;
+  selectLevel(nextIdx);
+  startGame();
+}
+
+/* ─────────────────────────────────────────────
+   找到玩家位置
+───────────────────────────────────────────── */
+function findPlayer() {
+  const lv = LEVELS[currentLevelIdx];
+  for (let r = 0; r < lv.size; r++) {
+    for (let c = 0; c < lv.size; c++) {
+      if (gameState[r][c] === PLAYER || gameState[r][c] === PLY_ON) {
+        return [r, c];
+      }
+    }
+  }
+  return null;
+}
+
+/* ─────────────────────────────────────────────
+   处理移动
+   dir: [dr, dc] 方向向量
+───────────────────────────────────────────── */
+function move(dr, dc) {
+  if (!gameActive) return;
+
+  const [pr, pc] = findPlayer();
+  const nr = pr + dr;   // 目标位置（玩家下一步）
+  const nc = pc + dc;
+  const lv = LEVELS[currentLevelIdx];
+  const size = lv.size;
+
+  // 边界检查
+  if (nr < 0 || nr >= size || nc < 0 || nc >= size) return;
+  const target = gameState[nr][nc];
+
+  // 撞墙不移动
+  if (target === WALL) return;
+
+  // 记录历史以便撤销
+  history.push(deepCopyMap(gameState));
+
+  const isBox = (target === BOX || target === BOX_ON);
+
+  // 记录移动前玩家原位是否是目标点（在 push history 之前已快照）
+  const prevMap = history[history.length - 1];
+  const prevPlayerCell = prevMap[pr][pc]; // PLAYER 或 PLY_ON
+
+  if (isBox) {
+    // 箱子前方位置
+    const br = nr + dr;
+    const bc = nc + dc;
+    if (br < 0 || br >= size || bc < 0 || bc >= size) {
+      history.pop(); return;
+    }
+    const boxTarget = gameState[br][bc];
+    if (boxTarget === WALL || boxTarget === BOX || boxTarget === BOX_ON) {
+      history.pop(); return;
+    }
+    // 移动箱子到新位置（若目标是目标点则变为 BOX_ON，否则 BOX）
+    gameState[br][bc] = (boxTarget === TARGET) ? BOX_ON : BOX;
+    // 玩家移入箱子原位置（若箱子原来在目标点上则 PLY_ON，否则 PLAYER）
+    gameState[nr][nc] = (target === BOX_ON) ? PLY_ON : PLAYER;
+  } else {
+    // 普通移动到空地或目标点
+    gameState[nr][nc] = (target === TARGET) ? PLY_ON : PLAYER;
+  }
+
+  // 玩家离开原位置：若原来是 PLY_ON（站在目标点）则恢复为 TARGET，否则为 FLOOR
+  gameState[pr][pc] = (prevPlayerCell === PLY_ON) ? TARGET : FLOOR;
+
+  steps++;
+  updateStats();
+  renderGrid();
+
+  // 检查是否通关
+  checkWin();
+}
+
+/* ─────────────────────────────────────────────
+   撤销
+───────────────────────────────────────────── */
+function undoMove() {
+  if (!gameActive) return;
+  if (history.length === 0) {
+    showNotify('没有可撤销的操作');
+    return;
+  }
+  const limit = parseInt(document.getElementById('undoLimit').value);
+  if (limit > 0 && undoUsed >= limit) {
+    showNotify(`撤销次数已用完（上限 ${limit} 次）`);
+    return;
+  }
+  gameState = history.pop();
+  undoUsed++;
+  // 撤销后步数回退一步（回到上一手状态）
+  steps = Math.max(0, steps - 1);
+  updateStats();
+  renderGrid();
+}
+
+/* ─────────────────────────────────────────────
+   检查是否通关：所有箱子都在目标位置
+───────────────────────────────────────────── */
+function checkWin() {
+  const lv = LEVELS[currentLevelIdx];
+  // 如果还有 BOX（未在目标上的箱子），未通关
+  for (let r = 0; r < lv.size; r++) {
+    for (let c = 0; c < lv.size; c++) {
+      if (gameState[r][c] === BOX) return;
+    }
+  }
+  // 全部通关
+  gameActive = false;
+  const idx = currentLevelIdx;
+
+  // 更新最佳步数
+  const isNewBest = steps < bestSteps[idx];
+  if (isNewBest) bestSteps[idx] = steps;
+
+  // 记录通关
+  clearedLevels[idx] = true;
+
+  // 判断是否解锁奖品（步数在限定内）
+  const threshold = parseInt(document.getElementById(`thresh${idx}`).value) || 9999;
+  const prizeName = document.getElementById(`prize${idx}`).value || '奖品';
+  const prizeIcons = ['🎁','🎀','🏆','💎','👑'];
+  const gotPrize = steps <= threshold;
+  if (gotPrize) unlockedPrizes[idx] = true;
+
+  // 追加通关记录
+  clearRecords.unshift({
+    level: idx,
+    steps: steps,
+    time: new Date().toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'}),
+    gotPrize,
+  });
+  if (clearRecords.length > 8) clearRecords.pop();
+
+  // 关卡按钮标绿
+  document.getElementById(`lvBtn${idx}`).classList.add('cleared');
+
+  updateStats();
+  renderRightPanel();
+
+  // 触发通关特效
+  spawnConfetti();
+
+  // 显示通关覆盖层
+  const overlay = document.getElementById('overlayWin');
+  overlay.classList.remove('hidden');
+  const winSub = document.getElementById('winSubText');
+  winSub.textContent = `用了 ${steps} 步完成${LEVELS[idx].name}！${isNewBest ? ' 🏆 新纪录！' : ''}`;
+
+  const prizeBox = document.getElementById('winPrizeBox');
+  const prizeNameEl = document.getElementById('winPrizeName');
+  if (gotPrize) {
+    prizeBox.classList.remove('hidden');
+    prizeNameEl.textContent = `解锁奖品：${prizeName}`;
+    showNotify(`🎉 通关！解锁 ${prizeName}`);
+  } else {
+    prizeBox.classList.add('hidden');
+    showNotify(`✅ 通关！用了 ${steps} 步（限定 ${threshold} 步内可解锁奖品）`);
+  }
+
+  updateFooter(`通关！${steps} 步`);
+}
+
+/* ─────────────────────────────────────────────
+   渲染游戏网格
+───────────────────────────────────────────── */
+function renderGrid() {
+  if (!gameState) return;
+  const lv = LEVELS[currentLevelIdx];
+  const grid = document.getElementById('sokobanGrid');
+
+  // 动态计算格子大小，适配容器
+  const maxW = 580; // 中间区域可用宽度
+  const cellSize = Math.min(52, Math.floor(maxW / lv.size));
+
+  grid.style.gridTemplateColumns = `repeat(${lv.size}, ${cellSize}px)`;
+  grid.innerHTML = '';
+
+  for (let r = 0; r < lv.size; r++) {
+    for (let c = 0; c < lv.size; c++) {
+      const val = gameState[r][c];
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.style.width  = cellSize + 'px';
+      cell.style.height = cellSize + 'px';
+
+      switch (val) {
+        case FLOOR:
+          cell.classList.add('cell-floor');
+          break;
+
+        case WALL:
+          cell.classList.add('cell-wall');
+          break;
+
+        case TARGET:
+          cell.classList.add('cell-target');
+          break;
+
+        case BOX:
+          cell.classList.add('cell-box');
+          cell.innerHTML = `<div class="box-sprite">📦</div>`;
+          break;
+
+        case BOX_ON:
+          cell.classList.add('box-on-target');
+          cell.innerHTML = `<div class="box-sprite">✅</div>`;
+          break;
+
+        case PLAYER:
+          cell.classList.add('cell-player');
+          cell.innerHTML = `
+            <div class="player-sprite">
+              <div class="player-head"></div>
+              <div class="player-body"></div>
+              <div class="player-legs">
+                <div class="player-leg"></div>
+                <div class="player-leg"></div>
+              </div>
+            </div>`;
+          break;
+
+        case PLY_ON:
+          cell.classList.add('cell-player-on-target');
+          cell.innerHTML = `
+            <div class="player-sprite">
+              <div class="player-head"></div>
+              <div class="player-body"></div>
+              <div class="player-legs">
+                <div class="player-leg"></div>
+                <div class="player-leg"></div>
+              </div>
+            </div>`;
+          break;
+
+        default:
+          cell.classList.add('cell-floor');
+      }
+      grid.appendChild(cell);
+    }
+  }
+
+  // 更新完成箱子数
+  let doneCount = 0;
+  const totalBoxes = LEVELS[currentLevelIdx].boxes;
+  for (let r = 0; r < lv.size; r++) {
+    for (let c = 0; c < lv.size; c++) {
+      if (gameState[r][c] === BOX_ON) doneCount++;
+    }
+  }
+  document.getElementById('statBoxDone').textContent = `${doneCount}/${totalBoxes}`;
+}
+
+/* ─────────────────────────────────────────────
+   更新顶部统计数字
+───────────────────────────────────────────── */
+function updateStats() {
+  const limit = parseInt(document.getElementById('undoLimit').value);
+  const undoLeft = limit === 0 ? '∞' : Math.max(0, limit - undoUsed);
+  document.getElementById('statSteps').textContent   = steps;
+  document.getElementById('statUndoLeft').textContent = undoLeft;
+  document.getElementById('statLevel').textContent   = currentLevelIdx + 1;
+
+  // 步数进度条
+  const thresh = parseInt(document.getElementById(`thresh${currentLevelIdx}`).value) || 9999;
+  const pct = Math.min(100, Math.round(steps / thresh * 100));
+  document.getElementById('stepsBarFill').style.width = pct + '%';
+  document.getElementById('stepsBarText').textContent = `${steps} / ${thresh} 步（限定奖品步数）`;
+  // 进度条超出变红
+  const fill = document.getElementById('stepsBarFill');
+  if (pct >= 100) {
+    fill.style.background = 'linear-gradient(90deg, #EF4444, #DC2626)';
+  } else {
+    fill.style.background = 'linear-gradient(90deg, var(--accent), var(--accent2))';
+  }
+
+  // 撤销按钮禁用状态
+  const btnUndo = document.getElementById('btnUndo');
+  if (limit > 0 && undoUsed >= limit) {
+    btnUndo.disabled = true;
+  } else {
+    btnUndo.disabled = !gameActive || history.length === 0;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   渲染右侧数据面板
+───────────────────────────────────────────── */
+function renderRightPanel() {
+  const names = ['新手关','简单关','中等关','困难关','高手关'];
+  const icons = ['🌱','😊','🔥','💎','👑'];
+
+  // 历史最少步数
+  const bestList = document.getElementById('bestStepsList');
+  bestList.innerHTML = names.map((name, i) => `
+    <div class="record-item">
+      <div class="record-rank ${i === currentLevelIdx ? 'gold' : ''}">${i+1}</div>
+      <div class="record-info">
+        <div class="record-name">${icons[i]} ${name}</div>
+        <div class="record-detail">${clearedLevels[i] ? '已通关' : '未通关'}</div>
+      </div>
+      <div class="record-steps">
+        ${bestSteps[i] === Infinity ? '—' : bestSteps[i] + ' 步'}
+      </div>
+    </div>
+  `).join('');
+
+  // 通关记录
+  const recList = document.getElementById('clearRecordList');
+  if (clearRecords.length === 0) {
+    recList.innerHTML = '<div style="color:var(--muted); font-size:13px;">暂无通关记录</div>';
+  } else {
+    recList.innerHTML = clearRecords.map((rec, i) => `
+      <div class="record-item">
+        <div class="record-rank ${i === 0 ? 'gold' : ''}">${i+1}</div>
+        <div class="record-info">
+          <div class="record-name">${icons[rec.level]} ${names[rec.level]}</div>
+          <div class="record-detail">${rec.time}${rec.gotPrize ? ' · 解锁奖品🎁' : ''}</div>
+        </div>
+        <div class="record-steps">${rec.steps} 步</div>
+      </div>
+    `).join('');
+  }
+
+  // 奖品解锁列表
+  const prizeListEl = document.getElementById('prizeUnlockList');
+  prizeListEl.innerHTML = names.map((name, i) => {
+    const thresh = parseInt(document.getElementById(`thresh${i}`).value) || 9999;
+    const prizeName = document.getElementById(`prize${i}`).value || '奖品';
+    const prizeIcons2 = ['🎁','🎀','🏆','💎','👑'];
+    const unlocked = unlockedPrizes[i];
+    return `
+      <div class="prize-unlock-item ${unlocked ? 'unlocked' : ''}">
+        <div class="prize-unlock-icon">${prizeIcons2[i]}</div>
+        <div class="prize-unlock-info">
+          <div class="prize-unlock-name">${prizeName}</div>
+          <div class="prize-unlock-cond">${name} · ${thresh} 步内通关</div>
+        </div>
+        <div class="prize-unlock-status ${unlocked ? 'done' : ''}">
+          ${unlocked ? '已解锁' : '未解锁'}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ─────────────────────────────────────────────
+   通关粒子特效
+───────────────────────────────────────────── */
+function spawnConfetti() {
+  const wrap = document.getElementById('confettiWrap');
+  wrap.innerHTML = '';
+  const colors = ['#F5C842','#7C3AED','#EC4899','#22C55E','#60A5FA','#F97316'];
+  for (let i = 0; i < 30; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'confetti-dot';
+    dot.style.left   = Math.random() * 100 + '%';
+    dot.style.top    = -10 + 'px';
+    dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+    dot.style.animationDelay = Math.random() * 0.8 + 's';
+    dot.style.animationDuration = (0.8 + Math.random() * 0.6) + 's';
+    dot.style.transform = `rotate(${Math.random()*360}deg)`;
+    wrap.appendChild(dot);
+  }
+  setTimeout(() => { wrap.innerHTML = ''; }, 2500);
+}
+
+/* ─────────────────────────────────────────────
+   通知气泡
+───────────────────────────────────────────── */
+let notifyTimer = null;
+function showNotify(msg) {
+  const el = document.getElementById('notifyBubble');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(notifyTimer);
+  notifyTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+/* ─────────────────────────────────────────────
+   底部状态
+───────────────────────────────────────────── */
+function updateFooter(text) {
+  document.getElementById('footerStatus').textContent = text;
+}
+
+/* ─────────────────────────────────────────────
+   键盘事件监听
+───────────────────────────────────────────── */
+document.addEventListener('keydown', function(e) {
+  if (!gameActive) {
+    // 空格或 Enter 开始游戏
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      startGame();
+    }
+    return;
+  }
+
+  switch (e.key) {
+    case 'ArrowUp':    case 'w': case 'W': e.preventDefault(); move(-1,  0); break;
+    case 'ArrowDown':  case 's': case 'S': e.preventDefault(); move( 1,  0); break;
+    case 'ArrowLeft':  case 'a': case 'A': e.preventDefault(); move( 0, -1); break;
+    case 'ArrowRight': case 'd': case 'D': e.preventDefault(); move( 0,  1); break;
+    case 'z': case 'Z': e.preventDefault(); undoMove(); break;
+    case 'r': case 'R': e.preventDefault(); restartLevel(); break;
+  }
+});
+
+/* ─────────────────────────────────────────────
+   撤销上限滑块同步更新显示
+───────────────────────────────────────────── */
+document.getElementById('undoLimit').addEventListener('input', function() {
+  document.getElementById('undoLimitVal').textContent = this.value;
+  updateStats();
+});
+
+/* ─────────────────────────────────────────────
+   奖品配置变更时刷新右侧面板
+───────────────────────────────────────────── */
+for (let i = 0; i < 5; i++) {
+  document.getElementById(`thresh${i}`).addEventListener('input', () => {
+    renderRightPanel();
+    updateStats();
+  });
+  document.getElementById(`prize${i}`).addEventListener('input', () => {
+    renderRightPanel();
+  });
+}
+
+/* ─────────────────────────────────────────────
+   初始化页面
+───────────────────────────────────────────── */
+(function init() {
+  selectLevel(0);
+  renderRightPanel();
+  // 渲染一个空白地图预览
+  const lv = LEVELS[0];
+  gameState = deepCopyMap(lv.map);
+  const [pr, pc] = lv.playerStart;
+  gameState[pr][pc] = PLAYER;
+  renderGrid();
+  updateStats();
+})();
+</script>
+
+</body>
+</html>
