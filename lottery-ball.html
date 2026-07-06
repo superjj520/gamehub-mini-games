@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 号码球抽奖</title>
+<style>
+  /* ===== 全局重置 & CSS变量 ===== */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold:    #F5C842;
+    --bg:      #0D0720;
+    --accent:  #7C3AED;
+    --accent2: #EC4899;
+    --deep:    #1A0A2E;
+    --card:    rgba(255,255,255,0.05);
+    --border:  rgba(255,255,255,0.1);
+    --text:    #F0EAF8;
+    --muted:   rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== 导航栏 ===== */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.96);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 200;
+    height: 56px;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 16px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: var(--text);
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-logo .badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 2px 8px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  /* 导航链接横向滚动区 */
+  .nav-scroll {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    flex: 1;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-scroll::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 6px 14px; border-radius: 8px;
+    font-size: 13px; cursor: pointer; white-space: nowrap;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center; flex-shrink: 0;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); font-weight: 600; }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  /* ===== 三列主布局 ===== */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    flex: 1;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+  }
+
+  /* ===== 左侧配置面板 ===== */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .panel-left::-webkit-scrollbar { width: 4px; }
+  .panel-left::-webkit-scrollbar-track { background: transparent; }
+  .panel-left::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .panel-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.2px; margin-bottom: 14px;
+  }
+  /* 配置卡片 */
+  .cfg-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .cfg-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .cfg-title .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--gold); flex-shrink: 0;
+  }
+  /* 配置行 */
+  .cfg-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 13px; gap: 12px;
+  }
+  .cfg-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .cfg-label { color: var(--muted); flex-shrink: 0; }
+  /* 文本输入框 */
+  .cfg-input {
+    background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+    border-radius: 7px; padding: 5px 10px; color: var(--text);
+    font-size: 13px; width: 90px; text-align: center; outline: none;
+    font-family: inherit;
+  }
+  .cfg-input:focus { border-color: var(--accent); }
+  /* 拨轮数字 */
+  .cfg-num {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .cfg-num-btn {
+    width: 26px; height: 26px; border-radius: 6px;
+    background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+    color: var(--text); cursor: pointer; font-size: 16px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s; flex-shrink: 0;
+    font-family: inherit;
+  }
+  .cfg-num-btn:hover { background: rgba(124,58,237,0.3); border-color: var(--accent); }
+  .cfg-num-val {
+    min-width: 34px; text-align: center;
+    font-size: 16px; font-weight: 700; color: var(--gold);
+  }
+  /* 拨码开关 */
+  .toggle {
+    width: 38px; height: 22px; background: rgba(255,255,255,0.12);
+    border-radius: 11px; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle::after {
+    content: ''; position: absolute;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: white; top: 2px; left: 2px; transition: transform 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  }
+  .toggle.on::after { transform: translateX(16px); }
+  /* 号码范围选择 */
+  .range-opts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .range-opt {
+    padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer;
+    border: 1px solid var(--border); color: var(--muted);
+    background: transparent; transition: all 0.15s; font-family: inherit;
+  }
+  .range-opt.active {
+    border-color: var(--accent); color: var(--text);
+    background: rgba(124,58,237,0.2);
+  }
+  /* 颜色主题选择 */
+  .color-themes { display: flex; gap: 8px; margin-top: 4px; }
+  .color-theme {
+    width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+    border: 2px solid transparent; transition: transform 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+  }
+  .color-theme.active { border-color: white; transform: scale(1.15); }
+  /* 奖品配置 */
+  .prize-cfg { display: flex; flex-direction: column; gap: 8px; }
+  .prize-cfg-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .prize-cfg-row .prize-dot {
+    width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+  }
+  .prize-cfg-row input {
+    flex: 1; background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 8px; color: var(--text); font-size: 12px;
+    outline: none; font-family: inherit;
+  }
+  .prize-cfg-row input:focus { border-color: var(--accent); }
+  .prize-cfg-row .prize-range {
+    width: 70px; text-align: center;
+  }
+  /* 按钮 */
+  .btn-primary {
+    width: 100%; padding: 12px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: white; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+    letter-spacing: 0.5px;
+  }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,58,237,0.4); }
+  .btn-primary:active:not(:disabled) { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary {
+    width: 100%; padding: 10px; border-radius: 10px;
+    background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+    color: var(--muted); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+    margin-top: 8px;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+
+  /* ===== 中间游戏区 ===== */
+  .game-center {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 28px 24px 20px;
+    position: relative; overflow: hidden;
+    background: var(--bg);
+  }
+  /* 背景光晕 */
+  .game-center::before {
+    content: ''; position: absolute;
+    width: 560px; height: 560px;
+    background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+    top: 40%; left: 50%; transform: translate(-50%, -50%);
+    pointer-events: none; z-index: 0;
+  }
+  .game-center > * { position: relative; z-index: 1; }
+
+  /* 标题 */
+  .game-header { text-align: center; margin-bottom: 24px; }
+  .game-name {
+    font-size: 26px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .game-sub { color: var(--muted); font-size: 13px; margin-top: 5px; }
+
+  /* ===== 摇号机球仓 ===== */
+  .machine-wrap {
+    position: relative;
+    width: 320px; height: 320px;
+    flex-shrink: 0;
+    margin-bottom: 20px;
+  }
+  /* 球仓外圈光晕 */
+  .machine-glow {
+    position: absolute; inset: -16px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,200,66,0.18), transparent 68%);
+    animation: glow-pulse 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes glow-pulse {
+    0%,100% { opacity: 0.6; transform: scale(1); }
+    50%      { opacity: 1;   transform: scale(1.04); }
+  }
+  /* 球仓容器 */
+  .machine-body {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    border: 3px solid rgba(245,200,66,0.5);
+    background: radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.07) 0%, rgba(13,7,32,0.85) 60%);
+    backdrop-filter: blur(2px);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.06),
+      inset 0 0 60px rgba(124,58,237,0.15),
+      0 8px 40px rgba(0,0,0,0.6);
+    overflow: hidden;
+    /* 摇号时添加 spinning 类 */
+    transition: border-color 0.3s;
+  }
+  .machine-body.spinning {
+    border-color: rgba(245,200,66,0.9);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.12),
+      inset 0 0 80px rgba(124,58,237,0.3),
+      0 8px 60px rgba(245,200,66,0.25);
+    animation: machine-shake 0.08s ease-in-out infinite;
+  }
+  @keyframes machine-shake {
+    0%   { transform: rotate(-0.5deg); }
+    50%  { transform: rotate(0.5deg); }
+    100% { transform: rotate(-0.5deg); }
+  }
+  /* 玻璃高光 */
+  .machine-shine {
+    position: absolute; top: 12%; left: 16%;
+    width: 42%; height: 36%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 40% 35%, rgba(255,255,255,0.18), transparent 70%);
+    pointer-events: none; z-index: 10;
+  }
+  /* 球仓底部出球口 */
+  .machine-outlet {
+    position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%);
+    width: 52px; height: 26px;
+    background: linear-gradient(180deg, rgba(245,200,66,0.3), rgba(245,200,66,0.7));
+    border-radius: 26px 26px 0 0;
+    border: 2px solid rgba(245,200,66,0.8);
+    border-bottom: none;
+    z-index: 12;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: rgba(245,200,66,0.9); font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  /* 球仓内彩色号码球 */
+  .ball-in-machine {
+    position: absolute;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    box-shadow: inset -3px -3px 6px rgba(0,0,0,0.3), inset 3px 3px 6px rgba(255,255,255,0.2);
+    cursor: default; user-select: none;
+    will-change: transform;
+  }
+  /* 球的浮动动画 — 每个球有独立随机路径 */
+  @keyframes float-0  { 0%{transform:translate(0,0) rotate(0deg)}   33%{transform:translate(28px,-32px) rotate(120deg)}  66%{transform:translate(-22px,18px) rotate(240deg)}  100%{transform:translate(0,0) rotate(360deg)} }
+  @keyframes float-1  { 0%{transform:translate(0,0) rotate(0deg)}   33%{transform:translate(-30px,20px) rotate(130deg)}  66%{transform:translate(24px,-25px) rotate(260deg)} 100%{transform:translate(0,0) rotate(360deg)} }
+  @keyframes float-2  { 0%{transform:translate(0,0) rotate(0deg)}   33%{transform:translate(18px,30px) rotate(100deg)}   66%{transform:translate(-28px,-20px) rotate(220deg)} 100%{transform:translate(0,0) rotate(360deg)} }
+  @keyframes float-3  { 0%{transform:translate(0,0) rotate(0deg)}   33%{transform:translate(-20px,-28px) rotate(115deg)} 66%{transform:translate(30px,22px) rotate(250deg)}  100%{transform:translate(0,0) rotate(360deg)} }
+  @keyframes float-4  { 0%{transform:translate(0,0) rotate(0deg)}   33%{transform:translate(26px,16px) rotate(140deg)}   66%{transform:translate(-18px,-30px) rotate(270deg)} 100%{transform:translate(0,0) rotate(360deg)} }
+  @keyframes float-5  { 0%{transform:translate(0,0) rotate(0deg)}   33%{transform:translate(-24px,26px) rotate(95deg)}   66%{transform:translate(20px,-16px) rotate(210deg)}  100%{transform:translate(0,0) rotate(360deg)} }
+  @keyframes float-6  { 0%{transform:translate(0,0) rotate(0deg)}   33%{transform:translate(32px,-18px) rotate(160deg)}  66%{transform:translate(-26px,28px) rotate(300deg)}  100%{transform:translate(0,0) rotate(360deg)} }
+  @keyframes float-7  { 0%{transform:translate(0,0) rotate(0deg)}   33%{transform:translate(-16px,-32px) rotate(125deg)} 66%{transform:translate(22px,20px) rotate(260deg)}   100%{transform:translate(0,0) rotate(360deg)} }
+  @keyframes float-8  { 0%{transform:translate(0,0) rotate(0deg)}   33%{transform:translate(14px,34px) rotate(110deg)}   66%{transform:translate(-32px,-14px) rotate(240deg)}  100%{transform:translate(0,0) rotate(360deg)} }
+  @keyframes float-9  { 0%{transform:translate(0,0) rotate(0deg)}   33%{transform:translate(-28px,14px) rotate(145deg)}  66%{transform:translate(18px,-32px) rotate(280deg)}  100%{transform:translate(0,0) rotate(360deg)} }
+  @keyframes float-10 { 0%{transform:translate(0,0) rotate(0deg)}   33%{transform:translate(22px,-24px) rotate(105deg)}  66%{transform:translate(-20px,30px) rotate(230deg)}  100%{transform:translate(0,0) rotate(360deg)} }
+  @keyframes float-11 { 0%{transform:translate(0,0) rotate(0deg)}   33%{transform:translate(-34px,10px) rotate(135deg)}  66%{transform:translate(16px,-28px) rotate(270deg)}  100%{transform:translate(0,0) rotate(360deg)} }
+
+  /* 摇号加速时球运动更快 */
+  .machine-body.spinning .ball-in-machine {
+    animation-duration: 0.45s !important;
+  }
+
+  /* ===== 出球动画 — 球从球仓弹出飞落到托盘 ===== */
+  @keyframes ball-fly-out {
+    0%   { transform: translateY(0) scale(1.1); opacity: 1; }
+    40%  { transform: translateY(60px) scale(1.15); opacity: 1; }
+    70%  { transform: translateY(110px) scale(1.05); opacity: 1; }
+    100% { transform: translateY(160px) scale(1); opacity: 0; }
+  }
+  .flying-ball {
+    position: absolute;
+    bottom: 12px; left: 50%; transform: translateX(-50%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 800; color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    animation: ball-fly-out 0.5s ease-in forwards;
+    z-index: 20; pointer-events: none;
+  }
+
+  /* ===== 大号当前球展示 ===== */
+  .current-ball-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    margin-bottom: 18px; min-height: 70px; justify-content: center;
+  }
+  .current-ball {
+    width: 70px; height: 70px; border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 900; color: white;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    box-shadow:
+      inset -4px -4px 8px rgba(0,0,0,0.35),
+      inset 4px 4px 10px rgba(255,255,255,0.25),
+      0 8px 28px rgba(0,0,0,0.5);
+    animation: ball-pop-in 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both;
+    position: relative;
+  }
+  .current-ball::after {
+    content: ''; position: absolute;
+    top: 14%; left: 20%; width: 35%; height: 28%;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.4), transparent 70%);
+    border-radius: 50%;
+  }
+  .current-ball-label {
+    font-size: 12px; color: var(--muted); margin-top: 8px; letter-spacing: 0.5px;
+  }
+  @keyframes ball-pop-in {
+    from { transform: scale(0.5) translateY(-20px); opacity: 0; }
+    to   { transform: scale(1) translateY(0);       opacity: 1; }
+  }
+  /* 空状态提示 */
+  .current-ball-placeholder {
+    width: 70px; height: 70px; border-radius: 50%;
+    border: 2px dashed var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; opacity: 0.35;
+  }
+
+  /* ===== 托盘 — 已抽出号码展示 ===== */
+  .tray-wrap {
+    width: 100%; max-width: 520px;
+  }
+  .tray-label {
+    font-size: 12px; color: var(--muted); margin-bottom: 10px; text-align: center; letter-spacing: 0.5px;
+  }
+  .tray {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    justify-content: center;
+    min-height: 54px;
+    padding: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+  }
+  .tray-ball {
+    width: 46px; height: 46px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 800; color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    box-shadow:
+      inset -3px -3px 6px rgba(0,0,0,0.3),
+      inset 3px 3px 8px rgba(255,255,255,0.2),
+      0 4px 14px rgba(0,0,0,0.3);
+    position: relative; cursor: default; user-select: none;
+    animation: tray-bounce-in 0.45s cubic-bezier(0.175,0.885,0.32,1.275) both;
+  }
+  .tray-ball::after {
+    content: ''; position: absolute;
+    top: 12%; left: 18%; width: 32%; height: 26%;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.4), transparent 70%);
+    border-radius: 50%;
+  }
+  @keyframes tray-bounce-in {
+    from { transform: scale(0.3) translateY(-16px); opacity: 0; }
+    to   { transform: scale(1) translateY(0);       opacity: 1; }
+  }
+  .tray-empty { color: var(--muted); font-size: 13px; width: 100%; text-align: center; padding: 6px 0; }
+
+  /* ===== 操作按钮区 ===== */
+  .action-bar {
+    display: flex; gap: 12px; margin-top: 22px; align-items: center;
+  }
+  .start-btn {
+    min-width: 140px; padding: 13px 28px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: white; font-size: 16px; font-weight: 800;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .start-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(124,58,237,0.5);
+  }
+  .start-btn:active:not(:disabled) { transform: translateY(0); }
+  .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .start-btn .ball-icon {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(255,255,255,0.3); display: flex;
+    align-items: center; justify-content: center; font-size: 12px;
+    flex-shrink: 0;
+  }
+  .clear-btn {
+    padding: 13px 20px; border-radius: 12px;
+    background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+    color: var(--muted); font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+  }
+  .clear-btn:hover { background: rgba(255,255,255,0.13); color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  /* 大屏模式按钮 */
+  .bigscreen-btn {
+    padding: 13px 18px; border-radius: 12px;
+    background: rgba(245,200,66,0.1); border: 1px solid rgba(245,200,66,0.3);
+    color: var(--gold); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .bigscreen-btn:hover { background: rgba(245,200,66,0.18); border-color: rgba(245,200,66,0.6); }
+
+  /* ===== 底部信息栏 ===== */
+  .game-footer {
+    position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; color: var(--muted); white-space: nowrap;
+    pointer-events: none; letter-spacing: 0.5px;
+  }
+
+  /* ===== 右侧数据面板 ===== */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .panel-right::-webkit-scrollbar { width: 4px; }
+  .panel-right::-webkit-scrollbar-track { background: transparent; }
+  .panel-right::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* 数据卡片 */
+  .data-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .data-title {
+    font-size: 11px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;
+  }
+  /* 统计数字 */
+  .stat-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--muted); }
+  .stat-val { font-weight: 700; color: var(--gold); font-size: 16px; }
+  .stat-val.green { color: #4ade80; }
+  .stat-val.pink  { color: var(--accent2); }
+
+  /* 已抽号码小列表 */
+  .result-list { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; }
+  .result-list::-webkit-scrollbar { width: 3px; }
+  .result-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .result-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    font-size: 13px;
+  }
+  .result-ball-sm {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; color: white;
+    box-shadow: inset -2px -2px 4px rgba(0,0,0,0.3), inset 2px 2px 5px rgba(255,255,255,0.18);
+  }
+  .result-info { flex: 1; }
+  .result-num { font-weight: 700; }
+  .result-prize { font-size: 11px; color: var(--muted); }
+  .result-order { font-size: 11px; color: var(--muted); }
+
+  /* 奖品分配 */
+  .prize-stat { display: flex; flex-direction: column; gap: 6px; }
+  .prize-stat-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    font-size: 12px;
+  }
+  .prize-stat-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .prize-stat-name { flex: 1; }
+  .prize-stat-cnt { color: var(--gold); font-weight: 700; }
+
+  /* 历史记录 */
+  .history-list { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
+  .history-list::-webkit-scrollbar { width: 3px; }
+  .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .history-item {
+    padding: 8px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .history-time { color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+  .history-balls { display: flex; gap: 5px; flex-wrap: wrap; }
+  .history-ball-mini {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: white;
+  }
+
+  /* ===== 大屏模式遮罩 ===== */
+  .bigscreen-overlay {
+    position: fixed; inset: 0;
+    background: rgba(5,2,16,0.97);
+    z-index: 999;
+    display: none;
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 32px;
+  }
+  .bigscreen-overlay.show { display: flex; }
+  .bigscreen-title {
+    font-size: 36px; font-weight: 900;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+  }
+  .bigscreen-ball {
+    width: 200px; height: 200px; border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 80px; font-weight: 900; color: white;
+    text-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    box-shadow:
+      inset -10px -10px 20px rgba(0,0,0,0.35),
+      inset 10px 10px 24px rgba(255,255,255,0.25),
+      0 20px 80px rgba(0,0,0,0.6);
+    animation: bigscreen-pop 0.6s cubic-bezier(0.175,0.885,0.32,1.275) both;
+    position: relative;
+  }
+  .bigscreen-ball::after {
+    content: ''; position: absolute;
+    top: 12%; left: 18%; width: 32%; height: 26%;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.45), transparent 70%);
+    border-radius: 50%;
+  }
+  @keyframes bigscreen-pop {
+    from { transform: scale(0.2) rotate(-15deg); opacity: 0; }
+    to   { transform: scale(1) rotate(0deg);    opacity: 1; }
+  }
+  .bigscreen-prize {
+    font-size: 28px; font-weight: 700; color: var(--gold);
+    letter-spacing: 2px; animation: fade-up 0.5s 0.3s both;
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .bigscreen-close {
+    position: absolute; top: 24px; right: 32px;
+    font-size: 16px; color: var(--muted); cursor: pointer;
+    padding: 8px 16px; border-radius: 8px;
+    background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+    transition: all 0.2s; font-family: inherit;
+  }
+  .bigscreen-close:hover { background: rgba(255,255,255,0.14); color: var(--text); }
+  .bigscreen-tray {
+    display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; max-width: 800px;
+  }
+  .bigscreen-tray-ball {
+    width: 60px; height: 60px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800; color: white;
+    box-shadow: inset -3px -3px 8px rgba(0,0,0,0.3), inset 3px 3px 10px rgba(255,255,255,0.2), 0 4px 16px rgba(0,0,0,0.4);
+  }
+
+  /* ===== 响应式修复 ===== */
+  @media (max-width: 1100px) {
+    .main { grid-template-columns: 320px 1fr 240px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 导航栏 ===== -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    🎮 <span>GameHub</span> <em class="badge">中台</em>
+  </a>
+  <div class="nav-scroll">
+    <a href="index.html"           class="nav-tab">🏠 首页</a>
+    <a href="wheel.html"           class="nav-tab">🎡 大转盘</a>
+    <a href="lottery-ball.html"    class="nav-tab active">🔮 号码球抽奖</a>
+    <a href="lucky-number.html"    class="nav-tab">🔢 幸运数字</a>
+    <a href="nine-grid.html"       class="nav-tab">🔲 九宫格</a>
+    <a href="slot-machine.html"    class="nav-tab">🎰 老虎机</a>
+    <a href="scratch-card.html"    class="nav-tab">🎟️ 刮刮乐</a>
+    <a href="blind-box.html"       class="nav-tab">📦 盲盒</a>
+    <a href="gashapon.html"        class="nav-tab">🥚 扭蛋机</a>
+    <a href="shake-dice.html"      class="nav-tab">🎲 摇骰子</a>
+    <a href="red-packet-rain.html" class="nav-tab">🧧 红包雨</a>
+    <a href="gift-box.html"        class="nav-tab">🎁 礼盒</a>
+    <a href="smash-egg.html"       class="nav-tab">🥚 砸金蛋</a>
+    <a href="number-bomb.html"     class="nav-tab">💣 数字炸弹</a>
+    <a href="flip-match.html"      class="nav-tab">🃏 翻牌对对碰</a>
+    <a href="quiz.html"            class="nav-tab">❓ 答题</a>
+    <a href="vote-pk.html"         class="nav-tab">⚡ 投票PK</a>
+    <a href="shake.html"           class="nav-tab">📱 摇一摇</a>
+    <a href="personality-test.html" class="nav-tab">🧠 性格测试</a>
+  </div>
+</nav>
+
+<!-- ===== 三列主布局 ===== -->
+<div class="main">
+
+  <!-- ========== 左侧配置面板 ========== -->
+  <div class="panel-left">
+    <div class="panel-title">配置面板</div>
+
+    <!-- 号码范围 -->
+    <div class="cfg-card">
+      <div class="cfg-title"><span class="dot"></span>号码范围</div>
+      <div class="cfg-row">
+        <span class="cfg-label">快捷选择</span>
+        <div class="range-opts">
+          <button class="range-opt active" onclick="setRange(1,50,this)">1-50</button>
+          <button class="range-opt"        onclick="setRange(1,100,this)">1-100</button>
+          <button class="range-opt"        onclick="setRange(1,200,this)">1-200</button>
+        </div>
+      </div>
+      <div class="cfg-row">
+        <span class="cfg-label">最小号码</span>
+        <input class="cfg-input" id="rangeMin" type="number" min="1" max="999" value="1" onchange="updatePool()">
+      </div>
+      <div class="cfg-row">
+        <span class="cfg-label">最大号码</span>
+        <input class="cfg-input" id="rangeMax" type="number" min="1" max="999" value="50" onchange="updatePool()">
+      </div>
+    </div>
+
+    <!-- 抽取设置 -->
+    <div class="cfg-card">
+      <div class="cfg-title"><span class="dot"></span>抽取设置</div>
+      <div class="cfg-row">
+        <span class="cfg-label">抽取数量</span>
+        <div class="cfg-num">
+          <button class="cfg-num-btn" onclick="changeCount(-1)">−</button>
+          <span class="cfg-num-val" id="countVal">5</span>
+          <button class="cfg-num-btn" onclick="changeCount(1)">+</button>
+        </div>
+      </div>
+      <div class="cfg-row">
+        <span class="cfg-label">号码不重复</span>
+        <div class="toggle on" id="noRepeatToggle" onclick="toggleNoRepeat(this)"></div>
+      </div>
+      <div class="cfg-row">
+        <span class="cfg-label">弹出间隔(ms)</span>
+        <input class="cfg-input" id="intervalVal" type="number" min="200" max="3000" step="100" value="600">
+      </div>
+    </div>
+
+    <!-- 球颜色主题 -->
+    <div class="cfg-card">
+      <div class="cfg-title"><span class="dot"></span>球颜色主题</div>
+      <div class="cfg-row">
+        <span class="cfg-label">颜色方案</span>
+        <div class="color-themes" id="colorThemes">
+          <!-- 动态生成 -->
+        </div>
+      </div>
+      <div class="cfg-row">
+        <span class="cfg-label">球仓内球数</span>
+        <div class="cfg-num">
+          <button class="cfg-num-btn" onclick="changeBallCount(-1)">−</button>
+          <span class="cfg-num-val" id="ballCountVal">14</span>
+          <button class="cfg-num-btn" onclick="changeBallCount(1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 奖品配置 -->
+    <div class="cfg-card">
+      <div class="cfg-title"><span class="dot"></span>奖品配置（按抽出顺序）</div>
+      <div class="prize-cfg" id="prizeCfg">
+        <!-- 动态生成 -->
+      </div>
+      <button class="btn-secondary" onclick="addPrize()" style="margin-top:10px">＋ 添加奖品</button>
+    </div>
+
+    <!-- 操作区 -->
+    <button class="btn-primary" id="leftStartBtn" onclick="handleStart()">开始摇号</button>
+    <button class="btn-secondary" onclick="handleClear()">清空重来</button>
+  </div>
+
+  <!-- ========== 中间游戏区 ========== -->
+  <div class="game-center">
+    <!-- 游戏标题 -->
+    <div class="game-header">
+      <div class="game-name">🔮 号码球抽奖</div>
+      <div class="game-sub">摇号机风格 · 去重抽取 · 大屏展示</div>
+    </div>
+
+    <!-- 摇号机主体 -->
+    <div class="machine-wrap">
+      <div class="machine-glow"></div>
+      <div class="machine-body" id="machineBody">
+        <!-- 球仓内彩色球 — JS动态生成 -->
+        <div class="machine-shine"></div>
+        <div class="machine-outlet" id="machineOutlet">出球</div>
+      </div>
+    </div>
+
+    <!-- 当前弹出号码大展示 -->
+    <div class="current-ball-wrap" id="currentBallWrap">
+      <div class="current-ball-placeholder">🎱</div>
+      <div class="current-ball-label" id="currentBallLabel">等待摇号...</div>
+    </div>
+
+    <!-- 已抽出号码托盘 -->
+    <div class="tray-wrap">
+      <div class="tray-label">📌 已抽出号码</div>
+      <div class="tray" id="tray">
+        <div class="tray-empty" id="trayEmpty">号码球将依次落入此处...</div>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="action-bar">
+      <button class="start-btn" id="mainStartBtn" onclick="handleStart()">
+        <div class="ball-icon">🎱</div>
+        <span id="startBtnText">开始摇号</span>
+      </button>
+      <button class="clear-btn" onclick="handleClear()">清空重来</button>
+      <button class="bigscreen-btn" onclick="enterBigScreen()">
+        ⛶ 大屏模式
+      </button>
+    </div>
+
+    <!-- 底部说明 -->
+    <div class="game-footer">摇号机视觉 · 去重抽取 | 大屏展示模式</div>
+  </div>
+
+  <!-- ========== 右侧数据面板 ========== -->
+  <div class="panel-right">
+    <div class="panel-title">数据面板</div>
+
+    <!-- 实时统计 -->
+    <div class="data-card">
+      <div class="data-title">本次统计</div>
+      <div class="stat-row">
+        <span class="stat-label">总号码池</span>
+        <span class="stat-val" id="statTotal">50</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">已抽出</span>
+        <span class="stat-val pink" id="statDrawn">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">剩余未抽</span>
+        <span class="stat-val green" id="statRemain">50</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">目标数量</span>
+        <span class="stat-val" id="statTarget">5</span>
+      </div>
+    </div>
+
+    <!-- 已抽号码列表 -->
+    <div class="data-card">
+      <div class="data-title">已抽号码</div>
+      <div class="result-list" id="resultList">
+        <div style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">暂无记录</div>
+      </div>
+    </div>
+
+    <!-- 奖品分配 -->
+    <div class="data-card">
+      <div class="data-title">奖品分配</div>
+      <div class="prize-stat" id="prizeStat">
+        <div style="color:var(--muted);font-size:12px;text-align:center;padding:6px 0">等待开始</div>
+      </div>
+    </div>
+
+    <!-- 历史记录 -->
+    <div class="data-card">
+      <div class="data-title">历史记录</div>
+      <div class="history-list" id="historyList">
+        <div style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">暂无历史</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.main -->
+
+<!-- ========== 大屏模式遮罩 ========== -->
+<div class="bigscreen-overlay" id="bigscreenOverlay">
+  <button class="bigscreen-close" onclick="exitBigScreen()">✕ 关闭大屏</button>
+  <div class="bigscreen-title" id="bigscreenTitle">🔮 摇号进行中...</div>
+  <div class="bigscreen-ball" id="bigscreenBall" style="display:none"></div>
+  <div class="bigscreen-prize" id="bigscreenPrize" style="display:none"></div>
+  <div class="bigscreen-tray" id="bigscreenTray"></div>
+</div>
+
+<script>
+/* =========================================
+   全局状态
+   ========================================= */
+let state = {
+  rangeMin: 1,
+  rangeMax: 50,
+  drawCount: 5,       // 目标抽取数量
+  noRepeat: true,     // 是否去重
+  interval: 600,      // 弹出间隔(ms)
+  colorTheme: 0,      // 当前颜色主题索引
+  ballCount: 14,      // 球仓内球数
+  pool: [],           // 可用号码池
+  drawn: [],          // 已抽出号码
+  prizes: [           // 奖品配置
+    { name: '一等奖', color: '#F5C842', from: 1, to: 1 },
+    { name: '二等奖', color: '#7C3AED', from: 2, to: 3 },
+    { name: '三等奖', color: '#EC4899', from: 4, to: 5 },
+  ],
+  spinning: false,    // 是否正在摇号
+  bigScreen: false,   // 大屏模式
+  history: [],        // 历史记录
+};
+
+/* 颜色主题方案 */
+const COLOR_THEMES = [
+  // 彩虹（默认）
+  ['#F72585','#7209B7','#3A86FF','#FB8500','#38B000','#E63946','#4CC9F0','#FFD60A','#FF6B6B','#6FCF97','#F4A261','#A8DADC'],
+  // 暖色系
+  ['#FF6B6B','#FF8E53','#FFC145','#FFD166','#FFA07A','#FF4500','#FF6347','#FF7F50','#FF8C00','#FFA500','#FFB347','#FFCC02'],
+  // 冷色系
+  ['#4361EE','#3A86FF','#48CAE4','#00B4D8','#0096C7','#023E8A','#4CC9F0','#5E60CE','#6930C3','#7400B8','#80FFDB','#56CFE1'],
+  // 糖果色
+  ['#FF99C8','#FCF6BD','#D0F4DE','#A9DEF9','#E4C1F9','#FF85A1','#FFC8DD','#BDE0FE','#CAFFBF','#FDFFB6','#FFD6FF','#C8B6FF'],
+];
+
+/* 从主题获取球颜色 */
+function getBallColor(index) {
+  const theme = COLOR_THEMES[state.colorTheme];
+  return theme[index % theme.length];
+}
+
+/* =========================================
+   初始化
+   ========================================= */
+function init() {
+  buildColorThemeUI();
+  buildPrizeCfgUI();
+  updatePool();
+  renderMachineBalls();
+  updateStatPanel();
+}
+
+/* 构建颜色主题选择器 */
+function buildColorThemeUI() {
+  const wrap = document.getElementById('colorThemes');
+  wrap.innerHTML = '';
+  const previews = ['#F72585','#FB8500','#3A86FF','#80FFDB'];
+  COLOR_THEMES.forEach((theme, idx) => {
+    const el = document.createElement('div');
+    el.className = 'color-theme' + (idx === 0 ? ' active' : '');
+    el.style.background = `linear-gradient(135deg, ${theme[0]}, ${theme[3]})`;
+    el.title = ['彩虹','暖色','冷色','糖果'][idx];
+    el.onclick = () => {
+      document.querySelectorAll('.color-theme').forEach(e => e.classList.remove('active'));
+      el.classList.add('active');
+      state.colorTheme = idx;
+      renderMachineBalls();  // 重新渲染球颜色
+      redrawTray();
+    };
+    wrap.appendChild(el);
+  });
+}
+
+/* 构建奖品配置UI */
+function buildPrizeCfgUI() {
+  const wrap = document.getElementById('prizeCfg');
+  wrap.innerHTML = '';
+  state.prizes.forEach((p, idx) => {
+    const row = document.createElement('div');
+    row.className = 'prize-cfg-row';
+    row.innerHTML = `
+      <div class="prize-dot" style="background:${p.color}"></div>
+      <input type="text" placeholder="奖品名称" value="${p.name}"
+        onchange="state.prizes[${idx}].name=this.value; updatePrizeStat()">
+      <input type="number" class="prize-range" min="1" placeholder="第几名" value="${p.from}"
+        title="从第几位抽出开始" onchange="state.prizes[${idx}].from=+this.value">
+      <input type="number" class="prize-range" min="1" placeholder="至" value="${p.to}"
+        title="到第几位抽出结束" onchange="state.prizes[${idx}].to=+this.value">
+      <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 4px"
+        onclick="removePrize(${idx})">×</button>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+/* 根据顺序号获取奖品 */
+function getPrizeByOrder(order) {
+  for (const p of state.prizes) {
+    if (order >= p.from && order <= p.to) return p;
+  }
+  return null;
+}
+
+/* 更新号码池 */
+function updatePool() {
+  const min = parseInt(document.getElementById('rangeMin').value) || 1;
+  const max = parseInt(document.getElementById('rangeMax').value) || 50;
+  state.rangeMin = min;
+  state.rangeMax = max;
+  // 重置池（已抽的保留不清空，只更新统计）
+  rebuildPool();
+  updateStatPanel();
+}
+
+/* 重建可用号码池（排除已抽出） */
+function rebuildPool() {
+  const all = [];
+  for (let i = state.rangeMin; i <= state.rangeMax; i++) all.push(i);
+  state.pool = all.filter(n => !state.drawn.includes(n));
+  updateStatUI();
+}
+
+/* =========================================
+   摇号机球仓 — 动态生成浮动小球
+   ========================================= */
+function renderMachineBalls() {
+  const body = document.getElementById('machineBody');
+  // 清除旧球（保留出口和高光）
+  const oldBalls = body.querySelectorAll('.ball-in-machine');
+  oldBalls.forEach(b => b.remove());
+
+  const cnt = state.ballCount;
+  const radius = 140;  // 球仓半径（px，仓body 320px）
+  const center = 160;  // 中心点
+
+  for (let i = 0; i < cnt; i++) {
+    // 随机分布在球仓内（留边距避免超出）
+    const angle = (i / cnt) * 2 * Math.PI + Math.random() * 0.5;
+    const r = 40 + Math.random() * 80;
+    const x = center + r * Math.cos(angle) - 18;  // 18 = 球半径
+    const y = center + r * Math.sin(angle) - 18;
+
+    const ball = document.createElement('div');
+    ball.className = 'ball-in-machine';
+    ball.style.width  = '36px';
+    ball.style.height = '36px';
+    ball.style.left   = x + 'px';
+    ball.style.top    = y + 'px';
+    ball.style.background = `radial-gradient(circle at 35% 30%, ${lightenColor(getBallColor(i), 40)}, ${getBallColor(i)})`;
+
+    // 分配一个随机号码用于展示（视觉用，不影响抽取逻辑）
+    const displayNum = state.rangeMin + Math.floor(Math.random() * (state.rangeMax - state.rangeMin + 1));
+    ball.textContent = displayNum > 99 ? '?' : displayNum;
+
+    // 随机浮动动画
+    const animIdx = i % 12;
+    const dur = (2.8 + Math.random() * 1.5).toFixed(2);
+    const delay = -(Math.random() * 3).toFixed(2);
+    ball.style.animation = `float-${animIdx} ${dur}s ${delay}s linear infinite`;
+
+    body.insertBefore(ball, body.querySelector('.machine-shine'));
+  }
+}
+
+/* 颜色加亮工具函数 */
+function lightenColor(hex, amount) {
+  const num = parseInt(hex.replace('#',''), 16);
+  const r = Math.min(255, (num >> 16) + amount);
+  const g = Math.min(255, ((num >> 8) & 0xff) + amount);
+  const b = Math.min(255, (num & 0xff) + amount);
+  return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+}
+
+/* =========================================
+   开始摇号
+   ========================================= */
+function handleStart() {
+  if (state.spinning) return;
+
+  // 已达到目标数量，提示
+  if (state.drawn.length >= state.drawCount) {
+    showToast(`已完成 ${state.drawCount} 个号码抽取！点击"清空重来"重新开始`);
+    return;
+  }
+  // 号码池耗尽
+  if (state.pool.length === 0) {
+    showToast('号码池已空，请清空重来或扩大号码范围');
+    return;
+  }
+
+  state.spinning = true;
+  setButtonState(true);
+
+  // 球仓开始震动旋转
+  document.getElementById('machineBody').classList.add('spinning');
+
+  // 读取间隔配置
+  const interval = parseInt(document.getElementById('intervalVal').value) || 600;
+  state.interval = interval;
+
+  // 需要再抽多少个
+  const remaining = state.drawCount - state.drawn.length;
+  const toBeDraw = Math.min(remaining, state.pool.length);
+
+  let count = 0;
+
+  /* 摇号预热延迟 — 先转600ms再开始弹球 */
+  setTimeout(() => {
+    function drawNext() {
+      if (count >= toBeDraw) {
+        // 全部弹出，结束摇号
+        finishSpinning();
+        return;
+      }
+
+      // 随机抽一个号码
+      const pickedNum = pickNumber();
+      count++;
+
+      // 出球动画
+      triggerFlyOutBall(pickedNum);
+
+      // 延迟后刷新当前球展示 & 托盘
+      setTimeout(() => {
+        addDrawnBall(pickedNum);
+        updateStatPanel();
+        if (state.bigScreen) updateBigScreen(pickedNum);
+        drawNext();
+      }, state.interval);
+    }
+    drawNext();
+  }, 600);
+}
+
+/* 从池中随机抽取一个号码 */
+function pickNumber() {
+  rebuildPool();
+  const idx = Math.floor(Math.random() * state.pool.length);
+  const num = state.pool[idx];
+  if (state.noRepeat) {
+    state.pool.splice(idx, 1);
+  }
+  state.drawn.push(num);
+  return num;
+}
+
+/* 触发出球飞出动画 */
+function triggerFlyOutBall(num) {
+  const machineWrap = document.querySelector('.machine-wrap');
+  const color = getBallColor(state.drawn.length - 1);
+  const flyBall = document.createElement('div');
+  flyBall.className = 'flying-ball';
+  flyBall.style.width  = '44px';
+  flyBall.style.height = '44px';
+  flyBall.style.background = `radial-gradient(circle at 35% 30%, ${lightenColor(color, 40)}, ${color})`;
+  flyBall.textContent = num;
+  machineWrap.appendChild(flyBall);
+  // 动画结束后移除
+  flyBall.addEventListener('animationend', () => flyBall.remove());
+}
+
+/* 将号码球加入托盘和结果列表 */
+function addDrawnBall(num) {
+  const order = state.drawn.length;
+  const color = getBallColor(order - 1);
+  const prize = getPrizeByOrder(order);
+
+  // 更新当前球大展示
+  updateCurrentBall(num, color, prize);
+
+  // 加入托盘
+  const tray = document.getElementById('tray');
+  const empty = document.getElementById('trayEmpty');
+  if (empty) empty.remove();
+
+  const ball = document.createElement('div');
+  ball.className = 'tray-ball';
+  ball.style.background = `radial-gradient(circle at 35% 30%, ${lightenColor(color, 40)}, ${color})`;
+  ball.textContent = num;
+  ball.title = prize ? `第${order}位 · ${prize.name}` : `第${order}位`;
+  tray.appendChild(ball);
+
+  // 更新右侧结果列表
+  updateResultList(num, order, color, prize);
+  updatePrizeStat();
+}
+
+/* 更新当前球大展示 */
+function updateCurrentBall(num, color, prize) {
+  const wrap = document.getElementById('currentBallWrap');
+  wrap.innerHTML = `
+    <div class="current-ball" style="background:radial-gradient(circle at 35% 30%, ${lightenColor(color,40)}, ${color})">
+      ${num}
+    </div>
+    <div class="current-ball-label">${prize ? '🏆 ' + prize.name : '第 ' + state.drawn.length + ' 位'}</div>
+  `;
+}
+
+/* 结束摇号 */
+function finishSpinning() {
+  state.spinning = false;
+  document.getElementById('machineBody').classList.remove('spinning');
+  setButtonState(false);
+
+  // 判断是否全部完成
+  if (state.drawn.length >= state.drawCount) {
+    document.getElementById('startBtnText').textContent = '摇号完成 ✓';
+    document.getElementById('leftStartBtn').textContent = '摇号完成 ✓';
+    // 保存历史
+    saveHistory();
+  } else {
+    document.getElementById('startBtnText').textContent = '继续摇号';
+    document.getElementById('leftStartBtn').textContent = '继续摇号';
+  }
+
+  updateStatPanel();
+}
+
+/* 清空重来 */
+function handleClear() {
+  if (state.spinning) return;
+  state.drawn = [];
+  state.pool = [];
+
+  // 重置当前球展示
+  document.getElementById('currentBallWrap').innerHTML = `
+    <div class="current-ball-placeholder">🎱</div>
+    <div class="current-ball-label" id="currentBallLabel">等待摇号...</div>
+  `;
+
+  // 清空托盘
+  const tray = document.getElementById('tray');
+  tray.innerHTML = '<div class="tray-empty" id="trayEmpty">号码球将依次落入此处...</div>';
+
+  // 重置按钮
+  document.getElementById('startBtnText').textContent = '开始摇号';
+  document.getElementById('leftStartBtn').textContent = '开始摇号';
+
+  // 重置右侧数据
+  document.getElementById('resultList').innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">暂无记录</div>';
+  document.getElementById('prizeStat').innerHTML   = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:6px 0">等待开始</div>';
+
+  // 重建号码池
+  rebuildPool();
+  updateStatPanel();
+
+  // 重新渲染球仓
+  renderMachineBalls();
+}
+
+/* 设置按钮禁用状态 */
+function setButtonState(disabled) {
+  document.getElementById('mainStartBtn').disabled = disabled;
+  document.getElementById('leftStartBtn').disabled = disabled;
+  if (disabled) {
+    document.getElementById('startBtnText').textContent = '摇号中...';
+    document.getElementById('leftStartBtn').textContent = '摇号中...';
+  }
+}
+
+/* =========================================
+   右侧数据面板更新
+   ========================================= */
+function updateStatPanel() {
+  const total  = state.rangeMax - state.rangeMin + 1;
+  const drawn  = state.drawn.length;
+  const remain = total - drawn;
+  document.getElementById('statTotal').textContent  = total;
+  document.getElementById('statDrawn').textContent  = drawn;
+  document.getElementById('statRemain').textContent = remain > 0 ? remain : 0;
+  document.getElementById('statTarget').textContent = state.drawCount;
+}
+
+function updateStatUI() {
+  updateStatPanel();
+}
+
+/* 更新右侧结果列表 */
+function updateResultList(num, order, color, prize) {
+  const list = document.getElementById('resultList');
+  // 移除空状态
+  const empty = list.querySelector('div[style]');
+  if (empty && list.children.length === 1) list.innerHTML = '';
+
+  const item = document.createElement('div');
+  item.className = 'result-item';
+  item.innerHTML = `
+    <div class="result-ball-sm" style="background:radial-gradient(circle at 35% 30%, ${lightenColor(color,40)}, ${color})">${num}</div>
+    <div class="result-info">
+      <div class="result-num">${num} 号</div>
+      <div class="result-prize">${prize ? prize.name : '参与奖'}</div>
+    </div>
+    <div class="result-order">第${order}位</div>
+  `;
+  list.insertBefore(item, list.firstChild);  // 最新的排最上面
+}
+
+/* 更新奖品分配统计 */
+function updatePrizeStat() {
+  const stat = document.getElementById('prizeStat');
+  if (state.drawn.length === 0) {
+    stat.innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:6px 0">等待开始</div>';
+    return;
+  }
+  // 统计每个奖品有多少人
+  const counts = {};
+  state.prizes.forEach(p => { counts[p.name] = 0; });
+  state.drawn.forEach((num, i) => {
+    const order = i + 1;
+    const p = getPrizeByOrder(order);
+    if (p) counts[p.name] = (counts[p.name] || 0) + 1;
+  });
+
+  stat.innerHTML = '';
+  state.prizes.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'prize-stat-row';
+    row.innerHTML = `
+      <div class="prize-stat-dot" style="background:${p.color}"></div>
+      <div class="prize-stat-name">${p.name}</div>
+      <div class="prize-stat-cnt">${counts[p.name] || 0} 人</div>
+    `;
+    stat.appendChild(row);
+  });
+}
+
+/* 保存历史记录 */
+function saveHistory() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('zh-CN', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  const record = {
+    time: timeStr,
+    balls: [...state.drawn],
+    colors: state.drawn.map((_, i) => getBallColor(i)),
+  };
+  state.history.unshift(record);
+  if (state.history.length > 10) state.history.pop();
+  renderHistory();
+}
+
+/* 渲染历史记录 */
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  list.innerHTML = '';
+  if (state.history.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">暂无历史</div>';
+    return;
+  }
+  state.history.forEach(record => {
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    const balls = record.balls.map((n, i) => `
+      <div class="history-ball-mini" style="background:${record.colors[i]}">${n}</div>
+    `).join('');
+    item.innerHTML = `
+      <div class="history-time">${record.time}</div>
+      <div class="history-balls">${balls}</div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+/* =========================================
+   大屏模式
+   ========================================= */
+function enterBigScreen() {
+  state.bigScreen = true;
+  const overlay = document.getElementById('bigscreenOverlay');
+  overlay.classList.add('show');
+  renderBigScreenTray();
+}
+
+function exitBigScreen() {
+  state.bigScreen = false;
+  document.getElementById('bigscreenOverlay').classList.remove('show');
+}
+
+function updateBigScreen(num) {
+  const order = state.drawn.length;
+  const color = getBallColor(order - 1);
+  const prize = getPrizeByOrder(order);
+  const ballEl = document.getElementById('bigscreenBall');
+  const prizeEl = document.getElementById('bigscreenPrize');
+  const title  = document.getElementById('bigscreenTitle');
+
+  ballEl.style.display = 'flex';
+  ballEl.style.background = `radial-gradient(circle at 35% 30%, ${lightenColor(color,50)}, ${color})`;
+  ballEl.textContent = num;
+  ballEl.style.animation = 'none';
+  void ballEl.offsetWidth;  // 强制重排以重播动画
+  ballEl.style.animation = '';
+
+  if (prize) {
+    prizeEl.style.display = 'block';
+    prizeEl.textContent = '🏆 ' + prize.name;
+  } else {
+    prizeEl.style.display = 'none';
+  }
+
+  title.textContent = `🔮 第 ${order} 位号码`;
+  renderBigScreenTray();
+}
+
+function renderBigScreenTray() {
+  const tray = document.getElementById('bigscreenTray');
+  tray.innerHTML = '';
+  state.drawn.forEach((num, i) => {
+    const color = getBallColor(i);
+    const ball = document.createElement('div');
+    ball.className = 'bigscreen-tray-ball';
+    ball.style.background = `radial-gradient(circle at 35% 30%, ${lightenColor(color,40)}, ${color})`;
+    ball.textContent = num;
+    tray.appendChild(ball);
+  });
+}
+
+/* 按ESC退出大屏 */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && state.bigScreen) exitBigScreen();
+});
+
+/* =========================================
+   配置操作
+   ========================================= */
+/* 设置号码范围 */
+function setRange(min, max, el) {
+  document.querySelectorAll('.range-opt').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('rangeMin').value = min;
+  document.getElementById('rangeMax').value = max;
+  state.rangeMin = min;
+  state.rangeMax = max;
+  rebuildPool();
+  renderMachineBalls();
+  updateStatPanel();
+}
+
+/* 改变抽取数量 */
+function changeCount(delta) {
+  state.drawCount = Math.max(1, Math.min(50, state.drawCount + delta));
+  document.getElementById('countVal').textContent = state.drawCount;
+  document.getElementById('statTarget').textContent = state.drawCount;
+}
+
+/* 切换去重开关 */
+function toggleNoRepeat(el) {
+  el.classList.toggle('on');
+  state.noRepeat = el.classList.contains('on');
+}
+
+/* 改变球仓内球数 */
+function changeBallCount(delta) {
+  state.ballCount = Math.max(6, Math.min(20, state.ballCount + delta));
+  document.getElementById('ballCountVal').textContent = state.ballCount;
+  renderMachineBalls();
+}
+
+/* 添加奖品 */
+function addPrize() {
+  const colors = ['#4CC9F0','#38B000','#FF6B6B','#A8DADC','#FFD166','#9B5DE5'];
+  const newIdx = state.prizes.length;
+  state.prizes.push({
+    name: `${newIdx + 1}等奖`,
+    color: colors[newIdx % colors.length],
+    from: state.drawCount,
+    to: state.drawCount,
+  });
+  buildPrizeCfgUI();
+}
+
+/* 删除奖品 */
+function removePrize(idx) {
+  state.prizes.splice(idx, 1);
+  buildPrizeCfgUI();
+}
+
+/* 重绘托盘（颜色主题切换后） */
+function redrawTray() {
+  const tray = document.getElementById('tray');
+  const balls = tray.querySelectorAll('.tray-ball');
+  balls.forEach((ball, i) => {
+    const color = getBallColor(i);
+    ball.style.background = `radial-gradient(circle at 35% 30%, ${lightenColor(color,40)}, ${color})`;
+  });
+}
+
+/* =========================================
+   Toast 提示
+   ========================================= */
+function showToast(msg) {
+  const old = document.querySelector('.toast-tip');
+  if (old) old.remove();
+  const el = document.createElement('div');
+  el.className = 'toast-tip';
+  el.textContent = msg;
+  el.style.cssText = `
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+    background:rgba(26,10,46,0.95); color:var(--text); padding:10px 20px;
+    border-radius:8px; font-size:13px; z-index:9999; white-space:nowrap;
+    border:1px solid var(--border); backdrop-filter:blur(8px);
+    box-shadow:0 4px 20px rgba(0,0,0,0.4);
+    animation: fade-in-up 0.3s both;
+  `;
+  document.body.appendChild(el);
+  setTimeout(() => {
+    el.style.transition = 'opacity 0.3s';
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 300);
+  }, 2800);
+}
+
+/* =========================================
+   启动
+   ========================================= */
+init();
+</script>
+</body>
+</html>
