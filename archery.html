@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 射箭</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.97);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: inherit;
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .nav-links-wrap {
+    flex: 1;
+    overflow-x: auto;
+    margin: 0 20px;
+    scrollbar-width: none;
+  }
+  .nav-links-wrap::-webkit-scrollbar { display: none; }
+  .nav-links {
+    display: flex;
+    gap: 2px;
+    white-space: nowrap;
+  }
+  .nav-link {
+    padding: 6px 13px; border-radius: 7px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-link:hover { background: var(--card); color: var(--text); }
+  .nav-link.active { background: var(--card); color: var(--gold); }
+  .nav-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.4} }
+  .status-text { font-size: 12px; color: var(--muted); }
+
+  /* ─── 主体三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: calc(100vh - 57px - 42px);
+  }
+
+  /* ─── 通用面板样式 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--deep);
+    position: relative;
+    overflow: hidden;
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* ─── 选项按钮组 ─── */
+  .opt-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .opt-btn {
+    flex: 1; min-width: 60px; padding: 9px 6px; border-radius: 8px;
+    text-align: center; font-size: 13px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s;
+    color: var(--muted); font-weight: 600;
+  }
+  .opt-btn:hover { border-color: rgba(124,58,237,0.5); color: var(--text); }
+  .opt-btn.active {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.15);
+    color: var(--gold);
+  }
+
+  /* ─── 滑块样式 ─── */
+  .slider-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 4px;
+  }
+  .slider-label { font-size: 12px; color: var(--muted); width: 28px; text-align: right; flex-shrink: 0; }
+  input[type=range] {
+    flex: 1; height: 4px; border-radius: 2px;
+    appearance: none; background: rgba(255,255,255,0.12);
+    outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    appearance: none; width: 14px; height: 14px;
+    border-radius: 50%; background: var(--gold);
+    box-shadow: 0 0 6px rgba(245,200,66,0.5);
+    cursor: pointer;
+  }
+  .slider-val {
+    font-size: 13px; font-weight: 700; color: var(--gold);
+    width: 32px; text-align: center; flex-shrink: 0;
+  }
+
+  /* ─── 奖品配置 ─── */
+  .prize-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+  }
+  .prize-row:last-child { margin-bottom: 0; }
+  .prize-icon { font-size: 18px; }
+  .prize-input {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .prize-input:focus { border-color: var(--accent); }
+  .prize-label { font-size: 12px; color: var(--muted); width: 55px; text-align: right; flex-shrink: 0; }
+
+  /* ─── 中间区域HUD ─── */
+  .game-hud {
+    display: flex; align-items: center; gap: 16px;
+    width: 100%; margin-bottom: 12px;
+    padding: 10px 16px; border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .hud-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .hud-label { font-size: 10px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+  .hud-val { font-size: 20px; font-weight: 700; color: var(--gold); line-height: 1; }
+  .hud-sep { width: 1px; height: 30px; background: var(--border); }
+  .hud-center { flex: 1; text-align: center; }
+  .hud-title { font-size: 15px; font-weight: 700; color: var(--text); }
+  .hud-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* 箭矢剩余指示 */
+  .arrow-bar {
+    display: flex; gap: 8px;
+    justify-content: center;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+  .arrow-dot {
+    width: 24px; height: 6px; border-radius: 3px;
+    background: linear-gradient(90deg, var(--gold), #c8962a);
+    border: 1px solid rgba(245,200,66,0.5);
+    transition: opacity 0.3s;
+    position: relative;
+  }
+  .arrow-dot::after {
+    content: '';
+    position: absolute;
+    right: -4px; top: 50%; transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 5px solid var(--gold);
+  }
+  .arrow-dot.used { opacity: 0.15; }
+
+  /* Canvas 容器 */
+  .canvas-wrap {
+    flex: 1; width: 100%;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: crosshair;
+    min-height: 0;
+  }
+  #gameCanvas {
+    display: block;
+    width: 100%; height: 100%;
+  }
+
+  /* 游戏遮罩（开始/结束） */
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(13,7,32,0.88);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+    z-index: 10;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-title { font-size: 32px; font-weight: 800; color: var(--gold); text-shadow: 0 0 20px rgba(245,200,66,0.5); }
+  .overlay-sub { font-size: 15px; color: var(--muted); text-align: center; line-height: 1.6; }
+  .overlay-score { font-size: 22px; font-weight: 700; color: var(--text); }
+  .overlay-prize { font-size: 18px; color: var(--gold); font-weight: 700; }
+  .overlay-btns { display: flex; gap: 12px; margin-top: 8px; }
+  .btn-start {
+    padding: 12px 32px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: #fff; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-start:hover { opacity: 0.85; }
+  .btn-outline {
+    padding: 12px 28px; border-radius: 10px;
+    background: transparent;
+    border: 1px solid var(--border); color: var(--muted); font-size: 15px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--text); }
+
+  /* 操作按钮区 */
+  .action-bar {
+    display: flex; gap: 10px; margin-top: 10px;
+    flex-shrink: 0;
+  }
+  .btn-action {
+    flex: 1; padding: 10px 20px; border-radius: 9px; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none; transition: all 0.2s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .btn-secondary:hover { color: var(--text); border-color: var(--accent); }
+
+  /* 屏住呼吸状态指示 */
+  .breath-bar {
+    display: flex; gap: 8px; margin-top: 8px;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .breath-chip {
+    padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.05);
+    color: var(--muted);
+    transition: all 0.3s;
+  }
+  .breath-chip.active {
+    background: rgba(34,197,94,0.15);
+    border-color: #22C55E;
+    color: #22C55E;
+    box-shadow: 0 0 8px rgba(34,197,94,0.3);
+  }
+  .breath-chip.used {
+    background: rgba(255,255,255,0.02);
+    border-color: rgba(255,255,255,0.05);
+    color: rgba(240,234,248,0.2);
+  }
+
+  /* ─── 右侧数据面板 ─── */
+  .stat-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--muted); }
+  .stat-val { font-weight: 700; color: var(--text); }
+  .stat-val.gold { color: var(--gold); }
+  .stat-val.green { color: #22C55E; }
+  .stat-val.red { color: #F87171; }
+
+  /* 本局环数序列 */
+  .score-seq {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;
+  }
+  .score-chip {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition: all 0.3s;
+  }
+  .score-chip.hit { background: rgba(124,58,237,0.2); border-color: var(--accent); color: var(--text); }
+  .score-chip.bull { background: rgba(245,200,66,0.2); border-color: var(--gold); color: var(--gold); }
+  .score-chip.miss { background: rgba(248,113,113,0.1); border-color: #F87171; color: #F87171; }
+
+  /* 奖品解锁进度 */
+  .prize-progress {
+    margin-bottom: 10px;
+  }
+  .prize-progress-header {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: var(--muted); margin-bottom: 6px;
+  }
+  .prize-progress-bar {
+    height: 8px; border-radius: 4px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden;
+  }
+  .prize-progress-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    transition: width 0.5s ease;
+  }
+  .prize-unlocked {
+    text-align: center; padding: 12px;
+    background: rgba(245,200,66,0.1);
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 10px;
+    margin-top: 8px;
+    animation: unlockPulse 1s ease-out;
+  }
+  @keyframes unlockPulse {
+    0% { transform: scale(0.9); opacity: 0; }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .prize-unlocked-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .prize-unlocked-name { font-size: 16px; font-weight: 700; color: var(--gold); }
+
+  /* ─── 底部状态栏 ─── */
+  .footer {
+    padding: 10px 28px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: var(--muted);
+    background: rgba(13,7,32,0.97);
+    flex-shrink: 0;
+  }
+  .footer-tags { display: flex; gap: 16px; }
+  .footer-tag { display: flex; align-items: center; gap: 5px; }
+  .footer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+
+</style>
+</head>
+<body>
+
+<!-- ─── 顶部导航 ─── -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">
+    🎮 <span>GameHub</span>
+    <div class="nav-badge">Mini</div>
+  </a>
+  <div class="nav-links-wrap">
+    <div class="nav-links">
+      <a class="nav-link" href="index.html">首页</a>
+      <a class="nav-link" href="wheel.html">大转盘</a>
+      <a class="nav-link" href="nine-grid.html">九宫格</a>
+      <a class="nav-link" href="scratch-card.html">刮刮乐</a>
+      <a class="nav-link" href="shake-dice.html">摇骰子</a>
+      <a class="nav-link" href="smash-egg.html">砸金蛋</a>
+      <a class="nav-link" href="slot-machine.html">老虎机</a>
+      <a class="nav-link" href="gift-box.html">礼盒开箱</a>
+      <a class="nav-link" href="whack-mole.html">打地鼠</a>
+      <a class="nav-link" href="cup-game.html">三杯游戏</a>
+      <a class="nav-link" href="number-bomb.html">数字炸弹</a>
+      <a class="nav-link" href="stamp-collect.html">集卡集章</a>
+      <a class="nav-link" href="vote-pk.html">投票PK</a>
+      <a class="nav-link" href="gashapon.html">扭蛋机</a>
+      <a class="nav-link" href="blind-box.html">盲盒抽卡</a>
+      <a class="nav-link" href="game-2048.html">2048</a>
+      <a class="nav-link" href="match3.html">消消乐</a>
+      <a class="nav-link" href="catch-coins.html">接金币</a>
+      <a class="nav-link" href="grow-tree.html">成长树</a>
+      <a class="nav-link" href="pinball.html">弹珠机</a>
+      <a class="nav-link" href="snake.html">贪吃蛇</a>
+      <a class="nav-link" href="slingshot.html">弹弓射击</a>
+      <a class="nav-link active" href="archery.html">射箭</a>
+      <a class="nav-link" href="fruit-cut.html">切水果</a>
+      <a class="nav-link" href="progress-unlock.html">进度解锁</a>
+      <a class="nav-link" href="energy-collect.html">能量收集</a>
+      <a class="nav-link" href="flying-chess.html">飞行棋</a>
+      <a class="nav-link" href="monopoly.html">大富翁</a>
+      <a class="nav-link" href="red-packet-rain.html">红包雨</a>
+      <a class="nav-link" href="claw-machine.html">夹娃娃机</a>
+      <a class="nav-link" href="flip-match.html">翻牌配对</a>
+      <a class="nav-link" href="shake.html">摇一摇</a>
+      <a class="nav-link" href="quiz.html">问答闯关</a>
+      <a class="nav-link" href="daily-checkin.html">每日签到</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span class="status-text">组件运行中</span>
+  </div>
+</nav>
+
+<!-- ─── 主体三列 ─── -->
+<div class="main">
+
+  <!-- ══════════════════════════════
+       左侧：配置面板
+  ══════════════════════════════ -->
+  <div class="panel-left">
+    <div class="panel-title">⚙️ 游戏配置</div>
+
+    <!-- 靶子移动速度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>靶子移动速度</div>
+      <div class="opt-btns" id="targetSpeedBtns">
+        <div class="opt-btn" data-val="0">固定</div>
+        <div class="opt-btn active" data-val="1">慢速</div>
+        <div class="opt-btn" data-val="2">中速</div>
+        <div class="opt-btn" data-val="3">快速</div>
+      </div>
+    </div>
+
+    <!-- 风力强度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>风力强度</div>
+      <div class="opt-btns" id="windBtns">
+        <div class="opt-btn active" data-val="0">无风</div>
+        <div class="opt-btn" data-val="1">微风</div>
+        <div class="opt-btn" data-val="2">强风</div>
+        <div class="opt-btn" data-val="3">狂风</div>
+      </div>
+      <!-- 风向显示 -->
+      <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:12px;color:var(--muted);">风向：</span>
+        <span id="windDirDisplay" style="font-size:13px;color:var(--gold);font-weight:600;">— 无风 —</span>
+      </div>
+    </div>
+
+    <!-- 每局箭数 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>每局箭数</div>
+      <div class="opt-btns" id="arrowCountBtns">
+        <div class="opt-btn" data-val="3">3 支</div>
+        <div class="opt-btn active" data-val="5">5 支</div>
+        <div class="opt-btn" data-val="8">8 支</div>
+        <div class="opt-btn" data-val="10">10 支</div>
+      </div>
+    </div>
+
+    <!-- 准星漂移强度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>准星漂移强度</div>
+      <div class="slider-row">
+        <span class="slider-label">弱</span>
+        <input type="range" id="driftSlider" min="0" max="10" value="4">
+        <span class="slider-label">强</span>
+        <span class="slider-val" id="driftVal">4</span>
+      </div>
+    </div>
+
+    <!-- 奖品配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品配置</div>
+      <!-- 奖品1 -->
+      <div class="prize-row">
+        <span class="prize-icon">🥉</span>
+        <input class="prize-input" id="prize1Name" type="text" placeholder="奖品名称" value="优惠券 5 元">
+        <span class="prize-label">≥<input id="prize1Score" type="number" min="0" max="50" value="15" style="width:36px;background:transparent;border:none;color:var(--gold);font-weight:700;font-size:13px;text-align:center;outline:none;"> 环</span>
+      </div>
+      <!-- 奖品2 -->
+      <div class="prize-row">
+        <span class="prize-icon">🥈</span>
+        <input class="prize-input" id="prize2Name" type="text" placeholder="奖品名称" value="优惠券 20 元">
+        <span class="prize-label">≥<input id="prize2Score" type="number" min="0" max="50" value="25" style="width:36px;background:transparent;border:none;color:var(--gold);font-weight:700;font-size:13px;text-align:center;outline:none;"> 环</span>
+      </div>
+      <!-- 奖品3 -->
+      <div class="prize-row">
+        <span class="prize-icon">🥇</span>
+        <input class="prize-input" id="prize3Name" type="text" placeholder="奖品名称" value="免费商品一件">
+        <span class="prize-label">≥<input id="prize3Score" type="number" min="0" max="50" value="40" style="width:36px;background:transparent;border:none;color:var(--gold);font-weight:700;font-size:13px;text-align:center;outline:none;"> 环</span>
+      </div>
+    </div>
+
+    <!-- 帮助提示 -->
+    <div class="card" style="background:rgba(124,58,237,0.07);border-color:rgba(124,58,237,0.25);">
+      <div class="card-title"><span class="dot" style="background:var(--accent)"></span>操作说明</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.8;">
+        🖱️ <b style="color:var(--text)">移动鼠标</b> — 控制准星位置<br>
+        🖱️ <b style="color:var(--text)">点击射击</b> — 发射箭矢<br>
+        ⌨️ <b style="color:var(--text)">按住 Shift</b> — 屏住呼吸（稳定准星3秒）<br>
+        📌 <b style="color:var(--gold)">屏住呼吸每局限用 2 次</b>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════
+       中间：游戏区
+  ══════════════════════════════ -->
+  <div class="panel-center">
+
+    <!-- HUD 信息条 -->
+    <div class="game-hud">
+      <div class="hud-item">
+        <span class="hud-label">本局得分</span>
+        <span class="hud-val" id="hudScore">0</span>
+      </div>
+      <div class="hud-sep"></div>
+      <div class="hud-center">
+        <div class="hud-title" id="hudTitle">射箭挑战</div>
+        <div class="hud-hint" id="hudHint">移动鼠标瞄准 · 点击发射</div>
+      </div>
+      <div class="hud-sep"></div>
+      <div class="hud-item">
+        <span class="hud-label">剩余箭数</span>
+        <span class="hud-val" id="hudArrows">5</span>
+      </div>
+    </div>
+
+    <!-- 箭矢剩余可视化 -->
+    <div class="arrow-bar" id="arrowBar"></div>
+
+    <!-- Canvas 游戏区 -->
+    <div class="canvas-wrap" id="canvasWrap">
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- 开始遮罩 -->
+      <div class="overlay" id="overlayStart">
+        <div class="overlay-title">🏹 射箭挑战</div>
+        <div class="overlay-sub">5 支箭，瞄准靶心<br>准星会漂移 · 风力会偏航<br>按住 Shift 屏住呼吸</div>
+        <div class="overlay-btns">
+          <button class="btn-start" id="btnStart">开始游戏</button>
+        </div>
+      </div>
+
+      <!-- 结束遮罩 -->
+      <div class="overlay hidden" id="overlayEnd">
+        <div class="overlay-title" id="endTitle">🎯 挑战结束</div>
+        <div class="overlay-score" id="endScore"></div>
+        <div class="overlay-prize" id="endPrize"></div>
+        <div class="overlay-sub" id="endSub"></div>
+        <div class="overlay-btns">
+          <button class="btn-start" id="btnRestart">再来一局</button>
+          <button class="btn-outline" id="btnShare">分享成绩</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 屏住呼吸状态 -->
+    <div class="breath-bar" id="breathBar">
+      <div class="breath-chip" id="breath0">🫁 屏气 1</div>
+      <div class="breath-chip" id="breath1">🫁 屏气 2</div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="action-bar">
+      <button class="btn-action btn-secondary" id="btnPause">⏸ 暂停</button>
+      <button class="btn-action btn-secondary" id="btnReset">↺ 重置</button>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════
+       右侧：数据统计
+  ══════════════════════════════ -->
+  <div class="panel-right">
+    <div class="panel-title">📊 数据统计</div>
+
+    <!-- 本局环数序列 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>本局命中详情</div>
+      <div class="score-seq" id="scoreSeq"></div>
+      <div style="margin-top:12px;">
+        <div class="stat-row">
+          <span class="stat-label">本局总环数</span>
+          <span class="stat-val gold" id="statTotal">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">最高单箭</span>
+          <span class="stat-val" id="statBest">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">靶心命中</span>
+          <span class="stat-val green" id="statBull">0 次</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">脱靶次数</span>
+          <span class="stat-val red" id="statMiss">0 次</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 奖品解锁进度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品解锁进度</div>
+      <div id="prizeProgressList"></div>
+    </div>
+
+    <!-- 历史记录 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>历史最佳</div>
+      <div class="stat-row">
+        <span class="stat-label">历史最高分</span>
+        <span class="stat-val gold" id="statHistoryBest">—</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">累计局数</span>
+        <span class="stat-val" id="statGames">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">累计靶心</span>
+        <span class="stat-val green" id="statTotalBull">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">历史最高单箭</span>
+        <span class="stat-val gold" id="statHistoryBestArrow">—</span>
+      </div>
+    </div>
+
+    <!-- 当前风向信息 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>当前环境</div>
+      <div class="stat-row">
+        <span class="stat-label">风力等级</span>
+        <span class="stat-val" id="statWind">无风</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">风向偏移</span>
+        <span class="stat-val" id="statWindOffset">—</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">靶子速度</span>
+        <span class="stat-val" id="statTargetSpeed">慢速</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">准星状态</span>
+        <span class="stat-val" id="statCrosshair">漂移中</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── 底部状态栏 ─── -->
+<div class="footer">
+  <div class="footer-tags">
+    <div class="footer-tag">
+      <div class="footer-dot"></div>
+      <span>准星漂移 · 风力系统</span>
+    </div>
+    <div class="footer-tag">
+      <div class="footer-dot" style="background:var(--accent)"></div>
+      <span>5 支箭挑战</span>
+    </div>
+    <div class="footer-tag">
+      <div class="footer-dot" style="background:var(--accent2)"></div>
+      <span>Shift 屏住呼吸</span>
+    </div>
+  </div>
+  <span>射箭 · 小游戏中台组件</span>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   射箭游戏核心逻辑
+   - Canvas 2D 绘制弓手、靶子、箭矢、准星
+   - 靶子上下移动（可配速度）
+   - 准星随时间漂移（模拟手抖）
+   - 风力系统影响箭矢轨迹
+   - Shift 屏住呼吸，稳定准星3秒，限用2次
+   - 命中检测 + 环数计算
+   - 奖品解锁逻辑
+═══════════════════════════════════════════════ */
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const wrap = document.getElementById('canvasWrap');
+
+// ─── 游戏状态 ───
+let state = 'idle'; // idle | playing | paused | ended
+let frameId = null;
+
+// ─── 配置（从左侧面板同步） ───
+let cfg = {
+  targetSpeed: 1,   // 0=固定 1=慢 2=中 3=快
+  windLevel: 0,     // 0~3
+  arrowCount: 5,    // 每局箭数
+  driftStrength: 4, // 准星漂移强度
+};
+
+// ─── 游戏变量 ───
+let arrowsLeft = 5;
+let totalScore = 0;
+let roundScores = [];  // 本局每箭得分
+let bullCount = 0;     // 靶心命中
+let missCount = 0;     // 脱靶
+
+// ─── 历史数据 ───
+let history = {
+  bestScore: 0,
+  gamesPlayed: 0,
+  totalBull: 0,
+  bestArrow: 0,
+};
+
+// ─── 靶子状态 ───
+let target = {
+  x: 0, y: 0,          // 当前位置（靶心）
+  baseY: 0,             // 中心基准Y
+  moveDir: 1,           // 移动方向
+  moveOffset: 0,        // 当前偏移
+  maxOffset: 80,        // 最大偏移幅度
+  radius: 60,           // 靶子外圆半径
+};
+
+// ─── 准星状态 ───
+let crosshair = {
+  x: 0, y: 0,          // 准星实际位置
+  mouseX: 0, mouseY: 0,// 鼠标位置
+  driftX: 0, driftY: 0,// 漂移量
+  driftVX: 0, driftVY: 0, // 漂移速度
+  steadyTimer: 0,       // 屏气剩余帧数
+  breathUsed: 0,        // 已用屏气次数
+  breathMax: 2,
+};
+
+// ─── 风力系统 ───
+let wind = {
+  x: 0, y: 0,      // 风力偏移（每帧）
+  label: '无风',
+  offsetDesc: '—',
+};
+
+// ─── 飞行箭矢列表 ───
+let flyingArrows = [];
+
+// ─── 钉在靶上的箭 ───
+let stukkArrows = [];  // {relX, relY, angle, score, flashTimer}
+
+// ─── 飘字特效列表 ───
+let floatTexts = [];   // {x, y, text, color, alpha, vy, life}
+
+// ─── 粒子特效（靶心闪光） ───
+let particles = [];    // {x, y, vx, vy, life, maxLife, color, r}
+
+// ─── 屏幕尺寸自适应 ───
+function resizeCanvas() {
+  const r = wrap.getBoundingClientRect();
+  canvas.width = r.width;
+  canvas.height = r.height;
+
+  // 靶子位置：右侧1/4处，垂直居中
+  target.x = r.width * 0.72;
+  target.y = r.height * 0.5;
+  target.baseY = r.height * 0.5;
+  target.maxOffset = r.height * 0.22;
+  target.radius = Math.min(r.height * 0.22, 80);
+
+  // 准星初始位置：中间偏左
+  crosshair.mouseX = r.width * 0.42;
+  crosshair.mouseY = r.height * 0.5;
+  crosshair.x = crosshair.mouseX;
+  crosshair.y = crosshair.mouseY;
+}
+
+// ─── 初始化风力 ───
+function initWind() {
+  const level = cfg.windLevel;
+  const strengths = [0, 2.5, 5.5, 10];
+  const str = strengths[level];
+  const labels = ['无风', '微风', '强风', '狂风'];
+  wind.label = labels[level];
+
+  if (level === 0) {
+    wind.x = 0; wind.y = 0;
+    wind.offsetDesc = '—';
+    document.getElementById('windDirDisplay').textContent = '— 无风 —';
+  } else {
+    // 随机风向，以垂直为主（影响上下漂移）
+    const angle = (Math.random() * Math.PI * 0.6) - Math.PI * 0.3; // ±54°
+    wind.x = Math.cos(angle) * str * 0.3;
+    wind.y = Math.sin(angle) * str;
+    const dirs = ['↑', '↗', '→', '↘', '↓', '↙', '←', '↖'];
+    const idx = Math.round(((Math.atan2(wind.y, wind.x) + Math.PI) / (Math.PI * 2)) * 8) % 8;
+    wind.offsetDesc = `${dirs[idx]} ${str.toFixed(1)} px/帧`;
+    document.getElementById('windDirDisplay').textContent = `${dirs[idx]} ${labels[level]}`;
+  }
+
+  document.getElementById('statWind').textContent = wind.label;
+  document.getElementById('statWindOffset').textContent = wind.offsetDesc;
+}
+
+// ─── 弓手绘制（Canvas 手绘CSS风格） ───
+function drawArcher(cx, cy, w, h) {
+  const archerX = cx * 0.16;
+  const archerY = cy;
+
+  ctx.save();
+
+  // 身体
+  ctx.fillStyle = '#7C3AED';
+  ctx.beginPath();
+  ctx.roundRect(archerX - 8, archerY - 28, 16, 32, 4);
+  ctx.fill();
+
+  // 头部
+  ctx.fillStyle = '#F0EAF8';
+  ctx.beginPath();
+  ctx.arc(archerX, archerY - 36, 12, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 帽子
+  ctx.fillStyle = '#7C3AED';
+  ctx.beginPath();
+  ctx.ellipse(archerX, archerY - 46, 13, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillRect(archerX - 6, archerY - 50, 12, 8);
+
+  // 腿
+  ctx.fillStyle = '#1A0A2E';
+  ctx.fillRect(archerX - 7, archerY + 3, 6, 20);
+  ctx.fillRect(archerX + 1, archerY + 3, 6, 20);
+
+  // 弓（弧形）
+  const bowX = archerX + 14;
+  const bowY = archerY - 10;
+  ctx.strokeStyle = '#c8962a';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(bowX, bowY, 28, -Math.PI * 0.6, Math.PI * 0.6);
+  ctx.stroke();
+
+  // 弓弦（动态：如果在shooting状态则拉紧）
+  ctx.strokeStyle = 'rgba(240,234,248,0.7)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(bowX + 28 * Math.cos(-Math.PI * 0.6), bowY + 28 * Math.sin(-Math.PI * 0.6));
+  ctx.lineTo(bowX + 28 * Math.cos(Math.PI * 0.6), bowY + 28 * Math.sin(Math.PI * 0.6));
+  ctx.stroke();
+
+  // 搭在弦上的箭（当有箭剩余时显示）
+  if (arrowsLeft > 0 && state === 'playing') {
+    ctx.strokeStyle = '#c8962a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(bowX - 10, bowY);
+    ctx.lineTo(bowX + 40, bowY);
+    ctx.stroke();
+    // 箭头
+    ctx.fillStyle = '#F5C842';
+    ctx.beginPath();
+    ctx.moveTo(bowX + 40, bowY);
+    ctx.lineTo(bowX + 35, bowY - 5);
+    ctx.lineTo(bowX + 35, bowY + 5);
+    ctx.closePath();
+    ctx.fill();
+    // 尾羽
+    ctx.fillStyle = '#EC4899';
+    ctx.beginPath();
+    ctx.moveTo(bowX - 10, bowY);
+    ctx.lineTo(bowX - 18, bowY - 5);
+    ctx.lineTo(bowX - 15, bowY);
+    ctx.lineTo(bowX - 18, bowY + 5);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // 手臂（拉弦手）
+  ctx.strokeStyle = '#F0EAF8';
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(archerX + 6, archerY - 16);
+  ctx.lineTo(bowX - 10, bowY);
+  ctx.stroke();
+
+  // 前臂（持弓手）
+  ctx.beginPath();
+  ctx.moveTo(archerX + 6, archerY - 20);
+  ctx.lineTo(bowX, bowY - 8);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+// ─── 靶子绘制（同心圆） ───
+function drawTarget(tx, ty) {
+  // 靶环颜色（从外到内：白/黑/蓝/红/黄）
+  const rings = [
+    { r: 1.00, color: '#FFFFFF' },  // 1环 白
+    { r: 0.84, color: '#1a1a1a' },  // 3环 黑
+    { r: 0.68, color: '#2563EB' },  // 5环 蓝
+    { r: 0.52, color: '#DC2626' },  // 7环 红
+    { r: 0.34, color: '#DC2626' },  // 9环 红
+    { r: 0.18, color: '#F5C842' },  // 10环 黄（靶心）
+  ];
+
+  const R = target.radius;
+
+  // 外边框阴影
+  ctx.save();
+  ctx.shadowColor = 'rgba(245,200,66,0.3)';
+  ctx.shadowBlur = 20;
+
+  rings.forEach(ring => {
+    ctx.beginPath();
+    ctx.arc(tx, ty, R * ring.r, 0, Math.PI * 2);
+    ctx.fillStyle = ring.color;
+    ctx.fill();
+  });
+
+  // 环数刻度线
+  ctx.shadowBlur = 0;
+  const ringEdges = [1.00, 0.84, 0.68, 0.52, 0.34, 0.18];
+  ringEdges.forEach(r => {
+    ctx.beginPath();
+    ctx.arc(tx, ty, R * r, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // 靶心十字线
+  ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(tx - R * 0.18, ty);
+  ctx.lineTo(tx + R * 0.18, ty);
+  ctx.moveTo(tx, ty - R * 0.18);
+  ctx.lineTo(tx, ty + R * 0.18);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+// ─── 钉在靶上的箭 ───
+function drawStuckArrows() {
+  stukkArrows.forEach(a => {
+    ctx.save();
+    ctx.translate(target.x + a.relX, target.y + a.relY);
+    ctx.rotate(a.angle);
+
+    // 箭杆
+    ctx.strokeStyle = '#c8962a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-30, 0);
+    ctx.lineTo(5, 0);
+    ctx.stroke();
+
+    // 箭头
+    ctx.fillStyle = '#aaa';
+    ctx.beginPath();
+    ctx.moveTo(5, 0);
+    ctx.lineTo(0, -3);
+    ctx.lineTo(0, 3);
+    ctx.closePath();
+    ctx.fill();
+
+    // 尾羽
+    ctx.fillStyle = '#EC4899';
+    ctx.beginPath();
+    ctx.moveTo(-30, 0);
+    ctx.lineTo(-36, -5);
+    ctx.lineTo(-33, 0);
+    ctx.lineTo(-36, 5);
+    ctx.closePath();
+    ctx.fill();
+
+    // 靶心命中 —— 金色光晕
+    if (a.score === 10 && a.flashTimer > 0) {
+      const alpha = a.flashTimer / 30;
+      ctx.beginPath();
+      ctx.arc(5, 0, (1 - alpha) * 20 + 5, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(245,200,66,${alpha * 0.8})`;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      a.flashTimer--;
+    }
+
+    ctx.restore();
+  });
+}
+
+// ─── 飞行中的箭矢 ───
+function updateFlyingArrows() {
+  flyingArrows = flyingArrows.filter(a => {
+    a.x += a.vx;
+    a.y += a.vy;
+    // 风力影响
+    a.vy += wind.y * 0.04;
+    a.vx += wind.x * 0.04;
+
+    // 绘制箭矢
+    ctx.save();
+    const angle = Math.atan2(a.vy, a.vx);
+    ctx.translate(a.x, a.y);
+    ctx.rotate(angle);
+
+    // 箭杆
+    ctx.strokeStyle = '#c8962a';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-28, 0);
+    ctx.lineTo(6, 0);
+    ctx.stroke();
+
+    // 箭头
+    ctx.fillStyle = '#e0e0e0';
+    ctx.beginPath();
+    ctx.moveTo(6, 0); ctx.lineTo(1, -4); ctx.lineTo(1, 4);
+    ctx.closePath(); ctx.fill();
+
+    // 尾羽
+    ctx.fillStyle = '#EC4899';
+    ctx.beginPath();
+    ctx.moveTo(-28, 0); ctx.lineTo(-34, -5); ctx.lineTo(-31, 0); ctx.lineTo(-34, 5);
+    ctx.closePath(); ctx.fill();
+
+    // 运动拖尾
+    ctx.strokeStyle = 'rgba(245,200,66,0.3)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-28, 0); ctx.lineTo(-50, 0);
+    ctx.stroke();
+
+    ctx.restore();
+
+    // 超出边界则移除
+    return a.x < canvas.width + 100 && a.x > -100 && a.y > -100 && a.y < canvas.height + 100;
+  });
+}
+
+// ─── 准星绘制 ───
+function drawCrosshair(cx, cy, isStable) {
+  ctx.save();
+  const size = 28;
+  const innerSize = 6;
+  const color = isStable ? '#22C55E' : 'rgba(245,200,66,0.9)';
+  const alpha = isStable ? 0.95 : 0.85;
+
+  // 外圆
+  ctx.beginPath();
+  ctx.arc(cx, cy, size, 0, Math.PI * 2);
+  ctx.strokeStyle = `rgba(${isStable ? '34,197,94' : '245,200,66'},${alpha})`;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // 内圆
+  ctx.beginPath();
+  ctx.arc(cx, cy, innerSize, 0, Math.PI * 2);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // 四条瞄准线（带缺口）
+  const gap = 10;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.lineCap = 'round';
+
+  // 上
+  ctx.beginPath(); ctx.moveTo(cx, cy - gap); ctx.lineTo(cx, cy - size - 8); ctx.stroke();
+  // 下
+  ctx.beginPath(); ctx.moveTo(cx, cy + gap); ctx.lineTo(cx, cy + size + 8); ctx.stroke();
+  // 左
+  ctx.beginPath(); ctx.moveTo(cx - gap, cy); ctx.lineTo(cx - size - 8, cy); ctx.stroke();
+  // 右
+  ctx.beginPath(); ctx.moveTo(cx + gap, cy); ctx.lineTo(cx + size + 8, cy); ctx.stroke();
+
+  // 屏气时的绿色光晕
+  if (isStable) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, size + 4, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(34,197,94,0.25)';
+    ctx.lineWidth = 6;
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+// ─── 飘字特效 ───
+function updateFloatTexts() {
+  floatTexts = floatTexts.filter(t => {
+    t.y += t.vy;
+    t.life--;
+    t.alpha = t.life / t.maxLife;
+
+    ctx.save();
+    ctx.globalAlpha = t.alpha;
+    ctx.font = `bold ${t.size || 24}px -apple-system, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = t.color;
+    ctx.shadowColor = t.color;
+    ctx.shadowBlur = 10;
+    ctx.fillText(t.text, t.x, t.y);
+    ctx.restore();
+
+    return t.life > 0;
+  });
+}
+
+// ─── 粒子特效（靶心金色闪光） ───
+function spawnBullseyeParticles(x, y) {
+  for (let i = 0; i < 24; i++) {
+    const angle = (Math.PI * 2 / 24) * i + Math.random() * 0.3;
+    const speed = 2 + Math.random() * 5;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 40 + Math.random() * 20,
+      maxLife: 60,
+      color: Math.random() > 0.5 ? '#F5C842' : '#EC4899',
+      r: 2 + Math.random() * 3,
+    });
+  }
+}
+
+function updateParticles() {
+  particles = particles.filter(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.1; // 重力
+    p.life--;
+    const alpha = p.life / p.maxLife;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 6;
+    ctx.fill();
+    ctx.restore();
+
+    return p.life > 0;
+  });
+}
+
+// ─── 命中环数计算 ───
+function calcScore(dx, dy) {
+  const R = target.radius;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const ratio = dist / R;
+
+  if (ratio > 1.0) return 0;       // 脱靶
+  if (ratio > 0.84) return 1;
+  if (ratio > 0.68) return 3;
+  if (ratio > 0.52) return 5;
+  if (ratio > 0.34) return 7;
+  if (ratio > 0.18) return 9;
+  return 10;                         // 靶心
+}
+
+// ─── 准星漂移更新 ───
+function updateDrift() {
+  if (crosshair.steadyTimer > 0) {
+    // 屏气中：快速收敛到鼠标位置
+    crosshair.driftX *= 0.85;
+    crosshair.driftY *= 0.85;
+    crosshair.driftVX *= 0.7;
+    crosshair.driftVY *= 0.7;
+    crosshair.steadyTimer--;
+  } else {
+    // 正常漂移
+    const driftMag = cfg.driftStrength * 0.12;
+    // 随机施加微小冲量
+    if (Math.random() < 0.04) {
+      crosshair.driftVX += (Math.random() - 0.5) * driftMag * 2;
+      crosshair.driftVY += (Math.random() - 0.5) * driftMag * 2;
+    }
+    // 弹簧回弹（趋向鼠标中心）
+    const toMouseX = -crosshair.driftX * 0.015;
+    const toMouseY = -crosshair.driftY * 0.015;
+    crosshair.driftVX += toMouseX;
+    crosshair.driftVY += toMouseY;
+    // 阻尼
+    crosshair.driftVX *= 0.92;
+    crosshair.driftVY *= 0.92;
+    // 速度上限
+    const maxSpeed = driftMag * 3;
+    const spd = Math.sqrt(crosshair.driftVX ** 2 + crosshair.driftVY ** 2);
+    if (spd > maxSpeed) {
+      crosshair.driftVX = (crosshair.driftVX / spd) * maxSpeed;
+      crosshair.driftVY = (crosshair.driftVY / spd) * maxSpeed;
+    }
+    crosshair.driftX += crosshair.driftVX;
+    crosshair.driftY += crosshair.driftVY;
+    // 漂移幅度上限
+    const maxDrift = cfg.driftStrength * 3.5;
+    if (Math.abs(crosshair.driftX) > maxDrift) crosshair.driftX = Math.sign(crosshair.driftX) * maxDrift;
+    if (Math.abs(crosshair.driftY) > maxDrift) crosshair.driftY = Math.sign(crosshair.driftY) * maxDrift;
+  }
+
+  crosshair.x = crosshair.mouseX + crosshair.driftX;
+  crosshair.y = crosshair.mouseY + crosshair.driftY;
+}
+
+// ─── 靶子位置更新 ───
+function updateTarget() {
+  const speeds = [0, 0.8, 1.8, 3.5];
+  const spd = speeds[cfg.targetSpeed];
+  if (spd === 0) return;
+
+  target.moveOffset += spd * target.moveDir;
+  if (Math.abs(target.moveOffset) >= target.maxOffset) {
+    target.moveDir *= -1;
+  }
+  target.y = target.baseY + target.moveOffset;
+}
+
+// ─── 主渲染循环 ───
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 背景渐变
+  const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+  grad.addColorStop(0, '#1A0A2E');
+  grad.addColorStop(0.5, '#0D0720');
+  grad.addColorStop(1, '#150820');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // 草地背景线条（装饰）
+  ctx.save();
+  for (let i = 0; i < 8; i++) {
+    const yLine = (canvas.height * 0.65) + i * 12;
+    ctx.strokeStyle = `rgba(255,255,255,${0.02 - i * 0.002})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, yLine); ctx.lineTo(canvas.width, yLine);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // 更新靶子位置
+  updateTarget();
+
+  // 绘制靶子
+  drawTarget(target.x, target.y);
+
+  // 绘制钉在靶上的箭
+  drawStuckArrows();
+
+  // 绘制弓箭手
+  drawArcher(canvas.width, canvas.height);
+
+  // 更新和绘制飞行箭矢
+  updateFlyingArrows();
+
+  // 更新准星漂移
+  if (state === 'playing') updateDrift();
+
+  // 绘制准星
+  if (state === 'playing') {
+    const isStable = crosshair.steadyTimer > 0;
+    drawCrosshair(crosshair.x, crosshair.y, isStable);
+    // 屏气时同步更新状态显示
+    document.getElementById('statCrosshair').textContent = isStable ? '屏气稳定' : '漂移中';
+  }
+
+  // 飘字
+  updateFloatTexts();
+
+  // 粒子
+  updateParticles();
+
+  // 连续帧
+  if (state === 'playing') {
+    frameId = requestAnimationFrame(gameLoop);
+  }
+}
+
+// ─── 发射箭矢 ───
+function shoot() {
+  if (state !== 'playing' || arrowsLeft <= 0 || flyingArrows.length > 0) return;
+
+  // 箭矢从弓手位置出发，目标是准星位置
+  const archerX = canvas.width * 0.16 + 54; // 弓头X
+  const archerY = canvas.height * 0.5 - 10;
+  const targetX = crosshair.x;
+  const targetY = crosshair.y;
+
+  const dx = targetX - archerX;
+  const dy = targetY - archerY;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const speed = 22;
+  const vx = (dx / dist) * speed;
+  const vy = (dy / dist) * speed;
+
+  // 随机漂移（风力 + 不稳定因素）
+  const instability = cfg.driftStrength * 0.06;
+  const driftY = wind.y * 0.35 + (Math.random() - 0.5) * instability * 8;
+  const driftX = wind.x * 0.35 + (Math.random() - 0.5) * instability * 4;
+
+  flyingArrows.push({
+    x: archerX, y: archerY,
+    vx: vx + driftX,
+    vy: vy + driftY,
+    // 记录最终落点供命中检测
+    destX: targetX + wind.x * 8 + driftX * 3,
+    destY: targetY + wind.y * 8 + driftY * 3,
+    hit: false,
+    frame: 0,
+  });
+
+  arrowsLeft--;
+  document.getElementById('hudArrows').textContent = arrowsLeft;
+  updateArrowBar();
+
+  // 等箭矢到达靶子区域后再做命中检测
+  // 用定时器模拟飞行时间（约 dist/speed 帧）
+  const travelFrames = Math.round(dist / speed);
+  setTimeout(() => {
+    resolveHit(targetX + wind.x * 8 + driftX * 3, targetY + wind.y * 8 + driftY * 3);
+  }, (travelFrames / 60) * 1000 + 100);
+}
+
+// ─── 命中结算 ───
+function resolveHit(finalX, finalY) {
+  // 以靶子当前位置判断
+  const dx = finalX - target.x;
+  const dy = finalY - target.y;
+  const score = calcScore(dx, dy);
+  const isHit = score > 0;
+
+  roundScores.push(score);
+  totalScore += score;
+
+  if (isHit) {
+    if (score === 10) {
+      bullCount++;
+      // 金色闪光特效
+      spawnBullseyeParticles(target.x + dx, target.y + dy);
+      floatTexts.push({
+        x: target.x + dx, y: target.y + dy - 20,
+        text: '10环！',
+        color: '#F5C842', alpha: 1, vy: -1.8, life: 80, maxLife: 80, size: 28,
+      });
+    } else {
+      floatTexts.push({
+        x: target.x + dx, y: target.y + dy - 20,
+        text: `${score}环`,
+        color: score >= 7 ? '#EC4899' : '#F0EAF8',
+        alpha: 1, vy: -1.5, life: 60, maxLife: 60, size: 22,
+      });
+    }
+
+    // 钉在靶子上
+    stukkArrows.push({
+      relX: dx, relY: dy,
+      angle: Math.atan2(dy - 0, dx - 0) + Math.PI, // 箭头朝靶心
+      score,
+      flashTimer: score === 10 ? 30 : 0,
+    });
+  } else {
+    missCount++;
+    floatTexts.push({
+      x: finalX, y: finalY,
+      text: '脱靶',
+      color: '#F87171', alpha: 1, vy: -1.5, life: 50, maxLife: 50, size: 20,
+    });
+  }
+
+  // 更新HUD和统计
+  document.getElementById('hudScore').textContent = totalScore;
+  updateRightPanel();
+
+  // 检查是否用完所有箭
+  if (arrowsLeft <= 0) {
+    // 延迟一点再结束，让最后一个飘字显示出来
+    setTimeout(() => endGame(), 1200);
+  }
+}
+
+// ─── 更新箭矢条 ───
+function updateArrowBar() {
+  const bar = document.getElementById('arrowBar');
+  const dots = bar.querySelectorAll('.arrow-dot');
+  const used = cfg.arrowCount - arrowsLeft;
+  dots.forEach((d, i) => {
+    d.classList.toggle('used', i < used);
+  });
+}
+
+// ─── 初始化箭矢条 ───
+function initArrowBar() {
+  const bar = document.getElementById('arrowBar');
+  bar.innerHTML = '';
+  for (let i = 0; i < cfg.arrowCount; i++) {
+    const d = document.createElement('div');
+    d.className = 'arrow-dot';
+    bar.appendChild(d);
+  }
+}
+
+// ─── 更新右侧面板 ───
+function updateRightPanel() {
+  // 本局序列
+  const seq = document.getElementById('scoreSeq');
+  seq.innerHTML = '';
+  roundScores.forEach(s => {
+    const c = document.createElement('div');
+    c.className = 'score-chip' + (s === 10 ? ' bull' : s === 0 ? ' miss' : ' hit');
+    c.textContent = s === 0 ? '脱' : s;
+    seq.appendChild(c);
+  });
+  // 填充占位
+  for (let i = roundScores.length; i < cfg.arrowCount; i++) {
+    const c = document.createElement('div');
+    c.className = 'score-chip';
+    c.textContent = '—';
+    seq.appendChild(c);
+  }
+
+  document.getElementById('statTotal').textContent = totalScore;
+  document.getElementById('statBest').textContent = roundScores.length > 0
+    ? Math.max(...roundScores) + ' 环'
+    : '—';
+  document.getElementById('statBull').textContent = bullCount + ' 次';
+  document.getElementById('statMiss').textContent = missCount + ' 次';
+
+  // 奖品进度
+  updatePrizeProgress(totalScore);
+}
+
+// ─── 奖品进度更新 ───
+function updatePrizeProgress(score) {
+  const prizes = getPrizeConfig();
+  const maxScore = cfg.arrowCount * 10;
+  const list = document.getElementById('prizeProgressList');
+  list.innerHTML = '';
+
+  prizes.forEach(p => {
+    const pct = Math.min(100, (score / p.threshold) * 100);
+    const unlocked = score >= p.threshold;
+    const div = document.createElement('div');
+    div.className = 'prize-progress';
+    div.innerHTML = `
+      <div class="prize-progress-header">
+        <span>${p.icon} ${p.name}</span>
+        <span style="color:${unlocked ? 'var(--gold)' : 'var(--muted)'}">${score}/${p.threshold}环</span>
+      </div>
+      <div class="prize-progress-bar">
+        <div class="prize-progress-fill" style="width:${pct}%"></div>
+      </div>
+      ${unlocked ? `<div style="margin-top:5px;font-size:11px;color:#22C55E;font-weight:700;">✓ 已解锁</div>` : ''}
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ─── 读取奖品配置 ───
+function getPrizeConfig() {
+  return [
+    {
+      icon: '🥉',
+      name: document.getElementById('prize1Name').value || '奖品1',
+      threshold: parseInt(document.getElementById('prize1Score').value) || 15,
+    },
+    {
+      icon: '🥈',
+      name: document.getElementById('prize2Name').value || '奖品2',
+      threshold: parseInt(document.getElementById('prize2Score').value) || 25,
+    },
+    {
+      icon: '🥇',
+      name: document.getElementById('prize3Name').value || '奖品3',
+      threshold: parseInt(document.getElementById('prize3Score').value) || 40,
+    },
+  ];
+}
+
+// ─── 获取本局最高奖品 ───
+function getBestPrize(score) {
+  const prizes = getPrizeConfig().reverse(); // 从高到低检查
+  for (const p of prizes) {
+    if (score >= p.threshold) return p;
+  }
+  return null;
+}
+
+// ─── 游戏开始 ───
+function startGame() {
+  state = 'playing';
+  arrowsLeft = cfg.arrowCount;
+  totalScore = 0;
+  roundScores = [];
+  bullCount = 0;
+  missCount = 0;
+  stukkArrows = [];
+  flyingArrows = [];
+  particles = [];
+  floatTexts = [];
+  crosshair.driftX = 0; crosshair.driftY = 0;
+  crosshair.driftVX = 0; crosshair.driftVY = 0;
+  crosshair.steadyTimer = 0;
+  crosshair.breathUsed = 0;
+
+  initArrowBar();
+  updateArrowBar();
+  updateBreathUI();
+  initRightPanelEmpty();
+  initWind();
+
+  document.getElementById('hudScore').textContent = '0';
+  document.getElementById('hudArrows').textContent = arrowsLeft;
+  document.getElementById('hudHint').textContent = '移动鼠标瞄准 · 点击发射';
+  document.getElementById('overlayStart').classList.add('hidden');
+  document.getElementById('overlayEnd').classList.add('hidden');
+
+  if (frameId) cancelAnimationFrame(frameId);
+  gameLoop();
+}
+
+// ─── 游戏结束 ───
+function endGame() {
+  state = 'ended';
+  if (frameId) cancelAnimationFrame(frameId);
+
+  // 更新历史
+  history.gamesPlayed++;
+  if (totalScore > history.bestScore) history.bestScore = totalScore;
+  history.totalBull += bullCount;
+  const bestArrow = roundScores.length > 0 ? Math.max(...roundScores) : 0;
+  if (bestArrow > history.bestArrow) history.bestArrow = bestArrow;
+  updateHistoryUI();
+
+  // 奖品
+  const prize = getBestPrize(totalScore);
+  const maxScore = cfg.arrowCount * 10;
+  const pct = Math.round((totalScore / maxScore) * 100);
+
+  let endTitle = totalScore >= maxScore * 0.8 ? '🏆 神射手！' : totalScore >= maxScore * 0.5 ? '🎯 挑战完成' : '🏹 挑战结束';
+  document.getElementById('endTitle').textContent = endTitle;
+  document.getElementById('endScore').textContent = `总环数：${totalScore} / ${maxScore}  (${pct}%)`;
+
+  if (prize) {
+    document.getElementById('endPrize').textContent = `${prize.icon} 解锁奖品：${prize.name}`;
+    document.getElementById('endPrize').style.display = '';
+  } else {
+    document.getElementById('endPrize').style.display = 'none';
+  }
+
+  const missStr = missCount > 0 ? `脱靶 ${missCount} 次` : '全部命中';
+  const bullStr = bullCount > 0 ? ` · 靶心 ${bullCount} 次` : '';
+  document.getElementById('endSub').textContent = `${missStr}${bullStr}`;
+
+  document.getElementById('overlayEnd').classList.remove('hidden');
+
+  // 最后一帧渲染确保结果显示
+  gameLoop();
+}
+
+// ─── 屏气功能 ───
+function activateBreath() {
+  if (crosshair.breathUsed >= crosshair.breathMax || crosshair.steadyTimer > 0) return;
+  crosshair.steadyTimer = 180; // 3秒 × 60帧
+  crosshair.breathUsed++;
+  updateBreathUI();
+  document.getElementById('hudHint').textContent = '🫁 屏住呼吸... 准星稳定中';
+  document.getElementById('statCrosshair').textContent = '屏气稳定';
+
+  // 3秒后解除
+  setTimeout(() => {
+    if (state === 'playing') {
+      document.getElementById('hudHint').textContent = '移动鼠标瞄准 · 点击发射';
+    }
+    updateBreathUI();
+  }, 3000);
+}
+
+function updateBreathUI() {
+  for (let i = 0; i < 2; i++) {
+    const chip = document.getElementById(`breath${i}`);
+    if (i < crosshair.breathUsed) {
+      chip.classList.remove('active');
+      chip.classList.add('used');
+    } else if (crosshair.steadyTimer > 0 && i === crosshair.breathUsed - 1) {
+      chip.classList.add('active');
+      chip.classList.remove('used');
+    } else {
+      chip.classList.remove('active', 'used');
+    }
+  }
+}
+
+// ─── 初始化右侧空白状态 ───
+function initRightPanelEmpty() {
+  const seq = document.getElementById('scoreSeq');
+  seq.innerHTML = '';
+  for (let i = 0; i < cfg.arrowCount; i++) {
+    const c = document.createElement('div');
+    c.className = 'score-chip';
+    c.textContent = '—';
+    seq.appendChild(c);
+  }
+  document.getElementById('statTotal').textContent = '0';
+  document.getElementById('statBest').textContent = '—';
+  document.getElementById('statBull').textContent = '0 次';
+  document.getElementById('statMiss').textContent = '0 次';
+  updatePrizeProgress(0);
+}
+
+// ─── 历史 UI 更新 ───
+function updateHistoryUI() {
+  document.getElementById('statHistoryBest').textContent =
+    history.bestScore > 0 ? history.bestScore + ' 环' : '—';
+  document.getElementById('statGames').textContent = history.gamesPlayed + ' 局';
+  document.getElementById('statTotalBull').textContent = history.totalBull;
+  document.getElementById('statHistoryBestArrow').textContent =
+    history.bestArrow > 0 ? history.bestArrow + ' 环' : '—';
+}
+
+// ─── 暂停 ───
+let pauseBtn = document.getElementById('btnPause');
+pauseBtn.addEventListener('click', () => {
+  if (state === 'playing') {
+    state = 'paused';
+    if (frameId) cancelAnimationFrame(frameId);
+    pauseBtn.textContent = '▶ 继续';
+    document.getElementById('hudHint').textContent = '已暂停';
+  } else if (state === 'paused') {
+    state = 'playing';
+    pauseBtn.textContent = '⏸ 暂停';
+    document.getElementById('hudHint').textContent = '移动鼠标瞄准 · 点击发射';
+    gameLoop();
+  }
+});
+
+// ─── 重置 ───
+document.getElementById('btnReset').addEventListener('click', () => {
+  if (state !== 'idle') {
+    state = 'idle';
+    if (frameId) cancelAnimationFrame(frameId);
+    pauseBtn.textContent = '⏸ 暂停';
+    document.getElementById('overlayStart').classList.remove('hidden');
+    document.getElementById('overlayEnd').classList.add('hidden');
+    // 清场后渲染一帧
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+});
+
+// ─── 开始按钮 ───
+document.getElementById('btnStart').addEventListener('click', startGame);
+document.getElementById('btnRestart').addEventListener('click', startGame);
+document.getElementById('btnShare').addEventListener('click', () => {
+  alert(`我在射箭挑战中得了 ${totalScore} 环！${bullCount > 0 ? `靶心命中 ${bullCount} 次！` : ''}`);
+});
+
+// ─── 鼠标控制准星 ───
+canvas.addEventListener('mousemove', e => {
+  if (state !== 'playing') return;
+  const rect = canvas.getBoundingClientRect();
+  crosshair.mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+  crosshair.mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+});
+
+// ─── 点击发射 ───
+canvas.addEventListener('click', e => {
+  if (state !== 'playing') return;
+  shoot();
+});
+
+// ─── 键盘：Shift 屏气 ───
+let shiftDown = false;
+document.addEventListener('keydown', e => {
+  if (e.key === 'Shift' && !shiftDown) {
+    shiftDown = true;
+    if (state === 'playing') activateBreath();
+  }
+});
+document.addEventListener('keyup', e => {
+  if (e.key === 'Shift') shiftDown = false;
+});
+
+// ─── 左侧配置面板交互 ───
+
+// 靶子速度
+document.getElementById('targetSpeedBtns').addEventListener('click', e => {
+  const btn = e.target.closest('.opt-btn');
+  if (!btn) return;
+  document.querySelectorAll('#targetSpeedBtns .opt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  cfg.targetSpeed = parseInt(btn.dataset.val);
+  const labels = ['固定', '慢速', '中速', '快速'];
+  document.getElementById('statTargetSpeed').textContent = labels[cfg.targetSpeed];
+});
+
+// 风力
+document.getElementById('windBtns').addEventListener('click', e => {
+  const btn = e.target.closest('.opt-btn');
+  if (!btn) return;
+  document.querySelectorAll('#windBtns .opt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  cfg.windLevel = parseInt(btn.dataset.val);
+  initWind();
+});
+
+// 箭数
+document.getElementById('arrowCountBtns').addEventListener('click', e => {
+  const btn = e.target.closest('.opt-btn');
+  if (!btn) return;
+  document.querySelectorAll('#arrowCountBtns .opt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  cfg.arrowCount = parseInt(btn.dataset.val);
+  document.getElementById('hudArrows').textContent = cfg.arrowCount;
+  initArrowBar();
+});
+
+// 准星漂移强度
+document.getElementById('driftSlider').addEventListener('input', e => {
+  cfg.driftStrength = parseInt(e.target.value);
+  document.getElementById('driftVal').textContent = cfg.driftStrength;
+});
+
+// ─── 自适应 Canvas 尺寸 ───
+const resizeObs = new ResizeObserver(() => {
+  resizeCanvas();
+  // idle 状态也渲染一帧
+  if (state === 'idle' || state === 'ended') {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+});
+resizeObs.observe(wrap);
+
+// ─── 初始化 ───
+resizeCanvas();
+initArrowBar();
+initRightPanelEmpty();
+updateHistoryUI();
+initWind();
+
+// 初始一帧显示靶子背景
+(function initFrame() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+  grad.addColorStop(0, '#1A0A2E');
+  grad.addColorStop(1, '#0D0720');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  drawTarget(target.x, target.y);
+  drawArcher(canvas.width, canvas.height);
+})();
+
+</script>
+</body>
+</html>
