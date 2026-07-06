@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 能量收集</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+    /* 能量球颜色（根据进度动态更新） */
+    --energy-color: #4ADE80;
+    --energy-glow: rgba(74,222,128,0.4);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 导航栏 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    height: 52px;
+    gap: 16px;
+    overflow: hidden;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 16px; font-weight: 700;
+    text-decoration: none; color: var(--text);
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-scroll {
+    display: flex; gap: 2px;
+    overflow-x: auto; flex: 1;
+    scrollbar-width: none;
+  }
+  .nav-scroll::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 6px 12px; border-radius: 6px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  /* ─── 三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    height: calc(100vh - 52px - 40px);
+    overflow: hidden;
+  }
+
+  /* ─── 左侧面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.5px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold); flex-shrink: 0;
+  }
+
+  /* ─── 表单控件 ─── */
+  .form-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 0; font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .form-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .form-label {
+    flex: 1; color: var(--muted); font-size: 12px;
+  }
+  .form-input {
+    width: 80px; background: rgba(255,255,255,0.07);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 8px; color: var(--text); font-size: 12px;
+    text-align: center; transition: border 0.2s;
+  }
+  .form-input:focus { outline: none; border-color: var(--accent); }
+  .btn-apply {
+    width: 100%; padding: 9px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 8px;
+    color: #fff; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: opacity 0.2s;
+    margin-top: 4px;
+  }
+  .btn-apply:hover { opacity: 0.85; }
+
+  /* 奖品配置行 */
+  .prize-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .prize-row:last-child { border-bottom: none; }
+  .prize-threshold {
+    width: 44px; color: var(--gold); font-weight: 600; flex-shrink: 0;
+    font-size: 11px;
+  }
+  .prize-input {
+    flex: 1; background: rgba(255,255,255,0.07);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 8px; color: var(--text); font-size: 12px;
+  }
+  .prize-input:focus { outline: none; border-color: var(--accent2); }
+
+  /* 好友列表 */
+  .friend-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .friend-row:last-child { border-bottom: none; }
+  .friend-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .friend-name { flex: 1; color: var(--text); }
+  .friend-energy {
+    color: var(--gold); font-size: 11px;
+    background: rgba(245,200,66,0.1);
+    padding: 2px 6px; border-radius: 4px;
+  }
+  .friend-btn {
+    padding: 3px 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 5px;
+    color: #fff; font-size: 11px; cursor: pointer;
+    transition: opacity 0.2s; flex-shrink: 0;
+  }
+  .friend-btn:hover { opacity: 0.8; }
+  .friend-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* ─── 中间游戏区 ─── */
+  .panel-center {
+    display: flex; flex-direction: column;
+    overflow: hidden; position: relative;
+    background: radial-gradient(ellipse at 50% 60%, #110830 0%, #0D0720 70%);
+  }
+
+  /* 能量碎片飘浮区（上半部分） */
+  .float-zone {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* 粒子背景星点 */
+  .bg-star {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.6);
+    pointer-events: none;
+    animation: twinkle-bg var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+  }
+  @keyframes twinkle-bg {
+    0%, 100% { opacity: 0.15; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.5); }
+  }
+
+  /* 能量球区域（中央固定） */
+  .energy-ball-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0 10px;
+    position: relative;
+    z-index: 5;
+    flex-shrink: 0;
+  }
+
+  /* SVG进度环 */
+  .progress-ring-wrap {
+    position: relative;
+    width: 220px; height: 220px;
+    flex-shrink: 0;
+  }
+  .progress-ring-svg {
+    position: absolute; inset: 0;
+    transform: rotate(-90deg);
+  }
+  .progress-track {
+    fill: none;
+    stroke: rgba(255,255,255,0.08);
+    stroke-width: 6;
+  }
+  .progress-fill {
+    fill: none;
+    stroke: var(--energy-color);
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                stroke 0.6s ease;
+    filter: drop-shadow(0 0 4px var(--energy-glow));
+  }
+
+  /* 中央大能量球 */
+  .energy-ball {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.6s ease;
+    z-index: 10;
+    /* 多层光晕 */
+    box-shadow:
+      0 0 30px var(--energy-glow),
+      0 0 60px rgba(74,222,128,0.15),
+      0 0 100px rgba(74,222,128,0.05),
+      inset 0 -20px 40px rgba(0,0,0,0.3);
+    animation: ball-float 4s ease-in-out infinite;
+    overflow: hidden;
+  }
+  .energy-ball::before {
+    /* 内部流光层 */
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0%,
+      rgba(255,255,255,0.12) 20%,
+      transparent 40%,
+      rgba(255,255,255,0.06) 60%,
+      transparent 80%
+    );
+    animation: ball-swirl 3s linear infinite;
+  }
+  .energy-ball::after {
+    /* 高光反射 */
+    content: '';
+    position: absolute;
+    top: 14%; left: 18%;
+    width: 40%; height: 30%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.35) 0%, transparent 70%);
+    transform: rotate(-30deg);
+  }
+  .energy-ball-inner {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%,
+      rgba(255,255,255,0.15) 0%,
+      var(--energy-color) 40%,
+      rgba(0,0,0,0.3) 100%
+    );
+    transition: background 0.6s ease;
+  }
+  /* 球心能量数值 */
+  .ball-value {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .ball-num {
+    font-size: 32px; font-weight: 900;
+    color: #fff;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+    line-height: 1;
+  }
+  .ball-label {
+    font-size: 11px; color: rgba(255,255,255,0.7);
+    margin-top: 3px;
+  }
+
+  @keyframes ball-float {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -52%) scale(1.02); }
+  }
+  @keyframes ball-swirl {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  /* 点击膨胀动画 */
+  .energy-ball.pulse {
+    animation: ball-pulse 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  @keyframes ball-pulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.12); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  /* 能量信息 */
+  .energy-info {
+    text-align: center; margin-top: 12px;
+  }
+  .energy-pct {
+    font-size: 13px; color: var(--muted);
+  }
+  .energy-pct strong {
+    color: var(--energy-color);
+    transition: color 0.6s;
+    font-size: 14px;
+  }
+  .energy-max-hint {
+    font-size: 11px; color: var(--muted); margin-top: 3px;
+  }
+
+  /* 满能量兑换按钮 */
+  .btn-redeem {
+    margin-top: 10px;
+    padding: 10px 32px;
+    background: linear-gradient(135deg, var(--gold), #F59E0B);
+    border: none; border-radius: 24px;
+    color: #1a0a2e; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(245,200,66,0.4);
+    animation: redeem-shine 2s ease-in-out infinite;
+  }
+  .btn-redeem:hover { transform: scale(1.05); }
+  @keyframes redeem-shine {
+    0%, 100% { box-shadow: 0 4px 20px rgba(245,200,66,0.4); }
+    50% { box-shadow: 0 4px 35px rgba(245,200,66,0.7); }
+  }
+  .btn-redeem.hidden { display: none; }
+
+  /* ─── 行为按钮区 ─── */
+  .action-zone {
+    display: flex;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+    flex-shrink: 0;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .action-btn {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+    padding: 10px 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer; transition: all 0.2s;
+    color: var(--text); font-size: 12px;
+    min-width: 70px; flex-shrink: 0;
+  }
+  .action-btn:hover { border-color: var(--accent); background: rgba(124,58,237,0.1); }
+  .action-btn:active { transform: scale(0.95); }
+  .action-btn .icon { font-size: 20px; }
+  .action-btn .name { font-size: 11px; color: var(--muted); }
+  .action-btn .earn {
+    font-size: 10px; color: var(--gold);
+    background: rgba(245,200,66,0.1);
+    padding: 1px 5px; border-radius: 4px;
+  }
+  .action-btn.cooldown {
+    opacity: 0.45; cursor: not-allowed;
+  }
+  .action-btn .cd-timer {
+    font-size: 10px; color: var(--accent2);
+  }
+
+  /* ─── 能量碎片 ─── */
+  .fragment {
+    position: absolute;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 20;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    transition: transform 0.2s;
+    user-select: none;
+    animation: frag-float var(--float-dur, 4s) ease-in-out infinite var(--float-delay, 0s);
+    filter: drop-shadow(0 0 6px var(--frag-glow));
+  }
+  .fragment:hover { transform: scale(1.25) !important; }
+
+  /* 普通能量碎片（绿色） */
+  .fragment.normal {
+    width: 36px; height: 36px;
+    background: radial-gradient(circle at 35% 30%, #86efac, #22c55e 60%, #15803d);
+    --frag-glow: rgba(34,197,94,0.7);
+    box-shadow: 0 0 10px rgba(34,197,94,0.5);
+  }
+  /* 大能量碎片（黄色） */
+  .fragment.big {
+    width: 48px; height: 48px;
+    background: radial-gradient(circle at 35% 30%, #fde68a, #f59e0b 60%, #b45309);
+    --frag-glow: rgba(245,158,11,0.7);
+    box-shadow: 0 0 14px rgba(245,158,11,0.5);
+  }
+  /* 好友赠送（粉色） */
+  .fragment.gift {
+    width: 40px; height: 40px;
+    background: radial-gradient(circle at 35% 30%, #fbcfe8, #ec4899 60%, #9d174d);
+    --frag-glow: rgba(236,72,153,0.7);
+    box-shadow: 0 0 12px rgba(236,72,153,0.5);
+  }
+
+  @keyframes frag-float {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    25%  { transform: translate(var(--fx1, 8px), var(--fy1, -10px)) rotate(5deg); }
+    50%  { transform: translate(var(--fx2, -6px), var(--fy2, 8px)) rotate(-3deg); }
+    75%  { transform: translate(var(--fx3, 10px), var(--fy3, -5px)) rotate(4deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+
+  /* 碎片飞向大球 */
+  .fragment.collecting {
+    pointer-events: none;
+    animation: none;
+    transition: top 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+                left 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.55s ease,
+                opacity 0.55s ease;
+    transform: scale(0.2);
+    opacity: 0;
+  }
+
+  /* +数值飘字 */
+  .float-text {
+    position: absolute;
+    font-size: 18px; font-weight: 800;
+    pointer-events: none;
+    z-index: 50;
+    animation: float-up 1s ease-out forwards;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+  @keyframes float-up {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    60% { opacity: 1; transform: translateY(-30px) scale(1.1); }
+    100% { opacity: 0; transform: translateY(-55px) scale(0.8); }
+  }
+
+  /* 感谢动画 */
+  .thanks-popup {
+    position: absolute;
+    background: linear-gradient(135deg, var(--accent2), #f43f5e);
+    color: #fff; font-size: 12px; font-weight: 600;
+    padding: 5px 10px; border-radius: 20px;
+    pointer-events: none; z-index: 50;
+    animation: thanks-fly 1.2s ease-out forwards;
+    white-space: nowrap;
+  }
+  @keyframes thanks-fly {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    80% { opacity: 1; transform: translateY(-40px) scale(1.05); }
+    100% { opacity: 0; transform: translateY(-60px) scale(0.9); }
+  }
+
+  /* 从行为按钮飞出的碎片 */
+  .spawn-particle {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 200;
+    animation: none;
+  }
+
+  /* ─── 右侧数据面板 ─── */
+  .stat-row {
+    display: flex; justify-content: space-between;
+    align-items: center; padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--muted); }
+  .stat-val { color: var(--gold); font-weight: 600; }
+
+  /* 好友贡献排行 */
+  .rank-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-num {
+    width: 18px; text-align: center;
+    font-size: 11px; font-weight: 700; color: var(--muted); flex-shrink: 0;
+  }
+  .rank-num.top1 { color: var(--gold); }
+  .rank-num.top2 { color: #c0c0c0; }
+  .rank-num.top3 { color: #cd7f32; }
+  .rank-avatar { font-size: 16px; flex-shrink: 0; }
+  .rank-name { flex: 1; color: var(--text); }
+  .rank-bar-wrap {
+    width: 60px; height: 5px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px; flex-shrink: 0; overflow: hidden;
+  }
+  .rank-bar {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.6s ease;
+  }
+  .rank-val { font-size: 11px; color: var(--gold); flex-shrink: 0; width: 28px; text-align: right; }
+
+  /* 历史记录 */
+  .history-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-prize {
+    flex: 1; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .history-time { color: var(--muted); font-size: 11px; flex-shrink: 0; }
+  .history-icon { font-size: 15px; flex-shrink: 0; }
+
+  /* 解锁进度块 */
+  .unlock-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .unlock-item:last-child { border-bottom: none; }
+  .unlock-icon { font-size: 18px; flex-shrink: 0; }
+  .unlock-info { flex: 1; min-width: 0; }
+  .unlock-name { color: var(--text); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .unlock-need { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .unlock-badge {
+    font-size: 10px; padding: 2px 7px; border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .unlock-badge.done {
+    background: rgba(74,222,128,0.15);
+    color: #4ade80; border: 1px solid rgba(74,222,128,0.3);
+  }
+  .unlock-badge.locked {
+    background: rgba(255,255,255,0.06);
+    color: var(--muted); border: 1px solid var(--border);
+  }
+
+  /* ─── 底部说明 ─── */
+  .footer {
+    height: 40px; display: flex; align-items: center;
+    justify-content: center;
+    border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--muted);
+    gap: 16px; flex-shrink: 0;
+  }
+  .footer span { display: flex; align-items: center; gap: 5px; }
+  .footer-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--gold); opacity: 0.6;
+  }
+
+  /* ─── 兑换成功弹窗 ─── */
+  .modal-mask {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(6px);
+    z-index: 500;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-mask.show { opacity: 1; pointer-events: all; }
+  .modal-box {
+    background: linear-gradient(135deg, #1a0a2e, #0d0720);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    text-align: center;
+    min-width: 280px;
+    transform: scale(0.85);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .modal-mask.show .modal-box { transform: scale(1); }
+  .modal-emoji { font-size: 52px; margin-bottom: 12px; }
+  .modal-title {
+    font-size: 20px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), #f59e0b);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .modal-desc { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+  .modal-close {
+    padding: 10px 32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 24px;
+    color: #fff; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .modal-close:hover { opacity: 0.85; }
+
+  /* 提示 Toast */
+  .toast {
+    position: fixed; bottom: 80px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(30,15,60,0.95);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 13px; color: var(--text);
+    z-index: 400;
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── 导航栏 ─── -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">🎮 <span>GameHub</span></a>
+  <div class="nav-scroll">
+    <a href="index.html" class="nav-tab">首页</a>
+    <a href="wheel.html" class="nav-tab">大转盘</a>
+    <a href="nine-grid.html" class="nav-tab">九宫格</a>
+    <a href="scratch-card.html" class="nav-tab">刮刮乐</a>
+    <a href="shake-dice.html" class="nav-tab">摇骰子</a>
+    <a href="smash-egg.html" class="nav-tab">砸金蛋</a>
+    <a href="slot-machine.html" class="nav-tab">老虎机</a>
+    <a href="gift-box.html" class="nav-tab">礼盒开箱</a>
+    <a href="whack-mole.html" class="nav-tab">打地鼠</a>
+    <a href="cup-game.html" class="nav-tab">三杯游戏</a>
+    <a href="number-bomb.html" class="nav-tab">数字炸弹</a>
+    <a href="stamp-collect.html" class="nav-tab">集卡集章</a>
+    <a href="vote-pk.html" class="nav-tab">投票PK</a>
+    <a href="gashapon.html" class="nav-tab">扭蛋机</a>
+    <a href="blind-box.html" class="nav-tab">盲盒抽卡</a>
+    <a href="game-2048.html" class="nav-tab">2048</a>
+    <a href="match3.html" class="nav-tab">消消乐</a>
+    <a href="catch-coins.html" class="nav-tab">接金币</a>
+    <a href="grow-tree.html" class="nav-tab">成长树</a>
+    <a href="pinball.html" class="nav-tab">弹珠机</a>
+    <a href="snake.html" class="nav-tab">贪吃蛇</a>
+    <a href="slingshot.html" class="nav-tab">弹弓射击</a>
+    <a href="fruit-cut.html" class="nav-tab">切水果</a>
+    <a href="progress-unlock.html" class="nav-tab">进度解锁</a>
+    <a href="energy-collect.html" class="nav-tab active">能量收集</a>
+    <a href="flying-chess.html" class="nav-tab">飞行棋</a>
+    <a href="monopoly.html" class="nav-tab">大富翁</a>
+    <a href="red-packet-rain.html" class="nav-tab">红包雨</a>
+    <a href="claw-machine.html" class="nav-tab">夹娃娃机</a>
+    <a href="flip-match.html" class="nav-tab">翻牌配对</a>
+    <a href="shake.html" class="nav-tab">摇一摇</a>
+    <a href="quiz.html" class="nav-tab">问答闯关</a>
+    <a href="daily-checkin.html" class="nav-tab">每日签到</a>
+  </div>
+</nav>
+
+<!-- ─── 三列布局 ─── -->
+<div class="main">
+
+  <!-- ── 左侧配置面板 ── -->
+  <div class="panel-left">
+    <div class="panel-title">⚙ 配置面板</div>
+
+    <!-- 基础参数 -->
+    <div class="card">
+      <div class="card-title"><div class="dot"></div>基础参数</div>
+
+      <div class="form-row">
+        <span class="form-label">能量上限</span>
+        <select id="cfg-max-energy" class="form-input" style="width:90px;">
+          <option value="100">100</option>
+          <option value="200" selected>200</option>
+          <option value="500">500</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <span class="form-label">碎片最大数量</span>
+        <input id="cfg-max-frags" type="number" class="form-input" value="12" min="5" max="30">
+      </div>
+      <div class="form-row">
+        <span class="form-label">好友碎片生成间隔(s)</span>
+        <input id="cfg-spawn-interval" type="number" class="form-input" value="8" min="3" max="30">
+      </div>
+
+      <button class="btn-apply" onclick="applyConfig()">应用配置</button>
+    </div>
+
+    <!-- 行为产出配置 -->
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:var(--accent2)"></div>行为产出（碎片数）</div>
+
+      <div class="form-row">
+        <span class="form-label">📅 签到</span>
+        <input id="cfg-act-checkin" type="number" class="form-input" value="3" min="1" max="10">
+      </div>
+      <div class="form-row">
+        <span class="form-label">🛒 购买</span>
+        <input id="cfg-act-buy" type="number" class="form-input" value="5" min="1" max="10">
+      </div>
+      <div class="form-row">
+        <span class="form-label">📣 分享</span>
+        <input id="cfg-act-share" type="number" class="form-input" value="2" min="1" max="10">
+      </div>
+      <div class="form-row">
+        <span class="form-label">⭐ 评价</span>
+        <input id="cfg-act-review" type="number" class="form-input" value="2" min="1" max="10">
+      </div>
+    </div>
+
+    <!-- 奖品配置 -->
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:var(--gold)"></div>奖品配置（能量满时兑换）</div>
+
+      <div class="prize-row">
+        <div class="prize-threshold">50能量</div>
+        <input class="prize-input" id="prize-50" type="text" value="5折优惠券" placeholder="奖品名称">
+      </div>
+      <div class="prize-row">
+        <div class="prize-threshold">100能量</div>
+        <input class="prize-input" id="prize-100" type="text" value="免邮券×1" placeholder="奖品名称">
+      </div>
+      <div class="prize-row">
+        <div class="prize-threshold">200能量</div>
+        <input class="prize-input" id="prize-200" type="text" value="红包 ¥5" placeholder="奖品名称">
+      </div>
+      <div class="prize-row">
+        <div class="prize-threshold">500能量</div>
+        <input class="prize-input" id="prize-500" type="text" value="神秘大奖 🎁" placeholder="奖品名称">
+      </div>
+    </div>
+
+    <!-- 好友列表配置 -->
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:var(--accent2)"></div>好友能量贡献</div>
+
+      <div id="friend-list-cfg">
+        <!-- 由JS动态渲染 -->
+      </div>
+
+      <button class="btn-apply" style="background:linear-gradient(135deg,#1a6c3a,#166534);margin-top:8px" onclick="triggerFriendSpawn()">
+        模拟好友产生碎片
+      </button>
+    </div>
+  </div>
+
+  <!-- ── 中间游戏区 ── -->
+  <div class="panel-center">
+
+    <!-- 能量碎片飘浮区 -->
+    <div class="float-zone" id="float-zone">
+      <!-- 背景星点由JS生成 -->
+      <!-- 能量碎片由JS动态添加 -->
+
+      <!-- 中央大能量球 + 进度环 -->
+      <div class="energy-ball-zone" id="ball-zone">
+        <div class="progress-ring-wrap" id="ring-wrap">
+          <svg class="progress-ring-svg" width="220" height="220" viewBox="0 0 220 220">
+            <!-- 轨道圆 -->
+            <circle class="progress-track" cx="110" cy="110" r="100"></circle>
+            <!-- 进度弧 -->
+            <circle class="progress-fill" id="progress-arc"
+              cx="110" cy="110" r="100"
+              stroke-dasharray="0 628"
+              stroke-dashoffset="0">
+            </circle>
+          </svg>
+          <!-- 大能量球 -->
+          <div class="energy-ball" id="energy-ball" onclick="ballClick()">
+            <div class="energy-ball-inner" id="ball-inner"></div>
+            <div class="ball-value">
+              <div class="ball-num" id="ball-num">0</div>
+              <div class="ball-label">能量值</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 能量信息 -->
+        <div class="energy-info">
+          <div class="energy-pct">
+            已收集 <strong id="pct-text">0%</strong> · 距满能量还差 <strong id="remain-text" style="color:var(--muted)">200</strong>
+          </div>
+          <div class="energy-max-hint" id="max-hint">满200能量可兑换奖品</div>
+        </div>
+
+        <!-- 兑换按钮（满能量显示） -->
+        <button class="btn-redeem hidden" id="btn-redeem" onclick="redeemEnergy()">
+          🎁 立即兑换奖品
+        </button>
+      </div>
+    </div>
+
+    <!-- 行为按钮区 -->
+    <div class="action-zone">
+      <div class="action-btn" id="act-checkin" onclick="doAction('checkin')">
+        <div class="icon">📅</div>
+        <div class="name">签到</div>
+        <div class="earn" id="earn-checkin">+3碎片</div>
+        <div class="cd-timer" id="cd-checkin"></div>
+      </div>
+      <div class="action-btn" id="act-buy" onclick="doAction('buy')">
+        <div class="icon">🛒</div>
+        <div class="name">购买</div>
+        <div class="earn" id="earn-buy">+5碎片</div>
+        <div class="cd-timer" id="cd-buy"></div>
+      </div>
+      <div class="action-btn" id="act-share" onclick="doAction('share')">
+        <div class="icon">📣</div>
+        <div class="name">分享</div>
+        <div class="earn" id="earn-share">+2碎片</div>
+        <div class="cd-timer" id="cd-share"></div>
+      </div>
+      <div class="action-btn" id="act-review" onclick="doAction('review')">
+        <div class="icon">⭐</div>
+        <div class="name">评价</div>
+        <div class="earn" id="earn-review">+2碎片</div>
+        <div class="cd-timer" id="cd-review"></div>
+      </div>
+    </div>
+
+  </div><!-- /panel-center -->
+
+  <!-- ── 右侧数据面板 ── -->
+  <div class="panel-right">
+    <div class="panel-title">📊 数据统计</div>
+
+    <!-- 今日统计 -->
+    <div class="card">
+      <div class="card-title"><div class="dot"></div>今日收集统计</div>
+      <div class="stat-row">
+        <span class="stat-label">今日收集能量</span>
+        <span class="stat-val" id="stat-today">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">收集碎片数</span>
+        <span class="stat-val" id="stat-frags">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">好友赠送</span>
+        <span class="stat-val" id="stat-gift">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">行为产生碎片</span>
+        <span class="stat-val" id="stat-self">0</span>
+      </div>
+    </div>
+
+    <!-- 好友贡献排行 -->
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:var(--accent2)"></div>好友贡献排行</div>
+      <div id="rank-list">
+        <!-- 由JS渲染 -->
+      </div>
+    </div>
+
+    <!-- 当前奖品解锁状态 -->
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:var(--gold)"></div>奖品解锁状态</div>
+      <div id="unlock-list">
+        <!-- 由JS渲染 -->
+      </div>
+    </div>
+
+    <!-- 历史兑换记录 -->
+    <div class="card">
+      <div class="card-title"><div class="dot" style="background:#4ade80)"></div>历史兑换记录</div>
+      <div id="history-list">
+        <div style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">暂无兑换记录</div>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /main -->
+
+<!-- ─── 底部说明 ─── -->
+<div class="footer">
+  <span><div class="footer-dot"></div>社交能量</span>
+  <span>·</span>
+  <span>碎片飘浮</span>
+  <span>·</span>
+  <span>行为触发产出</span>
+</div>
+
+<!-- ─── 兑换成功弹窗 ─── -->
+<div class="modal-mask" id="modal-mask">
+  <div class="modal-box">
+    <div class="modal-emoji" id="modal-emoji">🎁</div>
+    <div class="modal-title" id="modal-title">兑换成功！</div>
+    <div class="modal-desc" id="modal-desc">恭喜获得奖品，已发放至您的账户</div>
+    <button class="modal-close" onclick="closeModal()">继续收集能量</button>
+  </div>
+</div>
+
+<!-- Toast提示 -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   能量收集游戏 · 核心逻辑
+   ═══════════════════════════════════════════════ */
+
+// ── 好友数据（模拟5个好友） ──
+const FRIENDS = [
+  { id: 'f1', name: '小李', avatar: '🐼', color: '#4ade80', energy: 0 },
+  { id: 'f2', name: '大美', avatar: '🦊', color: '#f472b6', energy: 0 },
+  { id: 'f3', name: '阿强', avatar: '🐯', color: '#60a5fa', energy: 0 },
+  { id: 'f4', name: '果果', avatar: '🐰', color: '#fb923c', energy: 0 },
+  { id: 'f5', name: '晓晓', avatar: '🐸', color: '#a78bfa', energy: 0 },
+];
+
+// ── 游戏状态 ──
+let state = {
+  energy: 0,      // 当前能量
+  maxEnergy: 200, // 能量上限
+  maxFrags: 12,   // 最大碎片数
+  spawnInterval: 8, // 好友碎片生成间隔(秒)
+
+  // 行为产出配置
+  actConfig: {
+    checkin: { count: 3, cd: 0, maxCd: 60 },
+    buy:     { count: 5, cd: 0, maxCd: 120 },
+    share:   { count: 2, cd: 0, maxCd: 30 },
+    review:  { count: 2, cd: 0, maxCd: 90 },
+  },
+
+  // 奖品配置
+  prizes: {
+    50:  '5折优惠券',
+    100: '免邮券×1',
+    200: '红包 ¥5',
+    500: '神秘大奖 🎁',
+  },
+
+  // 今日统计
+  todayEnergy: 0,
+  todayFrags: 0,
+  todayGift: 0,
+  todaySelf: 0,
+
+  // 历史记录
+  history: [],
+};
+
+// ── 活跃碎片列表 ──
+let fragments = [];
+let fragIdCounter = 0;
+let spawnTimer = null;
+let cdTimers = {};
+
+// ── localStorage Key ──
+const LS_KEY = 'energy-collect-v2';
+
+/* ─── 初始化 ─── */
+function init() {
+  loadState();
+  renderBgStars();
+  renderFriendListCfg();
+  updateBall();
+  updateStats();
+  updateRankList();
+  updateUnlockList();
+  updateHistoryList();
+  updateActionBtns();
+  startFriendSpawnLoop();
+
+  // 首次生成几个好友碎片
+  setTimeout(() => spawnFriendFragments(3), 800);
+}
+
+/* ─── 持久化 ─── */
+function saveState() {
+  const data = {
+    energy: state.energy,
+    maxEnergy: state.maxEnergy,
+    maxFrags: state.maxFrags,
+    spawnInterval: state.spawnInterval,
+    actConfig: state.actConfig,
+    prizes: state.prizes,
+    todayEnergy: state.todayEnergy,
+    todayFrags: state.todayFrags,
+    todayGift: state.todayGift,
+    todaySelf: state.todaySelf,
+    history: state.history.slice(0, 20),
+    friends: FRIENDS.map(f => ({ id: f.id, energy: f.energy })),
+    saveDate: new Date().toDateString(),
+  };
+  localStorage.setItem(LS_KEY, JSON.stringify(data));
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+
+    // 每日重置
+    if (data.saveDate !== new Date().toDateString()) {
+      state.todayEnergy = 0;
+      state.todayFrags = 0;
+      state.todayGift = 0;
+      state.todaySelf = 0;
+      FRIENDS.forEach(f => f.energy = 0);
+    } else {
+      state.todayEnergy = data.todayEnergy || 0;
+      state.todayFrags  = data.todayFrags || 0;
+      state.todayGift   = data.todayGift || 0;
+      state.todaySelf   = data.todaySelf || 0;
+      if (data.friends) {
+        data.friends.forEach(fd => {
+          const f = FRIENDS.find(x => x.id === fd.id);
+          if (f) f.energy = fd.energy;
+        });
+      }
+    }
+
+    state.energy   = Math.min(data.energy || 0, data.maxEnergy || 200);
+    state.maxEnergy = data.maxEnergy || 200;
+    state.maxFrags  = data.maxFrags || 12;
+    state.spawnInterval = data.spawnInterval || 8;
+    if (data.prizes) state.prizes = data.prizes;
+    if (data.history) state.history = data.history;
+
+    // 同步配置到表单
+    document.getElementById('cfg-max-energy').value = state.maxEnergy;
+    document.getElementById('cfg-max-frags').value  = state.maxFrags;
+    document.getElementById('cfg-spawn-interval').value = state.spawnInterval;
+    Object.keys(state.prizes).forEach(k => {
+      const el = document.getElementById('prize-' + k);
+      if (el) el.value = state.prizes[k];
+    });
+  } catch (e) {}
+}
+
+/* ─── 背景星点 ─── */
+function renderBgStars() {
+  const zone = document.getElementById('float-zone');
+  for (let i = 0; i < 40; i++) {
+    const star = document.createElement('div');
+    star.className = 'bg-star';
+    const sz = Math.random() * 2 + 1;
+    star.style.cssText = `
+      width:${sz}px; height:${sz}px;
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      --d:${(Math.random()*3+2).toFixed(1)}s;
+      --delay:-${(Math.random()*3).toFixed(1)}s;
+    `;
+    zone.appendChild(star);
+  }
+}
+
+/* ─── 能量球颜色更新 ─── */
+function getEnergyColor(pct) {
+  if (pct < 0.3) return { color: '#4ade80', glow: 'rgba(74,222,128,0.45)', bg: '#22c55e' };
+  if (pct < 0.6) return { color: '#a3e635', glow: 'rgba(163,230,53,0.45)', bg: '#84cc16' };
+  if (pct < 0.8) return { color: '#facc15', glow: 'rgba(250,204,21,0.45)', bg: '#eab308' };
+  return { color: '#F5C842', glow: 'rgba(245,200,66,0.55)', bg: '#f59e0b' };
+}
+
+function updateBall() {
+  const pct = Math.min(state.energy / state.maxEnergy, 1);
+  const { color, glow, bg } = getEnergyColor(pct);
+
+  // 更新CSS变量
+  document.documentElement.style.setProperty('--energy-color', color);
+  document.documentElement.style.setProperty('--energy-glow', glow);
+
+  // 能量球内层渐变
+  const inner = document.getElementById('ball-inner');
+  inner.style.background = `radial-gradient(circle at 40% 35%, rgba(255,255,255,0.18) 0%, ${bg} 40%, rgba(0,0,0,0.3) 100%)`;
+
+  // 光晕
+  const ball = document.getElementById('energy-ball');
+  ball.style.boxShadow = `0 0 30px ${glow}, 0 0 60px ${glow.replace('0.45','0.18')}, 0 0 100px ${glow.replace('0.45','0.07')}, inset 0 -20px 40px rgba(0,0,0,0.3)`;
+
+  // SVG进度环
+  const circumference = 2 * Math.PI * 100; // r=100
+  const arc = document.getElementById('progress-arc');
+  arc.setAttribute('stroke-dasharray', `${(circumference * pct).toFixed(1)} ${circumference.toFixed(1)}`);
+  arc.style.stroke = color;
+  arc.style.filter = `drop-shadow(0 0 5px ${glow})`;
+
+  // 数值
+  document.getElementById('ball-num').textContent = state.energy;
+  document.getElementById('pct-text').textContent = Math.round(pct * 100) + '%';
+  document.getElementById('remain-text').textContent = Math.max(0, state.maxEnergy - state.energy);
+  document.getElementById('max-hint').textContent = `满${state.maxEnergy}能量可兑换奖品`;
+
+  // 兑换按钮
+  const btn = document.getElementById('btn-redeem');
+  if (state.energy >= state.maxEnergy) {
+    btn.classList.remove('hidden');
+  } else {
+    btn.classList.add('hidden');
+  }
+}
+
+/* ─── 收集能量 ─── */
+function addEnergy(amount, fragEl, type) {
+  const old = state.energy;
+  state.energy = Math.min(state.energy + amount, state.maxEnergy);
+  const gained = state.energy - old;
+
+  if (gained <= 0) {
+    showToast('能量已满！请先兑换奖品 🎁');
+    return false;
+  }
+
+  // 今日统计
+  state.todayEnergy += gained;
+  state.todayFrags  += 1;
+  if (type === 'gift') state.todayGift += 1;
+
+  updateBall();
+  updateStats();
+  updateUnlockList();
+
+  // 飘字
+  if (fragEl) {
+    const zone = document.getElementById('float-zone');
+    const rect = fragEl.getBoundingClientRect();
+    const zoneRect = zone.getBoundingClientRect();
+    const ft = document.createElement('div');
+    ft.className = 'float-text';
+    ft.style.left = (rect.left - zoneRect.left + rect.width / 2 - 14) + 'px';
+    ft.style.top  = (rect.top  - zoneRect.top  - 8) + 'px';
+    ft.style.color = type === 'big' ? '#facc15' : type === 'gift' ? '#f472b6' : '#4ade80';
+    ft.textContent = '+' + amount;
+    zone.appendChild(ft);
+    setTimeout(() => ft.remove(), 1000);
+  }
+
+  saveState();
+  return true;
+}
+
+/* ─── 碎片管理 ─── */
+function createFragment(type, x, y, fromFriendIdx) {
+  const zone = document.getElementById('float-zone');
+  if (fragments.length >= state.maxFrags) return null;
+
+  const id = ++fragIdCounter;
+  const el = document.createElement('div');
+  el.className = `fragment ${type}`;
+  el.id = 'frag-' + id;
+
+  // 随机漂浮参数
+  const dur = (Math.random() * 3 + 3).toFixed(1);
+  const delay = -(Math.random() * 3).toFixed(1);
+  const offsets = [
+    (Math.random()*16-8).toFixed(0), (Math.random()*16-8).toFixed(0),
+    (Math.random()*16-8).toFixed(0), (Math.random()*16-8).toFixed(0),
+    (Math.random()*16-8).toFixed(0), (Math.random()*16-8).toFixed(0),
+  ];
+  el.style.cssText = `
+    left:${x}px; top:${y}px;
+    --float-dur:${dur}s;
+    --float-delay:${delay}s;
+    --fx1:${offsets[0]}px; --fy1:${offsets[1]}px;
+    --fx2:${offsets[2]}px; --fy2:${offsets[3]}px;
+    --fx3:${offsets[4]}px; --fy3:${offsets[5]}px;
+  `;
+
+  // 能量值
+  const values = { normal: 5, big: 20, gift: 10 };
+  const val = values[type] || 5;
+
+  // 显示emoji
+  const icons = { normal: '💚', big: '💛', gift: '❤️' };
+  el.textContent = icons[type] || '💚';
+
+  // 好友名字提示
+  if (fromFriendIdx !== undefined) {
+    el.title = FRIENDS[fromFriendIdx].name + ' 赠送';
+    el.dataset.friend = fromFriendIdx;
+  }
+
+  // 点击收集
+  el.addEventListener('click', function(e) {
+    e.stopPropagation();
+    collectFragment(id, type, val, el);
+  });
+
+  zone.appendChild(el);
+  const fragData = { id, el, type, val, x, y };
+  fragments.push(fragData);
+  return fragData;
+}
+
+function collectFragment(id, type, val, el) {
+  // 找到碎片数据
+  const idx = fragments.findIndex(f => f.id === id);
+  if (idx === -1) return;
+  fragments.splice(idx, 1);
+
+  // 好友赠送时显示感谢
+  if (type === 'gift') {
+    const zone = document.getElementById('float-zone');
+    const zoneRect = zone.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+    const thanks = document.createElement('div');
+    thanks.className = 'thanks-popup';
+    thanks.textContent = '谢谢好友 ❤️';
+    thanks.style.left = (rect.left - zoneRect.left) + 'px';
+    thanks.style.top  = (rect.top - zoneRect.top - 10) + 'px';
+    zone.appendChild(thanks);
+    setTimeout(() => thanks.remove(), 1200);
+
+    // 更新好友贡献
+    const fi = el.dataset.friend;
+    if (fi !== undefined) {
+      FRIENDS[parseInt(fi)].energy += val;
+      updateRankList();
+    }
+  }
+
+  // 计算大球中心（相对float-zone）
+  const zone = document.getElementById('float-zone');
+  const zoneRect = zone.getBoundingClientRect();
+  const ballEl = document.getElementById('energy-ball');
+  const ballRect = ballEl.getBoundingClientRect();
+  const targetX = ballRect.left - zoneRect.left + ballRect.width / 2 - el.offsetWidth / 2;
+  const targetY = ballRect.top  - zoneRect.top  + ballRect.height / 2 - el.offsetHeight / 2;
+
+  // 飞向大球动画
+  el.classList.add('collecting');
+  el.style.left = targetX + 'px';
+  el.style.top  = targetY + 'px';
+  el.style.transform = 'scale(0.1)';
+  el.style.opacity = '0';
+
+  // 能量增加 + 大球膨胀
+  const ok = addEnergy(val, el, type);
+  if (ok) {
+    const ball = document.getElementById('energy-ball');
+    ball.classList.remove('pulse');
+    void ball.offsetWidth;
+    ball.classList.add('pulse');
+    setTimeout(() => ball.classList.remove('pulse'), 400);
+  }
+
+  setTimeout(() => el.remove(), 560);
+}
+
+/* ─── 好友碎片生成 ─── */
+function spawnFriendFragments(count) {
+  const zone = document.getElementById('float-zone');
+  const zw = zone.offsetWidth;
+  const zh = zone.offsetHeight;
+
+  for (let i = 0; i < (count || 1); i++) {
+    if (fragments.length >= state.maxFrags) break;
+
+    // 随机好友
+    const fi = Math.floor(Math.random() * FRIENDS.length);
+    // 随机类型（70%普通, 20%礼物, 10%大能量）
+    const r = Math.random();
+    const type = r < 0.7 ? 'normal' : r < 0.9 ? 'gift' : 'big';
+
+    // 随机位置（避开中央大球区域）
+    let x, y;
+    do {
+      x = Math.random() * (zw - 60) + 10;
+      y = Math.random() * (zh - 80) + 10;
+    } while (
+      x > zw * 0.3 && x < zw * 0.7 &&
+      y > zh * 0.25 && y < zh * 0.75
+    );
+
+    setTimeout(() => createFragment(type, x, y, fi), i * 300);
+  }
+}
+
+function startFriendSpawnLoop() {
+  if (spawnTimer) clearInterval(spawnTimer);
+  spawnTimer = setInterval(() => {
+    spawnFriendFragments(Math.floor(Math.random() * 2) + 1);
+  }, state.spawnInterval * 1000);
+}
+
+/* ─── 手动触发好友碎片 ─── */
+function triggerFriendSpawn() {
+  spawnFriendFragments(3);
+  showToast('好友产生了新碎片！快去收集 ✨');
+}
+
+/* ─── 行为按钮 ─── */
+const ACT_LABELS = {
+  checkin: '签到', buy: '购买', share: '分享', review: '评价',
+};
+
+function doAction(key) {
+  const cfg = state.actConfig[key];
+  if (cfg.cd > 0) {
+    showToast(`${ACT_LABELS[key]}冷却中，还剩 ${cfg.cd}s`);
+    return;
+  }
+
+  const btn = document.getElementById('act-' + key);
+  // 产生碎片（从按钮位置飞出，然后在游戏区随机落点）
+  const btnRect = btn.getBoundingClientRect();
+  const zone = document.getElementById('float-zone');
+  const zoneRect = zone.getBoundingClientRect();
+  const count = cfg.count;
+
+  for (let i = 0; i < count; i++) {
+    if (fragments.length >= state.maxFrags) break;
+    setTimeout(() => {
+      // 随机落点
+      const zw = zone.offsetWidth;
+      const zh = zone.offsetHeight;
+      const tx = Math.random() * (zw - 60) + 10;
+      const ty = Math.random() * (zh - 80) + 10;
+
+      // 先创建一个"飞行粒子"从按钮位置飞到目标
+      const particle = document.createElement('div');
+      particle.className = 'spawn-particle';
+      const colors = { checkin:'#4ade80', buy:'#facc15', share:'#60a5fa', review:'#f472b6' };
+      particle.style.cssText = `
+        width: 18px; height: 18px;
+        background: radial-gradient(circle, ${colors[key]}, transparent);
+        left: ${btnRect.left + btnRect.width/2 - 9}px;
+        top:  ${btnRect.top + btnRect.height/2 - 9}px;
+        opacity: 1;
+        transition: left 0.5s cubic-bezier(0.25,0.46,0.45,0.94),
+                    top  0.5s cubic-bezier(0.25,0.46,0.45,0.94),
+                    opacity 0.5s;
+      `;
+      document.body.appendChild(particle);
+      requestAnimationFrame(() => {
+        particle.style.left = (zoneRect.left + tx + 9) + 'px';
+        particle.style.top  = (zoneRect.top  + ty + 9) + 'px';
+        particle.style.opacity = '0';
+      });
+
+      setTimeout(() => {
+        particle.remove();
+        // 落地后在float-zone里创建真正的碎片
+        createFragment('normal', tx, ty);
+        state.todaySelf += 1;
+        updateStats();
+        saveState();
+      }, 520);
+
+    }, i * 120);
+  }
+
+  // 设置冷却
+  cfg.cd = cfg.maxCd;
+  updateActionBtns();
+  startCdCountdown(key);
+
+  showToast(`${ACT_LABELS[key]}成功！产生 ${Math.min(count, state.maxFrags - fragments.length + count)} 个能量碎片 ✨`);
+}
+
+function startCdCountdown(key) {
+  if (cdTimers[key]) clearInterval(cdTimers[key]);
+  cdTimers[key] = setInterval(() => {
+    state.actConfig[key].cd--;
+    if (state.actConfig[key].cd <= 0) {
+      state.actConfig[key].cd = 0;
+      clearInterval(cdTimers[key]);
+    }
+    updateActionBtns();
+  }, 1000);
+}
+
+function updateActionBtns() {
+  const keys = ['checkin', 'buy', 'share', 'review'];
+  const earnIds = {
+    checkin: 'cfg-act-checkin', buy: 'cfg-act-buy',
+    share: 'cfg-act-share', review: 'cfg-act-review',
+  };
+  keys.forEach(key => {
+    const cfg = state.actConfig[key];
+    const btn = document.getElementById('act-' + key);
+    const cdEl = document.getElementById('cd-' + key);
+    const earnEl = document.getElementById('earn-' + key);
+
+    earnEl.textContent = `+${cfg.count}碎片`;
+    if (cfg.cd > 0) {
+      btn.classList.add('cooldown');
+      cdEl.textContent = `冷却 ${cfg.cd}s`;
+    } else {
+      btn.classList.remove('cooldown');
+      cdEl.textContent = '';
+    }
+  });
+}
+
+/* ─── 点击大球（小彩蛋：球心点击随机飞出碎片） ─── */
+function ballClick() {
+  const ball = document.getElementById('energy-ball');
+  ball.classList.remove('pulse');
+  void ball.offsetWidth;
+  ball.classList.add('pulse');
+  showToast('点击周围的能量碎片来收集能量！✨');
+}
+
+/* ─── 兑换奖品 ─── */
+function redeemEnergy() {
+  if (state.energy < state.maxEnergy) return;
+
+  // 找到对应奖品
+  const thresholds = [500, 200, 100, 50];
+  let prize = '神秘奖品';
+  for (const t of thresholds) {
+    if (state.maxEnergy >= t && state.prizes[t]) {
+      prize = state.prizes[t];
+      break;
+    }
+  }
+
+  // 弹窗
+  document.getElementById('modal-emoji').textContent = '🎉';
+  document.getElementById('modal-title').textContent = '兑换成功！';
+  document.getElementById('modal-desc').textContent = `恭喜获得「${prize}」，已发放至您的账户！\n能量将重置，继续收集吧 💪`;
+  document.getElementById('modal-mask').classList.add('show');
+
+  // 记录历史
+  const now = new Date();
+  const timeStr = `${now.getMonth()+1}/${now.getDate()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  state.history.unshift({ prize, time: timeStr, energy: state.energy });
+
+  // 重置能量
+  state.energy = 0;
+  FRIENDS.forEach(f => f.energy = 0);
+
+  updateBall();
+  updateStats();
+  updateRankList();
+  updateHistoryList();
+  updateUnlockList();
+  saveState();
+
+  // 碎片清空（兑换后重新生成）
+  fragments.forEach(f => { try { f.el.remove(); } catch(e){} });
+  fragments = [];
+  setTimeout(() => spawnFriendFragments(4), 800);
+}
+
+function closeModal() {
+  document.getElementById('modal-mask').classList.remove('show');
+}
+
+/* ─── 右侧数据渲染 ─── */
+function updateStats() {
+  document.getElementById('stat-today').textContent = state.todayEnergy;
+  document.getElementById('stat-frags').textContent  = state.todayFrags;
+  document.getElementById('stat-gift').textContent   = state.todayGift;
+  document.getElementById('stat-self').textContent   = state.todaySelf;
+}
+
+function updateRankList() {
+  // 按贡献降序排列
+  const sorted = [...FRIENDS].sort((a, b) => b.energy - a.energy);
+  const maxVal = sorted[0]?.energy || 1;
+  const html = sorted.map((f, i) => {
+    const cls = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
+    const barPct = maxVal > 0 ? Math.round(f.energy / maxVal * 100) : 0;
+    return `
+      <div class="rank-row">
+        <div class="rank-num ${cls}">${i+1}</div>
+        <div class="rank-avatar">${f.avatar}</div>
+        <div class="rank-name">${f.name}</div>
+        <div class="rank-bar-wrap"><div class="rank-bar" style="width:${barPct}%"></div></div>
+        <div class="rank-val">${f.energy}</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('rank-list').innerHTML = html;
+}
+
+function updateUnlockList() {
+  const thresholds = [50, 100, 200, 500];
+  const icons = { 50:'🎫', 100:'📦', 200:'💰', 500:'🎁' };
+  const html = thresholds.map(t => {
+    const prize = state.prizes[t] || `${t}能量奖品`;
+    const unlocked = state.maxEnergy >= t;
+    const done = state.energy >= t || state.todayEnergy >= t;
+    return `
+      <div class="unlock-item">
+        <div class="unlock-icon">${icons[t]}</div>
+        <div class="unlock-info">
+          <div class="unlock-name">${prize}</div>
+          <div class="unlock-need">需要 ${t} 能量${unlocked ? '' : '（需调整上限）'}</div>
+        </div>
+        <div class="unlock-badge ${done && unlocked ? 'done' : 'locked'}">
+          ${done && unlocked ? '可兑换' : unlocked ? `差${t - Math.min(state.energy, t)}` : '未开启'}
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('unlock-list').innerHTML = html;
+}
+
+function updateHistoryList() {
+  if (state.history.length === 0) {
+    document.getElementById('history-list').innerHTML =
+      '<div style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">暂无兑换记录</div>';
+    return;
+  }
+  const html = state.history.slice(0, 8).map(item => `
+    <div class="history-item">
+      <div class="history-icon">🎉</div>
+      <div class="history-prize">${item.prize}</div>
+      <div class="history-time">${item.time}</div>
+    </div>
+  `).join('');
+  document.getElementById('history-list').innerHTML = html;
+}
+
+/* ─── 左侧配置渲染 ─── */
+function renderFriendListCfg() {
+  const html = FRIENDS.map((f, i) => `
+    <div class="friend-row">
+      <div class="friend-avatar" style="background:${f.color}22">${f.avatar}</div>
+      <div class="friend-name">${f.name}</div>
+      <div class="friend-energy">${f.energy} 能量</div>
+      <button class="friend-btn" onclick="spawnGiftFrom(${i})">赠送</button>
+    </div>
+  `).join('');
+  document.getElementById('friend-list-cfg').innerHTML = html;
+}
+
+/* ─── 好友赠送触发 ─── */
+function spawnGiftFrom(friendIdx) {
+  const zone = document.getElementById('float-zone');
+  if (fragments.length >= state.maxFrags) {
+    showToast('碎片已满，先收集一些吧！');
+    return;
+  }
+  const zw = zone.offsetWidth;
+  const zh = zone.offsetHeight;
+  let x, y;
+  do {
+    x = Math.random() * (zw - 60) + 10;
+    y = Math.random() * (zh - 80) + 10;
+  } while (
+    x > zw * 0.3 && x < zw * 0.7 &&
+    y > zh * 0.25 && y < zh * 0.75
+  );
+  createFragment('gift', x, y, friendIdx);
+  showToast(`${FRIENDS[friendIdx].name} 赠送了一个能量碎片 ❤️`);
+}
+
+/* ─── 应用配置 ─── */
+function applyConfig() {
+  const newMax = parseInt(document.getElementById('cfg-max-energy').value) || 200;
+  const newMaxFrags = parseInt(document.getElementById('cfg-max-frags').value) || 12;
+  const newInterval = parseInt(document.getElementById('cfg-spawn-interval').value) || 8;
+
+  state.maxEnergy = newMax;
+  state.maxFrags  = Math.min(Math.max(newMaxFrags, 5), 30);
+  state.spawnInterval = Math.min(Math.max(newInterval, 3), 60);
+
+  // 行为产出配置
+  state.actConfig.checkin.count = parseInt(document.getElementById('cfg-act-checkin').value) || 3;
+  state.actConfig.buy.count     = parseInt(document.getElementById('cfg-act-buy').value) || 5;
+  state.actConfig.share.count   = parseInt(document.getElementById('cfg-act-share').value) || 2;
+  state.actConfig.review.count  = parseInt(document.getElementById('cfg-act-review').value) || 2;
+
+  // 奖品配置
+  [50, 100, 200, 500].forEach(t => {
+    const el = document.getElementById('prize-' + t);
+    if (el) state.prizes[t] = el.value || `${t}能量奖品`;
+  });
+
+  // 能量不超过新上限
+  state.energy = Math.min(state.energy, state.maxEnergy);
+
+  updateBall();
+  updateUnlockList();
+  updateActionBtns();
+  startFriendSpawnLoop();
+  saveState();
+  showToast('配置已应用 ✅');
+}
+
+/* ─── Toast提示 ─── */
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+/* ─── 启动 ─── */
+init();
+</script>
+</body>
+</html>
