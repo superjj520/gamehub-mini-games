@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 集卡集章</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* ─── CSS 变量 ─── */
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 导航栏 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 24px;
+    height: 56px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 17px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: var(--text);
+    flex-shrink: 0;
+  }
+  .nav-logo .emoji { font-size: 20px; }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+  }
+  /* 导航链接横向滚动区 */
+  .nav-scroll {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    flex: 1;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .nav-scroll::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 6px 13px; border-radius: 8px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  /* ─── 三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    flex: 1;
+    min-height: 0;
+    height: calc(100vh - 56px - 40px);
+    overflow: hidden;
+  }
+
+  /* ─── 左侧配置 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.2px; margin-bottom: 14px;
+  }
+  .config-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .config-card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .config-card-title .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); }
+
+  /* 输入框统一样式 */
+  .form-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px; gap: 10px;
+  }
+  .form-row:last-child { border-bottom: none; }
+  .form-label { color: var(--muted); flex-shrink: 0; }
+  .form-input {
+    flex: 1; text-align: right;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 9px; color: var(--text); font-size: 12px;
+    outline: none; max-width: 160px;
+  }
+  .form-input:focus { border-color: var(--accent); }
+
+  /* 单选按钮组 */
+  .radio-group {
+    display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;
+  }
+  .radio-btn {
+    padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;
+    border: 1px solid var(--border); background: transparent; color: var(--muted);
+    transition: all 0.2s;
+  }
+  .radio-btn.active {
+    background: rgba(124,58,237,0.3); border-color: var(--accent); color: var(--text);
+  }
+  .radio-btn:hover:not(.active) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+  /* 模式切换按钮 */
+  .mode-switch {
+    display: flex; gap: 8px; margin-bottom: 14px;
+  }
+  .mode-btn {
+    flex: 1; padding: 9px; border-radius: 9px; font-size: 13px; font-weight: 600;
+    border: 1px solid var(--border); cursor: pointer;
+    background: transparent; color: var(--muted);
+    transition: all 0.2s; text-align: center;
+  }
+  .mode-btn.active {
+    background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(236,72,153,0.2));
+    border-color: var(--accent); color: var(--text);
+  }
+
+  /* 奖品配置 */
+  .prize-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .prize-row:last-child { border-bottom: none; }
+  .prize-badge {
+    padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;
+    flex-shrink: 0; min-width: 36px; text-align: center;
+  }
+  .prize-badge.s1 { background: rgba(245,200,66,0.2); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
+  .prize-badge.s2 { background: rgba(124,58,237,0.2); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+  .prize-badge.rare { background: rgba(236,72,153,0.2); color: #f9a8d4; border: 1px solid rgba(236,72,153,0.3); }
+  .prize-input {
+    flex: 1; background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: 5px; padding: 4px 8px; color: var(--text); font-size: 12px; outline: none;
+  }
+  .prize-input:focus { border-color: var(--accent); }
+
+  /* 主操作按钮 */
+  .btn-primary {
+    width: 100%; padding: 11px; border-radius: 10px; font-size: 14px; font-weight: 700;
+    cursor: pointer; border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; transition: all 0.2s; margin-top: 4px;
+  }
+  .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-secondary {
+    width: 100%; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.05);
+    color: var(--muted); transition: all 0.2s; margin-top: 6px;
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+  /* ─── 中间游戏区 ─── */
+  .panel-center {
+    display: flex; flex-direction: column;
+    overflow: hidden; position: relative;
+  }
+  .game-header {
+    padding: 16px 28px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .game-title {
+    font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
+  }
+  .game-title span {
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .game-subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* 进度条 */
+  .progress-bar-wrap {
+    padding: 0 28px 14px; flex-shrink: 0;
+  }
+  .progress-info {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: var(--muted); margin-bottom: 6px;
+  }
+  .progress-track {
+    height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.5s ease;
+  }
+
+  /* 卡册容器 */
+  .book-area {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 10px 20px; overflow: hidden; position: relative;
+  }
+
+  /* 卡片模式：卡册 */
+  .book {
+    display: flex; gap: 0;
+    background: linear-gradient(160deg, #2a1150, #1a0a40);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08);
+    position: relative;
+    max-width: 700px; width: 100%;
+  }
+  /* 书脊效果 */
+  .book::before {
+    content: '';
+    position: absolute; left: 50%; top: 0; bottom: 0;
+    width: 6px; transform: translateX(-50%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.12), rgba(255,255,255,0.05));
+    z-index: 2;
+  }
+  /* 书脊圆点装饰 */
+  .book::after {
+    content: '';
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 10px rgba(245,200,66,0.6);
+    z-index: 3;
+  }
+  .book-page {
+    flex: 1; padding: 20px 16px; min-height: 360px;
+  }
+  .book-page-title {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    letter-spacing: 1px; text-align: center; margin-bottom: 14px;
+  }
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  /* 单张卡片 */
+  .card-slot {
+    position: relative;
+    aspect-ratio: 3/4;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    overflow: visible;
+  }
+  .card-slot:hover { transform: translateY(-3px); }
+
+  /* 未收集：灰色占位 */
+  .card-slot.empty .card-inner {
+    background: rgba(255,255,255,0.04);
+    border: 2px dashed rgba(255,255,255,0.12);
+    border-radius: 10px;
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 6px;
+    color: rgba(255,255,255,0.2);
+  }
+  .card-slot.empty .card-inner .q-mark {
+    font-size: 28px; opacity: 0.3;
+  }
+  .card-slot.empty .card-inner .card-name {
+    font-size: 10px; letter-spacing: 0.5px;
+  }
+
+  /* 已收集：彩色卡片 */
+  .card-slot.collected .card-inner {
+    border-radius: 10px;
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-end;
+    padding: 8px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+  .card-art {
+    position: absolute; inset: 0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .card-name-tag {
+    position: relative; z-index: 2;
+    font-size: 10px; font-weight: 700;
+    background: rgba(0,0,0,0.5);
+    padding: 2px 6px; border-radius: 4px;
+    letter-spacing: 0.3px;
+    backdrop-filter: blur(4px);
+  }
+  .card-num-tag {
+    position: absolute; top: 6px; left: 6px; z-index: 2;
+    font-size: 9px; font-weight: 700;
+    background: rgba(0,0,0,0.6);
+    padding: 1px 5px; border-radius: 3px;
+    color: var(--muted);
+  }
+
+  /* 稀有卡金色边框 */
+  .card-slot.rare-card .card-inner {
+    box-shadow: 0 0 20px rgba(245,200,66,0.5), 0 0 40px rgba(245,200,66,0.2), 0 4px 16px rgba(0,0,0,0.4);
+  }
+  .card-slot.rare-card::before {
+    content: '✦ 稀有';
+    position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    font-size: 9px; font-weight: 800; color: var(--gold);
+    background: linear-gradient(135deg, #1a0a2e, #2a1050);
+    border: 1px solid var(--gold); border-radius: 10px;
+    padding: 1px 7px; white-space: nowrap; z-index: 5;
+    box-shadow: 0 0 8px rgba(245,200,66,0.4);
+  }
+  .card-slot.rare-card .card-inner::before {
+    content: '';
+    position: absolute; inset: 0; border-radius: 10px;
+    border: 2px solid var(--gold);
+    z-index: 3;
+    animation: rare-border 2s ease-in-out infinite;
+  }
+  @keyframes rare-border {
+    0%, 100% { box-shadow: inset 0 0 15px rgba(245,200,66,0.2); }
+    50% { box-shadow: inset 0 0 25px rgba(245,200,66,0.4); }
+  }
+
+  /* 稀有卡闪光 */
+  .card-slot.rare-card .card-inner::after {
+    content: '';
+    position: absolute; inset: 0; border-radius: 10px;
+    background: linear-gradient(115deg, transparent 30%, rgba(245,200,66,0.15) 50%, transparent 70%);
+    background-size: 200% 200%;
+    animation: rare-shine 3s ease-in-out infinite;
+    z-index: 4;
+  }
+  @keyframes rare-shine {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ─── 印章模式 ─── */
+  .stamp-book {
+    background: linear-gradient(160deg, #2a1a08, #1a1008);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(245,200,66,0.15);
+    max-width: 700px; width: 100%;
+    padding: 24px;
+    position: relative;
+  }
+  .stamp-book-header {
+    text-align: center; margin-bottom: 20px;
+  }
+  .stamp-book-title {
+    font-size: 16px; font-weight: 800; color: var(--gold);
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(245,200,66,0.4);
+  }
+  .stamp-book-sub {
+    font-size: 11px; color: rgba(245,200,66,0.5); margin-top: 4px; letter-spacing: 1px;
+  }
+  .stamp-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  /* 印章格子 */
+  .stamp-slot {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .stamp-slot:hover { transform: scale(1.05); }
+  .stamp-slot.empty-stamp {
+    border: 2px dashed rgba(245,200,66,0.2);
+    background: rgba(245,200,66,0.03);
+  }
+  .stamp-slot.empty-stamp .stamp-inner-q {
+    font-size: 22px; opacity: 0.2; color: var(--gold);
+  }
+  .stamp-slot.stamped {
+    animation-fill-mode: both;
+  }
+  .stamp-circle {
+    width: 100%; height: 100%; border-radius: 50%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .stamp-icon { font-size: 28px; z-index: 1; }
+  .stamp-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
+    z-index: 1; margin-top: 2px;
+  }
+  /* 印章边框圆形纹理 */
+  .stamp-circle::before {
+    content: '';
+    position: absolute; inset: 3px;
+    border-radius: 50%;
+    border: 1px dashed rgba(255,255,255,0.25);
+  }
+  /* 稀有印章 */
+  .stamp-slot.rare-stamp .stamp-circle {
+    box-shadow: 0 0 20px rgba(245,200,66,0.5), 0 0 40px rgba(245,200,66,0.2);
+  }
+  .stamp-slot.rare-stamp::after {
+    content: '✦';
+    position: absolute; top: -2px; right: -2px;
+    font-size: 10px; color: var(--gold);
+    text-shadow: 0 0 6px var(--gold);
+  }
+
+  /* ─── 飞入动画 ─── */
+  @keyframes card-fly-in {
+    0% { transform: translateY(-300px) rotate(-15deg) scale(0.5); opacity: 0; }
+    60% { transform: translateY(20px) rotate(5deg) scale(1.05); opacity: 1; }
+    80% { transform: translateY(-8px) rotate(-2deg) scale(0.98); }
+    100% { transform: translateY(0) rotate(0) scale(1); opacity: 1; }
+  }
+  .card-fly-anim { animation: card-fly-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+  /* 印章落下动画 */
+  @keyframes stamp-drop {
+    0% { transform: scale(2) rotate(-20deg); opacity: 0; }
+    50% { transform: scale(0.85) rotate(5deg); opacity: 1; }
+    70% { transform: scale(1.1) rotate(-3deg); }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+  .stamp-drop-anim { animation: stamp-drop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+  /* 稀有卡获得时的光爆效果 */
+  @keyframes rare-burst {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: scale(4); opacity: 0; }
+  }
+  .rare-burst {
+    position: absolute; width: 60px; height: 60px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,200,66,0.8), transparent 70%);
+    pointer-events: none; z-index: 10;
+    animation: rare-burst 0.8s ease-out forwards;
+  }
+
+  /* 集齐庆祝动画 */
+  @keyframes celebrate-flash {
+    0%, 100% { box-shadow: 0 0 0 rgba(245,200,66,0); }
+    50% { box-shadow: 0 0 40px rgba(245,200,66,0.6), 0 0 80px rgba(124,58,237,0.4); }
+  }
+  .celebrating { animation: celebrate-flash 0.5s ease-in-out 6; }
+
+  /* 已集满套装标记 */
+  .set-complete-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700;
+    background: linear-gradient(135deg, rgba(245,200,66,0.2), rgba(245,200,66,0.1));
+    border: 1px solid rgba(245,200,66,0.4); color: var(--gold);
+    animation: badge-pulse 2s ease-in-out infinite;
+  }
+  @keyframes badge-pulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(245,200,66,0); }
+    50% { box-shadow: 0 0 12px rgba(245,200,66,0.4); }
+  }
+
+  /* 抽卡按钮区 */
+  .draw-area {
+    padding: 12px 28px 16px;
+    display: flex; align-items: center; gap: 12px;
+    flex-shrink: 0;
+    border-top: 1px solid var(--border);
+  }
+  .draw-btn {
+    flex: 1; padding: 12px; border-radius: 11px; font-size: 15px; font-weight: 700;
+    cursor: pointer; border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .draw-btn:hover { opacity: 0.85; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.4); }
+  .draw-btn:active { transform: translateY(0); }
+  .draw-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .draw-btn-icon { font-size: 20px; }
+  .draw-set-info {
+    text-align: center; font-size: 11px; color: var(--muted); min-width: 70px;
+  }
+  .draw-set-info strong { color: var(--text); font-size: 13px; display: block; }
+
+  /* ─── 右侧数据面板 ─── */
+  .data-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .data-card-title {
+    font-size: 12px; font-weight: 700; color: var(--muted);
+    display: flex; align-items: center; gap: 6px; margin-bottom: 12px;
+  }
+  .data-card-title .icon { font-size: 14px; }
+
+  /* 套装进度 */
+  .set-progress-item {
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .set-progress-item:last-child { border-bottom: none; }
+  .set-progress-top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 5px;
+  }
+  .set-name { font-weight: 600; }
+  .set-count { color: var(--gold); font-weight: 700; }
+  .mini-bar {
+    height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08);
+    overflow: hidden;
+  }
+  .mini-fill {
+    height: 100%; border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.5s ease;
+  }
+
+  /* 最近获得 */
+  .log-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 11px;
+  }
+  .log-item:last-child { border-bottom: none; }
+  .log-dot {
+    width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  }
+  .log-dot.common { background: var(--accent); }
+  .log-dot.rare { background: var(--gold); }
+  .log-text { color: var(--muted); flex: 1; }
+  .log-time { color: rgba(240,234,248,0.3); font-size: 10px; }
+
+  /* 兑换历史 */
+  .redeem-item {
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 11px;
+  }
+  .redeem-item:last-child { border-bottom: none; }
+  .redeem-item .prize-name { font-weight: 600; font-size: 12px; }
+  .redeem-item .redeem-desc { color: var(--muted); margin-top: 1px; }
+
+  /* 差几张提示 */
+  .missing-hint {
+    background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 8px; padding: 10px 12px; margin-top: 6px; font-size: 11px;
+  }
+  .missing-hint .missing-num { color: var(--accent2); font-size: 18px; font-weight: 800; }
+  .missing-hint .missing-desc { color: var(--muted); }
+
+  /* 兑换按钮 */
+  .btn-redeem {
+    width: 100%; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 700;
+    cursor: pointer; border: 1px solid rgba(245,200,66,0.4);
+    background: rgba(245,200,66,0.1); color: var(--gold);
+    transition: all 0.2s; margin-top: 6px;
+  }
+  .btn-redeem:hover:not(:disabled) {
+    background: rgba(245,200,66,0.2);
+    box-shadow: 0 0 16px rgba(245,200,66,0.3);
+  }
+  .btn-redeem:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* 空状态 */
+  .empty-state {
+    text-align: center; color: var(--muted); font-size: 12px; padding: 14px 0;
+  }
+
+  /* 概率标签 */
+  .prob-badge {
+    display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 600;
+  }
+  .prob-common { background: rgba(124,58,237,0.2); color: #a78bfa; }
+  .prob-rare { background: rgba(245,200,66,0.2); color: var(--gold); }
+
+  /* ─── 底部状态栏 ─── */
+  .statusbar {
+    height: 40px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; font-size: 11px; color: var(--muted);
+    padding: 0 24px; flex-shrink: 0;
+    background: rgba(13,7,32,0.8);
+  }
+  .statusbar .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); opacity: 0.5; }
+  .status-green { color: #34d399; }
+
+  /* 套装页切换标签 */
+  .page-tabs {
+    display: flex; gap: 6px; padding: 0 28px 8px; flex-shrink: 0;
+  }
+  .page-tab {
+    padding: 5px 14px; border-radius: 7px; font-size: 12px; cursor: pointer;
+    border: 1px solid var(--border); background: transparent; color: var(--muted);
+    transition: all 0.2s;
+  }
+  .page-tab.active {
+    background: rgba(124,58,237,0.2); border-color: var(--accent); color: var(--text);
+  }
+
+  /* 提示弹出层 */
+  .toast {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: rgba(26,10,46,0.95); border: 1px solid var(--border);
+    padding: 10px 20px; border-radius: 10px; font-size: 13px;
+    backdrop-filter: blur(12px); z-index: 999;
+    opacity: 0; transition: all 0.3s;
+    pointer-events: none; white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1; transform: translateX(-50%) translateY(0);
+  }
+  .toast.gold { border-color: rgba(245,200,66,0.5); color: var(--gold); }
+  .toast.green { border-color: rgba(52,211,153,0.5); color: #34d399; }
+  .toast.purple { border-color: rgba(124,58,237,0.5); color: #a78bfa; }
+
+  /* 滚动条美化 */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+</style>
+</head>
+<body>
+
+<!-- ─── 导航栏 ─── -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span class="emoji">🎮</span>
+    <span>游戏中台</span>
+    <span class="nav-badge">DEMO</span>
+  </a>
+  <div class="nav-scroll">
+    <a href="index.html" class="nav-tab">首页</a>
+    <a href="wheel.html" class="nav-tab">大转盘</a>
+    <a href="nine-grid.html" class="nav-tab">九宫格</a>
+    <a href="scratch-card.html" class="nav-tab">刮刮乐</a>
+    <a href="shake-dice.html" class="nav-tab">摇骰子</a>
+    <a href="smash-egg.html" class="nav-tab">砸金蛋</a>
+    <a href="slot-machine.html" class="nav-tab">老虎机</a>
+    <a href="gift-box.html" class="nav-tab">礼盒开箱</a>
+    <a href="whack-mole.html" class="nav-tab">打地鼠</a>
+    <a href="cup-game.html" class="nav-tab">三杯游戏</a>
+    <a href="number-bomb.html" class="nav-tab">数字炸弹</a>
+    <a href="stamp-collect.html" class="nav-tab active">集卡集章</a>
+    <a href="vote-pk.html" class="nav-tab">投票PK</a>
+    <a href="flying-chess.html" class="nav-tab">飞行棋</a>
+    <a href="monopoly.html" class="nav-tab">大富翁</a>
+    <a href="red-packet-rain.html" class="nav-tab">红包雨</a>
+    <a href="claw-machine.html" class="nav-tab">夹娃娃机</a>
+    <a href="flip-match.html" class="nav-tab">翻牌配对</a>
+    <a href="shake.html" class="nav-tab">摇一摇</a>
+    <a href="quiz.html" class="nav-tab">问答闯关</a>
+    <a href="daily-checkin.html" class="nav-tab">每日签到</a>
+  </div>
+</nav>
+
+<!-- ─── 提示层 ─── -->
+<div class="toast" id="toast"></div>
+
+<!-- ─── 主体三列 ─── -->
+<div class="main">
+
+  <!-- ═══ 左侧配置面板 ═══ -->
+  <div class="panel-left">
+    <div class="panel-title">🗂 配置面板</div>
+
+    <!-- 展示模式切换 -->
+    <div class="config-card">
+      <div class="config-card-title"><span class="dot"></span>展示模式</div>
+      <div class="mode-switch">
+        <button class="mode-btn active" id="modeCardBtn" onclick="switchMode('card')">🃏 卡片模式</button>
+        <button class="mode-btn" id="modeStampBtn" onclick="switchMode('stamp')">📮 印章模式</button>
+      </div>
+    </div>
+
+    <!-- 活动配置 -->
+    <div class="config-card">
+      <div class="config-card-title"><span class="dot"></span>活动设置</div>
+      <div class="form-row">
+        <span class="form-label">活动名称</span>
+        <input class="form-input" id="activityName" type="text" value="品牌集卡活动" maxlength="20">
+      </div>
+      <div class="form-row">
+        <span class="form-label">卡片套数</span>
+        <div class="radio-group">
+          <button class="radio-btn active" id="sets1Btn" onclick="setSetsCount(1)">1套</button>
+          <button class="radio-btn" id="sets2Btn" onclick="setSetsCount(2)">2套</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <span class="form-label">每套数量</span>
+        <div class="radio-group">
+          <button class="radio-btn" id="count4Btn" onclick="setCardsPerSet(4)">4张</button>
+          <button class="radio-btn active" id="count6Btn" onclick="setCardsPerSet(6)">6张</button>
+          <button class="radio-btn" id="count8Btn" onclick="setCardsPerSet(8)">8张</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <span class="form-label">稀有卡概率</span>
+        <div class="radio-group">
+          <button class="radio-btn active" id="rare5Btn" onclick="setRareProb(5)">5%</button>
+          <button class="radio-btn" id="rare10Btn" onclick="setRareProb(10)">10%</button>
+          <button class="radio-btn" id="rare20Btn" onclick="setRareProb(20)">20%</button>
+        </div>
+      </div>
+      <div style="margin-top:10px; display:flex; gap:8px;">
+        <button class="btn-primary" onclick="applyConfig()" style="flex:1; margin-top:0; font-size:12px; padding:8px;">应用配置</button>
+        <button class="btn-secondary" onclick="resetAll()" style="flex:1; margin-top:0; font-size:12px; padding:8px; border:1px solid rgba(255,255,255,0.1);">重置数据</button>
+      </div>
+    </div>
+
+    <!-- 奖品配置 -->
+    <div class="config-card">
+      <div class="config-card-title"><span class="dot"></span>兑换奖品</div>
+      <div class="prize-row">
+        <span class="prize-badge s1">套装1</span>
+        <input class="prize-input" id="prize1" type="text" value="星巴克咖啡券" placeholder="集满套装1奖品">
+      </div>
+      <div class="prize-row" id="prize2Row">
+        <span class="prize-badge s2">套装2</span>
+        <input class="prize-input" id="prize2" type="text" value="品牌限定周边" placeholder="集满套装2奖品">
+      </div>
+      <div class="prize-row">
+        <span class="prize-badge rare">稀有</span>
+        <input class="prize-input" id="prizeRare" type="text" value="iPhone大奖" placeholder="集齐稀有卡奖品">
+      </div>
+    </div>
+
+    <!-- 获取方式说明 -->
+    <div class="config-card">
+      <div class="config-card-title"><span class="dot"></span>卡片获取方式</div>
+      <div style="font-size:12px; color:var(--muted); line-height:2;">
+        <div>🛒 每消费满100元 → 抽1张</div>
+        <div>📅 每日签到 → 抽1张</div>
+        <div>🔗 成功邀请好友 → 抽2张</div>
+        <div>📣 分享活动页 → 抽1张</div>
+        <div>🤝 好友互赠 → 转赠1张</div>
+      </div>
+    </div>
+
+    <!-- 模拟好友赠送 -->
+    <div class="config-card">
+      <div class="config-card-title"><span class="dot"></span>模拟好友赠送</div>
+      <div style="font-size:12px; color:var(--muted); margin-bottom:10px;">好友可以把重复的卡片赠送给你</div>
+      <button class="btn-secondary" onclick="friendGift()" style="margin-top:0;">🎁 接受好友赠送</button>
+    </div>
+  </div>
+
+  <!-- ═══ 中间游戏区 ═══ -->
+  <div class="panel-center">
+    <!-- 游戏标题 -->
+    <div class="game-header">
+      <div>
+        <div class="game-title"><span id="gameTitle">品牌集卡活动</span></div>
+        <div class="game-subtitle" id="gameSubtitle">集齐全套卡片，兑换专属大奖</div>
+      </div>
+      <div id="completeBadgeArea"></div>
+    </div>
+
+    <!-- 总体进度条 -->
+    <div class="progress-bar-wrap">
+      <div class="progress-info">
+        <span id="progressText">已收集 0 / 6 张</span>
+        <span id="progressPct" style="color:var(--gold);">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- 套装页签（2套时显示） -->
+    <div class="page-tabs" id="pageTabs" style="display:none;">
+      <button class="page-tab active" id="pageTab1" onclick="switchPage(1)">套装一</button>
+      <button class="page-tab" id="pageTab2" onclick="switchPage(2)">套装二</button>
+    </div>
+
+    <!-- 卡册/印章册主体 -->
+    <div class="book-area" id="bookArea">
+      <!-- 由 JS 动态渲染 -->
+    </div>
+
+    <!-- 抽卡操作区 -->
+    <div class="draw-area">
+      <div class="draw-set-info" id="drawSetInfo">
+        <strong id="drawSetName">套装一</strong>
+        当前套装
+      </div>
+      <button class="draw-btn" id="drawBtn" onclick="drawCard()">
+        <span class="draw-btn-icon">✨</span>
+        抽取卡片
+      </button>
+      <div class="draw-set-info" style="text-align:right;">
+        <strong id="totalDrawn">0</strong>
+        累计抽取
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 右侧数据面板 ═══ -->
+  <div class="panel-right">
+    <div class="panel-title">📊 收集数据</div>
+
+    <!-- 收集进度 -->
+    <div class="data-card">
+      <div class="data-card-title"><span class="icon">🗂</span>套装进度</div>
+      <div id="setProgressList"><!-- JS渲染 --></div>
+    </div>
+
+    <!-- 距离集齐还差 -->
+    <div class="data-card">
+      <div class="data-card-title"><span class="icon">🎯</span>距离集齐</div>
+      <div id="missingHints"><!-- JS渲染 --></div>
+    </div>
+
+    <!-- 最近获得 -->
+    <div class="data-card">
+      <div class="data-card-title"><span class="icon">⚡</span>最近获得</div>
+      <div id="recentLog">
+        <div class="empty-state">快去抽取第一张卡吧～</div>
+      </div>
+    </div>
+
+    <!-- 兑换历史 -->
+    <div class="data-card">
+      <div class="data-card-title"><span class="icon">🏆</span>兑换历史</div>
+      <div id="redeemHistory">
+        <div class="empty-state">暂无兑换记录</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── 底部状态栏 ─── -->
+<div class="statusbar">
+  <span class="status-green">● localStorage持久化</span>
+  <span class="dot"></span>
+  <span>跨日累积</span>
+  <span class="dot"></span>
+  <span id="rareProb">稀有卡概率 5%</span>
+  <span class="dot"></span>
+  <span>好友互赠模拟</span>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   集卡集章 · 完整游戏逻辑
+   ═══════════════════════════════════════════════════════ */
+
+// ─── 卡片插画色彩方案（用CSS几何图案代替真实插画） ───
+const CARD_THEMES = [
+  // [渐变起色, 渐变终色, 图标表情, 卡名]
+  ['#7C3AED','#EC4899','🌸','春日樱花'],
+  ['#2563EB','#06B6D4','🌊','夏日海浪'],
+  ['#D97706','#EF4444','🍁','秋日枫叶'],
+  ['#0EA5E9','#818CF8','❄️','冬雪精灵'],
+  ['#059669','#10B981','🌿','翠绿森林'],
+  ['#F59E0B','#FBBF24','⭐','星光闪闪'],
+  ['#8B5CF6','#C084FC','🦋','紫蝶飞舞'],
+  ['#EF4444','#FB923C','🔥','火焰烈焰'],
+];
+
+// 套装一特色名称
+const SET1_NAMES = ['春日樱花','夏日海浪','秋日枫叶','冬雪精灵','翠绿森林','星光闪闪','紫蝶飞舞','火焰烈焰'];
+// 套装二特色名称
+const SET2_NAMES = ['赤鳞神龙','蓝羽凤凰','碧玉灵龟','银翼天马','金角麒麟','紫云玄武','朱雀烈焰','苍龙破空'];
+// 印章图标
+const STAMP_ICONS_1 = ['🌸','🌊','🍁','❄️','🌿','⭐','🦋','🔥'];
+const STAMP_ICONS_2 = ['🐉','🦅','🐢','🐴','🦁','🐲','🦜','🐦'];
+
+// ─── 游戏状态 ───
+let state = {
+  mode: 'card',           // 'card' | 'stamp'
+  setsCount: 1,           // 套数：1 | 2
+  cardsPerSet: 6,         // 每套数量：4 | 6 | 8
+  rareProb: 5,            // 稀有卡概率（%）
+  currentPage: 1,         // 当前显示套装页
+  collections: {},        // { 'set1_0': true, 'set1_1': true, ... } 收集状态
+  rareCollected: {},      // { 'set1_0': true } 稀有卡标记（每套最后一张为稀有）
+  totalDrawn: 0,          // 总抽取次数
+  recentLog: [],          // 最近获得日志 [{name, rare, time}]
+  redeemHistory: [],      // 兑换记录 [{prize, time}]
+  redeemed: {},           // { 'set1': true } 已兑换标记
+};
+
+// ─── 持久化 ───
+const STORAGE_KEY = 'stamp_collect_v1';
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function loadState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try {
+      const saved = JSON.parse(raw);
+      // 合并已保存的状态
+      Object.assign(state, saved);
+    } catch(e) {}
+  }
+}
+
+// ─── 配置操作 ───
+function switchMode(mode) {
+  state.mode = mode;
+  document.getElementById('modeCardBtn').classList.toggle('active', mode === 'card');
+  document.getElementById('modeStampBtn').classList.toggle('active', mode === 'stamp');
+  renderBook();
+  saveState();
+}
+
+function setSetsCount(n) {
+  state.setsCount = n;
+  document.getElementById('sets1Btn').classList.toggle('active', n === 1);
+  document.getElementById('sets2Btn').classList.toggle('active', n === 2);
+  document.getElementById('prize2Row').style.display = n === 2 ? '' : 'none';
+}
+
+function setCardsPerSet(n) {
+  state.cardsPerSet = n;
+  [4,6,8].forEach(v => {
+    document.getElementById(`count${v}Btn`).classList.toggle('active', v === n);
+  });
+}
+
+function setRareProb(n) {
+  state.rareProb = n;
+  [5,10,20].forEach(v => {
+    document.getElementById(`rare${v}Btn`).classList.toggle('active', v === n);
+  });
+}
+
+function applyConfig() {
+  // 应用活动名称
+  const name = document.getElementById('activityName').value.trim() || '品牌集卡活动';
+  document.getElementById('gameTitle').textContent = name;
+  // 更新套装页签显示
+  document.getElementById('pageTabs').style.display = state.setsCount === 2 ? '' : 'none';
+  document.getElementById('prize2Row').style.display = state.setsCount === 2 ? '' : 'none';
+  // 更新稀有概率状态栏
+  document.getElementById('rareProb').textContent = `稀有卡概率 ${state.rareProb}%`;
+  // 重置当前页
+  state.currentPage = 1;
+  switchPage(1);
+  renderBook();
+  updateProgress();
+  updateRightPanel();
+  saveState();
+  showToast('✅ 配置已应用', 'green');
+}
+
+function resetAll() {
+  if (!confirm('确认清除所有收集记录？')) return;
+  state.collections = {};
+  state.rareCollected = {};
+  state.totalDrawn = 0;
+  state.recentLog = [];
+  state.redeemHistory = [];
+  state.redeemed = {};
+  saveState();
+  renderBook();
+  updateProgress();
+  updateRightPanel();
+  showToast('🔄 数据已重置', 'purple');
+}
+
+function switchPage(page) {
+  state.currentPage = page;
+  document.getElementById('pageTab1').classList.toggle('active', page === 1);
+  document.getElementById('pageTab2').classList.toggle('active', page === 2);
+  // 更新当前套装信息
+  const setNames = ['套装一','套装二'];
+  document.getElementById('drawSetName').textContent = setNames[page - 1];
+  renderBook();
+  saveState();
+}
+
+// ─── 卡片数据辅助 ───
+function getCardKey(set, idx) { return `set${set}_${idx}`; }
+function isRareCard(set, idx) { return idx === state.cardsPerSet - 1; } // 每套最后一张为稀有
+
+function getCardName(set, idx) {
+  const names = set === 1 ? SET1_NAMES : SET2_NAMES;
+  return names[idx % names.length];
+}
+function getStampIcon(set, idx) {
+  const icons = set === 1 ? STAMP_ICONS_1 : STAMP_ICONS_2;
+  return icons[idx % icons.length];
+}
+
+// 获取某套已收集数量
+function getCollectedCount(set) {
+  let count = 0;
+  for (let i = 0; i < state.cardsPerSet; i++) {
+    if (state.collections[getCardKey(set, i)]) count++;
+  }
+  return count;
+}
+
+// 判断某套是否集齐
+function isSetComplete(set) {
+  return getCollectedCount(set) >= state.cardsPerSet;
+}
+
+// ─── 渲染卡册 ───
+function renderBook() {
+  const area = document.getElementById('bookArea');
+  if (state.mode === 'card') {
+    renderCardBook(area);
+  } else {
+    renderStampBook(area);
+  }
+}
+
+// 渲染卡片模式卡册（左右两页）
+function renderCardBook(area) {
+  const set = state.currentPage;
+  const total = state.cardsPerSet;
+  const half = Math.ceil(total / 2);
+
+  let leftCards = '';
+  let rightCards = '';
+
+  for (let i = 0; i < total; i++) {
+    const key = getCardKey(set, i);
+    const collected = !!state.collections[key];
+    const rare = isRareCard(set, i);
+    const name = getCardName(set, i);
+    const theme = CARD_THEMES[i % CARD_THEMES.length];
+
+    const rareClass = rare ? 'rare-card' : '';
+    const collectedClass = collected ? 'collected' : 'empty';
+
+    let cardHtml = '';
+    if (collected) {
+      // 已收集：绘制彩色卡片
+      cardHtml = `
+        <div class="card-slot ${collectedClass} ${rareClass}" title="${name}">
+          <div class="card-num-tag">#${String(i+1).padStart(2,'0')}</div>
+          <div class="card-inner">
+            <div class="card-art" style="background:linear-gradient(135deg,${theme[0]},${theme[1]});">
+              <!-- 几何装饰 -->
+              <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.08);"></div>
+              <div style="position:absolute;bottom:-15px;left:-15px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.06);"></div>
+              <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);font-size:38px;">${theme[2]}</div>
+            </div>
+            <span class="card-name-tag">${name}</span>
+          </div>
+        </div>`;
+    } else {
+      // 未收集：灰色占位
+      cardHtml = `
+        <div class="card-slot ${collectedClass} ${rareClass}" title="${name}">
+          <div class="card-inner">
+            <div class="q-mark">?</div>
+            <div class="card-name" style="font-size:10px;color:rgba(255,255,255,0.2);">${rare ? '稀有' : `No.${i+1}`}</div>
+          </div>
+        </div>`;
+    }
+
+    if (i < half) leftCards += cardHtml;
+    else rightCards += cardHtml;
+  }
+
+  // 动态列数
+  const cols = half <= 2 ? 1 : 2;
+  const setName = set === 1 ? '套装一' : '套装二';
+
+  area.innerHTML = `
+    <div class="book" id="bookEl">
+      <div class="book-page">
+        <div class="book-page-title">— ${setName} · 上册 —</div>
+        <div class="cards-grid" style="grid-template-columns:repeat(${cols},1fr);">${leftCards}</div>
+      </div>
+      <div class="book-page">
+        <div class="book-page-title">— ${setName} · 下册 —</div>
+        <div class="cards-grid" style="grid-template-columns:repeat(${cols},1fr);">${rightCards}</div>
+      </div>
+    </div>`;
+}
+
+// 渲染印章模式集章册
+function renderStampBook(area) {
+  const set = state.currentPage;
+  const total = state.cardsPerSet;
+  const setName = set === 1 ? '套装一' : '套装二';
+
+  let stamps = '';
+  for (let i = 0; i < total; i++) {
+    const key = getCardKey(set, i);
+    const collected = !!state.collections[key];
+    const rare = isRareCard(set, i);
+    const icon = getStampIcon(set, i);
+    const name = getCardName(set, i);
+
+    // 印章颜色方案
+    const colors = [
+      ['#7C3AED','#4C1D95'],['#EC4899','#831843'],['#2563EB','#1E3A8A'],
+      ['#059669','#064E3B'],['#D97706','#78350F'],['#EF4444','#7F1D1D'],
+      ['#8B5CF6','#4C1D95'],['#0EA5E9','#0C4A6E'],
+    ];
+    const [c1, c2] = colors[i % colors.length];
+
+    if (collected) {
+      stamps += `
+        <div class="stamp-slot stamped ${rare ? 'rare-stamp' : ''}" title="${name}" id="stamp_${set}_${i}">
+          <div class="stamp-circle" style="background:linear-gradient(135deg,${c1},${c2}); box-shadow:0 4px 16px ${c1}66;">
+            <div class="stamp-icon">${icon}</div>
+            <div class="stamp-label" style="color:rgba(255,255,255,0.85);">${name.slice(0,4)}</div>
+          </div>
+        </div>`;
+    } else {
+      stamps += `
+        <div class="stamp-slot empty-stamp ${rare ? 'rare-stamp' : ''}" title="${rare ? '稀有：' + name : name}" id="stamp_${set}_${i}">
+          <div class="stamp-inner-q">?</div>
+        </div>`;
+    }
+  }
+
+  // 根据数量调整列数
+  const cols = total <= 4 ? 4 : (total <= 6 ? 3 : 4);
+
+  area.innerHTML = `
+    <div class="stamp-book" id="bookEl">
+      <div class="stamp-book-header">
+        <div class="stamp-book-title">✦ ${setName}集章册 ✦</div>
+        <div class="stamp-book-sub">盖满印章，兑换专属奖品</div>
+      </div>
+      <div class="stamp-grid" style="grid-template-columns:repeat(${cols},1fr);">${stamps}</div>
+    </div>`;
+}
+
+// ─── 抽卡逻辑 ───
+function drawCard() {
+  const set = state.currentPage;
+  const total = state.cardsPerSet;
+
+  // 找未收集的卡
+  const missing = [];
+  for (let i = 0; i < total; i++) {
+    if (!state.collections[getCardKey(set, i)]) {
+      missing.push(i);
+    }
+  }
+
+  if (missing.length === 0) {
+    showToast('🎉 本套已全部集齐！', 'gold');
+    return;
+  }
+
+  // 禁用按钮防连点
+  const btn = document.getElementById('drawBtn');
+  btn.disabled = true;
+
+  // 稀有卡判定：仅当稀有卡未收集且满足概率时才有机会抽到
+  const rareIdx = total - 1; // 最后一张是稀有
+  const rareNotCollected = missing.includes(rareIdx);
+  const hitRare = rareNotCollected && (Math.random() * 100 < state.rareProb);
+
+  let pickedIdx;
+  if (hitRare) {
+    pickedIdx = rareIdx;
+  } else {
+    // 普通卡随机（排除稀有卡槽）
+    const normalMissing = missing.filter(i => i !== rareIdx);
+    if (normalMissing.length > 0) {
+      pickedIdx = normalMissing[Math.floor(Math.random() * normalMissing.length)];
+    } else {
+      // 普通卡全收集了，只剩稀有
+      pickedIdx = rareIdx;
+    }
+  }
+
+  const key = getCardKey(set, pickedIdx);
+  const cardName = getCardName(set, pickedIdx);
+  const isRare = isRareCard(set, pickedIdx);
+
+  // 标记收集
+  state.collections[key] = true;
+  if (isRare) state.rareCollected[key] = true;
+  state.totalDrawn++;
+
+  // 记录日志
+  const now = new Date();
+  const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  state.recentLog.unshift({ name: cardName, rare: isRare, time: timeStr, set });
+  if (state.recentLog.length > 10) state.recentLog.pop();
+
+  saveState();
+
+  // 刷新卡册显示 + 播放动画
+  renderBook();
+
+  // 播放飞入动画
+  setTimeout(() => {
+    playDrawAnimation(set, pickedIdx, isRare);
+  }, 50);
+
+  // 更新界面
+  updateProgress();
+  updateRightPanel();
+
+  // 恢复按钮
+  setTimeout(() => {
+    btn.disabled = false;
+    // 检查是否集齐
+    checkSetComplete(set);
+  }, 800);
+
+  // Toast提示
+  if (isRare) {
+    showToast(`✨ 稀有卡「${cardName}」！`, 'gold');
+  } else {
+    showToast(`🃏 获得「${cardName}」`, 'purple');
+  }
+}
+
+// 播放卡片/印章飞入动画
+function playDrawAnimation(set, idx, isRare) {
+  if (state.mode === 'card') {
+    // 找到对应卡槽元素（按位置）
+    const allSlots = document.querySelectorAll('.card-slot');
+    // 计算在DOM中的位置
+    const total = state.cardsPerSet;
+    const half = Math.ceil(total / 2);
+    // 左页是0到half-1，右页是half到total-1
+    if (allSlots[idx]) {
+      allSlots[idx].classList.add('card-fly-anim');
+      setTimeout(() => allSlots[idx].classList.remove('card-fly-anim'), 700);
+    }
+    // 稀有卡光爆
+    if (isRare && allSlots[idx]) {
+      const burst = document.createElement('div');
+      burst.className = 'rare-burst';
+      burst.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);';
+      document.body.appendChild(burst);
+      setTimeout(() => burst.remove(), 900);
+    }
+  } else {
+    // 印章落下动画
+    const stampEl = document.getElementById(`stamp_${set}_${idx}`);
+    if (stampEl) {
+      stampEl.classList.add('stamp-drop-anim');
+      setTimeout(() => stampEl.classList.remove('stamp-drop-anim'), 600);
+    }
+  }
+}
+
+// 检查集齐并庆祝
+function checkSetComplete(set) {
+  if (isSetComplete(set) && !state.redeemed[`set${set}`]) {
+    // 卡册闪光庆祝
+    const bookEl = document.getElementById('bookEl');
+    if (bookEl) bookEl.classList.add('celebrating');
+    setTimeout(() => bookEl && bookEl.classList.remove('celebrating'), 3500);
+    // 更新完成标识
+    updateCompleteBadge();
+    showToast(`🎉 套装${set === 1 ? '一' : '二'}已集齐！可以兑换奖品啦`, 'gold');
+  }
+}
+
+// 更新集齐徽章
+function updateCompleteBadge() {
+  const area = document.getElementById('completeBadgeArea');
+  let badges = '';
+  for (let s = 1; s <= state.setsCount; s++) {
+    if (isSetComplete(s)) {
+      badges += `<span class="set-complete-badge">✦ 套装${s === 1 ? '一' : '二'}已集齐</span> `;
+    }
+  }
+  area.innerHTML = badges;
+}
+
+// 好友赠送（模拟）
+function friendGift() {
+  const set = state.currentPage;
+  const total = state.cardsPerSet;
+  // 找未收集的普通卡（不含稀有）
+  const missing = [];
+  for (let i = 0; i < total - 1; i++) {
+    if (!state.collections[getCardKey(set, i)]) missing.push(i);
+  }
+  if (missing.length === 0) {
+    showToast('✅ 本套普通卡已全部收集', 'green');
+    return;
+  }
+  const idx = missing[Math.floor(Math.random() * missing.length)];
+  const key = getCardKey(set, idx);
+  const name = getCardName(set, idx);
+  state.collections[key] = true;
+  state.totalDrawn++;
+  state.recentLog.unshift({ name: `${name}（好友赠送）`, rare: false, time: getTimeStr(), set });
+  if (state.recentLog.length > 10) state.recentLog.pop();
+  saveState();
+  renderBook();
+  updateProgress();
+  updateRightPanel();
+  checkSetComplete(set);
+  showToast(`🎁 好友赠送「${name}」`, 'green');
+}
+
+// 兑换奖品
+function redeemPrize(set) {
+  if (!isSetComplete(set)) return;
+  if (state.redeemed[`set${set}`]) {
+    showToast('此套装已兑换过', 'purple');
+    return;
+  }
+  const prizeEl = set === 1 ? document.getElementById('prize1') : document.getElementById('prize2');
+  const prize = prizeEl ? prizeEl.value.trim() || '神秘大奖' : '神秘大奖';
+  state.redeemed[`set${set}`] = true;
+  state.redeemHistory.unshift({
+    prize,
+    time: getTimeStr(),
+    setName: set === 1 ? '套装一' : '套装二'
+  });
+  saveState();
+  updateRightPanel();
+  showToast(`🏆 兑换成功：${prize}`, 'gold');
+}
+
+// ─── 更新进度 ───
+function updateProgress() {
+  let total = state.setsCount * state.cardsPerSet;
+  let collected = 0;
+  for (let s = 1; s <= state.setsCount; s++) {
+    collected += getCollectedCount(s);
+  }
+  const pct = total === 0 ? 0 : Math.round((collected / total) * 100);
+  document.getElementById('progressText').textContent = `已收集 ${collected} / ${total} 张`;
+  document.getElementById('progressPct').textContent = `${pct}%`;
+  document.getElementById('progressFill').style.width = `${pct}%`;
+  document.getElementById('totalDrawn').textContent = state.totalDrawn;
+  updateCompleteBadge();
+}
+
+// ─── 更新右侧面板 ───
+function updateRightPanel() {
+  updateSetProgressList();
+  updateMissingHints();
+  updateRecentLog();
+  updateRedeemHistory();
+}
+
+function updateSetProgressList() {
+  let html = '';
+  for (let s = 1; s <= state.setsCount; s++) {
+    const cnt = getCollectedCount(s);
+    const total = state.cardsPerSet;
+    const pct = Math.round((cnt / total) * 100);
+    const setName = s === 1 ? '套装一' : '套装二';
+    const complete = isSetComplete(s);
+    html += `
+      <div class="set-progress-item">
+        <div class="set-progress-top">
+          <span class="set-name">${setName} ${complete ? '✦' : ''}</span>
+          <span class="set-count">${cnt}/${total}</span>
+        </div>
+        <div class="mini-bar"><div class="mini-fill" style="width:${pct}%"></div></div>
+        ${complete && !state.redeemed[`set${s}`] ? `<button class="btn-redeem" onclick="redeemPrize(${s})" style="margin-top:8px;">兑换奖品</button>` : ''}
+        ${state.redeemed[`set${s}`] ? '<div style="text-align:center;margin-top:6px;font-size:11px;color:var(--gold);">✅ 已兑换</div>' : ''}
+      </div>`;
+  }
+  document.getElementById('setProgressList').innerHTML = html;
+}
+
+function updateMissingHints() {
+  let html = '';
+  for (let s = 1; s <= state.setsCount; s++) {
+    const missing = state.cardsPerSet - getCollectedCount(s);
+    const setName = s === 1 ? '套装一' : '套装二';
+    if (missing === 0) {
+      html += `<div class="missing-hint" style="background:rgba(52,211,153,0.08);border-color:rgba(52,211,153,0.2);">
+        <div style="color:#34d399;font-weight:700;">✅ ${setName}已集齐！</div>
+      </div>`;
+    } else {
+      html += `<div class="missing-hint">
+        <div style="display:flex;align-items:baseline;gap:6px;">
+          <span class="missing-num">${missing}</span>
+          <span class="missing-desc">张即可集齐${setName}</span>
+        </div>
+      </div>`;
+    }
+  }
+  document.getElementById('missingHints').innerHTML = html;
+}
+
+function updateRecentLog() {
+  if (state.recentLog.length === 0) {
+    document.getElementById('recentLog').innerHTML = '<div class="empty-state">快去抽取第一张卡吧～</div>';
+    return;
+  }
+  const html = state.recentLog.slice(0, 8).map(item => `
+    <div class="log-item">
+      <div class="log-dot ${item.rare ? 'rare' : 'common'}"></div>
+      <div class="log-text">${item.name}</div>
+      ${item.rare ? '<span class="prob-badge prob-rare">稀有</span>' : ''}
+      <div class="log-time">${item.time}</div>
+    </div>`).join('');
+  document.getElementById('recentLog').innerHTML = html;
+}
+
+function updateRedeemHistory() {
+  if (state.redeemHistory.length === 0) {
+    document.getElementById('redeemHistory').innerHTML = '<div class="empty-state">暂无兑换记录</div>';
+    return;
+  }
+  const html = state.redeemHistory.map(item => `
+    <div class="redeem-item">
+      <div class="prize-name">🏆 ${item.prize}</div>
+      <div class="redeem-desc">${item.setName} · ${item.time}</div>
+    </div>`).join('');
+  document.getElementById('redeemHistory').innerHTML = html;
+}
+
+// ─── 工具函数 ───
+function getTimeStr() {
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+
+// Toast通知
+let toastTimer = null;
+function showToast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast${type ? ' ' + type : ''} show`;
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    el.className = `toast${type ? ' ' + type : ''}`;
+  }, 2500);
+}
+
+// ─── 初始化 ───
+function init() {
+  // 加载持久化状态
+  loadState();
+
+  // 同步配置面板 UI
+  document.getElementById('modeCardBtn').classList.toggle('active', state.mode === 'card');
+  document.getElementById('modeStampBtn').classList.toggle('active', state.mode === 'stamp');
+  document.getElementById('sets1Btn').classList.toggle('active', state.setsCount === 1);
+  document.getElementById('sets2Btn').classList.toggle('active', state.setsCount === 2);
+  [4,6,8].forEach(v => {
+    document.getElementById(`count${v}Btn`).classList.toggle('active', v === state.cardsPerSet);
+  });
+  [5,10,20].forEach(v => {
+    document.getElementById(`rare${v}Btn`).classList.toggle('active', v === state.rareProb);
+  });
+
+  // 套装二显示控制
+  document.getElementById('prize2Row').style.display = state.setsCount === 2 ? '' : 'none';
+  document.getElementById('pageTabs').style.display = state.setsCount === 2 ? '' : 'none';
+
+  // 恢复套装页
+  const setNames = ['套装一','套装二'];
+  document.getElementById('drawSetName').textContent = setNames[state.currentPage - 1];
+  if (state.setsCount === 2) {
+    document.getElementById('pageTab1').classList.toggle('active', state.currentPage === 1);
+    document.getElementById('pageTab2').classList.toggle('active', state.currentPage === 2);
+  }
+
+  // 状态栏更新
+  document.getElementById('rareProb').textContent = `稀有卡概率 ${state.rareProb}%`;
+
+  // 渲染卡册
+  renderBook();
+  updateProgress();
+  updateRightPanel();
+}
+
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
