@@ -1336,6 +1336,23 @@ async function startDraw() {
   addHistory(roundCount, drawRed, drawBlue, prizeIdx, prizeName);
   renderPrizeStats();
 
+  // ─── 积分 / 成就 / 排行榜上报 ────────────────────────
+  const PRIZE_SCORES = [1000, 500, 200, 100, 50, 30, 10, 0]; // 特/一/二/三/四/五/六/未中奖
+  const score = prizeIdx >= 0 ? (PRIZE_SCORES[prizeIdx] || 0) : 0;
+  const resultText = prizeIdx >= 0
+    ? `${prizeName}（红球${redMatchCount}个+蓝球${blueMatch ? 1 : 0}个）`
+    : `未中奖（红球${redMatchCount}个+蓝球${blueMatch ? 1 : 0}个）`;
+
+  if (typeof GameLeaderboard !== 'undefined' && GameLeaderboard.submitAndNotify) {
+    GameLeaderboard.submitAndNotify({ game: '幸运数字', score: score, result: resultText });
+  }
+  if (typeof GameAchievement !== 'undefined' && GameAchievement.trigger) {
+    GameAchievement.trigger('spin', 1);
+  }
+  if (typeof GameUser !== 'undefined' && GameUser.addExp) {
+    GameUser.addExp(score > 0 ? 15 : 5);
+  }
+
   // 恢复
   isDrawing = false;
   btnDraw.disabled = false;
@@ -1510,6 +1527,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

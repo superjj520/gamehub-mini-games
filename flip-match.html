@@ -1140,6 +1140,19 @@ function gameOver(win) {
     addLog('info', `通关！步数 ${state.steps}，用时 ${state.elapsed}s，评级 ${rank}`);
     showWinModal(rank, win);
     launchParticles();
+
+    // 提交排行榜、成就、经验
+    var score = Math.max(100, 1000 - state.steps * 10);
+    var timeStr = state.elapsed + 's';
+    if (typeof GameLeaderboard !== 'undefined' && GameLeaderboard.submitAndNotify) {
+      GameLeaderboard.submitAndNotify({ game: '翻牌记忆', score: score, result: '用时:' + timeStr });
+    }
+    if (typeof GameAchievement !== 'undefined' && GameAchievement.trigger) {
+      GameAchievement.trigger('puzzle', 1);
+    }
+    if (typeof GameUser !== 'undefined' && GameUser.addExp) {
+      GameUser.addExp(20);
+    }
   } else {
     addLog('fail', `超时失败，已匹配 ${state.matched}/${state.totalPairs} 对`);
     showWinModal(rank, false);
@@ -1326,6 +1339,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

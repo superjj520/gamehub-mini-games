@@ -621,6 +621,19 @@ function spin() {
     // 音效
     if (PRIZES[resultIdx].type === 'win') GameSound.play('bigWin');
     else GameSound.play('lose');
+    // ─── 中台系统集成 ───
+    const _prize = PRIZES[resultIdx];
+    const _prizeScoreMap = { '免单券×1': 1000, '100元优惠券': 500, '50元红包': 200, '20元券': 50, '积分×100': 50 };
+    const _prizeScore = _prizeScoreMap[_prize.name] !== undefined ? _prizeScoreMap[_prize.name] : (_prize.type === 'miss' ? 0 : 50);
+    if (typeof GameLeaderboard !== 'undefined') {
+      GameLeaderboard.submitAndNotify({ game: '大转盘', score: _prizeScore, result: _prize.name });
+    }
+    if (typeof GameAchievement !== 'undefined') {
+      GameAchievement.trigger('spin', 1);
+    }
+    if (typeof GameUser !== 'undefined') {
+      GameUser.addExp(_prizeScore > 0 ? 20 : 5);
+    }
     updateStats(); updateChance(); addLog(PRIZES[resultIdx]); updateDist();
     setTimeout(() => {
       showModal(PRIZES[resultIdx]);
@@ -753,6 +766,7 @@ function toggleSound() {
 </script>
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

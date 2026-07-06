@@ -699,39 +699,59 @@
   <main class="game-center" id="gameCenter">
 
     <!-- 标题 -->
-    <div class="game-name" id="activityTitle">🏆 夏日竞技赛</div>
-    <div class="game-subtitle">
-      好友排行榜 · <span id="autoRefreshBadge" class="refresh-badge">
-        <span class="refresh-dot"></span>实时更新中
-      </span>
+    <div class="game-name" id="activityTitle">🏆 游戏排行榜</div>
+    <div class="game-subtitle" id="boardSubtitle">
+      记录你的每一场胜利
     </div>
 
-    <!-- 维度切换 -->
-    <div class="dim-tabs" id="dimTabs">
-      <button class="dim-tab active" onclick="switchDim('total',this)">总积分</button>
-      <button class="dim-tab" onclick="switchDim('today',this)">今日</button>
-      <button class="dim-tab" onclick="switchDim('week',this)">本周</button>
-      <button class="dim-tab" onclick="switchDim('history',this)">历史</button>
+    <!-- 主模式切换 -->
+    <div class="dim-tabs" id="modeTabs" style="margin-bottom:4px">
+      <button class="dim-tab active" id="modeReal"  onclick="switchMode('real',this)">🎯 我的战绩</button>
+      <button class="dim-tab"        id="modeFriend" onclick="switchMode('friend',this)">👥 好友模拟榜</button>
     </div>
 
-    <!-- 实时滚动榜 -->
-    <div class="live-ticker" id="liveTicker">
-      <div class="live-ticker-inner" id="liveTickerInner"></div>
+    <!-- ══ 真实得分榜 ══ -->
+    <div id="realBoard">
+      <div class="dim-tabs" id="gameTabs" style="flex-wrap:wrap;gap:6px;margin-top:8px">
+        <button class="dim-tab active" data-game="__all__" onclick="switchGame('__all__',this)">全部游戏</button>
+      </div>
+      <div id="realRankList" style="margin-top:12px"></div>
+      <div id="realEmpty" style="display:none;text-align:center;padding:48px 20px;color:var(--muted)">
+        <div style="font-size:48px;margin-bottom:12px">🎮</div>
+        <div style="font-size:15px;margin-bottom:6px">还没有游戏记录</div>
+        <div style="font-size:12px;margin-bottom:16px">去玩几局游戏，成绩会自动出现在这里</div>
+        <a href="index.html" style="display:inline-block;padding:10px 24px;background:linear-gradient(135deg,#7C3AED,#EC4899);color:white;border-radius:24px;font-size:13px;text-decoration:none">去玩游戏 →</a>
+      </div>
     </div>
 
-    <!-- 段位展示区 -->
-    <div class="rank-tier-section" id="tierSection"></div>
+    <!-- ══ 模拟好友榜 ══ -->
+    <div id="friendBoard" style="display:none">
+      <div class="dim-tabs" id="dimTabs" style="margin-top:8px">
+        <button class="dim-tab active" onclick="switchDim('total',this)">总积分</button>
+        <button class="dim-tab" onclick="switchDim('today',this)">今日</button>
+        <button class="dim-tab" onclick="switchDim('week',this)">本周</button>
+        <button class="dim-tab" onclick="switchDim('history',this)">历史</button>
+      </div>
 
-    <!-- 颁奖台（前3名） -->
-    <div class="podium" id="podium"></div>
+      <!-- 实时滚动榜 -->
+      <div class="live-ticker" id="liveTicker">
+        <div class="live-ticker-inner" id="liveTickerInner"></div>
+      </div>
 
-    <!-- 4-10名列表 -->
-    <div class="rank-list" id="rankList"></div>
+      <!-- 段位展示区 -->
+      <div class="rank-tier-section" id="tierSection"></div>
 
-    <!-- 我的排名固定底栏 -->
-    <div class="my-rank-bar">
-      <div class="my-rank-gap" id="myGapText"></div>
-      <div class="rank-list" id="myRankRow"></div>
+      <!-- 颁奖台（前3名） -->
+      <div class="podium" id="podium"></div>
+
+      <!-- 4-10名列表 -->
+      <div class="rank-list" id="rankList"></div>
+
+      <!-- 我的排名固定底栏 -->
+      <div class="my-rank-bar">
+        <div class="my-rank-gap" id="myGapText"></div>
+        <div class="rank-list" id="myRankRow"></div>
+      </div>
     </div>
 
   </main><!-- /game-center -->
@@ -742,8 +762,29 @@
 
     <div class="panel-title">📊 我的数据</div>
 
-    <!-- 我的历史数据卡 -->
-    <div class="card">
+    <!-- 真实战绩统计卡 -->
+    <div class="card" id="realStatCard">
+      <div class="card-title"><span class="dot"></span>我的真实战绩</div>
+      <div class="my-stat-row">
+        <span class="my-stat-label">游戏种类</span>
+        <span class="my-stat-val gold" id="statRealGames">-</span>
+      </div>
+      <div class="my-stat-row">
+        <span class="my-stat-label">总游玩次数</span>
+        <span class="my-stat-val accent2" id="statRealPlays">-</span>
+      </div>
+      <div class="my-stat-row">
+        <span class="my-stat-label">历史最高分</span>
+        <span class="my-stat-val gold" id="statRealBest">-</span>
+      </div>
+      <div class="my-stat-row">
+        <span class="my-stat-label">最爱玩的游戏</span>
+        <span class="my-stat-val green" id="statRealFav">-</span>
+      </div>
+    </div>
+
+    <!-- 模拟榜统计卡（切换到好友榜时显示） -->
+    <div class="card" id="friendStatCard" style="display:none">
       <div class="card-title"><span class="dot"></span>本次活动统计</div>
       <div class="my-stat-row">
         <span class="my-stat-label">当前排名</span>
@@ -1319,7 +1360,130 @@ function startAutoRefresh() {
   // 导航激活tab滚动到可见区域
   const activeTab = document.querySelector('.nav-tab.active');
   if (activeTab) activeTab.scrollIntoView({ block: 'nearest', inline: 'center' });
+
+  // 默认显示真实战绩榜
+  renderRealBoard('__all__');
+  renderRealStats();
 })();
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   真实得分榜逻辑
+═══════════════════════════════════════════════════════════ */
+let currentMode = 'real';
+let currentGame = '__all__';
+
+function switchMode(mode, btn) {
+  currentMode = mode;
+  document.querySelectorAll('#modeTabs .dim-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const realBoard   = document.getElementById('realBoard');
+  const friendBoard = document.getElementById('friendBoard');
+  const realCard    = document.getElementById('realStatCard');
+  const friendCard  = document.getElementById('friendStatCard');
+
+  if (mode === 'real') {
+    realBoard.style.display   = '';
+    friendBoard.style.display = 'none';
+    realCard.style.display    = '';
+    friendCard.style.display  = 'none';
+    renderRealBoard(currentGame);
+    renderRealStats();
+  } else {
+    realBoard.style.display   = 'none';
+    friendBoard.style.display = '';
+    realCard.style.display    = 'none';
+    friendCard.style.display  = '';
+    renderAll();
+    startAutoRefresh();
+  }
+}
+
+function switchGame(game, btn) {
+  currentGame = game;
+  document.querySelectorAll('#gameTabs .dim-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderRealBoard(game);
+}
+
+function buildGameTabs() {
+  const games = typeof GameLeaderboard !== 'undefined' ? GameLeaderboard.getGames() : [];
+  const container = document.getElementById('gameTabs');
+  // 保留"全部游戏"按钮，重建其余
+  container.innerHTML = '<button class="dim-tab ' + (currentGame === '__all__' ? 'active' : '') + '" data-game="__all__" onclick="switchGame(\'__all__\',this)">全部游戏</button>';
+  games.forEach(g => {
+    const btn = document.createElement('button');
+    btn.className = 'dim-tab' + (currentGame === g ? ' active' : '');
+    btn.dataset.game = g;
+    btn.onclick = function() { switchGame(g, this); };
+    btn.textContent = g;
+    container.appendChild(btn);
+  });
+}
+
+function fmtTime(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  const diff = now - d;
+  if (diff < 60000) return '刚刚';
+  if (diff < 3600000) return Math.floor(diff/60000) + '分钟前';
+  if (diff < 86400000) return Math.floor(diff/3600000) + '小时前';
+  return (d.getMonth()+1) + '/' + d.getDate();
+}
+
+function renderRealBoard(game) {
+  buildGameTabs();
+  const list = document.getElementById('realRankList');
+  const empty = document.getElementById('realEmpty');
+
+  if (typeof GameLeaderboard === 'undefined') {
+    list.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+
+  const records = GameLeaderboard.getTop(game === '__all__' ? null : game, 20);
+
+  if (!records.length) {
+    list.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+  const medals = ['🥇','🥈','🥉'];
+
+  list.innerHTML = records.map((r, i) => {
+    const medal = i < 3 ? medals[i] : `<span style="color:var(--muted);font-size:13px">#${i+1}</span>`;
+    const gameTag = game === '__all__' ? `<span style="font-size:10px;padding:2px 6px;background:rgba(124,58,237,0.2);border-radius:10px;color:var(--accent);margin-left:4px">${r.game || ''}</span>` : '';
+    const result = r.result ? `<span style="font-size:11px;color:var(--muted);margin-left:6px">${r.result}</span>` : '';
+    return `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.04);margin-bottom:6px;border:1px solid rgba(255,255,255,0.06)">
+        <div style="width:28px;text-align:center;font-size:18px;flex-shrink:0">${medal}</div>
+        <div style="font-size:20px;flex-shrink:0">${r.avatar || '🎮'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;flex-wrap:wrap">
+            ${r.nickname || '匿名玩家'}
+            ${gameTag}
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${fmtTime(r.ts)}${result}</div>
+        </div>
+        <div style="font-size:18px;font-weight:700;color:var(--gold);flex-shrink:0">${r.score.toLocaleString()}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderRealStats() {
+  if (typeof GameLeaderboard === 'undefined') return;
+  const s = GameLeaderboard.getSummary();
+  const el = id => document.getElementById(id);
+  if (el('statRealGames')) el('statRealGames').textContent = s.totalGames + ' 种';
+  if (el('statRealPlays')) el('statRealPlays').textContent = s.myPlays + ' 次';
+  if (el('statRealBest'))  el('statRealBest').textContent  = s.myBestScore ? s.myBestScore.toLocaleString() : '-';
+  if (el('statRealFav'))   el('statRealFav').textContent   = s.myFavoriteGame || '暂无';
+}
 </script>
 
 function mobileSwitchTab(tab) {
@@ -1347,6 +1511,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

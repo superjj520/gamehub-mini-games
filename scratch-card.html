@@ -640,11 +640,11 @@
 <script>
 // ─── 奖品配置 ───
 const PRIZES = [
-  { id: 0, emoji: '🧧', name: '50元红包',   desc: '可直接提现或消费抵扣',   prob: 0.08,  win: true,  color: '#EF4444', barColor: 'linear-gradient(90deg,#EF4444,#F97316)' },
-  { id: 1, emoji: '🎫', name: '20元优惠券', desc: '指定商品满减使用，有效期30天', prob: 0.15, win: true,  color: '#F59E0B', barColor: 'linear-gradient(90deg,#F59E0B,#F5C842)' },
-  { id: 2, emoji: '🛒', name: '免单券',     desc: '随机单笔订单全额免单',   prob: 0.03,  win: true,  color: '#10B981', barColor: 'linear-gradient(90deg,#10B981,#34D399)' },
-  { id: 3, emoji: '⭐', name: '积分×200',   desc: '可兑换商品或抵扣消费',   prob: 0.24,  win: true,  color: '#7C3AED', barColor: 'linear-gradient(90deg,#7C3AED,#A78BFA)' },
-  { id: 4, emoji: '😊', name: '谢谢参与',   desc: '感谢您的参与，下次好运', prob: 0.50,  win: false, color: '#6B7280', barColor: 'linear-gradient(90deg,#6B7280,#9CA3AF)' },
+  { id: 0, emoji: '🧧', name: '50元红包',   desc: '可直接提现或消费抵扣',   prob: 0.08,  win: true,  score: 50,  color: '#EF4444', barColor: 'linear-gradient(90deg,#EF4444,#F97316)' },
+  { id: 1, emoji: '🎫', name: '20元优惠券', desc: '指定商品满减使用，有效期30天', prob: 0.15, win: true,  score: 20,  color: '#F59E0B', barColor: 'linear-gradient(90deg,#F59E0B,#F5C842)' },
+  { id: 2, emoji: '🛒', name: '免单券',     desc: '随机单笔订单全额免单',   prob: 0.03,  win: true,  score: 100, color: '#10B981', barColor: 'linear-gradient(90deg,#10B981,#34D399)' },
+  { id: 3, emoji: '⭐', name: '积分×200',   desc: '可兑换商品或抵扣消费',   prob: 0.24,  win: true,  score: 200, color: '#7C3AED', barColor: 'linear-gradient(90deg,#7C3AED,#A78BFA)' },
+  { id: 4, emoji: '😊', name: '谢谢参与',   desc: '感谢您的参与，下次好运', prob: 0.50,  win: false, score: 0,   color: '#6B7280', barColor: 'linear-gradient(90deg,#6B7280,#9CA3AF)' },
 ];
 
 // ─── 状态 ───
@@ -883,6 +883,19 @@ function showModal() {
   addRecord(prize);
   updateStats();
   renderDist();
+
+  // 中台系统集成：提交排行榜、触发成就、增加经验值
+  const prizeScore = prize.score || 0;
+  const prizeText = prize.name;
+  if (typeof GameLeaderboard !== 'undefined') {
+    GameLeaderboard.submitAndNotify({ game: '刮刮乐', score: prizeScore, result: prizeText });
+  }
+  if (typeof GameAchievement !== 'undefined') {
+    GameAchievement.trigger('scratch', 1);
+  }
+  if (typeof GameUser !== 'undefined') {
+    GameUser.addExp(prizeScore > 0 ? 15 : 5);
+  }
 }
 
 function closeModal() {
@@ -1083,6 +1096,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
