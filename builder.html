@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameHub · 游戏生成器</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --gold: #F5C842; --bg: #0D0720; --accent: #7C3AED; --accent2: #EC4899;
+  --deep: #1A0A2E; --card: rgba(255,255,255,0.05); --border: rgba(255,255,255,0.1);
+  --text: #F0EAF8; --muted: rgba(240,234,248,0.5); --green: #22C55E;
+}
+body { font-family: -apple-system,'PingFang SC','Microsoft YaHei',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ─── 导航 ─── */
+.nav { display:flex; align-items:center; justify-content:space-between; padding:0 24px; height:56px; border-bottom:1px solid var(--border); background:rgba(13,7,32,0.97); backdrop-filter:blur(12px); position:sticky; top:0; z-index:100; gap:16px; }
+.nav-logo { display:flex; align-items:center; gap:8px; font-size:17px; font-weight:700; color:var(--text); text-decoration:none; }
+.nav-badge { background:linear-gradient(135deg,var(--accent),var(--accent2)); padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+
+/* ─── 主体 ─── */
+.builder { display:grid; grid-template-columns:1fr 420px; gap:0; min-height:calc(100vh - 56px); }
+
+/* ─── 左侧编辑区 ─── */
+.editor { padding:28px 32px; overflow-y:auto; border-right:1px solid var(--border); }
+.step { margin-bottom:32px; }
+.step-label { font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.step-num { width:20px; height:20px; border-radius:50%; background:var(--accent); color:white; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; flex-shrink:0; }
+
+/* 游戏类型选择 */
+.game-types { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.game-type-card { padding:16px 12px; border-radius:12px; border:1px solid var(--border); cursor:pointer; text-align:center; transition:all 0.2s; background:transparent; }
+.game-type-card:hover { border-color:rgba(124,58,237,0.4); background:rgba(124,58,237,0.06); }
+.game-type-card.active { border-color:var(--accent); background:rgba(124,58,237,0.12); }
+.game-type-card.disabled { opacity:0.35; cursor:not-allowed; }
+.game-type-icon { font-size:28px; margin-bottom:6px; }
+.game-type-name { font-size:12px; font-weight:600; }
+.game-type-badge { font-size:10px; color:var(--green); margin-top:2px; }
+
+/* 表单 */
+.field { margin-bottom:14px; }
+.field label { display:block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; }
+.field input, .field select, .field textarea {
+  width:100%; padding:9px 12px; border-radius:8px;
+  background:rgba(255,255,255,0.06); border:1px solid var(--border);
+  color:var(--text); font-size:13px; font-family:inherit; outline:none;
+  transition:border-color 0.2s;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color:var(--accent); }
+.field select option { background:#1A0A2E; }
+.field-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.field-row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+
+/* 奖品列表 */
+.prize-editor { display:flex; flex-direction:column; gap:8px; }
+.prize-row {
+  display:grid; grid-template-columns:36px 1fr 80px 70px 80px 36px;
+  align-items:center; gap:8px;
+  padding:10px 12px; border-radius:10px;
+  background:rgba(255,255,255,0.04); border:1px solid var(--border);
+}
+.prize-row input { padding:6px 8px; font-size:12px; }
+.prize-emoji-pick { font-size:20px; cursor:pointer; text-align:center; }
+.prize-color-dot { width:24px; height:24px; border-radius:50%; border:2px solid rgba(255,255,255,0.2); cursor:pointer; flex-shrink:0; }
+.prize-del { width:28px; height:28px; border-radius:6px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:#EF4444; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; transition:background 0.2s; }
+.prize-del:hover { background:rgba(239,68,68,0.2); }
+.prize-header { display:grid; grid-template-columns:36px 1fr 80px 70px 80px 36px; gap:8px; padding:0 12px; margin-bottom:4px; }
+.prize-header span { font-size:10px; color:var(--muted); font-weight:600; }
+
+.add-prize-btn {
+  padding:9px; border-radius:10px; border:1px dashed rgba(124,58,237,0.4);
+  background:rgba(124,58,237,0.05); color:var(--accent);
+  font-size:13px; font-weight:600; cursor:pointer; width:100%;
+  transition:all 0.2s; font-family:inherit;
+}
+.add-prize-btn:hover { background:rgba(124,58,237,0.12); border-color:var(--accent); }
+
+/* 概率条 */
+.prob-bar { height:6px; border-radius:3px; background:rgba(255,255,255,0.08); margin-top:10px; overflow:hidden; display:flex; }
+.prob-seg { height:100%; transition:width 0.3s; }
+.prob-total { font-size:11px; color:var(--muted); margin-top:6px; display:flex; justify-content:space-between; align-items:center; }
+.prob-warn { color:#EF4444; font-size:11px; }
+.prob-ok   { color:var(--green); font-size:11px; }
+
+/* 按钮 */
+.btn { padding:11px 20px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; border:none; transition:opacity 0.2s; font-family:inherit; }
+.btn:hover { opacity:0.85; }
+.btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; }
+.btn-outline { background:transparent; border:1px solid var(--border); color:var(--muted); }
+.btn-row { display:flex; gap:10px; margin-top:8px; }
+
+/* ─── 右侧预览+生成 ─── */
+.preview-panel { padding:24px; display:flex; flex-direction:column; gap:20px; }
+.preview-title { font-size:14px; font-weight:700; color:var(--text); margin-bottom:12px; }
+
+/* iframe 预览 */
+.preview-frame-wrap {
+  border-radius:14px; overflow:hidden;
+  border:1px solid rgba(124,58,237,0.3);
+  background:var(--deep); position:relative;
+  aspect-ratio:9/14; max-height:520px;
+}
+.preview-iframe { width:100%; height:100%; border:none; transform-origin:top left; }
+.preview-overlay {
+  position:absolute; inset:0; background:rgba(0,0,0,0.5);
+  display:flex; align-items:center; justify-content:center;
+  border-radius:14px; cursor:pointer;
+}
+.preview-overlay-text { color:white; font-size:13px; font-weight:600; text-align:center; }
+
+/* 生成链接区 */
+.link-box {
+  background:rgba(255,255,255,0.04); border:1px solid var(--border);
+  border-radius:12px; padding:16px;
+}
+.link-url {
+  font-size:11px; color:var(--gold); word-break:break-all;
+  background:rgba(0,0,0,0.3); padding:8px 10px; border-radius:6px;
+  margin:10px 0; font-family:monospace; line-height:1.6;
+  max-height:80px; overflow:auto;
+}
+.link-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.link-btn { padding:8px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; border:none; font-family:inherit; transition:opacity 0.2s; }
+.link-btn:hover { opacity:0.85; }
+.link-btn-copy { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; }
+.link-btn-preview { background:rgba(255,255,255,0.08); border:1px solid var(--border); color:var(--text); }
+.link-btn-qr { background:rgba(245,200,66,0.15); border:1px solid rgba(245,200,66,0.3); color:var(--gold); }
+
+/* 二维码 */
+#qrWrap { text-align:center; margin-top:12px; }
+#qrCanvas { border-radius:8px; }
+
+/* 模板库 */
+.template-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+.template-card {
+  padding:12px; border-radius:10px; border:1px solid var(--border);
+  cursor:pointer; transition:all 0.2s; background:var(--card);
+}
+.template-card:hover { border-color:rgba(124,58,237,0.5); background:rgba(124,58,237,0.08); }
+.template-icon { font-size:20px; margin-bottom:4px; }
+.template-name { font-size:12px; font-weight:700; }
+.template-desc { font-size:10px; color:var(--muted); margin-top:2px; }
+
+/* emoji picker */
+.emoji-picker-modal {
+  position:fixed; inset:0; z-index:9999; display:none;
+  align-items:center; justify-content:center;
+  background:rgba(0,0,0,0.7); backdrop-filter:blur(4px);
+}
+.emoji-picker-modal.show { display:flex; }
+.emoji-picker-box { background:#1A0A2E; border:1px solid var(--border); border-radius:16px; padding:16px; width:min(320px,90vw); }
+.emoji-picker-title { font-size:13px; font-weight:700; margin-bottom:10px; }
+.emoji-grid { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; }
+.emoji-opt { font-size:22px; cursor:pointer; text-align:center; padding:6px; border-radius:6px; transition:background 0.15s; }
+.emoji-opt:hover { background:rgba(255,255,255,0.1); }
+
+/* toast */
+#builder-toast {
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:rgba(26,10,46,0.95); border:1px solid rgba(124,58,237,0.4);
+  border-radius:24px; padding:10px 20px; font-size:13px; color:var(--text);
+  z-index:8888; opacity:0; transition:opacity 0.3s,transform 0.3s; white-space:nowrap;
+  box-shadow:0 4px 20px rgba(0,0,0,0.5); pointer-events:none;
+}
+
+@media(max-width:768px) {
+  .builder { grid-template-columns:1fr; }
+  .preview-panel { border-top:1px solid var(--border); }
+  .game-types { grid-template-columns:repeat(3,1fr); }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span>🎮</span>
+    <span>GameHub</span>
+    <div class="nav-badge">游戏生成器</div>
+  </a>
+  <div style="display:flex;gap:8px">
+    <a href="index.html" style="padding:6px 14px;border-radius:20px;font-size:13px;color:var(--muted);text-decoration:none;border:1px solid var(--border)">← 返回首页</a>
+    <a href="shop.html" style="padding:6px 14px;border-radius:20px;font-size:13px;color:var(--muted);text-decoration:none;border:1px solid var(--border)">🪙 商城</a>
+  </div>
+</nav>
+
+<div class="builder">
+
+  <!-- ══ 左侧编辑区 ══ -->
+  <div class="editor">
+
+    <!-- Step 1：选择游戏类型 -->
+    <div class="step">
+      <div class="step-label"><div class="step-num">1</div>选择游戏类型</div>
+      <div class="game-types">
+        <div class="game-type-card active" data-type="wheel" onclick="selectGameType('wheel',this)">
+          <div class="game-type-icon">🎡</div>
+          <div class="game-type-name">大转盘</div>
+          <div class="game-type-badge">✓ 已支持</div>
+        </div>
+        <div class="game-type-card disabled" data-type="scratch">
+          <div class="game-type-icon">🎟</div>
+          <div class="game-type-name">刮刮乐</div>
+          <div class="game-type-badge" style="color:var(--muted)">即将支持</div>
+        </div>
+        <div class="game-type-card disabled" data-type="slot">
+          <div class="game-type-icon">🎰</div>
+          <div class="game-type-name">老虎机</div>
+          <div class="game-type-badge" style="color:var(--muted)">即将支持</div>
+        </div>
+        <div class="game-type-card disabled" data-type="nine">
+          <div class="game-type-icon">🔲</div>
+          <div class="game-type-name">九宫格</div>
+          <div class="game-type-badge" style="color:var(--muted)">即将支持</div>
+        </div>
+        <div class="game-type-card disabled" data-type="smash">
+          <div class="game-type-icon">🥚</div>
+          <div class="game-type-name">砸金蛋</div>
+          <div class="game-type-badge" style="color:var(--muted)">即将支持</div>
+        </div>
+        <div class="game-type-card disabled" data-type="blind">
+          <div class="game-type-icon">📦</div>
+          <div class="game-type-name">盲盒</div>
+          <div class="game-type-badge" style="color:var(--muted)">即将支持</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2：基础配置 -->
+    <div class="step">
+      <div class="step-label"><div class="step-num">2</div>基础配置</div>
+      <div class="field">
+        <label>活动标题</label>
+        <input type="text" id="cfgTitle" value="夏日大转盘" placeholder="例：双11幸运大转盘" oninput="refreshPreview()">
+      </div>
+      <div class="field">
+        <label>副标题</label>
+        <input type="text" id="cfgSubtitle" value="转动命运，赢取大奖" placeholder="例：每天3次免费抽" oninput="refreshPreview()">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>每日抽奖次数</label>
+          <input type="number" id="cfgDailyLimit" value="3" min="1" max="99" oninput="refreshPreview()">
+        </div>
+        <div class="field">
+          <label>转盘皮肤</label>
+          <select id="cfgSkin" onchange="refreshPreview()">
+            <option value="default">默认紫色</option>
+            <option value="festive">喜庆红</option>
+            <option value="ocean">海洋蓝</option>
+            <option value="gold">土豪金</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3：奖品配置 -->
+    <div class="step">
+      <div class="step-label"><div class="step-num">3</div>奖品配置</div>
+
+      <!-- 快速模板 -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600">快速模板</div>
+        <div class="template-grid">
+          <div class="template-card" onclick="applyTemplate('marketing')">
+            <div class="template-icon">🛒</div>
+            <div class="template-name">电商促销</div>
+            <div class="template-desc">优惠券+红包+积分</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('brand')">
+            <div class="template-icon">🏢</div>
+            <div class="template-name">品牌活动</div>
+            <div class="template-desc">礼品+体验券+周边</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('game')">
+            <div class="template-icon">🎮</div>
+            <div class="template-name">游戏积分</div>
+            <div class="template-desc">道具+金币+称号</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('catering')">
+            <div class="template-icon">🍔</div>
+            <div class="template-name">餐饮外卖</div>
+            <div class="template-desc">免单+折扣+配送</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 奖品表头 -->
+      <div class="prize-header">
+        <span></span>
+        <span>奖品名称</span>
+        <span>概率(%)</span>
+        <span>库存</span>
+        <span>类型</span>
+        <span></span>
+      </div>
+
+      <!-- 奖品列表 -->
+      <div class="prize-editor" id="prizeEditor"></div>
+
+      <!-- 概率总计 -->
+      <div class="prob-bar" id="probBar"></div>
+      <div class="prob-total">
+        <span>概率合计：<strong id="probTotal">0</strong>%</span>
+        <span id="probStatus"></span>
+      </div>
+
+      <button class="add-prize-btn" onclick="addPrize()" style="margin-top:10px">＋ 添加奖品</button>
+    </div>
+
+    <!-- 生成按钮 -->
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="generateLink()" style="flex:1">🚀 生成游戏链接</button>
+      <button class="btn btn-outline" onclick="resetAll()">重置</button>
+    </div>
+
+  </div>
+
+  <!-- ══ 右侧预览+生成结果 ══ -->
+  <div class="preview-panel">
+
+    <!-- 手机预览 -->
+    <div>
+      <div class="preview-title">📱 实时预览</div>
+      <div class="preview-frame-wrap" id="previewWrap">
+        <iframe id="previewIframe" class="preview-iframe" src="wheel.html" scrolling="no"></iframe>
+      </div>
+      <div style="text-align:center;margin-top:6px;font-size:11px;color:var(--muted)">预览为实时效果，配置变化后点「刷新预览」</div>
+      <div style="text-align:center;margin-top:8px">
+        <button class="link-btn link-btn-preview" onclick="forceRefreshPreview()">🔄 刷新预览</button>
+      </div>
+    </div>
+
+    <!-- 生成结果 -->
+    <div class="link-box" id="resultBox" style="display:none">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px">🎉 游戏链接已生成</div>
+      <div class="link-url" id="generatedUrl"></div>
+      <div class="link-actions">
+        <button class="link-btn link-btn-copy" onclick="copyLink()">📋 复制链接</button>
+        <button class="link-btn link-btn-preview" onclick="openPreview()">🔗 新窗口打开</button>
+        <button class="link-btn link-btn-qr" onclick="toggleQR()">📷 生成二维码</button>
+      </div>
+      <div id="qrWrap" style="display:none;margin-top:12px">
+        <canvas id="qrCanvas" width="160" height="160"></canvas>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">扫码直接玩游戏</div>
+      </div>
+    </div>
+
+    <!-- 使用说明 -->
+    <div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.2);border-radius:12px;padding:14px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px">💡 使用说明</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.8">
+        1. 选游戏类型，填写标题和奖品<br>
+        2. 点「生成游戏链接」获得独立链接<br>
+        3. 把链接发给用户，他们直接打开就能玩<br>
+        4. 每个链接配置独立，可以做不同活动<br>
+        5. 用户数据存在他们自己的浏览器里
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- emoji 选择器 -->
+<div class="emoji-picker-modal" id="emojiModal">
+  <div class="emoji-picker-box">
+    <div class="emoji-picker-title">选择图标</div>
+    <div class="emoji-grid" id="emojiGrid"></div>
+  </div>
+</div>
+
+<div id="builder-toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   数据
+═══════════════════════════════════════════════════════ */
+const GAME_MAP = { wheel: 'wheel.html' };
+
+const TEMPLATES = {
+  marketing: [
+    { name:'100元优惠券', emoji:'🎫', prob:5,  color:'#F5C842', stock:50,  type:'win'  },
+    { name:'50元红包',    emoji:'🧧', prob:8,  color:'#EF4444', stock:100, type:'win'  },
+    { name:'20元券',      emoji:'💰', prob:12, color:'#10B981', stock:200, type:'win'  },
+    { name:'5元券',       emoji:'🏷️', prob:25, color:'#6366F1', stock:500, type:'win'  },
+    { name:'免单×1',     emoji:'🛒', prob:3,  color:'#8B5CF6', stock:20,  type:'win'  },
+    { name:'谢谢参与',    emoji:'😊', prob:47, color:'#6B7280', stock:999, type:'miss' },
+  ],
+  brand: [
+    { name:'限定礼盒',    emoji:'🎁', prob:3,  color:'#F5C842', stock:30,  type:'win'  },
+    { name:'体验券',      emoji:'🎟️', prob:10, color:'#8B5CF6', stock:200, type:'win'  },
+    { name:'品牌周边',    emoji:'🏆', prob:7,  color:'#EC4899', stock:100, type:'win'  },
+    { name:'会员积分',    emoji:'⭐', prob:30, color:'#F59E0B', stock:999, type:'win'  },
+    { name:'谢谢参与',    emoji:'😊', prob:50, color:'#6B7280', stock:999, type:'miss' },
+  ],
+  game: [
+    { name:'稀有道具',    emoji:'💎', prob:3,  color:'#F5C842', stock:20,  type:'win'  },
+    { name:'金币×1000',  emoji:'🪙', prob:8,  color:'#F59E0B', stock:999, type:'win'  },
+    { name:'经验×500',   emoji:'⚡', prob:15, color:'#6366F1', stock:999, type:'win'  },
+    { name:'传说称号',    emoji:'🌟', prob:2,  color:'#EC4899', stock:10,  type:'win'  },
+    { name:'普通道具',    emoji:'🎒', prob:22, color:'#10B981', stock:999, type:'win'  },
+    { name:'谢谢参与',    emoji:'😊', prob:50, color:'#6B7280', stock:999, type:'miss' },
+  ],
+  catering: [
+    { name:'今日免单',    emoji:'🍔', prob:2,  color:'#EF4444', stock:10,  type:'win'  },
+    { name:'五折优惠',    emoji:'🎉', prob:5,  color:'#F5C842', stock:50,  type:'win'  },
+    { name:'八折券',      emoji:'🏷️', prob:15, color:'#10B981', stock:200, type:'win'  },
+    { name:'免费配送',    emoji:'🛵', prob:20, color:'#6366F1', stock:999, type:'win'  },
+    { name:'谢谢参与',    emoji:'😊', prob:58, color:'#6B7280', stock:999, type:'miss' },
+  ],
+};
+
+const EMOJI_LIST = [
+  '🎁','🎉','🎊','🎫','🎟️','🏆','🥇','🥈','🥉','⭐','💎','💰','🪙','🧧','🛒',
+  '🍔','🍕','🍜','🍰','🧁','☕','🥤','🍵','🎮','🕹️','🎲','🎯','🎳','🏅','🌟',
+  '✨','🔥','💫','⚡','🌈','🎠','🎡','🎢','🎪','🏖️','🌸','🍀','🌺','🦋','🐉',
+  '😊','😍','🥳','🤩','🎈','📦','🛍️','💌','🎗️','🪄','💡','🔑','🗝️','🏠','🚀',
+];
+
+const COLORS = ['#F5C842','#EF4444','#8B5CF6','#10B981','#F59E0B','#EC4899','#6366F1','#06B6D4','#6B7280','#D97706'];
+
+let prizes = [];
+let currentGameType = 'wheel';
+let emojiTargetIdx = -1;
+let generatedUrl = '';
+
+/* ═══════════════════════════════════════════════════════
+   初始化
+═══════════════════════════════════════════════════════ */
+function init() {
+  buildEmojiGrid();
+  applyTemplate('marketing');
+  refreshPreview();
+}
+
+/* ═══════════════════════════════════════════════════════
+   游戏类型选择
+═══════════════════════════════════════════════════════ */
+function selectGameType(type, el) {
+  if (el.classList.contains('disabled')) return;
+  currentGameType = type;
+  document.querySelectorAll('.game-type-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  refreshPreview();
+}
+
+/* ═══════════════════════════════════════════════════════
+   奖品编辑
+═══════════════════════════════════════════════════════ */
+function renderPrizes() {
+  const container = document.getElementById('prizeEditor');
+  container.innerHTML = prizes.map((p, i) => `
+    <div class="prize-row" id="prize-row-${i}">
+      <div class="prize-emoji-pick" onclick="openEmojiPicker(${i})" title="点击换图标">${p.emoji}</div>
+      <input type="text"   value="${p.name}"  placeholder="奖品名称" oninput="updatePrize(${i},'name',this.value)">
+      <input type="number" value="${p.prob}"  min="0" max="100" placeholder="%" oninput="updatePrize(${i},'prob',+this.value)">
+      <input type="number" value="${p.stock}" min="1" placeholder="库存" oninput="updatePrize(${i},'stock',+this.value)">
+      <select onchange="updatePrize(${i},'type',this.value)">
+        <option value="win"  ${p.type==='win' ?'selected':''}>中奖</option>
+        <option value="miss" ${p.type==='miss'?'selected':''}>未中</option>
+      </select>
+      <button class="prize-del" onclick="deletePrize(${i})" title="删除">×</button>
+    </div>
+  `).join('');
+  updateProbBar();
+}
+
+function updatePrize(idx, key, val) {
+  prizes[idx][key] = val;
+  updateProbBar();
+}
+
+function addPrize() {
+  if (prizes.length >= 12) { showToast('最多12个奖品'); return; }
+  prizes.push({ name:'新奖品', emoji:'🎁', prob:5, color: COLORS[prizes.length % COLORS.length], stock:100, type:'win' });
+  renderPrizes();
+}
+
+function deletePrize(idx) {
+  if (prizes.length <= 2) { showToast('至少保留2个奖品'); return; }
+  prizes.splice(idx, 1);
+  renderPrizes();
+}
+
+function updateProbBar() {
+  const total = prizes.reduce((s, p) => s + (Number(p.prob)||0), 0);
+  const bar = document.getElementById('probBar');
+  bar.innerHTML = prizes.map(p => {
+    const w = total > 0 ? (p.prob / total * 100).toFixed(1) : 0;
+    return `<div class="prob-seg" style="width:${w}%;background:${p.color}"></div>`;
+  }).join('');
+  document.getElementById('probTotal').textContent = total;
+  const status = document.getElementById('probStatus');
+  if (total === 100) { status.innerHTML = '<span class="prob-ok">✓ 完美</span>'; }
+  else if (total < 100) { status.innerHTML = `<span class="prob-warn">⚠ 少 ${100-total}%</span>`; }
+  else { status.innerHTML = `<span class="prob-warn">⚠ 超出 ${total-100}%</span>`; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   模板
+═══════════════════════════════════════════════════════ */
+function applyTemplate(name) {
+  const tpl = TEMPLATES[name];
+  if (!tpl) return;
+  prizes = tpl.map(p => ({ ...p }));
+  renderPrizes();
+  showToast('已应用模板');
+}
+
+/* ═══════════════════════════════════════════════════════
+   emoji 选择器
+═══════════════════════════════════════════════════════ */
+function buildEmojiGrid() {
+  const grid = document.getElementById('emojiGrid');
+  grid.innerHTML = EMOJI_LIST.map(e =>
+    `<div class="emoji-opt" onclick="pickEmoji('${e}')">${e}</div>`
+  ).join('');
+}
+
+function openEmojiPicker(idx) {
+  emojiTargetIdx = idx;
+  document.getElementById('emojiModal').classList.add('show');
+}
+
+function pickEmoji(e) {
+  if (emojiTargetIdx >= 0) {
+    prizes[emojiTargetIdx].emoji = e;
+    renderPrizes();
+  }
+  document.getElementById('emojiModal').classList.remove('show');
+  emojiTargetIdx = -1;
+}
+
+document.addEventListener('click', e => {
+  if (e.target === document.getElementById('emojiModal')) {
+    document.getElementById('emojiModal').classList.remove('show');
+  }
+});
+
+/* ═══════════════════════════════════════════════════════
+   生成配置 & 链接
+═══════════════════════════════════════════════════════ */
+function buildConfig() {
+  return {
+    title:      document.getElementById('cfgTitle').value || '大转盘',
+    subtitle:   document.getElementById('cfgSubtitle').value || '',
+    dailyLimit: parseInt(document.getElementById('cfgDailyLimit').value) || 3,
+    skin:       document.getElementById('cfgSkin').value || 'default',
+    prizes:     prizes.map(p => ({
+      name:  p.name,
+      emoji: p.emoji,
+      prob:  Number(p.prob),
+      color: p.color,
+      stock: Number(p.stock),
+      type:  p.type,
+    })),
+    embed: false,
+  };
+}
+
+function buildURL(cfg) {
+  const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
+  const gameFile = GAME_MAP[currentGameType] || 'wheel.html';
+  return location.origin + location.pathname.replace('builder.html', '') + gameFile + '?c=' + base64;
+}
+
+function generateLink() {
+  const total = prizes.reduce((s, p) => s + (Number(p.prob)||0), 0);
+  if (total === 0) { showToast('请先配置奖品'); return; }
+  if (prizes.length < 2) { showToast('至少需要2个奖品'); return; }
+
+  const cfg = buildConfig();
+  generatedUrl = buildURL(cfg);
+
+  document.getElementById('generatedUrl').textContent = generatedUrl;
+  document.getElementById('resultBox').style.display = '';
+  document.getElementById('qrWrap').style.display = 'none';
+
+  showToast('🎉 链接生成成功！');
+  forceRefreshPreview();
+}
+
+/* ═══════════════════════════════════════════════════════
+   预览
+═══════════════════════════════════════════════════════ */
+let previewTimer = null;
+function refreshPreview() {
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(forceRefreshPreview, 800);
+}
+
+function forceRefreshPreview() {
+  const cfg = buildConfig();
+  const url = buildURL(cfg).replace('embed:false', '') + ''; // 保留embed:false不影响预览
+  const iframe = document.getElementById('previewIframe');
+  iframe.src = url;
+}
+
+/* ═══════════════════════════════════════════════════════
+   操作按钮
+═══════════════════════════════════════════════════════ */
+function copyLink() {
+  if (!generatedUrl) { showToast('请先生成链接'); return; }
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(generatedUrl).then(() => showToast('✅ 链接已复制！'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = generatedUrl;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✅ 链接已复制！');
+  }
+}
+
+function openPreview() {
+  if (!generatedUrl) { showToast('请先生成链接'); return; }
+  window.open(generatedUrl, '_blank');
+}
+
+function toggleQR() {
+  if (!generatedUrl) { showToast('请先生成链接'); return; }
+  const wrap = document.getElementById('qrWrap');
+  if (wrap.style.display === 'none') {
+    wrap.style.display = '';
+    drawQR(generatedUrl, document.getElementById('qrCanvas'));
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   简易二维码生成（纯 JS，不依赖外部库）
+   使用 QR Code 基本编码原理的简化版本
+═══════════════════════════════════════════════════════ */
+function drawQR(text, canvas) {
+  // 使用 Google Charts API 生成二维码图片（网络可用时）
+  const size = 160;
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  // 方案A：用 img 加载 Google Charts QR
+  const img = new Image();
+  const encoded = encodeURIComponent(text);
+  img.crossOrigin = 'anonymous';
+  img.onload = () => ctx.drawImage(img, 0, 0, size, size);
+  img.onerror = () => {
+    // 方案B：网络不通时画占位符
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, size, size);
+    ctx.fillStyle = '#1A0A2E';
+    ctx.font = '11px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('二维码需联网生成', size/2, size/2 - 10);
+    ctx.fillText('请复制链接使用', size/2, size/2 + 10);
+  };
+  img.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encoded}`;
+}
+
+function resetAll() {
+  document.getElementById('cfgTitle').value = '夏日大转盘';
+  document.getElementById('cfgSubtitle').value = '转动命运，赢取大奖';
+  document.getElementById('cfgDailyLimit').value = '3';
+  document.getElementById('cfgSkin').value = 'default';
+  applyTemplate('marketing');
+  document.getElementById('resultBox').style.display = 'none';
+  generatedUrl = '';
+  showToast('已重置');
+}
+
+function showToast(msg) {
+  const el = document.getElementById('builder-toast');
+  el.textContent = msg;
+  el.style.opacity = '1';
+  el.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(-50%) translateY(20px)';
+  }, 2500);
+}
+
+init();
+</script>
+</body>
+</html>

@@ -402,8 +402,8 @@
   <!-- 中间游戏 -->
   <div class="game-center">
     <div class="game-title-area">
-      <div class="game-name">夏日大转盘</div>
-      <div class="game-subtitle">转动命运，赢取大奖</div>
+      <div class="game-name" id="gameTitle">夏日大转盘</div>
+      <div class="game-subtitle" id="gameSubtitle">转动命运，赢取大奖</div>
     </div>
 
     <div class="wheel-container">
@@ -510,6 +510,48 @@ const PRIZES = [
 
 let totalSpins = 0, winSpins = 0, dailyRemain = 3;
 let currentAngle = 0, spinning = false;
+
+// ─── URL 参数配置覆盖 ─────────────────────────────────────────────────────────
+// 支持 ?c=BASE64_JSON 加载外部配置，用于开放平台生成独立游戏链接
+(function loadURLConfig() {
+  try {
+    const params = new URLSearchParams(location.search);
+    const raw = params.get('c');
+    if (!raw) return;
+    const cfg = JSON.parse(atob(decodeURIComponent(raw)));
+
+    // 覆盖标题
+    if (cfg.title)    document.addEventListener('DOMContentLoaded', () => { const e = document.getElementById('gameTitle');    if(e) e.textContent = cfg.title; });
+    if (cfg.subtitle) document.addEventListener('DOMContentLoaded', () => { const e = document.getElementById('gameSubtitle'); if(e) e.textContent = cfg.subtitle; });
+
+    // 覆盖每日次数
+    if (cfg.dailyLimit != null) dailyRemain = Number(cfg.dailyLimit);
+
+    // 覆盖奖池（至少2个）
+    if (Array.isArray(cfg.prizes) && cfg.prizes.length >= 2) {
+      PRIZES.length = 0;
+      cfg.prizes.forEach(p => PRIZES.push({
+        name:  p.name  || '奖品',
+        emoji: p.emoji || '🎁',
+        prob:  Number(p.prob)  || 10,
+        color: p.color || '#7C3AED',
+        stock: Number(p.stock) || 999,
+        won:   0,
+        type:  p.type  || 'win',
+      }));
+    }
+
+    // 覆盖皮肤
+    if (cfg.skin && SKINS[cfg.skin]) currentSkin = cfg.skin;
+
+    // 嵌入模式：隐藏左侧配置面板（embed:true）
+    if (cfg.embed) document.addEventListener('DOMContentLoaded', () => {
+      const left = document.querySelector('.panel-left');
+      if (left) left.style.display = 'none';
+    });
+
+  } catch(e) { /* 配置解析失败使用默认值 */ }
+})();
 
 const canvas = document.getElementById('wheelCanvas');
 const ctx = canvas.getContext('2d');
