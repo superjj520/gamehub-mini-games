@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 套圈圈</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.97);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: inherit;
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .nav-links-wrap {
+    flex: 1;
+    overflow-x: auto;
+    margin: 0 20px;
+    scrollbar-width: none;
+  }
+  .nav-links-wrap::-webkit-scrollbar { display: none; }
+  .nav-links {
+    display: flex;
+    gap: 2px;
+    white-space: nowrap;
+  }
+  .nav-link {
+    padding: 6px 13px; border-radius: 7px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-link:hover { background: var(--card); color: var(--text); }
+  .nav-link.active { background: var(--card); color: var(--gold); }
+  .nav-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.4} }
+  .status-text { font-size: 12px; color: var(--muted); }
+
+  /* ─── 主体三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: calc(100vh - 57px - 42px);
+  }
+
+  /* ─── 通用面板样式 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--deep);
+    position: relative;
+    overflow: hidden;
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* ─── 选项按钮组 ─── */
+  .btn-group {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .btn-opt {
+    padding: 6px 14px; border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent; color: var(--muted);
+    font-size: 12px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-opt:hover { border-color: var(--gold); color: var(--text); }
+  .btn-opt.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-color: transparent; color: #fff;
+  }
+
+  /* ─── 标签输入 ─── */
+  .form-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .form-label { font-size: 12px; color: var(--muted); }
+  .form-input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 7px; padding: 5px 10px;
+    color: var(--text); font-size: 12px;
+    width: 130px; text-align: right;
+    outline: none;
+  }
+  .form-input:focus { border-color: var(--accent); }
+
+  /* ─── 奖品配置行 ─── */
+  .prize-row {
+    display: grid;
+    grid-template-columns: 16px 1fr 70px 60px;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .prize-row:last-child { border-bottom: none; }
+  .prize-color-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .prize-name-input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 6px; padding: 4px 8px;
+    color: var(--text); font-size: 12px;
+    outline: none; width: 100%;
+  }
+  .prize-name-input:focus { border-color: var(--accent); }
+  .prize-score {
+    font-size: 13px; font-weight: 700;
+    text-align: center;
+  }
+  .prize-toggle {
+    display: flex; align-items: center; justify-content: flex-end;
+  }
+  .toggle-sw {
+    width: 34px; height: 18px; border-radius: 9px;
+    background: rgba(255,255,255,0.1);
+    position: relative; cursor: pointer;
+    transition: background 0.2s;
+    border: none;
+  }
+  .toggle-sw.on { background: var(--accent); }
+  .toggle-sw::after {
+    content: ''; position: absolute;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #fff; top: 2px; left: 2px;
+    transition: left 0.2s;
+  }
+  .toggle-sw.on::after { left: 18px; }
+
+  /* ─── 滑块 ─── */
+  .slider-wrap { margin-top: 6px; }
+  .slider {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,0.1); outline: none;
+    cursor: pointer;
+  }
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--gold); cursor: pointer;
+  }
+  .slider-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted); margin-top: 4px;
+  }
+
+  /* ─── 主按钮 ─── */
+  .btn-main {
+    width: 100%; padding: 11px;
+    border-radius: 10px; border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-main:hover { opacity: 0.85; }
+  .btn-secondary {
+    width: 100%; padding: 9px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent; color: var(--muted);
+    font-size: 13px; cursor: pointer;
+    transition: all 0.2s; margin-top: 8px;
+  }
+  .btn-secondary:hover { border-color: var(--gold); color: var(--text); }
+
+  /* ─── 游戏Canvas区域 ─── */
+  .game-area {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+  }
+
+  /* 圈数显示 */
+  .rings-display {
+    display: flex; gap: 10px; align-items: center;
+  }
+  .ring-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 3px solid;
+    transition: all 0.3s;
+  }
+  .ring-icon.used { opacity: 0.2; }
+
+  /* 分数显示 */
+  .score-bar {
+    display: flex; align-items: center;
+    gap: 20px; padding: 8px 20px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 30px;
+  }
+  .score-item { text-align: center; }
+  .score-item .val {
+    font-size: 22px; font-weight: 800;
+    color: var(--gold);
+    text-shadow: 0 0 12px rgba(245,200,66,0.5);
+  }
+  .score-item .lbl { font-size: 10px; color: var(--muted); }
+  .score-divider {
+    width: 1px; height: 30px;
+    background: var(--border);
+  }
+
+  /* Canvas包装 */
+  .canvas-wrap {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 0 40px rgba(124,58,237,0.2);
+    cursor: crosshair;
+    flex: 1;
+    width: 100%;
+    max-width: 680px;
+  }
+  #gameCanvas { display: block; width: 100%; height: 100%; }
+
+  /* 游戏状态覆盖层 */
+  .game-overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: rgba(13,7,32,0.85);
+    backdrop-filter: blur(6px);
+    border-radius: 16px;
+    z-index: 10;
+    gap: 16px;
+  }
+  .game-overlay.hidden { display: none; }
+  .overlay-title {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .overlay-subtitle { font-size: 14px; color: var(--muted); }
+  .overlay-score {
+    font-size: 48px; font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(245,200,66,0.6);
+  }
+
+  /* 瞄准线指示 */
+  .aim-hint {
+    font-size: 12px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .aim-hint-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold);
+    animation: blink 1s ease-in-out infinite;
+  }
+
+  /* ─── 右侧数据 ─── */
+  .stat-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-left {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px;
+  }
+  .stat-color {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .stat-val {
+    font-size: 13px; font-weight: 700; color: var(--gold);
+  }
+  .stat-bar-wrap {
+    height: 3px; background: rgba(255,255,255,0.08);
+    border-radius: 2px; margin-top: 4px; overflow: hidden;
+  }
+  .stat-bar-fill {
+    height: 100%; border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* 历史最高 */
+  .best-score-box {
+    text-align: center; padding: 14px;
+    background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(236,72,153,0.15));
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 12px; margin-bottom: 14px;
+  }
+  .best-score-box .num {
+    font-size: 36px; font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 0 16px rgba(245,200,66,0.4);
+  }
+  .best-score-box .lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* 奖品解锁 */
+  .prize-unlock-item {
+    display: flex; align-items: center;
+    gap: 10px; padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .prize-unlock-item:last-child { border-bottom: none; }
+  .prize-unlock-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .prize-unlock-icon.locked {
+    background: rgba(255,255,255,0.05);
+    filter: grayscale(1);
+  }
+  .prize-unlock-icon.unlocked {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+  }
+  .prize-unlock-info { flex: 1; }
+  .prize-unlock-name { font-size: 12px; font-weight: 600; }
+  .prize-unlock-req { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .prize-unlock-prog {
+    height: 3px; background: rgba(255,255,255,0.08);
+    border-radius: 2px; margin-top: 5px; overflow: hidden;
+  }
+  .prize-unlock-prog-fill {
+    height: 100%; border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.4s ease;
+  }
+  .unlock-badge {
+    font-size: 11px; padding: 2px 7px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #22C55E, #16A34A);
+    color: #fff; flex-shrink: 0;
+  }
+  .lock-badge {
+    font-size: 11px; padding: 2px 7px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.07);
+    color: var(--muted); flex-shrink: 0;
+  }
+
+  /* 底部状态栏 */
+  .footer {
+    height: 36px;
+    display: flex; align-items: center;
+    padding: 0 24px; gap: 24px;
+    border-top: 1px solid var(--border);
+    background: rgba(13,7,32,0.6);
+    flex-shrink: 0;
+  }
+  .footer-item {
+    font-size: 11px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .footer-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* 击中动画弹出字 */
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-60px) scale(1.3); }
+  }
+  .float-score {
+    position: absolute;
+    font-size: 20px; font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(245,200,66,0.8);
+    pointer-events: none;
+    animation: floatUp 1s ease-out forwards;
+    z-index: 20;
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── 顶部导航 ─── -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">
+    🎮 <span>Game</span>Hub
+    <span class="nav-badge">中台</span>
+  </a>
+  <div class="nav-links-wrap">
+    <div class="nav-links">
+      <a class="nav-link" href="slot-machine.html">🎰 老虎机</a>
+      <a class="nav-link" href="wheel.html">🎡 幸运转盘</a>
+      <a class="nav-link" href="scratch-card.html">🎟️ 刮刮卡</a>
+      <a class="nav-link" href="blind-box.html">📦 盲盒</a>
+      <a class="nav-link" href="gashapon.html">🧸 扭蛋机</a>
+      <a class="nav-link" href="claw-machine.html">🦾 抓娃娃</a>
+      <a class="nav-link" href="nine-grid.html">🔲 九宫格</a>
+      <a class="nav-link" href="flip-match.html">🃏 翻牌对对碰</a>
+      <a class="nav-link" href="red-packet-rain.html">🧧 红包雨</a>
+      <a class="nav-link" href="catch-coins.html">🪙 接金币</a>
+      <a class="nav-link" href="shake.html">📱 摇一摇</a>
+      <a class="nav-link" href="shake-dice.html">🎲 摇骰子</a>
+      <a class="nav-link" href="daily-checkin.html">📅 每日签到</a>
+      <a class="nav-link" href="progress-unlock.html">🔓 进度解锁</a>
+      <a class="nav-link" href="gift-box.html">🎁 礼盒拆箱</a>
+      <a class="nav-link" href="cup-game.html">🎩 猜杯子</a>
+      <a class="nav-link" href="whack-mole.html">🔨 打地鼠</a>
+      <a class="nav-link" href="fruit-cut.html">🍉 切水果</a>
+      <a class="nav-link" href="match3.html">💎 消消乐</a>
+      <a class="nav-link" href="pinball.html">🎱 弹球</a>
+      <a class="nav-link" href="quiz.html">❓ 答题闯关</a>
+      <a class="nav-link" href="energy-collect.html">⚡ 能量收集</a>
+      <a class="nav-link" href="grow-tree.html">🌳 种树养成</a>
+      <a class="nav-link" href="stamp-collect.html">📮 集章</a>
+      <a class="nav-link" href="number-bomb.html">💣 数字炸弹</a>
+      <a class="nav-link" href="vote-pk.html">⚔️ 投票PK</a>
+      <a class="nav-link" href="flying-chess.html">✈️ 飞行棋</a>
+      <a class="nav-link" href="monopoly.html">🏠 大富翁</a>
+      <a class="nav-link" href="snake.html">🐍 贪吃蛇</a>
+      <a class="nav-link" href="game-2048.html">🔢 2048</a>
+      <a class="nav-link" href="smash-egg.html">🥚 砸金蛋</a>
+      <a class="nav-link" href="slingshot.html">🏹 弹弓射击</a>
+      <a class="nav-link active" href="ring-toss.html">⭕ 套圈圈</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span class="status-text">运行中</span>
+  </div>
+</nav>
+
+<!-- ─── 主体三列 ─── -->
+<div class="main">
+
+  <!-- ══════════════ 左侧配置面板 ══════════════ -->
+  <div class="panel-left">
+    <div class="panel-title">⚙ 游戏配置</div>
+
+    <!-- 奖品/桩子配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>桩子 & 奖品配置</div>
+
+      <!-- 表头 -->
+      <div style="display:grid;grid-template-columns:16px 1fr 70px 60px;gap:8px;font-size:11px;color:var(--muted);margin-bottom:6px;padding:0 0 4px;border-bottom:1px solid var(--border);">
+        <span></span>
+        <span>奖品名称</span>
+        <span style="text-align:center">分值</span>
+        <span style="text-align:right">启用</span>
+      </div>
+
+      <!-- 5根桩子 -->
+      <div id="prizeConfig">
+        <!-- 由JS动态生成 -->
+      </div>
+    </div>
+
+    <!-- 游戏难度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>难度设置</div>
+      <div class="form-row" style="margin-bottom:4px;">
+        <span class="form-label">难度模式</span>
+      </div>
+      <div class="btn-group" style="margin-bottom:14px;" id="difficultyBtns">
+        <button class="btn-opt active" data-val="easy" onclick="setDifficulty(this,'easy')">简单</button>
+        <button class="btn-opt" data-val="normal" onclick="setDifficulty(this,'normal')">普通</button>
+        <button class="btn-opt" data-val="hard" onclick="setDifficulty(this,'hard')">困难</button>
+      </div>
+
+      <!-- 桩子间距 -->
+      <div class="form-row">
+        <span class="form-label">桩子间距</span>
+        <span class="form-label" id="spacingVal">100px</span>
+      </div>
+      <div class="slider-wrap">
+        <input type="range" class="slider" id="spacingSlider" min="60" max="140" value="100" oninput="updateSpacing(this)">
+        <div class="slider-labels"><span>密集</span><span>稀疏</span></div>
+      </div>
+    </div>
+
+    <!-- 圈数配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>投掷设置</div>
+      <div class="form-row">
+        <span class="form-label">每局圈数</span>
+      </div>
+      <div class="btn-group" id="ringCountBtns">
+        <button class="btn-opt" data-val="3" onclick="setRingCount(this, 3)">3圈</button>
+        <button class="btn-opt active" data-val="5" onclick="setRingCount(this, 5)">5圈</button>
+        <button class="btn-opt" data-val="8" onclick="setRingCount(this, 8)">8圈</button>
+        <button class="btn-opt" data-val="10" onclick="setRingCount(this, 10)">10圈</button>
+      </div>
+
+      <div class="form-row" style="margin-top:12px;">
+        <span class="form-label">圆环大小</span>
+        <span class="form-label" id="ringSizeVal">中</span>
+      </div>
+      <div class="slider-wrap">
+        <input type="range" class="slider" id="ringSizeSlider" min="1" max="3" value="2" step="1" oninput="updateRingSize(this)">
+        <div class="slider-labels"><span>小圈(难)</span><span>大圈(易)</span></div>
+      </div>
+    </div>
+
+    <!-- 解锁阈值 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品解锁阈值</div>
+      <div class="form-row">
+        <span class="form-label">铜奖解锁分</span>
+        <input type="number" class="form-input" id="thresh1" value="50" min="10" max="500">
+      </div>
+      <div class="form-row">
+        <span class="form-label">银奖解锁分</span>
+        <input type="number" class="form-input" id="thresh2" value="150" min="50" max="1000">
+      </div>
+      <div class="form-row">
+        <span class="form-label">金奖解锁分</span>
+        <input type="number" class="form-input" id="thresh3" value="300" min="100" max="2000">
+      </div>
+    </div>
+
+    <!-- 开始按钮 -->
+    <button class="btn-main" id="startBtn" onclick="startGame()">🎯 开始游戏</button>
+    <button class="btn-secondary" id="resetBtn" onclick="resetGame()">↺ 重置</button>
+  </div>
+
+  <!-- ══════════════ 中间游戏区 ══════════════ -->
+  <div class="panel-center">
+    <div class="panel-title">⭕ 套圈圈 · 游戏区</div>
+
+    <!-- 分数栏 -->
+    <div class="score-bar">
+      <div class="score-item">
+        <div class="val" id="currentScore">0</div>
+        <div class="lbl">本局得分</div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-item">
+        <div class="val" id="comboDisplay">x1</div>
+        <div class="lbl">连击</div>
+      </div>
+      <div class="score-divider"></div>
+      <!-- 圈数图标 -->
+      <div class="rings-display" id="ringsDisplay"></div>
+    </div>
+
+    <!-- 游戏Canvas区 -->
+    <div class="canvas-wrap" id="canvasWrap">
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- 开始/结束覆盖层 -->
+      <div class="game-overlay" id="gameOverlay">
+        <div class="overlay-title">⭕ 套圈圈</div>
+        <div class="overlay-subtitle">移动鼠标瞄准，点击投掷圆环</div>
+        <button class="btn-main" style="width:160px;" onclick="startGame()">🎯 开始游戏</button>
+      </div>
+    </div>
+
+    <!-- 瞄准提示 -->
+    <div class="aim-hint" id="aimHint">
+      <div class="aim-hint-dot"></div>
+      <span id="aimHintText">移动鼠标瞄准桩子，点击投掷</span>
+    </div>
+  </div>
+
+  <!-- ══════════════ 右侧数据面板 ══════════════ -->
+  <div class="panel-right">
+    <div class="panel-title">📊 本局数据</div>
+
+    <!-- 历史最高 -->
+    <div class="best-score-box">
+      <div class="num" id="bestScore">0</div>
+      <div class="lbl">历史最高分</div>
+    </div>
+
+    <!-- 各桩命中率 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>各桩命中统计</div>
+      <div id="hitStats">
+        <!-- 由JS动态生成 -->
+      </div>
+    </div>
+
+    <!-- 投掷汇总 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>投掷汇总</div>
+      <div class="stat-row">
+        <span class="stat-left">总投掷次数</span>
+        <span class="stat-val" id="totalThrows">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-left">命中次数</span>
+        <span class="stat-val" id="totalHits">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-left">命中率</span>
+        <span class="stat-val" id="hitRate">0%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-left">最大连击</span>
+        <span class="stat-val" id="maxCombo">0</span>
+      </div>
+    </div>
+
+    <!-- 奖品解锁进度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品解锁</div>
+      <div id="prizeLockPanel">
+        <!-- 由JS动态生成 -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 底部状态栏 -->
+<div class="footer">
+  <div class="footer-item"><div class="footer-dot"></div>套圈圈 v1.0</div>
+  <div class="footer-item"><div class="footer-dot" style="background:var(--gold)"></div>Canvas 2D 渲染</div>
+  <div class="footer-item"><div class="footer-dot" style="background:var(--accent2)"></div>物理抛物线模拟</div>
+  <div class="footer-item" style="margin-left:auto;"><span id="footerTip">准备开始</span></div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   套圈圈游戏 - 核心逻辑
+   ══════════════════════════════════════════════════ */
+
+// ─── 桩子颜色 & 基础数据 ───
+const STAKE_COLORS = ['#FF4B4B','#FF9800','#F5C842','#4CAF50','#7C3AED'];
+const STAKE_SCORES = [10, 20, 50, 100, 500];
+const STAKE_EMOJIS = ['🎁','🛍️','⭐','💎','👑'];
+const STAKE_NAMES_DEFAULT = ['小礼品','优惠券','积分×50','大奖','超级大奖'];
+
+// ─── 游戏配置状态 ───
+let cfg = {
+  prizeNames: [...STAKE_NAMES_DEFAULT],
+  prizeEnabled: [true, true, true, true, true],
+  difficulty: 'easy',   // easy/normal/hard
+  stakeSpacing: 100,
+  ringCount: 5,
+  ringSizeLevel: 2,     // 1小 2中 3大
+  thresholds: [50, 150, 300],
+};
+
+// ─── 游戏运行状态 ───
+let state = {
+  running: false,
+  score: 0,
+  ringsLeft: 5,
+  combo: 0,
+  maxCombo: 0,
+  totalThrows: 0,
+  totalHits: 0,
+  hitPerStake: [0, 0, 0, 0, 0],   // 每根桩命中次数
+  throwsPerStake: [0, 0, 0, 0, 0], // 每根桩投掷（计算最近落点）
+  bestScore: parseInt(localStorage.getItem('ringToss_best') || '0'),
+};
+
+// ─── Canvas & 渲染 ───
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let W = 0, H = 0;
+
+// ─── 抛物线飞行中的圆环 ───
+let flyingRings = [];
+// ─── 落地弹起圆环（未套中） ───
+let bouncingRings = [];
+// ─── 套中效果 ───
+let hitEffects = [];
+// ─── 飘分数字 ───
+let floatScores = [];
+// ─── 鼠标位置 ───
+let mouseX = 300;
+// ─── 圆环旋转角度 ───
+let ringRotation = 0;
+// ─── 动画帧 ───
+let animFrame = null;
+
+// ─── 桩子数据（运行时计算） ───
+let stakes = [];
+
+/* ══════════════ 初始化 ══════════════ */
+
+// 初始化奖品配置面板
+function initPrizeConfig() {
+  const container = document.getElementById('prizeConfig');
+  container.innerHTML = '';
+  STAKE_SCORES.forEach((score, i) => {
+    const row = document.createElement('div');
+    row.className = 'prize-row';
+    row.innerHTML = `
+      <div class="prize-color-dot" style="background:${STAKE_COLORS[i]}"></div>
+      <input class="prize-name-input" id="prizeName${i}" value="${cfg.prizeNames[i]}"
+        onchange="cfg.prizeNames[${i}]=this.value;updatePrizeLockPanel()">
+      <div class="prize-score" style="color:${STAKE_COLORS[i]}">${score}</div>
+      <div class="prize-toggle">
+        <button class="toggle-sw ${cfg.prizeEnabled[i]?'on':''}" id="prizeToggle${i}"
+          onclick="togglePrize(${i})"></button>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+// 初始化右侧命中统计
+function initHitStats() {
+  const container = document.getElementById('hitStats');
+  container.innerHTML = '';
+  STAKE_SCORES.forEach((score, i) => {
+    const div = document.createElement('div');
+    div.style.marginBottom = '8px';
+    div.innerHTML = `
+      <div class="stat-row" style="border:none;padding:4px 0 2px;">
+        <span class="stat-left">
+          <span class="stat-color" style="background:${STAKE_COLORS[i]}"></span>
+          ${cfg.prizeNames[i]}（${score}分）
+        </span>
+        <span class="stat-val" id="hitStat${i}">0次</span>
+      </div>
+      <div class="stat-bar-wrap">
+        <div class="stat-bar-fill" id="hitBar${i}" style="background:${STAKE_COLORS[i]};width:0%"></div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// 初始化奖品解锁面板
+function initPrizeLockPanel() {
+  updatePrizeLockPanel();
+}
+
+// 更新奖品解锁面板（含进度）
+function updatePrizeLockPanel() {
+  const thresholds = [
+    parseInt(document.getElementById('thresh1').value) || 50,
+    parseInt(document.getElementById('thresh2').value) || 150,
+    parseInt(document.getElementById('thresh3').value) || 300,
+  ];
+  const prizes = [
+    { name: '铜奖', emoji: '🥉', thresh: thresholds[0] },
+    { name: '银奖', emoji: '🥈', thresh: thresholds[1] },
+    { name: '金奖', emoji: '🥇', thresh: thresholds[2] },
+  ];
+  const panel = document.getElementById('prizeLockPanel');
+  panel.innerHTML = '';
+  prizes.forEach(p => {
+    const pct = Math.min(100, Math.round(state.score / p.thresh * 100));
+    const unlocked = state.score >= p.thresh;
+    const div = document.createElement('div');
+    div.className = 'prize-unlock-item';
+    div.innerHTML = `
+      <div class="prize-unlock-icon ${unlocked?'unlocked':'locked'}">${p.emoji}</div>
+      <div class="prize-unlock-info">
+        <div class="prize-unlock-name">${p.name}</div>
+        <div class="prize-unlock-req">${unlocked?'已解锁！':'还需 '+(p.thresh-state.score)+' 分'}</div>
+        <div class="prize-unlock-prog">
+          <div class="prize-unlock-prog-fill" style="width:${pct}%"></div>
+        </div>
+      </div>
+      ${unlocked
+        ? '<span class="unlock-badge">已解锁</span>'
+        : '<span class="lock-badge">'+(pct)+'%</span>'}
+    `;
+    panel.appendChild(div);
+  });
+}
+
+/* ══════════════ 配置交互 ══════════════ */
+
+function togglePrize(i) {
+  cfg.prizeEnabled[i] = !cfg.prizeEnabled[i];
+  const btn = document.getElementById(`prizeToggle${i}`);
+  btn.classList.toggle('on', cfg.prizeEnabled[i]);
+  buildStakes();
+}
+
+function setDifficulty(el, val) {
+  cfg.difficulty = val;
+  document.querySelectorAll('#difficultyBtns .btn-opt').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  // 根据难度自动设置间距
+  const spacings = { easy: 80, normal: 100, hard: 130 };
+  cfg.stakeSpacing = spacings[val];
+  const slider = document.getElementById('spacingSlider');
+  slider.value = cfg.stakeSpacing;
+  document.getElementById('spacingVal').textContent = cfg.stakeSpacing + 'px';
+  if (state.running) buildStakes();
+}
+
+function updateSpacing(el) {
+  cfg.stakeSpacing = parseInt(el.value);
+  document.getElementById('spacingVal').textContent = cfg.stakeSpacing + 'px';
+  if (state.running) buildStakes();
+}
+
+function setRingCount(el, val) {
+  cfg.ringCount = val;
+  document.querySelectorAll('#ringCountBtns .btn-opt').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  if (!state.running) updateRingsDisplay();
+}
+
+function updateRingSize(el) {
+  cfg.ringSizeLevel = parseInt(el.value);
+  const labels = ['', '小圈(难)', '中圈(标准)', '大圈(易)'];
+  document.getElementById('ringSizeVal').textContent = ['','小','中','大'][cfg.ringSizeLevel];
+}
+
+/* ══════════════ Canvas尺寸自适应 ══════════════ */
+
+function resizeCanvas() {
+  const wrap = document.getElementById('canvasWrap');
+  const rect = wrap.getBoundingClientRect();
+  W = rect.width;
+  H = rect.height;
+  canvas.width = W;
+  canvas.height = H;
+  if (state.running) {
+    buildStakes();
+  } else {
+    drawIdle();
+  }
+}
+
+/* ══════════════ 桩子构建 ══════════════ */
+
+function getRingRadius() {
+  // 根据 ringSizeLevel (1/2/3) 返回圆环外径
+  const sizes = [0, 22, 30, 38];
+  return sizes[cfg.ringSizeLevel];
+}
+
+function buildStakes() {
+  // 只取已启用的桩子
+  const enabled = STAKE_SCORES.map((s, i) => i).filter(i => cfg.prizeEnabled[i]);
+  const n = enabled.length;
+  if (n === 0) return;
+
+  const totalWidth = (n - 1) * cfg.stakeSpacing;
+  const startX = W / 2 - totalWidth / 2;
+  const groundY = H - 30; // 地面Y坐标
+
+  stakes = enabled.map((origIdx, j) => {
+    const score = STAKE_SCORES[origIdx];
+    // 分值越高越细越高
+    const scaleFactor = [1.6, 1.3, 1.0, 0.7, 0.5][origIdx];
+    const radius = Math.max(6, 18 * scaleFactor);       // 桩子半径
+    const height = 60 + (4 - origIdx) * 20;             // 桩子高度
+    return {
+      origIdx,
+      x: startX + j * cfg.stakeSpacing,
+      topY: groundY - height,
+      baseY: groundY,
+      radius,
+      height,
+      score,
+      color: STAKE_COLORS[origIdx],
+      emoji: STAKE_EMOJIS[origIdx],
+      name: cfg.prizeNames[origIdx],
+    };
+  });
+}
+
+/* ══════════════ 绘制 ══════════════ */
+
+// 绘制地面
+function drawGround() {
+  const groundY = H - 30;
+  // 地面渐变
+  const grad = ctx.createLinearGradient(0, groundY - 6, 0, H);
+  grad.addColorStop(0, 'rgba(124,58,237,0.4)');
+  grad.addColorStop(0.3, 'rgba(124,58,237,0.15)');
+  grad.addColorStop(1, 'rgba(124,58,237,0.05)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, groundY - 6, W, H - groundY + 6);
+
+  // 地面线
+  ctx.strokeStyle = 'rgba(124,58,237,0.6)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, groundY);
+  ctx.lineTo(W, groundY);
+  ctx.stroke();
+
+  // 地板网格纹理
+  ctx.strokeStyle = 'rgba(124,58,237,0.08)';
+  ctx.lineWidth = 1;
+  const gridSize = 30;
+  for (let x = 0; x < W; x += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(x, groundY);
+    ctx.lineTo(x, H);
+    ctx.stroke();
+  }
+  for (let y = groundY; y < H; y += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y);
+    ctx.stroke();
+  }
+}
+
+// 绘制单根桩子
+function drawStake(s) {
+  ctx.save();
+  // 桩子主体（圆柱渐变）
+  const grad = ctx.createLinearGradient(s.x - s.radius, 0, s.x + s.radius, 0);
+  grad.addColorStop(0, 'rgba(0,0,0,0.3)');
+  grad.addColorStop(0.3, s.color);
+  grad.addColorStop(0.7, s.color);
+  grad.addColorStop(1, 'rgba(0,0,0,0.3)');
+
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.roundRect(s.x - s.radius, s.topY, s.radius * 2, s.height, [s.radius, s.radius, 2, 2]);
+  ctx.fill();
+
+  // 桩子顶部光晕
+  const topGrad = ctx.createRadialGradient(s.x, s.topY, 0, s.x, s.topY, s.radius * 2);
+  topGrad.addColorStop(0, 'rgba(255,255,255,0.6)');
+  topGrad.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = topGrad;
+  ctx.beginPath();
+  ctx.ellipse(s.x, s.topY, s.radius * 1.5, s.radius * 0.8, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 分值文字
+  ctx.fillStyle = '#fff';
+  ctx.font = `bold ${Math.min(13, s.radius * 1.2)}px -apple-system,sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const scoreText = s.score >= 1000 ? (s.score/1000)+'k' : String(s.score);
+  ctx.fillText(scoreText, s.x, s.topY - 14);
+
+  // 桩子底部发光
+  const baseGrad = ctx.createRadialGradient(s.x, s.baseY, 0, s.x, s.baseY, s.radius * 2.5);
+  baseGrad.addColorStop(0, s.color + '60');
+  baseGrad.addColorStop(1, 'transparent');
+  ctx.fillStyle = baseGrad;
+  ctx.beginPath();
+  ctx.ellipse(s.x, s.baseY, s.radius * 2.5, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+// 绘制圆环（飞行中）
+function drawRing(ring) {
+  ctx.save();
+  ctx.translate(ring.x, ring.y);
+  ctx.rotate(ring.rotation);
+
+  const outerR = ring.outerR;
+  const innerR = ring.innerR;
+
+  // 外圈渐变
+  const grad = ctx.createLinearGradient(-outerR, 0, outerR, 0);
+  grad.addColorStop(0, ring.color1);
+  grad.addColorStop(0.5, ring.color2);
+  grad.addColorStop(1, ring.color3);
+
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = outerR - innerR;
+  ctx.shadowColor = ring.color2;
+  ctx.shadowBlur = 8;
+
+  ctx.beginPath();
+  ctx.arc(0, 0, (outerR + innerR) / 2, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+// 绘制瞄准圆环（跟随鼠标）
+function drawAimRing() {
+  if (!state.running || state.ringsLeft <= 0) return;
+  const outerR = getRingRadius();
+  const innerR = outerR * 0.65;
+  const x = mouseX;
+  const y = 50; // 顶部固定高度
+
+  ctx.save();
+  ctx.rotate(ringRotation);
+
+  // 旋转效果
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(ringRotation);
+
+  const grad = ctx.createLinearGradient(-outerR, 0, outerR, 0);
+  grad.addColorStop(0, '#FF4B4B');
+  grad.addColorStop(0.33, '#F5C842');
+  grad.addColorStop(0.66, '#4CAF50');
+  grad.addColorStop(1, '#7C3AED');
+
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = outerR - innerR;
+  ctx.shadowColor = '#F5C842';
+  ctx.shadowBlur = 12;
+
+  ctx.beginPath();
+  ctx.arc(0, 0, (outerR + innerR) / 2, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.restore();
+
+  // 瞄准辅助线（虚线）
+  ctx.strokeStyle = 'rgba(245,200,66,0.25)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 6]);
+  ctx.beginPath();
+  ctx.moveTo(x, y + outerR + 5);
+  ctx.lineTo(x, H - 80);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.restore();
+}
+
+// 绘制套中光圈效果
+function drawHitEffects() {
+  hitEffects = hitEffects.filter(e => e.life > 0);
+  hitEffects.forEach(e => {
+    ctx.save();
+    const alpha = e.life / e.maxLife;
+    const r = e.radius * (1 + (1 - alpha) * 0.5);
+
+    // 扩散光圈
+    ctx.strokeStyle = e.color;
+    ctx.lineWidth = 3 * alpha;
+    ctx.globalAlpha = alpha;
+    ctx.shadowColor = e.color;
+    ctx.shadowBlur = 15;
+    ctx.beginPath();
+    ctx.arc(e.x, e.y, r, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // 内部光圈
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1 * alpha;
+    ctx.beginPath();
+    ctx.arc(e.x, e.y, r * 0.7, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.restore();
+    e.life -= 2;
+    e.radius += 0.8;
+  });
+}
+
+// 绘制弹跳圆环
+function drawBouncingRings() {
+  bouncingRings = bouncingRings.filter(r => r.life > 0);
+  bouncingRings.forEach(r => {
+    const alpha = r.life / r.maxLife;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(r.x, r.y);
+    ctx.rotate(r.rotation);
+
+    const outerR = r.outerR * (1 - (1 - alpha) * 0.3);
+    const innerR = outerR * 0.65;
+
+    ctx.strokeStyle = r.color;
+    ctx.lineWidth = Math.max(1, outerR - innerR);
+    ctx.beginPath();
+    ctx.arc(0, 0, (outerR + innerR) / 2, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.restore();
+    // 物理：重力+弹跳
+    r.vy += 0.5;
+    r.y += r.vy;
+    r.x += r.vx;
+    r.rotation += r.rotSpeed;
+    if (r.y > H - 35 && r.vy > 0) {
+      r.vy *= -0.5;
+      r.vx *= 0.7;
+      r.life -= 15;
+    }
+    r.life -= 1;
+  });
+}
+
+// 主渲染循环
+function render() {
+  ctx.clearRect(0, 0, W, H);
+
+  // 背景
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, '#0D0720');
+  bgGrad.addColorStop(1, '#1A0A2E');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // 环境氛围光
+  const ambientGrad = ctx.createRadialGradient(W/2, H*0.7, 0, W/2, H*0.7, W*0.6);
+  ambientGrad.addColorStop(0, 'rgba(124,58,237,0.08)');
+  ambientGrad.addColorStop(1, 'transparent');
+  ctx.fillStyle = ambientGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // 地面
+  drawGround();
+
+  // 桩子
+  stakes.forEach(s => drawStake(s));
+
+  // 套中效果
+  drawHitEffects();
+
+  // 弹跳圆环
+  drawBouncingRings();
+
+  // 飞行中圆环
+  flyingRings.forEach(r => drawRing(r));
+
+  // 瞄准圆环
+  drawAimRing();
+
+  // 更新飞行圆环物理
+  updateFlyingRings();
+
+  // 自旋
+  ringRotation += 0.04;
+
+  animFrame = requestAnimationFrame(render);
+}
+
+// 空闲状态绘制
+function drawIdle() {
+  ctx.clearRect(0, 0, W, H);
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, '#0D0720');
+  bgGrad.addColorStop(1, '#1A0A2E');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // 示意桩子
+  const demoStakes = [
+    { x: W*0.25, topY: H-120, baseY: H-30, radius: 18, height: 90, color: '#FF4B4B', score: 10 },
+    { x: W*0.375, topY: H-140, baseY: H-30, radius: 14, height: 110, color: '#FF9800', score: 20 },
+    { x: W*0.5, topY: H-160, baseY: H-30, radius: 11, height: 130, color: '#F5C842', score: 50 },
+    { x: W*0.625, topY: H-180, baseY: H-30, radius: 9, height: 150, color: '#4CAF50', score: 100 },
+    { x: W*0.75, topY: H-200, baseY: H-30, radius: 7, height: 170, color: '#7C3AED', score: 500 },
+  ];
+  drawGround();
+  demoStakes.forEach(s => drawStake(s));
+}
+
+/* ══════════════ 圆环飞行物理 ══════════════ */
+
+function createRingColors() {
+  const palettes = [
+    ['#FF4B4B','#F5C842','#FF9800'],
+    ['#4CAF50','#7C3AED','#EC4899'],
+    ['#7C3AED','#EC4899','#F5C842'],
+    ['#00BCD4','#4CAF50','#7C3AED'],
+  ];
+  const p = palettes[Math.floor(Math.random() * palettes.length)];
+  return { color1: p[0], color2: p[1], color3: p[2] };
+}
+
+// 发射圆环
+function throwRing() {
+  if (!state.running || state.ringsLeft <= 0 || flyingRings.length > 0) return;
+
+  const outerR = getRingRadius();
+  const colors = createRingColors();
+
+  // 计算抛物线参数：从顶部瞄准点飞向鼠标X正下方的地面
+  const startX = mouseX;
+  const startY = 50;
+  // 目标落点：鼠标X，地面Y附近
+  const targetX = mouseX + (Math.random() - 0.5) * getDifficultyOffset();
+  const targetY = H - 35;
+
+  // 抛物线：vx固定，vy根据需要时间计算
+  const frames = 40 + Math.random() * 10; // 飞行帧数
+  const vx = (targetX - startX) / frames;
+  const gravity = 0.5;
+  // vy_0 + gravity * frames/2 * frames = targetY - startY  (近似)
+  const vy0 = (targetY - startY - 0.5 * gravity * frames * frames) / frames;
+
+  flyingRings.push({
+    x: startX, y: startY,
+    vx, vy: vy0, gravity,
+    outerR, innerR: outerR * 0.65,
+    rotation: 0,
+    rotSpeed: 0.12 + Math.random() * 0.08,
+    targetX, targetY,
+    ...colors,
+    landed: false,
+    frames,
+    frame: 0,
+  });
+
+  state.ringsLeft--;
+  state.totalThrows++;
+  updateRingsDisplay();
+  updateStats();
+}
+
+// 难度偏移量：鼠标精度误差
+function getDifficultyOffset() {
+  const offsets = { easy: 15, normal: 30, hard: 55 };
+  return offsets[cfg.difficulty] || 30;
+}
+
+// 更新飞行圆环
+function updateFlyingRings() {
+  const groundY = H - 35;
+  const toRemove = [];
+
+  flyingRings.forEach((r, i) => {
+    r.x += r.vx;
+    r.vy += r.gravity;
+    r.y += r.vy;
+    r.rotation += r.rotSpeed;
+    r.frame++;
+
+    // 到达地面
+    if (r.y >= groundY) {
+      r.y = groundY;
+      r.landed = true;
+
+      // 判断是否套中某根桩子
+      const hitStake = checkHit(r);
+      if (hitStake !== null) {
+        onHit(r, hitStake);
+      } else {
+        onMiss(r);
+      }
+      toRemove.push(i);
+    }
+  });
+
+  // 逆序移除（防止索引偏移）
+  for (let i = toRemove.length - 1; i >= 0; i--) {
+    flyingRings.splice(toRemove[i], 1);
+  }
+
+  // 所有圈用完且没有飞行中圆环
+  if (state.running && state.ringsLeft <= 0 && flyingRings.length === 0) {
+    // 延迟结束（等弹跳消散）
+    setTimeout(() => endGame(), 1200);
+  }
+}
+
+// 判断套中
+function checkHit(ring) {
+  // 圆环内径需要 > 桩子半径，且圆心水平距离 < 允许误差
+  const innerR = ring.innerR;
+
+  for (const s of stakes) {
+    const dist = Math.abs(ring.x - s.x);
+    // 允许水平误差：内径 - 桩子半径
+    const tolerance = innerR - s.radius;
+    if (tolerance > 0 && dist <= tolerance * 1.5) {
+      return s;
+    }
+  }
+  return null;
+}
+
+// 套中处理
+function onHit(ring, stake) {
+  // 连击
+  state.combo++;
+  if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+
+  // 得分（连击加成）
+  const comboBonus = state.combo >= 3 ? 2 : state.combo >= 2 ? 1.5 : 1;
+  const gained = Math.round(stake.score * comboBonus);
+  state.score += gained;
+  state.totalHits++;
+  state.hitPerStake[stake.origIdx]++;
+
+  // 套中光圈
+  hitEffects.push({
+    x: stake.x, y: stake.topY,
+    radius: ring.outerR,
+    color: stake.color,
+    life: 60, maxLife: 60,
+  });
+
+  // 飘分数字
+  showFloatScore(stake.x, stake.topY - 20, `+${gained}`, stake.color);
+
+  // 圆环套在桩子上（显示静态套中状态）
+  bouncingRings.push({
+    x: stake.x, y: stake.topY,
+    vx: 0, vy: 0,
+    outerR: ring.outerR, color: stake.color,
+    rotation: 0, rotSpeed: 0.02,
+    life: 90, maxLife: 90,
+  });
+
+  updateScore();
+  updateStats();
+  updateHitStats();
+  updatePrizeLockPanel();
+  document.getElementById('comboDisplay').textContent = 'x' + state.combo;
+}
+
+// 未套中处理
+function onMiss(ring) {
+  state.combo = 0;
+  document.getElementById('comboDisplay').textContent = 'x1';
+
+  // 弹跳效果
+  bouncingRings.push({
+    x: ring.x, y: ring.y,
+    vx: ring.vx * 0.3,
+    vy: -4 - Math.random() * 3,
+    outerR: ring.outerR,
+    color: '#888',
+    rotation: ring.rotation,
+    rotSpeed: ring.rotSpeed * 1.5,
+    life: 60, maxLife: 60,
+  });
+}
+
+// 飘分数字DOM
+function showFloatScore(x, y, text, color) {
+  const wrap = document.getElementById('canvasWrap');
+  const el = document.createElement('div');
+  el.className = 'float-score';
+  el.textContent = text;
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.style.color = color || 'var(--gold)';
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+
+/* ══════════════ 游戏流程 ══════════════ */
+
+function startGame() {
+  // 重置状态
+  state.running = true;
+  state.score = 0;
+  state.ringsLeft = cfg.ringCount;
+  state.combo = 0;
+  state.maxCombo = 0;
+  state.totalThrows = 0;
+  state.totalHits = 0;
+  state.hitPerStake = [0, 0, 0, 0, 0];
+
+  flyingRings = [];
+  bouncingRings = [];
+  hitEffects = [];
+
+  // 隐藏覆盖层
+  document.getElementById('gameOverlay').classList.add('hidden');
+
+  // 构建桩子
+  buildStakes();
+
+  // 更新UI
+  updateScore();
+  updateRingsDisplay();
+  updateStats();
+  updateHitStats();
+  updatePrizeLockPanel();
+  initHitStats();
+
+  document.getElementById('aimHintText').textContent = '移动鼠标瞄准桩子，点击投掷';
+  document.getElementById('footerTip').textContent = '游戏进行中 · 点击投掷圆环';
+
+  // 启动渲染
+  if (animFrame) cancelAnimationFrame(animFrame);
+  render();
+}
+
+function endGame() {
+  state.running = false;
+
+  // 更新历史最高
+  if (state.score > state.bestScore) {
+    state.bestScore = state.score;
+    localStorage.setItem('ringToss_best', state.bestScore);
+  }
+  document.getElementById('bestScore').textContent = state.bestScore;
+
+  // 判断解锁
+  const thresh = [
+    parseInt(document.getElementById('thresh1').value) || 50,
+    parseInt(document.getElementById('thresh2').value) || 150,
+    parseInt(document.getElementById('thresh3').value) || 300,
+  ];
+  const medals = ['🥉铜奖','🥈银奖','🥇金奖'];
+  let unlockMsg = '';
+  for (let i = thresh.length - 1; i >= 0; i--) {
+    if (state.score >= thresh[i]) {
+      unlockMsg = medals[i] + ' 已解锁！';
+      break;
+    }
+  }
+
+  // 显示结束覆盖层
+  const overlay = document.getElementById('gameOverlay');
+  overlay.innerHTML = `
+    <div class="overlay-title">🎯 游戏结束</div>
+    <div class="overlay-score">${state.score}</div>
+    <div class="overlay-subtitle">命中率 ${state.totalThrows > 0 ? Math.round(state.totalHits/state.totalThrows*100) : 0}% · 最大连击 ×${state.maxCombo}</div>
+    ${unlockMsg ? `<div style="color:var(--gold);font-size:18px;font-weight:700;">${unlockMsg}</div>` : ''}
+    <button class="btn-main" style="width:160px;" onclick="startGame()">🔄 再来一局</button>
+  `;
+  overlay.classList.remove('hidden');
+
+  document.getElementById('footerTip').textContent = '游戏结束 · 得分 ' + state.score;
+  updatePrizeLockPanel();
+}
+
+function resetGame() {
+  state.running = false;
+  state.score = 0;
+  state.ringsLeft = cfg.ringCount;
+  state.combo = 0;
+  state.maxCombo = 0;
+  state.totalThrows = 0;
+  state.totalHits = 0;
+  state.hitPerStake = [0, 0, 0, 0, 0];
+
+  flyingRings = [];
+  bouncingRings = [];
+  hitEffects = [];
+
+  const overlay = document.getElementById('gameOverlay');
+  overlay.innerHTML = `
+    <div class="overlay-title">⭕ 套圈圈</div>
+    <div class="overlay-subtitle">移动鼠标瞄准，点击投掷圆环</div>
+    <button class="btn-main" style="width:160px;" onclick="startGame()">🎯 开始游戏</button>
+  `;
+  overlay.classList.remove('hidden');
+
+  updateScore();
+  updateRingsDisplay();
+  updateStats();
+  initHitStats();
+  updatePrizeLockPanel();
+
+  if (animFrame) cancelAnimationFrame(animFrame);
+  drawIdle();
+
+  document.getElementById('footerTip').textContent = '准备开始';
+}
+
+/* ══════════════ UI更新 ══════════════ */
+
+function updateScore() {
+  document.getElementById('currentScore').textContent = state.score;
+}
+
+function updateRingsDisplay() {
+  const container = document.getElementById('ringsDisplay');
+  container.innerHTML = '';
+  const ringColors = ['#FF4B4B','#F5C842','#4CAF50','#7C3AED','#EC4899','#00BCD4','#FF9800','#E91E63','#2196F3','#8BC34A'];
+
+  for (let i = 0; i < cfg.ringCount; i++) {
+    const el = document.createElement('div');
+    el.className = 'ring-icon' + (i >= state.ringsLeft ? ' used' : '');
+    el.style.borderColor = ringColors[i % ringColors.length];
+    container.appendChild(el);
+  }
+}
+
+function updateStats() {
+  document.getElementById('totalThrows').textContent = state.totalThrows;
+  document.getElementById('totalHits').textContent = state.totalHits;
+  const rate = state.totalThrows > 0 ? Math.round(state.totalHits / state.totalThrows * 100) : 0;
+  document.getElementById('hitRate').textContent = rate + '%';
+  document.getElementById('maxCombo').textContent = state.maxCombo;
+  document.getElementById('bestScore').textContent = state.bestScore;
+}
+
+function updateHitStats() {
+  const maxHit = Math.max(...state.hitPerStake, 1);
+  STAKE_SCORES.forEach((s, i) => {
+    const el = document.getElementById(`hitStat${i}`);
+    const bar = document.getElementById(`hitBar${i}`);
+    if (el) el.textContent = state.hitPerStake[i] + '次';
+    if (bar) bar.style.width = Math.round(state.hitPerStake[i] / maxHit * 100) + '%';
+  });
+}
+
+/* ══════════════ 鼠标交互 ══════════════ */
+
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = W / rect.width;
+  mouseX = (e.clientX - rect.left) * scaleX;
+});
+
+canvas.addEventListener('click', () => {
+  if (state.running && state.ringsLeft > 0 && flyingRings.length === 0) {
+    throwRing();
+  }
+});
+
+/* ══════════════ 窗口尺寸变化 ══════════════ */
+window.addEventListener('resize', () => {
+  setTimeout(resizeCanvas, 100);
+});
+
+/* ══════════════ 初始化入口 ══════════════ */
+window.addEventListener('load', () => {
+  initPrizeConfig();
+  initHitStats();
+  initPrizeLockPanel();
+  updateRingsDisplay();
+  updateStats();
+  // 等DOM渲染完成后调整Canvas尺寸
+  setTimeout(() => {
+    resizeCanvas();
+    drawIdle();
+  }, 100);
+  document.getElementById('bestScore').textContent = state.bestScore;
+});
+</script>
+</body>
+</html>
