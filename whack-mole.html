@@ -1470,6 +1470,7 @@ function endGame() {
   }
   if (typeof GameUser !== 'undefined' && GameUser.addExp) {
     GameUser.addExp(Math.min(25, Math.floor(gameState.score / 10)));
+    if (typeof GameUser !== 'undefined') GameUser.addCoins(Math.min(20, Math.floor(gameState.score / 5)), '打地鼠');
   }
 
   // 弹出结算弹窗

@@ -633,6 +633,7 @@ function spin() {
     }
     if (typeof GameUser !== 'undefined') {
       GameUser.addExp(_prizeScore > 0 ? 20 : 5);
+      if (typeof GameUser !== 'undefined') GameUser.addCoins(_prizeScore > 0 ? Math.max(10, Math.floor(_prizeScore / 20)) : 2, '大转盘');
     }
     updateStats(); updateChance(); addLog(PRIZES[resultIdx]); updateDist();
     setTimeout(() => {

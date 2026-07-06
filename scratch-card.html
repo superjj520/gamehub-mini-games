@@ -895,6 +895,7 @@ function showModal() {
   }
   if (typeof GameUser !== 'undefined') {
     GameUser.addExp(prizeScore > 0 ? 15 : 5);
+    if (typeof GameUser !== 'undefined') GameUser.addCoins(prizeScore > 0 ? Math.max(5, Math.floor(prizeScore / 5)) : 2, '刮刮乐');
   }
 }
 

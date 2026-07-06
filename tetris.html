@@ -1571,6 +1571,7 @@ function gameOver() {
   }
   if (typeof GameUser !== 'undefined') {
     GameUser.addExp(Math.min(40, Math.floor(score / 50)));
+    if (typeof GameUser !== 'undefined') GameUser.addCoins(Math.min(40, Math.floor(score / 100)), '俄罗斯方块');
   }
 }
 

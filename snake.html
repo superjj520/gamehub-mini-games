@@ -1262,6 +1262,7 @@ function gameOver() {
   }
   if (typeof GameUser !== 'undefined') {
     GameUser.addExp(Math.min(30, score));
+    if (typeof GameUser !== 'undefined') GameUser.addCoins(Math.min(30, score), '贪吃蛇');
   }
 }
 

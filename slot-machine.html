@@ -903,6 +903,7 @@ function judgeResult() {
   }
   if (typeof GameUser !== 'undefined') {
     GameUser.addExp(totalScore > 100 ? 20 : 8);
+    if (typeof GameUser !== 'undefined') GameUser.addCoins(totalScore > 100 ? 20 : 5, '老虎机');
   }
 
   if (winType === 'big') {

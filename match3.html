@@ -905,6 +905,7 @@ function endGame() {
   }
   if (typeof GameUser !== 'undefined') {
     GameUser.addExp(Math.min(30, Math.floor(state.score / 20)));
+    if (typeof GameUser !== 'undefined') GameUser.addCoins(Math.min(25, Math.floor(state.score / 50)), '消消乐');
   }
   // 显示结束遮罩
   showGameOver();

@@ -1373,6 +1373,7 @@ function applyMove(moveFn) {
     }
     if (typeof GameUser !== 'undefined') {
       GameUser.addExp(Math.min(50, Math.floor(currentScore / 100)));
+      if (typeof GameUser !== 'undefined') GameUser.addCoins(Math.min(50, Math.floor(currentScore / 200)), '2048');
     }
     setTimeout(() => {
       document.getElementById('overlay-over').classList.add('show');

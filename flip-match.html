@@ -1152,6 +1152,7 @@ function gameOver(win) {
     }
     if (typeof GameUser !== 'undefined' && GameUser.addExp) {
       GameUser.addExp(20);
+      if (typeof GameUser !== 'undefined') GameUser.addCoins(15, '翻牌记忆');
     }
   } else {
     addLog('fail', `超时失败，已匹配 ${state.matched}/${state.totalPairs} 对`);

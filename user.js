@@ -89,6 +89,8 @@ const GameUser = (() => {
       avatar: randomAvatar(),
       level: 1,
       exp: 0,
+      coins: 100,
+      coinLog: [],
       totalGames: 0,
       totalPlays: 0,
       joinDate: formatDate(),
@@ -261,7 +263,7 @@ const GameUser = (() => {
       <span id="gu-nav-avatar">${user.avatar}</span>
       <div id="gu-nav-info">
         <span id="gu-nav-nickname">${user.nickname}</span>
-        <span id="gu-nav-level">Lv${user.level}</span>
+        <span id="gu-nav-level">Lv${user.level} · 🪙${user.coins || 0}</span>
       </div>
     `;
 
@@ -283,7 +285,7 @@ const GameUser = (() => {
     const level = document.getElementById('gu-nav-level');
     if (avatar) avatar.textContent = user.avatar;
     if (nickname) nickname.textContent = user.nickname;
-    if (level) level.textContent = 'Lv' + user.level;
+    if (level) level.textContent = 'Lv' + user.level + ' · 🪙' + (user.coins || 0);
   }
 
   // ─── 更新登录时间 ─────────────────────────────────────────────────────────────
@@ -338,6 +340,48 @@ const GameUser = (() => {
       user.avatar = avatar;
       save(user);
       refreshNavWidget();
+    },
+
+    /** 获取当前金币数量 */
+    getCoins() {
+      return load().coins || 0;
+    },
+
+    /**
+     * 增加金币
+     * @param {number} amount 金币数
+     * @param {string} [source] 来源说明（用于记录）
+     */
+    addCoins(amount, source = '') {
+      if (!amount || amount <= 0) return;
+      const user = load();
+      user.coins = (user.coins || 0) + amount;
+      user.coinLog = user.coinLog || [];
+      user.coinLog.unshift({ type: 'earn', amount, source, ts: Date.now() });
+      if (user.coinLog.length > 50) user.coinLog = user.coinLog.slice(0, 50);
+      save(user);
+      refreshNavWidget();
+      return user.coins;
+    },
+
+    /**
+     * 消费金币（失败返回 false）
+     * @param {number} amount 消费数量
+     * @param {string} [desc] 消费说明
+     * @returns {boolean}
+     */
+    spendCoins(amount, desc = '') {
+      if (!amount || amount <= 0) return false;
+      const user = load();
+      const cur = user.coins || 0;
+      if (cur < amount) return false;
+      user.coins = cur - amount;
+      user.coinLog = user.coinLog || [];
+      user.coinLog.unshift({ type: 'spend', amount: -amount, source: desc, ts: Date.now() });
+      if (user.coinLog.length > 50) user.coinLog = user.coinLog.slice(0, 50);
+      save(user);
+      refreshNavWidget();
+      return true;
     },
 
     /** 添加经验值，自动检测升级并弹出 Toast */

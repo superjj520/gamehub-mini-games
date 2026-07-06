@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 积分商城</title>
+<link rel="stylesheet" href="mobile.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold:    #F5C842;
+    --bg:      #0D0720;
+    --accent:  #7C3AED;
+    --accent2: #EC4899;
+    --deep:    #1A0A2E;
+    --card:    rgba(255,255,255,0.05);
+    --border:  rgba(255,255,255,0.1);
+    --text:    #F0EAF8;
+    --muted:   rgba(240,234,248,0.5);
+    --green:   #22C55E;
+    --red:     #EF4444;
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── 导航栏 ─── */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; height: 56px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.97);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    gap: 16px;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); text-decoration: none; }
+  .nav-logo-icon { font-size: 22px; }
+  .nav-tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab { padding: 6px 12px; border-radius: 20px; font-size: 13px; color: var(--muted); text-decoration: none; white-space: nowrap; transition: all 0.2s; }
+  .nav-tab:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+  .nav-tab.active { background: rgba(124,58,237,0.2); color: var(--accent); }
+  .nav-right { display: flex; align-items: center; gap: 8px; }
+
+  /* ─── 金币横幅 ─── */
+  .coin-banner {
+    background: linear-gradient(135deg, #1A0A2E 0%, #2D1060 50%, #1A0A2E 100%);
+    border-bottom: 1px solid rgba(124,58,237,0.3);
+    padding: 20px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+  }
+  .coin-info { display: flex; align-items: center; gap: 12px; }
+  .coin-icon { font-size: 36px; }
+  .coin-label { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+  .coin-amount { font-size: 28px; font-weight: 800; color: var(--gold); letter-spacing: -0.5px; }
+  .coin-tip { font-size: 11px; color: var(--muted); }
+  .coin-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .coin-btn {
+    padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: none; transition: opacity 0.2s;
+    font-family: inherit;
+  }
+  .coin-btn:hover { opacity: 0.85; }
+  .coin-btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; }
+  .coin-btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.15); color: var(--muted); }
+  .coin-btn-outline:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
+
+  /* ─── 主体布局 ─── */
+  .shop-body {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+  }
+
+  /* ─── 分类标签 ─── */
+  .cat-tabs {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .cat-tab {
+    padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--muted);
+    transition: all 0.2s; font-family: inherit;
+  }
+  .cat-tab:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
+  .cat-tab.active { background: rgba(124,58,237,0.2); border-color: var(--accent); color: var(--accent); }
+
+  /* ─── 商品网格 ─── */
+  .goods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .goods-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 16px 16px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .goods-card:hover { border-color: rgba(124,58,237,0.4); transform: translateY(-2px); }
+  .goods-card.sold-out { opacity: 0.5; }
+  .goods-card.owned { border-color: rgba(34,197,94,0.4); }
+
+  .goods-badge {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600;
+  }
+  .goods-badge.hot   { background: rgba(239,68,68,0.2); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .goods-badge.new   { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+  .goods-badge.limit { background: rgba(245,200,66,0.15); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
+  .goods-badge.owned { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+
+  .goods-icon { font-size: 48px; line-height: 1; }
+  .goods-name { font-size: 14px; font-weight: 700; color: var(--text); text-align: center; }
+  .goods-desc { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; }
+
+  .goods-price {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 18px; font-weight: 800; color: var(--gold);
+    margin-top: 2px;
+  }
+  .goods-price-icon { font-size: 14px; }
+  .goods-price.free { color: var(--green); }
+
+  .goods-btn {
+    width: 100%; padding: 9px; border-radius: 10px;
+    font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+    transition: opacity 0.2s; font-family: inherit;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+  }
+  .goods-btn:hover { opacity: 0.85; }
+  .goods-btn:disabled {
+    background: rgba(255,255,255,0.06);
+    color: var(--muted);
+    cursor: not-allowed;
+  }
+  .goods-btn.owned-btn {
+    background: rgba(34,197,94,0.15);
+    color: var(--green);
+    cursor: default;
+  }
+
+  /* ─── 段落标题 ─── */
+  .section-title {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    margin-bottom: 14px; padding-left: 10px;
+    border-left: 3px solid var(--accent);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title span { color: var(--muted); font-size: 12px; font-weight: 400; }
+
+  /* ─── 兑换记录 ─── */
+  .record-list { display: flex; flex-direction: column; gap: 8px; }
+  .record-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+  }
+  .record-icon { font-size: 24px; flex-shrink: 0; }
+  .record-info { flex: 1; min-width: 0; }
+  .record-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .record-time { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .record-cost { font-size: 14px; font-weight: 700; color: var(--red); flex-shrink: 0; }
+
+  /* ─── 每日签到 ─── */
+  .daily-card {
+    background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(236,72,153,0.1));
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 16px; padding: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    margin-bottom: 20px;
+  }
+  .daily-info { flex: 1; }
+  .daily-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .daily-desc  { font-size: 12px; color: var(--muted); }
+  .daily-streak { display: flex; gap: 6px; margin-top: 10px; }
+  .streak-dot {
+    width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: var(--muted); font-weight: 600;
+  }
+  .streak-dot.done { background: var(--gold); border-color: var(--gold); color: #1A0A2E; }
+  .streak-dot.today { border-color: var(--accent); color: var(--accent); animation: pulse 1.5s infinite; }
+
+  @keyframes pulse { 0%,100%{ box-shadow: 0 0 0 0 rgba(124,58,237,0.4); } 50%{ box-shadow: 0 0 0 6px rgba(124,58,237,0); } }
+
+  /* ─── 确认弹窗 ─── */
+  #shop-modal-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  #shop-modal-overlay.show { opacity: 1; pointer-events: all; }
+  #shop-modal {
+    background: #1A0A2E; border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px; padding: 28px 24px; width: min(360px, 90vw);
+    text-align: center;
+    transform: scale(0.9); transition: transform 0.3s;
+  }
+  #shop-modal-overlay.show #shop-modal { transform: scale(1); }
+  .modal-icon  { font-size: 52px; margin-bottom: 12px; }
+  .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .modal-desc  { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+  .modal-price { font-size: 24px; font-weight: 800; color: var(--gold); margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-btn {
+    flex: 1; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700;
+    cursor: pointer; border: none; font-family: inherit; transition: opacity 0.2s;
+  }
+  .modal-btn:hover { opacity: 0.85; }
+  .modal-btn-confirm { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; }
+  .modal-btn-cancel  { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+  /* ─── 成功/失败 Toast ─── */
+  #shop-toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: rgba(26,10,46,0.95); border: 1px solid rgba(124,58,237,0.4);
+    border-radius: 24px; padding: 10px 20px; font-size: 13px; color: var(--text);
+    z-index: 8888; opacity: 0; transition: opacity 0.3s, transform 0.3s;
+    white-space: nowrap; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    pointer-events: none;
+  }
+
+  /* ─── 空状态 ─── */
+  .empty-state {
+    text-align: center; padding: 40px 20px; color: var(--muted);
+  }
+  .empty-state-icon { font-size: 40px; margin-bottom: 10px; }
+  .empty-state-text { font-size: 13px; }
+</style>
+</head>
+<body>
+
+<!-- ════ 导航栏 ════ -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span class="nav-logo-icon">🎮</span>
+    <span>GameHub</span>
+  </a>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="index.html">🏠 首页</a>
+    <a class="nav-tab" href="leaderboard.html">🏆 排行榜</a>
+    <a class="nav-tab active" href="shop.html">🪙 积分商城</a>
+    <a class="nav-tab" href="profile.html">👤 个人中心</a>
+  </div>
+  <div class="nav-right"></div>
+</nav>
+
+<!-- ════ 金币横幅 ════ -->
+<div class="coin-banner">
+  <div class="coin-info">
+    <div class="coin-icon">🪙</div>
+    <div>
+      <div class="coin-label">我的金币</div>
+      <div class="coin-amount" id="coinDisplay">0</div>
+      <div class="coin-tip">玩游戏赚金币，兑换专属奖励</div>
+    </div>
+  </div>
+  <div class="coin-actions">
+    <button class="coin-btn coin-btn-outline" onclick="showLog()">账单明细</button>
+    <button class="coin-btn coin-btn-primary" onclick="showEarnTip()">如何获得？</button>
+  </div>
+</div>
+
+<!-- ════ 主体内容 ════ -->
+<div class="shop-body">
+
+  <!-- 每日签到 -->
+  <div class="daily-card" id="dailyCard">
+    <div class="daily-info">
+      <div class="daily-title">📅 每日签到</div>
+      <div class="daily-desc">连续签到奖励更丰厚，明天再来！</div>
+      <div class="daily-streak" id="dailyStreak"></div>
+    </div>
+    <button class="coin-btn coin-btn-primary" id="checkinBtn" onclick="doCheckin()" style="width:90px;padding:10px">签到领币</button>
+  </div>
+
+  <!-- 分类标签 -->
+  <div class="cat-tabs" id="catTabs">
+    <button class="cat-tab active" data-cat="all" onclick="filterCat('all',this)">🛒 全部</button>
+    <button class="cat-tab" data-cat="avatar" onclick="filterCat('avatar',this)">🎭 头像框</button>
+    <button class="cat-tab" data-cat="effect" onclick="filterCat('effect',this)">✨ 特效</button>
+    <button class="cat-tab" data-cat="coupon" onclick="filterCat('coupon',this)">🎟 优惠券</button>
+    <button class="cat-tab" data-cat="title" onclick="filterCat('title',this)">🏅 称号</button>
+    <button class="cat-tab" data-cat="misc" onclick="filterCat('misc',this)">🎁 道具</button>
+  </div>
+
+  <!-- 商品列表标题 -->
+  <div class="section-title">精选商品 <span id="goodsCount"></span></div>
+
+  <!-- 商品网格 -->
+  <div class="goods-grid" id="goodsGrid"></div>
+
+  <!-- 兑换记录 -->
+  <div style="margin-top:32px">
+    <div class="section-title">兑换记录 <span id="recordCount"></span></div>
+    <div id="recordList"></div>
+  </div>
+
+</div>
+
+<!-- ════ 确认弹窗 ════ -->
+<div id="shop-modal-overlay">
+  <div id="shop-modal">
+    <div class="modal-icon" id="modalIcon">🎁</div>
+    <div class="modal-title" id="modalTitle">确认兑换</div>
+    <div class="modal-desc"  id="modalDesc">确定要兑换这个商品吗？</div>
+    <div class="modal-price" id="modalPrice">🪙 100</div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel"  onclick="closeModal()">取消</button>
+      <button class="modal-btn modal-btn-confirm" id="modalConfirmBtn">确认兑换</button>
+    </div>
+  </div>
+</div>
+
+<div id="shop-toast"></div>
+
+<!-- 移动端底部标签栏 -->
+<div class="mobile-tabs">
+  <button class="mobile-tab active" id="tab-game" onclick="mobileSwitchTab('game')">
+    <span class="mobile-tab-icon">🪙</span>商城
+  </button>
+  <button class="mobile-tab" id="tab-sound" onclick="toggleSound()">
+    <span class="mobile-tab-icon" id="sound-icon">🔊</span>音效
+  </button>
+</div>
+
+<script src="sound.js"></script>
+<script src="share.js"></script>
+<script src="leaderboard.js"></script>
+<script src="achievement.js"></script>
+<script src="user.js"></script>
+<script src="themes.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   商品数据
+═══════════════════════════════════════════════════════════ */
+const GOODS_LIST = [
+  // ── 头像框 ──
+  { id: 'frame_gold',    cat: 'avatar',  icon: '👑',  name: '金色王冠框',   desc: '尊贵金色头像框，彰显王者地位',  price: 500,  badge: 'hot',   type: 'avatar_frame' },
+  { id: 'frame_fire',    cat: 'avatar',  icon: '🔥',  name: '火焰头像框',   desc: '燃烧的火焰环绕，热血沸腾',      price: 300,  badge: '',      type: 'avatar_frame' },
+  { id: 'frame_star',    cat: 'avatar',  icon: '⭐',  name: '星光头像框',   desc: '闪闪发光，你就是那颗星',         price: 200,  badge: 'new',   type: 'avatar_frame' },
+  { id: 'frame_rainbow', cat: 'avatar',  icon: '🌈',  name: '彩虹头像框',   desc: '七彩绚丽，独一无二',             price: 400,  badge: '',      type: 'avatar_frame' },
+
+  // ── 特效 ──
+  { id: 'fx_confetti',   cat: 'effect',  icon: '🎊',  name: '彩带爆炸特效', desc: '游戏胜利时触发彩带爆炸庆典',     price: 600,  badge: 'hot',   type: 'effect' },
+  { id: 'fx_firework',   cat: 'effect',  icon: '🎆',  name: '烟花特效',     desc: '绚烂烟花升空，庆祝每一次成功',   price: 800,  badge: 'limit', type: 'effect' },
+  { id: 'fx_sparkle',    cat: 'effect',  icon: '✨',  name: '闪光粒子特效', desc: '点击时触发闪光粒子飘散',          price: 350,  badge: 'new',   type: 'effect' },
+  { id: 'fx_coin_rain',  cat: 'effect',  icon: '💰',  name: '金币雨特效',   desc: '中奖时天降金币雨，财富滚滚',      price: 700,  badge: '',      type: 'effect' },
+
+  // ── 优惠券 ──
+  { id: 'coupon_spin3',  cat: 'coupon',  icon: '🎡',  name: '大转盘×3次',   desc: '额外获得3次大转盘抽奖机会',       price: 150,  badge: '',      type: 'coupon', consumable: true },
+  { id: 'coupon_lucky',  cat: 'coupon',  icon: '🍀',  name: '幸运加成卡',   desc: '下一次抽奖概率提升20%',           price: 200,  badge: 'hot',   type: 'coupon', consumable: true },
+  { id: 'coupon_exp2x',  cat: 'coupon',  icon: '⚡',  name: '双倍经验卡',   desc: '30分钟内获得双倍经验值',          price: 300,  badge: 'new',   type: 'coupon', consumable: true },
+  { id: 'coupon_coins',  cat: 'coupon',  icon: '💎',  name: '金币礼包×100', desc: '直接获得100枚金币',               price: 80,   badge: '',      type: 'coin_pack', consumable: true, reward: 100 },
+
+  // ── 称号 ──
+  { id: 'title_lucky',   cat: 'title',   icon: '🏅',  name: '「幸运儿」称号', desc: '显示在昵称旁边，专属荣耀标识',  price: 400,  badge: '',      type: 'title' },
+  { id: 'title_master',  cat: 'title',   icon: '🎖️', name: '「游戏大师」称号', desc: '极稀有称号，彰显顶级实力',      price: 1200, badge: 'limit', type: 'title' },
+  { id: 'title_rich',    cat: 'title',   icon: '💰',  name: '「土豪」称号',  desc: '最直白的炫富方式',               price: 888,  badge: 'hot',   type: 'title' },
+  { id: 'title_legend',  cat: 'title',   icon: '🌟',  name: '「传说」称号',  desc: '游戏传奇，万中无一',              price: 2000, badge: 'limit', type: 'title' },
+
+  // ── 道具 ──
+  { id: 'item_revive',   cat: 'misc',    icon: '💊',  name: '复活卡',       desc: '贪吃蛇/方块游戏复活一次',         price: 120,  badge: '',      type: 'item', consumable: true },
+  { id: 'item_freeze',   cat: 'misc',    icon: '🧊',  name: '时间冻结卡',   desc: '指定游戏暂停倒计时5秒',           price: 180,  badge: 'new',   type: 'item', consumable: true },
+  { id: 'item_magnet',   cat: 'misc',    icon: '🧲',  name: '磁铁道具',     desc: '自动吸引金币，收集更轻松',         price: 250,  badge: '',      type: 'item', consumable: true },
+  { id: 'item_bomb_def', cat: 'misc',    icon: '🛡️', name: '炸弹护盾',     desc: '一次抵挡炸弹伤害',                price: 160,  badge: '',      type: 'item', consumable: true },
+];
+
+/* ═══════════════════════════════════════════════════════════
+   本地存储
+═══════════════════════════════════════════════════════════ */
+const SHOP_KEY = 'gh_shop';
+
+function loadShop() {
+  try { return JSON.parse(localStorage.getItem(SHOP_KEY) || '{"owned":[],"records":[]}'); }
+  catch { return { owned: [], records: [] }; }
+}
+function saveShop(data) {
+  try { localStorage.setItem(SHOP_KEY, JSON.stringify(data)); } catch {}
+}
+
+function isOwned(id) {
+  const g = GOODS_LIST.find(g => g.id === id);
+  if (g && g.consumable) return false; // 消耗品可重复购买
+  return loadShop().owned.includes(id);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   每日签到
+═══════════════════════════════════════════════════════════ */
+const CHECKIN_KEY = 'gh_checkin';
+const CHECKIN_REWARDS = [20, 30, 40, 50, 60, 80, 100]; // 7天奖励
+
+function loadCheckin() {
+  try { return JSON.parse(localStorage.getItem(CHECKIN_KEY) || '{"streak":0,"lastDate":"","history":[]}'); }
+  catch { return { streak: 0, lastDate: '', history: [] }; }
+}
+function saveCheckin(d) { try { localStorage.setItem(CHECKIN_KEY, JSON.stringify(d)); } catch {} }
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function renderCheckin() {
+  const data = loadCheckin();
+  const today = todayStr();
+  const checked = data.lastDate === today;
+  const streak = Math.min(data.streak, 7);
+
+  // 渲染连续天数点
+  const container = document.getElementById('dailyStreak');
+  container.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'streak-dot';
+    if (i < streak - (checked ? 0 : 1)) { dot.className += ' done'; dot.textContent = '✓'; }
+    else if (i === streak - (checked ? 0 : 0) && !checked) { dot.className += ' today'; dot.textContent = i+1; }
+    else { dot.textContent = i+1; }
+    container.appendChild(dot);
+  }
+
+  const btn = document.getElementById('checkinBtn');
+  const desc = document.querySelector('.daily-card .daily-desc');
+  if (checked) {
+    btn.disabled = true;
+    btn.textContent = '已签到 ✓';
+    btn.style.background = 'rgba(34,197,94,0.2)';
+    btn.style.color = 'var(--green)';
+    desc.textContent = `连续签到第 ${data.streak} 天，明天奖励 🪙${CHECKIN_REWARDS[Math.min(data.streak, 6)]}`;
+  } else {
+    const reward = CHECKIN_REWARDS[Math.min(data.streak, 6)];
+    desc.textContent = `今日签到奖励 🪙${reward}，连续第 ${data.streak + 1} 天`;
+  }
+}
+
+function doCheckin() {
+  const data = loadCheckin();
+  const today = todayStr();
+  if (data.lastDate === today) { showToast('今天已经签到了 ✓'); return; }
+
+  const yesterday = new Date(Date.now() - 86400000);
+  const yStr = yesterday.getFullYear() + '-' + String(yesterday.getMonth()+1).padStart(2,'0') + '-' + String(yesterday.getDate()).padStart(2,'0');
+  if (data.lastDate === yStr) {
+    data.streak = (data.streak || 0) + 1;
+  } else {
+    data.streak = 1; // 断签重置
+  }
+
+  const reward = CHECKIN_REWARDS[Math.min(data.streak - 1, 6)];
+  data.lastDate = today;
+  data.history = data.history || [];
+  data.history.unshift({ date: today, reward, streak: data.streak });
+  saveCheckin(data);
+
+  if (typeof GameUser !== 'undefined') {
+    GameUser.addCoins(reward, '每日签到');
+    GameUser.addExp(10);
+  }
+  if (typeof GameSound !== 'undefined') GameSound.play('checkin');
+
+  showToast(`🎉 签到成功！获得 🪙${reward} 金币`);
+  updateCoinDisplay();
+  renderCheckin();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   渲染商品
+═══════════════════════════════════════════════════════════ */
+let currentCat = 'all';
+
+function filterCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderGoods();
+}
+
+function renderGoods() {
+  const filtered = currentCat === 'all' ? GOODS_LIST : GOODS_LIST.filter(g => g.cat === currentCat);
+  const container = document.getElementById('goodsGrid');
+  const countEl = document.getElementById('goodsCount');
+  countEl.textContent = filtered.length + ' 件';
+
+  container.innerHTML = filtered.map(g => {
+    const owned = isOwned(g.id);
+    const badgeHtml = owned
+      ? '<span class="goods-badge owned">已拥有</span>'
+      : g.badge ? `<span class="goods-badge ${g.badge}">${g.badge === 'hot' ? '🔥热' : g.badge === 'new' ? '✨新' : '⏱限'}</span>` : '';
+
+    const btnText = owned ? '已拥有' : '立即兑换';
+    const btnClass = owned ? 'goods-btn owned-btn' : 'goods-btn';
+
+    return `
+      <div class="goods-card ${owned ? 'owned' : ''}">
+        ${badgeHtml}
+        <div class="goods-icon">${g.icon}</div>
+        <div class="goods-name">${g.name}</div>
+        <div class="goods-desc">${g.desc}</div>
+        <div class="goods-price"><span class="goods-price-icon">🪙</span>${g.price}</div>
+        <button class="${btnClass}" ${owned && !g.consumable ? 'disabled' : ''}
+          onclick="tryBuy('${g.id}')">${btnText}</button>
+      </div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   购买流程
+═══════════════════════════════════════════════════════════ */
+let pendingBuyId = null;
+
+function tryBuy(id) {
+  const g = GOODS_LIST.find(g => g.id === id);
+  if (!g) return;
+  if (isOwned(id) && !g.consumable) { showToast('你已经拥有了这件商品'); return; }
+
+  pendingBuyId = id;
+  document.getElementById('modalIcon').textContent  = g.icon;
+  document.getElementById('modalTitle').textContent = g.name;
+  document.getElementById('modalDesc').textContent  = g.desc;
+  document.getElementById('modalPrice').textContent = '🪙 ' + g.price;
+
+  const confirmBtn = document.getElementById('modalConfirmBtn');
+  const coins = typeof GameUser !== 'undefined' ? GameUser.getCoins() : 0;
+  if (coins < g.price) {
+    confirmBtn.textContent = '金币不足';
+    confirmBtn.disabled = true;
+    document.getElementById('modalDesc').textContent = g.desc + '\n\n⚠️ 金币不足（当前 🪙' + coins + '，需要 🪙' + g.price + '）';
+  } else {
+    confirmBtn.textContent = '确认兑换';
+    confirmBtn.disabled = false;
+    confirmBtn.onclick = () => confirmBuy(id);
+  }
+
+  document.getElementById('shop-modal-overlay').classList.add('show');
+  if (typeof GameSound !== 'undefined') GameSound.play('click');
+}
+
+function confirmBuy(id) {
+  const g = GOODS_LIST.find(g => g.id === id);
+  if (!g) return;
+
+  const success = typeof GameUser !== 'undefined' ? GameUser.spendCoins(g.price, '兑换：' + g.name) : false;
+  if (!success) { showToast('金币不足，兑换失败'); closeModal(); return; }
+
+  // 处理特殊商品类型
+  if (g.type === 'coin_pack' && g.reward) {
+    if (typeof GameUser !== 'undefined') GameUser.addCoins(g.reward, '金币礼包');
+  }
+
+  // 记录到商店数据
+  const data = loadShop();
+  if (!g.consumable) data.owned.push(id);
+  data.records.unshift({ id, icon: g.icon, name: g.name, price: g.price, ts: Date.now() });
+  if (data.records.length > 50) data.records = data.records.slice(0, 50);
+  saveShop(data);
+
+  // 触发成就
+  if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('social', 1);
+  if (typeof GameSound !== 'undefined') GameSound.play('coin');
+
+  closeModal();
+  showToast(`🎉 兑换成功！${g.name} 已加入背包`);
+  updateCoinDisplay();
+  renderGoods();
+  renderRecords();
+}
+
+function closeModal() {
+  document.getElementById('shop-modal-overlay').classList.remove('show');
+  pendingBuyId = null;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   兑换记录
+═══════════════════════════════════════════════════════════ */
+function fmtTime(ts) {
+  const d = new Date(ts), now = new Date();
+  const diff = now - d;
+  if (diff < 60000) return '刚刚';
+  if (diff < 3600000) return Math.floor(diff/60000) + '分钟前';
+  if (diff < 86400000) return Math.floor(diff/3600000) + '小时前';
+  return (d.getMonth()+1) + '/' + d.getDate();
+}
+
+function renderRecords() {
+  const { records } = loadShop();
+  const container = document.getElementById('recordList');
+  const countEl = document.getElementById('recordCount');
+
+  if (!records.length) {
+    countEl.textContent = '';
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">还没有兑换记录</div></div>';
+    return;
+  }
+
+  countEl.textContent = records.length + ' 条';
+  container.innerHTML = '<div class="record-list">' + records.slice(0, 20).map(r => `
+    <div class="record-item">
+      <div class="record-icon">${r.icon}</div>
+      <div class="record-info">
+        <div class="record-name">${r.name}</div>
+        <div class="record-time">${fmtTime(r.ts)}</div>
+      </div>
+      <div class="record-cost">-🪙${r.price}</div>
+    </div>`).join('') + '</div>';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   其他 UI
+═══════════════════════════════════════════════════════════ */
+function updateCoinDisplay() {
+  const coins = typeof GameUser !== 'undefined' ? GameUser.getCoins() : 0;
+  document.getElementById('coinDisplay').textContent = coins.toLocaleString();
+}
+
+function showToast(msg) {
+  const el = document.getElementById('shop-toast');
+  el.textContent = msg;
+  el.style.opacity = '1';
+  el.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(-50%) translateY(20px)';
+  }, 2800);
+}
+
+function showLog() {
+  const user = typeof GameUser !== 'undefined' ? GameUser.getUser() : {};
+  const log = (user.coinLog || []).slice(0, 15);
+  if (!log.length) { showToast('暂无金币流水记录'); return; }
+
+  const lines = log.map(l => {
+    const sign = l.amount > 0 ? '+' : '';
+    return `${l.source || '未知'}: ${sign}🪙${l.amount}`;
+  }).join('\n');
+
+  alert('最近金币流水：\n\n' + lines);
+}
+
+function showEarnTip() {
+  alert('如何获得金币：\n\n' +
+    '🎮 玩游戏赢得奖励\n' +
+    '📅 每日签到（连续签到奖励更多）\n' +
+    '🏆 参与排行榜获得积分\n' +
+    '🎯 解锁成就获得金币\n' +
+    '⬆️ 升级等级奖励金币');
+}
+
+function mobileSwitchTab() {}
+function toggleSound() {
+  const on = typeof GameSound !== 'undefined' ? GameSound.toggle() : true;
+  const icon = document.getElementById('sound-icon');
+  if (icon) icon.textContent = on ? '🔊' : '🔇';
+}
+
+// 点击遮罩关闭
+document.getElementById('shop-modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+/* ═══════════════════════════════════════════════════════════
+   初始化
+═══════════════════════════════════════════════════════════ */
+(function init() {
+  updateCoinDisplay();
+  renderCheckin();
+  renderGoods();
+  renderRecords();
+
+  // 导航栏滚动到激活项
+  const activeTab = document.querySelector('.nav-tab.active');
+  if (activeTab) activeTab.scrollIntoView({ block: 'nearest', inline: 'center' });
+})();
+</script>
+
+</body>
+</html>
