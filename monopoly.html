@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 大富翁</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: var(--text);
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+  }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    padding: 7px 16px; border-radius: 8px;
+    font-size: 14px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  /* ─── 三列主布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .panel-title {
+    font-size: 12px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+
+  /* ─── 玩家卡片 ─── */
+  .player-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    transition: border-color 0.3s;
+  }
+  .player-card.active-player { border-color: var(--gold); box-shadow: 0 0 16px rgba(245,200,66,0.15); }
+  .player-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .player-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; border: 2px solid var(--border);
+    flex-shrink: 0;
+  }
+  .player-avatar.p1 { background: rgba(124,58,237,0.2); border-color: var(--accent); }
+  .player-avatar.p2 { background: rgba(236,72,153,0.2); border-color: var(--accent2); }
+  .player-name { font-size: 14px; font-weight: 700; }
+  .player-turn-badge {
+    margin-left: auto; font-size: 10px; font-weight: 600;
+    background: linear-gradient(135deg, var(--gold), #F5A623);
+    color: #3D2000; padding: 2px 8px; border-radius: 10px;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .player-card.active-player .player-turn-badge { opacity: 1; }
+  .player-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .player-stat { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px; text-align: center; }
+  .player-stat-num { font-size: 18px; font-weight: 800; color: var(--gold); }
+  .player-stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .player-pos { font-size: 11px; color: var(--muted); margin-top: 8px; text-align: center; }
+
+  /* 奖品列表 */
+  .prize-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; padding: 3px 8px; border-radius: 20px;
+    background: rgba(245,200,66,0.12); border: 1px solid rgba(245,200,66,0.3);
+    color: var(--gold); margin: 2px;
+  }
+  .prize-chips { display: flex; flex-wrap: wrap; gap: 2px; min-height: 28px; }
+
+  /* 回合日志 */
+  .log-list { display: flex; flex-direction: column; gap: 5px; max-height: 180px; overflow-y: auto; }
+  .log-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 7px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.03); border: 1px solid transparent;
+    font-size: 11px; animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .log-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+  .log-text { flex: 1; line-height: 1.4; color: var(--muted); }
+  .log-text strong { color: var(--text); }
+
+  /* ─── 游戏中间区域 ─── */
+  .game-center {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 24px 20px;
+    position: relative; overflow-y: auto; overflow-x: hidden;
+  }
+  .game-center::before {
+    content: ''; position: fixed;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .game-title-area { text-align: center; margin-bottom: 20px; }
+  .game-name {
+    font-size: 26px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .game-subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+  /* ─── 棋盘 ─── */
+  .board-wrap {
+    position: relative;
+    width: 540px; height: 540px;
+    flex-shrink: 0;
+  }
+  .board {
+    width: 540px; height: 540px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+    gap: 3px;
+    position: relative;
+  }
+
+  /* 格子通用 */
+  .cell {
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-size: 10px; text-align: center;
+    position: relative; cursor: default;
+    transition: transform 0.15s, box-shadow 0.15s;
+    overflow: hidden;
+    padding: 2px;
+    line-height: 1.2;
+  }
+  .cell:hover { transform: scale(1.05); z-index: 2; }
+  .cell .cell-icon { font-size: 14px; line-height: 1; margin-bottom: 2px; }
+  .cell .cell-name { font-size: 9px; color: rgba(255,255,255,0.7); line-height: 1.1; }
+
+  /* 格子类型颜色 */
+  .cell-start    { background: rgba(34,197,94,0.2);  border-color: rgba(34,197,94,0.6); }
+  .cell-shop     { background: rgba(59,130,246,0.18); border-color: rgba(59,130,246,0.5); }
+  .cell-event    { background: rgba(245,200,66,0.18); border-color: rgba(245,200,66,0.5); }
+  .cell-chance   { background: rgba(249,115,22,0.2);  border-color: rgba(249,115,22,0.5); }
+  .cell-destiny  { background: rgba(139,92,246,0.22); border-color: rgba(139,92,246,0.5); }
+  .cell-jail     { background: rgba(239,68,68,0.2);   border-color: rgba(239,68,68,0.5); }
+  .cell-parking  { background: rgba(107,114,128,0.2); border-color: rgba(107,114,128,0.5); }
+  .cell-center   { background: rgba(255,255,255,0.02); border-color: var(--border); border-radius: 8px; }
+
+  /* 棋盘中间信息区 */
+  .board-center-info {
+    grid-column: 2 / 7;
+    grid-row: 2 / 7;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: rgba(13,7,32,0.7);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 12px;
+    gap: 8px;
+  }
+  .board-round-label {
+    font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase;
+  }
+  .board-turn {
+    font-size: 16px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .board-event-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px;
+    font-size: 11px; color: var(--text); text-align: center;
+    min-height: 36px; display: flex; align-items: center; justify-content: center;
+    line-height: 1.4; width: 100%;
+  }
+  .board-scores {
+    display: flex; gap: 12px; width: 100%;
+  }
+  .board-score-item {
+    flex: 1; background: rgba(255,255,255,0.04);
+    border-radius: 8px; padding: 6px; text-align: center;
+  }
+  .board-score-num { font-size: 20px; font-weight: 800; color: var(--gold); }
+  .board-score-name { font-size: 10px; color: var(--muted); }
+  .dice-result-row { display: flex; gap: 8px; align-items: center; }
+  .dice-display {
+    width: 36px; height: 36px; border-radius: 8px;
+    border: 2px solid var(--border);
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 900; color: var(--text);
+    transition: all 0.1s;
+  }
+  .dice-display.rolling { animation: diceRoll 0.1s infinite; }
+  @keyframes diceRoll {
+    0%   { transform: rotate(0deg)   scale(1);    }
+    25%  { transform: rotate(8deg)   scale(1.05); }
+    50%  { transform: rotate(-8deg)  scale(0.95); }
+    75%  { transform: rotate(4deg)   scale(1.05); }
+    100% { transform: rotate(0deg)   scale(1);    }
+  }
+  .dice-vs { font-size: 12px; color: var(--muted); }
+
+  /* 棋子 */
+  .piece {
+    position: absolute;
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    border: 2px solid white;
+    z-index: 10;
+    pointer-events: none;
+    transition: top 0.35s cubic-bezier(.4,1.3,.6,1), left 0.35s cubic-bezier(.4,1.3,.6,1);
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+  }
+  .piece-1 { background: rgba(124,58,237,0.9); }
+  .piece-2 { background: rgba(236,72,153,0.9); top: 8px; left: 28px; }
+
+  /* 激活格子高亮 */
+  .cell.highlight {
+    box-shadow: 0 0 0 2px var(--gold), 0 0 12px rgba(245,200,66,0.4);
+    z-index: 3;
+  }
+
+  /* ─── 操作按钮 ─── */
+  .action-row {
+    display: flex; gap: 12px; align-items: center;
+    margin-top: 16px;
+  }
+  .btn-roll {
+    padding: 10px 28px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--gold), #F5A623);
+    border: none; cursor: pointer;
+    font-size: 15px; font-weight: 800; color: #3D2000;
+    box-shadow: 0 4px 16px rgba(245,166,35,0.35);
+    transition: all 0.2s; letter-spacing: 0.3px;
+  }
+  .btn-roll:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(245,166,35,0.5);
+  }
+  .btn-roll:active:not(:disabled) { transform: translateY(0); }
+  .btn-roll:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .btn-restart {
+    padding: 10px 20px; border-radius: 10px;
+    background: transparent; border: 1px solid var(--border);
+    cursor: pointer; font-size: 13px; color: var(--muted);
+    transition: all 0.2s;
+  }
+  .btn-restart:hover { border-color: var(--accent); color: var(--text); }
+
+  /* ─── 右侧面板 ─── */
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .stat-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px; text-align: center;
+  }
+  .stat-num {
+    font-size: 22px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-label { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+  .rank-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    margin-bottom: 8px; transition: border-color 0.3s;
+  }
+  .rank-row.rank-1 { border-color: rgba(245,200,66,0.4); background: rgba(245,200,66,0.06); }
+  .rank-num { font-size: 16px; font-weight: 900; color: var(--muted); width: 20px; text-align: center; }
+  .rank-num.gold { color: var(--gold); }
+  .rank-avatar { font-size: 18px; }
+  .rank-info { flex: 1; }
+  .rank-name { font-size: 13px; font-weight: 600; }
+  .rank-pts { font-size: 11px; color: var(--muted); }
+  .rank-score { font-size: 18px; font-weight: 800; color: var(--gold); }
+
+  .trigger-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .trigger-row:last-child { border-bottom: none; }
+  .trigger-label { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+  .trigger-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .trigger-val { font-weight: 700; color: var(--text); }
+
+  .rule-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 0; border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-label { color: var(--muted); }
+  .rule-input {
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: 6px; padding: 3px 8px; color: var(--text);
+    font-size: 12px; width: 60px; text-align: center; outline: none;
+  }
+  .rule-input:focus { border-color: var(--accent); }
+
+  /* ─── 底部状态栏 ─── */
+  .statusbar {
+    border-top: 1px solid var(--border);
+    padding: 8px 32px;
+    display: flex; align-items: center; gap: 24px;
+    background: rgba(13,7,32,0.95);
+    font-size: 12px; color: var(--muted);
+    flex-shrink: 0;
+  }
+  .statusbar-item { display: flex; align-items: center; gap: 6px; }
+  .status-dot-green {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 5px #22C55E;
+  }
+  .statusbar-sep { color: var(--border); }
+
+  /* ─── 结束弹窗 ─── */
+  .modal-mask {
+    position: fixed; inset: 0;
+    background: rgba(13,7,32,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 999;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-mask.show { opacity: 1; pointer-events: auto; }
+  .modal {
+    width: 480px;
+    background: linear-gradient(160deg, #1A0A2E, #0D0720);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    text-align: center;
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.3s;
+    position: relative; overflow: hidden;
+  }
+  .modal-mask.show .modal { transform: translateY(0) scale(1); }
+  .modal::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 300px 200px at 50% 0%, rgba(124,58,237,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .modal-trophy { font-size: 56px; margin-bottom: 12px; }
+  .modal-title {
+    font-size: 26px; font-weight: 900;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  .modal-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+  .modal-scores {
+    display: flex; gap: 16px; justify-content: center; margin-bottom: 24px;
+  }
+  .modal-score-card {
+    flex: 1; background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px;
+  }
+  .modal-score-card.winner { border-color: rgba(245,200,66,0.5); background: rgba(245,200,66,0.08); }
+  .modal-score-emoji { font-size: 28px; margin-bottom: 6px; }
+  .modal-score-name { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  .modal-score-pts { font-size: 28px; font-weight: 900; color: var(--gold); }
+  .modal-prizes { text-align: left; background: var(--card); border-radius: 10px; padding: 14px; margin-bottom: 24px; }
+  .modal-prizes-title { font-size: 12px; color: var(--muted); margin-bottom: 10px; letter-spacing: 1px; text-transform: uppercase; }
+  .modal-btn {
+    padding: 12px 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--gold), #F5A623);
+    border: none; cursor: pointer;
+    font-size: 15px; font-weight: 800; color: #3D2000;
+    box-shadow: 0 4px 16px rgba(245,166,35,0.35);
+    transition: all 0.2s;
+  }
+  .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(245,166,35,0.5); }
+
+  /* 卡片事件浮层 */
+  .event-toast {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white; font-size: 15px; font-weight: 700;
+    padding: 12px 28px; border-radius: 40px;
+    box-shadow: 0 8px 32px rgba(124,58,237,0.5);
+    z-index: 200;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+    transform: translateX(-50%) translateY(-10px);
+    white-space: nowrap;
+  }
+  .event-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* 骰子点数展示 */
+  .dice-faces { display: flex; gap: 4px; }
+  .die-face {
+    width: 32px; height: 32px; border-radius: 7px;
+    background: white; color: #1A0A2E;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 900;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+</style>
+</head>
+<body>
+
+<!-- 导航 -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">
+    <span>Game</span>Hub
+    <div class="nav-badge">BETA</div>
+  </a>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="wheel.html">🎡 大转盘</a>
+    <a class="nav-tab" href="scratch-card.html">🎴 刮刮乐</a>
+    <a class="nav-tab" href="nine-grid.html">🔲 九宫格</a>
+    <a class="nav-tab" href="shake-dice.html">🎲 摇骰子</a>
+    <a class="nav-tab" href="smash-egg.html">🥚 砸金蛋</a>
+    <a class="nav-tab active" href="monopoly.html">🎰 大富翁</a>
+  </div>
+  <div style="font-size:12px;color:var(--muted);">营销地图游戏</div>
+</nav>
+
+<!-- 主体三列 -->
+<div class="main">
+
+  <!-- ─── 左侧面板 ─── -->
+  <div class="panel-left">
+    <div class="panel-title">玩家信息</div>
+
+    <!-- 玩家A -->
+    <div class="player-card active-player" id="cardP1">
+      <div class="player-header">
+        <div class="player-avatar p1">🧑</div>
+        <div>
+          <div class="player-name">玩家 A</div>
+          <div style="font-size:11px;color:var(--muted);">人类玩家</div>
+        </div>
+        <div class="player-turn-badge">当前回合</div>
+      </div>
+      <div class="player-stats">
+        <div class="player-stat">
+          <div class="player-stat-num" id="p1Score">0</div>
+          <div class="player-stat-label">积分</div>
+        </div>
+        <div class="player-stat">
+          <div class="player-stat-num" id="p1Laps">0</div>
+          <div class="player-stat-label">已走圈</div>
+        </div>
+      </div>
+      <div class="player-pos" id="p1Pos">📍 位置：起点</div>
+    </div>
+
+    <!-- 玩家B -->
+    <div class="player-card" id="cardP2">
+      <div class="player-header">
+        <div class="player-avatar p2">🤖</div>
+        <div>
+          <div class="player-name">玩家 B</div>
+          <div style="font-size:11px;color:var(--muted);">AI 玩家</div>
+        </div>
+        <div class="player-turn-badge">当前回合</div>
+      </div>
+      <div class="player-stats">
+        <div class="player-stat">
+          <div class="player-stat-num" id="p2Score">0</div>
+          <div class="player-stat-label">积分</div>
+        </div>
+        <div class="player-stat">
+          <div class="player-stat-num" id="p2Laps">0</div>
+          <div class="player-stat-label">已走圈</div>
+        </div>
+      </div>
+      <div class="player-pos" id="p2Pos">📍 位置：起点</div>
+    </div>
+
+    <!-- 已获得奖品 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>玩家A 奖品</div>
+      <div class="prize-chips" id="p1Prizes"><span style="font-size:11px;color:var(--muted);">暂无奖品</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent2)"></span>玩家B 奖品</div>
+      <div class="prize-chips" id="p2Prizes"><span style="font-size:11px;color:var(--muted);">暂无奖品</span></div>
+    </div>
+
+    <!-- 回合日志 -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#22C55E"></span>回合日志</div>
+      <div class="log-list" id="logList">
+        <div class="log-item">
+          <div class="log-dot" style="background:var(--gold)"></div>
+          <div class="log-text">游戏开始，玩家A先行</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 中间游戏区 ─── -->
+  <div class="game-center">
+    <div class="game-title-area">
+      <div class="game-name">🎰 营销大富翁</div>
+      <div class="game-subtitle">走遍24格，积分称霸营销战场</div>
+    </div>
+
+    <!-- 棋盘 -->
+    <div class="board-wrap">
+      <div class="board" id="board"></div>
+      <!-- 棋子 -->
+      <div class="piece piece-1" id="piece1">🧑</div>
+      <div class="piece piece-2" id="piece2">🤖</div>
+    </div>
+
+    <!-- 操作区 -->
+    <div class="action-row">
+      <button class="btn-roll" id="btnRoll" onclick="rollDice()">🎲 掷骰子</button>
+      <button class="btn-restart" onclick="restartGame()">🔄 重新开始</button>
+      <div style="font-size:12px;color:var(--muted);margin-left:8px;" id="statusText">玩家A回合</div>
+    </div>
+  </div>
+
+  <!-- ─── 右侧面板 ─── -->
+  <div class="panel-right">
+    <div class="panel-title">游戏数据</div>
+
+    <!-- 进度统计 -->
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-num" id="statRound">1</div>
+        <div class="stat-label">当前回合</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statLapsMax">3</div>
+        <div class="stat-label">圈数上限</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-label">总积分</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statSteps">0</div>
+        <div class="stat-label">总步数</div>
+      </div>
+    </div>
+
+    <!-- 积分排行 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>积分排行</div>
+      <div id="rankList">
+        <div class="rank-row rank-1">
+          <div class="rank-num gold">1</div>
+          <div class="rank-avatar">🧑</div>
+          <div class="rank-info">
+            <div class="rank-name">玩家 A</div>
+            <div class="rank-pts">人类</div>
+          </div>
+          <div class="rank-score" id="rank1Score">0</div>
+        </div>
+        <div class="rank-row">
+          <div class="rank-num">2</div>
+          <div class="rank-avatar">🤖</div>
+          <div class="rank-info">
+            <div class="rank-name">玩家 B</div>
+            <div class="rank-pts">AI</div>
+          </div>
+          <div class="rank-score" id="rank2Score">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 格子触发统计 -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent2)"></span>格子触发统计</div>
+      <div class="trigger-row">
+        <span class="trigger-label"><span class="trigger-dot" style="background:#22C55E"></span>起点经过</span>
+        <span class="trigger-val" id="tStart">0</span>
+      </div>
+      <div class="trigger-row">
+        <span class="trigger-label"><span class="trigger-dot" style="background:#3B82F6"></span>商铺格</span>
+        <span class="trigger-val" id="tShop">0</span>
+      </div>
+      <div class="trigger-row">
+        <span class="trigger-label"><span class="trigger-dot" style="background:var(--gold)"></span>活动格</span>
+        <span class="trigger-val" id="tEvent">0</span>
+      </div>
+      <div class="trigger-row">
+        <span class="trigger-label"><span class="trigger-dot" style="background:#F97316"></span>机会格</span>
+        <span class="trigger-val" id="tChance">0</span>
+      </div>
+      <div class="trigger-row">
+        <span class="trigger-label"><span class="trigger-dot" style="background:#8B5CF6"></span>命运格</span>
+        <span class="trigger-val" id="tDestiny">0</span>
+      </div>
+      <div class="trigger-row">
+        <span class="trigger-label"><span class="trigger-dot" style="background:#EF4444"></span>监狱/暂停</span>
+        <span class="trigger-val" id="tJail">0</span>
+      </div>
+    </div>
+
+    <!-- 游戏设置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--muted)"></span>游戏设置</div>
+      <div class="rule-row">
+        <span class="rule-label">圈数上限</span>
+        <input class="rule-input" type="number" id="inputLaps" value="3" min="1" max="10" onchange="updateSettings()">
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">AI速度(ms)</span>
+        <input class="rule-input" type="number" id="inputAISpeed" value="1500" min="500" max="3000" step="100" onchange="updateSettings()">
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">经过起点积分</span>
+        <input class="rule-input" type="number" id="inputStartPts" value="50" min="10" max="200" step="10" onchange="updateSettings()">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 底部状态栏 -->
+<div class="statusbar">
+  <div class="statusbar-item">
+    <div class="status-dot-green"></div>
+    游戏运行中
+  </div>
+  <div class="statusbar-sep">|</div>
+  <div class="statusbar-item" id="sbTurn">回合：玩家A</div>
+  <div class="statusbar-sep">|</div>
+  <div class="statusbar-item" id="sbEvent">等待掷骰子</div>
+  <div class="statusbar-sep">|</div>
+  <div style="margin-left:auto;color:var(--muted);">GameHub · 大富翁 v1.0</div>
+</div>
+
+<!-- 结束弹窗 -->
+<div class="modal-mask" id="modalMask">
+  <div class="modal">
+    <div class="modal-trophy" id="modalTrophy">🏆</div>
+    <div class="modal-title" id="modalTitle">游戏结束</div>
+    <div class="modal-subtitle" id="modalSubtitle">积分揭晓</div>
+    <div class="modal-scores">
+      <div class="modal-score-card" id="modalCard1">
+        <div class="modal-score-emoji">🧑</div>
+        <div class="modal-score-name">玩家 A</div>
+        <div class="modal-score-pts" id="modalScore1">0</div>
+      </div>
+      <div class="modal-score-card" id="modalCard2">
+        <div class="modal-score-emoji">🤖</div>
+        <div class="modal-score-name">玩家 B</div>
+        <div class="modal-score-pts" id="modalScore2">0</div>
+      </div>
+    </div>
+    <div class="modal-prizes">
+      <div class="modal-prizes-title">获得奖品汇总</div>
+      <div id="modalPrizes" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
+    </div>
+    <button class="modal-btn" onclick="restartGame()">🎲 再来一局</button>
+  </div>
+</div>
+
+<!-- 事件浮层 -->
+<div class="event-toast" id="eventToast"></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   棋盘格子定义
+   24格外圈，顺时针编号 0-23
+   布局：
+   底行 L→R: 0(起点),1,2,3,4,5
+   右列 B→T: 6,7,8,9,10,11
+   顶行 R→L: 12,13,14,15,16,17
+   左列 T→B: 18,19,20,21,22,23
+═══════════════════════════════════════════ */
+
+const CELLS = [
+  // 底行 左→右 (row=6, col=0..5)
+  { id:0,  type:'start',   icon:'🏁', name:'起点',    row:6, col:0 },
+  { id:1,  type:'shop',    icon:'🏪', name:'奶茶铺',  row:6, col:1 },
+  { id:2,  type:'chance',  icon:'❓', name:'机会',    row:6, col:2 },
+  { id:3,  type:'shop',    icon:'👗', name:'服装店',  row:6, col:3 },
+  { id:4,  type:'destiny', icon:'🌟', name:'命运',    row:6, col:4 },
+  { id:5,  type:'jail',    icon:'⛔', name:'暂停',    row:6, col:5 },
+
+  // 右列 底→顶 (col=6, row=5..0)
+  { id:6,  type:'shop',    icon:'💄', name:'美妆店',  row:5, col:6 },
+  { id:7,  type:'event',   icon:'🎡', name:'活动',    row:4, col:6 },
+  { id:8,  type:'chance',  icon:'❓', name:'机会',    row:3, col:6 },
+  { id:9,  type:'shop',    icon:'📱', name:'数码店',  row:2, col:6 },
+  { id:10, type:'destiny', icon:'🌟', name:'命运',    row:1, col:6 },
+  { id:11, type:'parking', icon:'🅿️', name:'停车场',  row:0, col:6 },
+
+  // 顶行 右→左 (row=0, col=5..0)
+  { id:12, type:'shop',    icon:'☕', name:'咖啡馆',  row:0, col:5 },
+  { id:13, type:'event',   icon:'🎡', name:'活动',    row:0, col:4 },
+  { id:14, type:'chance',  icon:'❓', name:'机会',    row:0, col:3 },
+  { id:15, type:'shop',    icon:'🍕', name:'餐饮店',  row:0, col:2 },
+  { id:16, type:'destiny', icon:'🌟', name:'命运',    row:0, col:1 },
+  { id:17, type:'jail',    icon:'⛔', name:'暂停',    row:0, col:0 },
+
+  // 左列 顶→底 (col=0, row=1..5)
+  { id:18, type:'shop',    icon:'🎮', name:'游戏馆',  row:1, col:0 },
+  { id:19, type:'event',   icon:'🎡', name:'活动',    row:2, col:0 },
+  { id:20, type:'chance',  icon:'❓', name:'机会',    row:3, col:0 },
+  { id:21, type:'shop',    icon:'🏋️', name:'健身房',  row:4, col:0 },
+  { id:22, type:'destiny', icon:'🌟', name:'命运',    row:5, col:0 },
+  { id:23, type:'event',   icon:'🎡', name:'活动',    row:6, col:6 },
+];
+
+// 机会卡
+const CHANCE_CARDS = [
+  { text: '获得50积分 🎉',   pts: 50,   move: 0,  skip: false, prize: null },
+  { text: '前进3格 ➡️',      pts: 0,    move: 3,  skip: false, prize: null },
+  { text: '后退2格 ⬅️',      pts: 0,    move: -2, skip: false, prize: null },
+  { text: '获得优惠券 🎫',   pts: 30,   move: 0,  skip: false, prize: '优惠券' },
+  { text: '停一回合 ⏸️',     pts: 0,    move: 0,  skip: true,  prize: null },
+];
+
+// 命运卡
+const DESTINY_CARDS = [
+  { text: '获得100积分 💰',     pts: 100, swap: false, lucky: false, prize: null },
+  { text: '领取神秘礼盒 🎁',   pts: 60,  swap: false, lucky: false, prize: '神秘礼盒' },
+  { text: '与对手交换位置 🔄', pts: 0,   swap: true,  lucky: false, prize: null },
+  { text: '获得免费抽奖机会 🎰', pts: 80, swap: false, lucky: true, prize: '免费抽奖券' },
+];
+
+// 商铺奖励
+const SHOP_REWARDS = {
+  '奶茶铺':  { prize: '奶茶优惠券', pts: 20 },
+  '服装店':  { prize: '服装折扣券', pts: 25 },
+  '美妆店':  { prize: '美妆礼包',   pts: 30 },
+  '数码店':  { prize: '数码券',     pts: 35 },
+  '咖啡馆':  { prize: '咖啡买一送一', pts: 20 },
+  '餐饮店':  { prize: '餐饮满减券', pts: 25 },
+  '游戏馆':  { prize: '游戏兑换码', pts: 40 },
+  '健身房':  { prize: '健身体验券', pts: 30 },
+};
+
+// 游戏状态
+let state = {
+  players: [
+    { pos: 0, score: 0, laps: 0, skipNext: false, prizes: [], name: '玩家A', emoji: '🧑' },
+    { pos: 0, score: 0, laps: 0, skipNext: false, prizes: [], name: '玩家B', emoji: '🤖' },
+  ],
+  currentPlayer: 0,
+  round: 1,
+  totalSteps: 0,
+  triggers: { start: 0, shop: 0, event: 0, chance: 0, destiny: 0, jail: 0 },
+  running: false,
+  gameOver: false,
+  settings: { maxLaps: 3, aiSpeed: 1500, startPts: 50 },
+};
+
+/* ══════ 构建棋盘 ══════ */
+function buildBoard() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+
+  // 7×7 格子
+  for (let r = 0; r < 7; r++) {
+    for (let c = 0; c < 7; c++) {
+      const div = document.createElement('div');
+
+      // row6,col6 留给 cell-23，不特殊跳过
+
+      // 中间区域 (row 1-5, col 1-5) → 中心信息面板
+      if (r >= 1 && r <= 5 && c >= 1 && c <= 5) {
+        // 只在 r=1,c=1 时创建一个跨格中心区
+        if (r === 1 && c === 1) {
+          const center = document.createElement('div');
+          center.className = 'board-center-info';
+          center.style.gridColumn = '2 / 7';
+          center.style.gridRow = '2 / 7';
+          center.id = 'boardCenter';
+          center.innerHTML = `
+            <div class="board-round-label">当前回合</div>
+            <div class="board-turn" id="boardTurn">玩家 A</div>
+            <div class="board-event-box" id="boardEvent">点击"掷骰子"开始游戏</div>
+            <div class="dice-result-row">
+              <div class="dice-display" id="diceP1">–</div>
+              <div class="dice-vs">vs</div>
+              <div class="dice-display" id="diceP2">–</div>
+            </div>
+            <div class="board-scores">
+              <div class="board-score-item">
+                <div class="board-score-num" id="bScore1">0</div>
+                <div class="board-score-name">🧑 玩家A</div>
+              </div>
+              <div class="board-score-item">
+                <div class="board-score-num" id="bScore2">0</div>
+                <div class="board-score-name">🤖 玩家B</div>
+              </div>
+            </div>
+          `;
+          board.appendChild(center);
+        }
+        // 其他中间格跳过（被 grid-span 覆盖）
+        continue;
+      }
+
+      // 边缘格：找对应格子数据
+      const cellData = CELLS.find(c2 => c2.row === r && c2.col === c);
+      if (!cellData) {
+        div.className = 'cell cell-center';
+        div.style.background = 'transparent';
+        div.style.border = 'none';
+        board.appendChild(div);
+        continue;
+      }
+
+      div.className = `cell cell-${cellData.type}`;
+      div.id = `cell-${cellData.id}`;
+      div.innerHTML = `
+        <div class="cell-icon">${cellData.icon}</div>
+        <div class="cell-name">${cellData.name}</div>
+      `;
+      board.appendChild(div);
+    }
+  }
+
+  placePieces();
+}
+
+/* ══════ 棋子定位 ══════ */
+function getCellCoords(cellId) {
+  const cell = document.getElementById(`cell-${cellId}`);
+  if (!cell) return { top: 0, left: 0 };
+  const board = document.getElementById('board');
+  const br = board.getBoundingClientRect();
+  const cr = cell.getBoundingClientRect();
+  return {
+    top: cr.top - br.top + (cr.height - 22) / 2,
+    left: cr.left - br.left + (cr.width - 22) / 2,
+  };
+}
+
+function placePieces() {
+  for (let i = 0; i < 2; i++) {
+    const piece = document.getElementById(`piece${i + 1}`);
+    const pos = state.players[i].pos;
+    const coords = getCellCoords(pos);
+    piece.style.top = coords.top + (i === 1 ? 6 : -6) + 'px';
+    piece.style.left = coords.left + (i === 1 ? 10 : -10) + 'px';
+    piece.style.transition = 'none';
+  }
+}
+
+/* ══════ 动画移动棋子 ══════ */
+function animateMove(playerIdx, fromPos, steps, callback) {
+  let current = fromPos;
+  const total = CELLS.length;
+
+  function moveNext() {
+    current = (current + 1) % total;
+    const piece = document.getElementById(`piece${playerIdx + 1}`);
+    piece.style.transition = 'top 0.3s cubic-bezier(.4,1.3,.6,1), left 0.3s cubic-bezier(.4,1.3,.6,1)';
+    const coords = getCellCoords(current);
+    const offset = playerIdx === 1 ? 6 : -6;
+    const offsetH = playerIdx === 1 ? 10 : -10;
+    piece.style.top = (coords.top + offset) + 'px';
+    piece.style.left = (coords.left + offsetH) + 'px';
+
+    // 高亮格子
+    document.querySelectorAll('.cell.highlight').forEach(el => el.classList.remove('highlight'));
+    const cellEl = document.getElementById(`cell-${current}`);
+    if (cellEl) cellEl.classList.add('highlight');
+
+    const moved = ((current - fromPos + total) % total);
+    if (moved < steps) {
+      setTimeout(moveNext, 320);
+    } else {
+      // 移动完成
+      document.querySelectorAll('.cell.highlight').forEach(el => el.classList.remove('highlight'));
+      callback(current);
+    }
+  }
+  moveNext();
+}
+
+/* ══════ 掷骰子 ══════ */
+function rollDice() {
+  if (state.running || state.gameOver) return;
+  const btn = document.getElementById('btnRoll');
+  btn.disabled = true;
+  state.running = true;
+
+  const pi = state.currentPlayer;
+  const player = state.players[pi];
+
+  // 检查是否被跳过
+  if (player.skipNext) {
+    player.skipNext = false;
+    addLog(player.emoji, `${player.name} 本回合被跳过`);
+    showEvent(`${player.emoji} ${player.name} 暂停一回合`);
+    setStatusText(`${player.name} 被跳过`);
+    setTimeout(() => {
+      state.running = false;
+      nextTurn();
+    }, 1200);
+    return;
+  }
+
+  // 骰子动画
+  const diceEl = document.getElementById(`diceP${pi + 1}`);
+  diceEl.classList.add('rolling');
+
+  let rollCount = 0;
+  const rollInterval = setInterval(() => {
+    diceEl.textContent = Math.ceil(Math.random() * 6);
+    rollCount++;
+    if (rollCount >= 10) {
+      clearInterval(rollInterval);
+      diceEl.classList.remove('rolling');
+      const result = Math.ceil(Math.random() * 6);
+      diceEl.textContent = result;
+
+      const fromPos = player.pos;
+      state.totalSteps += result;
+      document.getElementById('statSteps').textContent = state.totalSteps;
+
+      addLog(player.emoji, `${player.name} 掷出 <strong>${result}</strong> 步`);
+      setStatusText(`${player.name} 掷出 ${result}`);
+      document.getElementById('sbEvent').textContent = `${player.name} 掷出 ${result} 步`;
+
+      // 动画移动
+      animateMove(pi, fromPos, result, (newPos) => {
+        // 检测是否经过起点
+        const oldPos = player.pos;
+        player.pos = newPos;
+        if (newPos < oldPos || (newPos === 0)) {
+          // 经过起点
+          player.laps++;
+          const startPts = state.settings.startPts;
+          player.score += startPts;
+          state.triggers.start++;
+          updateTriggers();
+          addLog('🏁', `${player.name} 经过起点，获得 ${startPts} 积分`);
+          showEvent(`🏁 经过起点！+${startPts} 积分`);
+        }
+
+        updateUI();
+        setTimeout(() => {
+          triggerCell(pi, newPos);
+        }, 400);
+      });
+    }
+  }, 80);
+}
+
+/* ══════ 触发格子事件 ══════ */
+function triggerCell(pi, pos) {
+  const cell = CELLS[pos];
+  const player = state.players[pi];
+  const opponent = state.players[1 - pi];
+
+  switch (cell.type) {
+    case 'start':
+      player.score += state.settings.startPts;
+      state.triggers.start++;
+      addLog(cell.icon, `${player.name} 落在起点，再获 ${state.settings.startPts} 积分`);
+      showEvent(`🏁 落在起点！+${state.settings.startPts} 积分`);
+      updateTriggers();
+      finishTurn(pi);
+      break;
+
+    case 'shop': {
+      const reward = SHOP_REWARDS[cell.name] || { prize: '商铺优惠券', pts: 20 };
+      player.score += reward.pts;
+      player.prizes.push(reward.prize);
+      state.triggers.shop++;
+      addLog(cell.icon, `${player.name} 落在${cell.name}，获得「${reward.prize}」+${reward.pts}分`);
+      showEvent(`${cell.icon} ${cell.name} 优惠！+${reward.pts}分`);
+      updateTriggers();
+      finishTurn(pi);
+      break;
+    }
+
+    case 'event': {
+      state.triggers.event++;
+      updateTriggers();
+      const evtList = ['转盘活动 🎡 +40分', '刮刮乐 🎴 +60分', '积分翻倍 ✨ +50分', '闪购特惠 ⚡ +35分'];
+      const evt = evtList[Math.floor(Math.random() * evtList.length)];
+      const pts = parseInt(evt.match(/\+(\d+)/)[1]);
+      player.score += pts;
+      addLog(cell.icon, `${player.name} 触发活动：${evt}`);
+      showEvent(`🎡 特殊活动！${evt}`);
+      finishTurn(pi);
+      break;
+    }
+
+    case 'chance': {
+      state.triggers.chance++;
+      updateTriggers();
+      const card = CHANCE_CARDS[Math.floor(Math.random() * CHANCE_CARDS.length)];
+      addLog('❓', `${player.name} 抽到机会卡：${card.text}`);
+      showEvent(`❓ 机会卡：${card.text}`);
+      document.getElementById('boardEvent').textContent = `机会卡：${card.text}`;
+
+      if (card.pts > 0) player.score += card.pts;
+      if (card.prize) player.prizes.push(card.prize);
+      if (card.skip) player.skipNext = true;
+      if (card.move !== 0) {
+        const newPos = (player.pos + card.move + CELLS.length) % CELLS.length;
+        player.pos = newPos;
+        const piece = document.getElementById(`piece${pi + 1}`);
+        piece.style.transition = 'top 0.4s, left 0.4s';
+        const coords = getCellCoords(newPos);
+        const offset = pi === 1 ? 6 : -6;
+        const offsetH = pi === 1 ? 10 : -10;
+        piece.style.top = (coords.top + offset) + 'px';
+        piece.style.left = (coords.left + offsetH) + 'px';
+      }
+      updateUI();
+      finishTurn(pi);
+      break;
+    }
+
+    case 'destiny': {
+      state.triggers.destiny++;
+      updateTriggers();
+      const dcard = DESTINY_CARDS[Math.floor(Math.random() * DESTINY_CARDS.length)];
+      addLog('🌟', `${player.name} 抽到命运卡：${dcard.text}`);
+      showEvent(`🌟 命运卡：${dcard.text}`);
+      document.getElementById('boardEvent').textContent = `命运卡：${dcard.text}`;
+
+      if (dcard.pts > 0) player.score += dcard.pts;
+      if (dcard.prize) player.prizes.push(dcard.prize);
+      if (dcard.swap) {
+        const tmp = player.pos;
+        player.pos = opponent.pos;
+        opponent.pos = tmp;
+        addLog('🔄', `${player.name} 与 ${opponent.name} 交换位置`);
+        setTimeout(() => placePieces(), 300);
+      }
+      updateUI();
+      finishTurn(pi);
+      break;
+    }
+
+    case 'jail':
+      state.triggers.jail++;
+      updateTriggers();
+      player.skipNext = true;
+      addLog('⛔', `${player.name} 进入暂停格，下回合停一次`);
+      showEvent(`⛔ 暂停！下回合停一回合`);
+      finishTurn(pi);
+      break;
+
+    case 'parking':
+      addLog('🅿️', `${player.name} 落在免费停车，平安无事`);
+      showEvent(`🅿️ 免费停车，安全！`);
+      finishTurn(pi);
+      break;
+
+    default:
+      finishTurn(pi);
+  }
+}
+
+/* ══════ 回合结束 ══════ */
+function finishTurn(pi) {
+  updateUI();
+  updateRank();
+  state.round++;
+  document.getElementById('statRound').textContent = state.round;
+
+  // 检查游戏结束
+  for (let p of state.players) {
+    if (p.laps >= state.settings.maxLaps) {
+      setTimeout(() => endGame(), 800);
+      state.running = false;
+      return;
+    }
+  }
+
+  state.running = false;
+  nextTurn();
+}
+
+/* ══════ 下一个回合 ══════ */
+function nextTurn() {
+  state.currentPlayer = 1 - state.currentPlayer;
+  updateActivePlayer();
+
+  const pi = state.currentPlayer;
+  if (pi === 1) {
+    // AI 自动掷骰
+    const speed = state.settings.aiSpeed;
+    document.getElementById('statusText').textContent = `玩家B思考中...`;
+    document.getElementById('btnRoll').disabled = true;
+    setTimeout(() => {
+      rollAI();
+    }, speed);
+  } else {
+    document.getElementById('btnRoll').disabled = false;
+    document.getElementById('statusText').textContent = '玩家A回合，请掷骰';
+  }
+}
+
+/* ══════ AI 掷骰（复用 rollDice 逻辑） ══════ */
+function rollAI() {
+  if (state.running || state.gameOver) return;
+  state.running = true;
+
+  const pi = 1;
+  const player = state.players[pi];
+
+  if (player.skipNext) {
+    player.skipNext = false;
+    addLog(player.emoji, `${player.name} 本回合被跳过`);
+    showEvent(`🤖 玩家B 暂停一回合`);
+    setTimeout(() => {
+      state.running = false;
+      nextTurn();
+    }, 1000);
+    return;
+  }
+
+  const diceEl = document.getElementById('diceP2');
+  diceEl.classList.add('rolling');
+
+  let rollCount = 0;
+  const rollInterval = setInterval(() => {
+    diceEl.textContent = Math.ceil(Math.random() * 6);
+    rollCount++;
+    if (rollCount >= 8) {
+      clearInterval(rollInterval);
+      diceEl.classList.remove('rolling');
+      const result = Math.ceil(Math.random() * 6);
+      diceEl.textContent = result;
+
+      const fromPos = player.pos;
+      state.totalSteps += result;
+      document.getElementById('statSteps').textContent = state.totalSteps;
+
+      addLog(player.emoji, `${player.name} 掷出 <strong>${result}</strong> 步`);
+      setStatusText(`${player.name} 掷出 ${result}`);
+
+      animateMove(pi, fromPos, result, (newPos) => {
+        const oldPos = player.pos;
+        player.pos = newPos;
+        if (newPos < oldPos || newPos === 0) {
+          player.laps++;
+          const startPts = state.settings.startPts;
+          player.score += startPts;
+          state.triggers.start++;
+          updateTriggers();
+          addLog('🏁', `${player.name} 经过起点，获得 ${startPts} 积分`);
+        }
+        updateUI();
+        setTimeout(() => {
+          triggerCell(pi, newPos);
+        }, 400);
+      });
+    }
+  }, 80);
+}
+
+/* ══════ 显示事件浮层 ══════ */
+function showEvent(text) {
+  const toast = document.getElementById('eventToast');
+  toast.textContent = text;
+  toast.classList.add('show');
+  document.getElementById('boardEvent').textContent = text;
+  document.getElementById('sbEvent').textContent = text;
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+/* ══════ 添加日志 ══════ */
+function addLog(icon, text) {
+  const list = document.getElementById('logList');
+  const item = document.createElement('div');
+  item.className = 'log-item';
+  item.innerHTML = `
+    <div class="log-dot" style="background:var(--gold)"></div>
+    <div class="log-text">${icon} ${text}</div>
+  `;
+  list.insertBefore(item, list.firstChild);
+  // 最多保留20条
+  while (list.children.length > 20) list.removeChild(list.lastChild);
+}
+
+/* ══════ 更新 UI ══════ */
+function updateUI() {
+  const [p1, p2] = state.players;
+
+  document.getElementById('p1Score').textContent = p1.score;
+  document.getElementById('p2Score').textContent = p2.score;
+  document.getElementById('p1Laps').textContent = p1.laps;
+  document.getElementById('p2Laps').textContent = p2.laps;
+  document.getElementById('p1Pos').textContent = `📍 位置：${CELLS[p1.pos].name}（格${p1.pos}）`;
+  document.getElementById('p2Pos').textContent = `📍 位置：${CELLS[p2.pos].name}（格${p2.pos}）`;
+
+  document.getElementById('bScore1').textContent = p1.score;
+  document.getElementById('bScore2').textContent = p2.score;
+
+  document.getElementById('statTotal').textContent = p1.score + p2.score;
+
+  // 奖品
+  updatePrizes('p1Prizes', p1.prizes);
+  updatePrizes('p2Prizes', p2.prizes);
+
+  // 棋子
+  placePieces();
+}
+
+function updatePrizes(elId, prizes) {
+  const el = document.getElementById(elId);
+  if (prizes.length === 0) {
+    el.innerHTML = '<span style="font-size:11px;color:var(--muted)">暂无奖品</span>';
+  } else {
+    el.innerHTML = prizes.map(p => `<span class="prize-chip">🎁 ${p}</span>`).join('');
+  }
+}
+
+function updateActivePlayer() {
+  const pi = state.currentPlayer;
+  document.getElementById('cardP1').classList.toggle('active-player', pi === 0);
+  document.getElementById('cardP2').classList.toggle('active-player', pi === 1);
+  const name = state.players[pi].name;
+  document.getElementById('boardTurn').textContent = name;
+  document.getElementById('sbTurn').textContent = `回合：${name}`;
+}
+
+function updateTriggers() {
+  const t = state.triggers;
+  document.getElementById('tStart').textContent = t.start;
+  document.getElementById('tShop').textContent = t.shop;
+  document.getElementById('tEvent').textContent = t.event;
+  document.getElementById('tChance').textContent = t.chance;
+  document.getElementById('tDestiny').textContent = t.destiny;
+  document.getElementById('tJail').textContent = t.jail;
+}
+
+function updateRank() {
+  const [p1, p2] = state.players;
+  const r1 = document.querySelector('#rankList .rank-row:nth-child(1)');
+  const r2 = document.querySelector('#rankList .rank-row:nth-child(2)');
+  document.getElementById('rank1Score').textContent = p1.score;
+  document.getElementById('rank2Score').textContent = p2.score;
+
+  if (p2.score > p1.score) {
+    r1.classList.remove('rank-1');
+    r2.classList.add('rank-1');
+    r1.querySelector('.rank-num').classList.remove('gold');
+    r2.querySelector('.rank-num').classList.add('gold');
+  } else {
+    r1.classList.add('rank-1');
+    r2.classList.remove('rank-1');
+    r1.querySelector('.rank-num').classList.add('gold');
+    r2.querySelector('.rank-num').classList.remove('gold');
+  }
+}
+
+function setStatusText(text) {
+  document.getElementById('statusText').textContent = text;
+}
+
+function updateSettings() {
+  const laps = parseInt(document.getElementById('inputLaps').value) || 3;
+  const speed = parseInt(document.getElementById('inputAISpeed').value) || 1500;
+  const startPts = parseInt(document.getElementById('inputStartPts').value) || 50;
+  state.settings.maxLaps = laps;
+  state.settings.aiSpeed = speed;
+  state.settings.startPts = startPts;
+  document.getElementById('statLapsMax').textContent = laps;
+}
+
+/* ══════ 游戏结束 ══════ */
+function endGame() {
+  state.gameOver = true;
+  state.running = false;
+  document.getElementById('btnRoll').disabled = true;
+
+  const [p1, p2] = state.players;
+  const win = p1.score >= p2.score ? 0 : 1;
+  const winner = state.players[win];
+  const loser = state.players[1 - win];
+
+  document.getElementById('modalTrophy').textContent = win === 0 ? '🏆' : '🎖️';
+  document.getElementById('modalTitle').textContent = `${winner.name} 获胜！`;
+  document.getElementById('modalSubtitle').textContent =
+    p1.score === p2.score ? '平局！势均力敌' : `以 ${winner.score - loser.score} 分优势胜出`;
+
+  document.getElementById('modalScore1').textContent = p1.score + ' 分';
+  document.getElementById('modalScore2').textContent = p2.score + ' 分';
+
+  const winCard = document.getElementById(`modalCard${win + 1}`);
+  const loseCard = document.getElementById(`modalCard${2 - win}`);
+  winCard.classList.add('winner');
+  loseCard.classList.remove('winner');
+
+  // 奖品汇总
+  const allPrizes = [
+    ...p1.prizes.map(p => `🧑 ${p}`),
+    ...p2.prizes.map(p => `🤖 ${p}`),
+  ];
+  const prizeEl = document.getElementById('modalPrizes');
+  if (allPrizes.length === 0) {
+    prizeEl.innerHTML = '<span style="color:var(--muted);font-size:12px">本局暂无奖品</span>';
+  } else {
+    prizeEl.innerHTML = allPrizes.map(p =>
+      `<span class="prize-chip" style="font-size:12px">${p}</span>`
+    ).join('');
+  }
+
+  setTimeout(() => {
+    document.getElementById('modalMask').classList.add('show');
+  }, 600);
+}
+
+/* ══════ 重新开始 ══════ */
+function restartGame() {
+  document.getElementById('modalMask').classList.remove('show');
+
+  state = {
+    players: [
+      { pos: 0, score: 0, laps: 0, skipNext: false, prizes: [], name: '玩家A', emoji: '🧑' },
+      { pos: 0, score: 0, laps: 0, skipNext: false, prizes: [], name: '玩家B', emoji: '🤖' },
+    ],
+    currentPlayer: 0,
+    round: 1,
+    totalSteps: 0,
+    triggers: { start: 0, shop: 0, event: 0, chance: 0, destiny: 0, jail: 0 },
+    running: false,
+    gameOver: false,
+    settings: {
+      maxLaps: parseInt(document.getElementById('inputLaps').value) || 3,
+      aiSpeed: parseInt(document.getElementById('inputAISpeed').value) || 1500,
+      startPts: parseInt(document.getElementById('inputStartPts').value) || 50,
+    },
+  };
+
+  document.getElementById('btnRoll').disabled = false;
+  document.getElementById('statusText').textContent = '玩家A回合，请掷骰';
+  document.getElementById('statRound').textContent = 1;
+  document.getElementById('statTotal').textContent = 0;
+  document.getElementById('statSteps').textContent = 0;
+  document.getElementById('statLapsMax').textContent = state.settings.maxLaps;
+  document.getElementById('diceP1').textContent = '–';
+  document.getElementById('diceP2').textContent = '–';
+  document.getElementById('boardEvent').textContent = '点击"掷骰子"开始游戏';
+  document.getElementById('boardTurn').textContent = '玩家 A';
+  document.getElementById('logList').innerHTML = `
+    <div class="log-item">
+      <div class="log-dot" style="background:var(--gold)"></div>
+      <div class="log-text">游戏重新开始，玩家A先行</div>
+    </div>
+  `;
+
+  document.getElementById('modalCard1').classList.remove('winner');
+  document.getElementById('modalCard2').classList.remove('winner');
+
+  updateUI();
+  updateActivePlayer();
+  updateTriggers();
+  updateRank();
+
+  // 重置棋子位置（不带动画）
+  setTimeout(() => placePieces(), 50);
+}
+
+/* ══════ 初始化 ══════ */
+window.addEventListener('load', () => {
+  buildBoard();
+  updateUI();
+  updateActivePlayer();
+
+  // 给棋盘格子加 tooltip
+  CELLS.forEach(cell => {
+    const el = document.getElementById(`cell-${cell.id}`);
+    if (el) el.title = `格${cell.id}: ${cell.name}`;
+  });
+});
+
+window.addEventListener('resize', () => {
+  placePieces();
+});
+</script>
+</body>
+</html>

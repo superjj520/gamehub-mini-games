@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 问答闯关</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --deep: #1A0A2E;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --bg: #0D0720;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: var(--text);
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+  }
+  .nav-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+  .nav-tab {
+    padding: 7px 16px; border-radius: 8px;
+    font-size: 14px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  /* ─── 三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: 0;
+    height: calc(100vh - 101px);
+  }
+
+  /* ─── 左侧配置 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-title {
+    font-size: 13px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 16px; margin-top: 20px;
+  }
+  .panel-title:first-child { margin-top: 0; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+
+  .rule-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-label { color: var(--muted); }
+  .rule-input {
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: 6px; padding: 4px 8px; color: var(--text);
+    font-size: 13px; width: 80px; text-align: center; outline: none;
+  }
+  .rule-input:focus { border-color: var(--accent); }
+
+  .seg-btn-group { display: flex; gap: 4px; }
+  .seg-btn {
+    padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted); cursor: pointer; transition: all 0.2s;
+  }
+  .seg-btn.active {
+    background: rgba(124,58,237,0.3); border-color: var(--accent); color: var(--text);
+  }
+  .seg-btn:hover:not(.active) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+  .bank-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s; margin-bottom: 8px;
+  }
+  .bank-item:hover { border-color: rgba(124,58,237,0.5); }
+  .bank-item.active { border-color: var(--accent); background: rgba(124,58,237,0.1); }
+  .bank-item:last-child { margin-bottom: 0; }
+  .bank-icon { font-size: 20px; flex-shrink: 0; }
+  .bank-info { flex: 1; }
+  .bank-name { font-size: 13px; font-weight: 600; }
+  .bank-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .bank-check { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+  .bank-item.active .bank-check { background: var(--accent); border-color: var(--accent); }
+
+  .prize-input-row {
+    display: flex; gap: 8px; align-items: center;
+    padding: 8px 0;
+  }
+  .prize-input-row:first-child { padding-top: 0; }
+  .prize-label-sm { font-size: 12px; color: var(--muted); flex-shrink: 0; width: 56px; }
+  .prize-input-full {
+    flex: 1; background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 10px; color: var(--text);
+    font-size: 13px; outline: none;
+  }
+  .prize-input-full:focus { border-color: var(--accent); }
+
+  /* ─── 游戏中心区域 ─── */
+  .game-center {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 32px 40px; position: relative; overflow: hidden;
+    overflow-y: auto;
+  }
+  .game-center::before {
+    content: ''; position: absolute;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+    top: 30%; left: 50%; transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  /* 待开始状态 */
+  .start-screen {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; flex: 1; text-align: center;
+    position: relative; z-index: 2;
+  }
+  .start-icon { font-size: 80px; margin-bottom: 24px; animation: float 3s ease-in-out infinite; }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .start-title {
+    font-size: 36px; font-weight: 800; letter-spacing: -1px;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+  .start-sub { font-size: 15px; color: var(--muted); margin-bottom: 36px; line-height: 1.7; }
+  .start-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 16px; padding: 16px 56px;
+    color: white; font-size: 18px; font-weight: 800; cursor: pointer;
+    box-shadow: 0 8px 32px rgba(124,58,237,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.5px;
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124,58,237,0.5); }
+  .start-btn:active { transform: translateY(0); }
+
+  /* 游戏进行中 */
+  .game-screen { width: 100%; max-width: 680px; position: relative; z-index: 2; }
+
+  /* 顶部信息栏 */
+  .game-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .game-progress {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .progress-label { font-size: 13px; color: var(--muted); }
+  .progress-val { font-size: 20px; font-weight: 800; color: var(--text); }
+  .progress-bar-wrap {
+    width: 120px; height: 6px; background: rgba(255,255,255,0.08);
+    border-radius: 3px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.4s ease;
+  }
+  .score-display {
+    text-align: center;
+  }
+  .score-num {
+    font-size: 32px; font-weight: 900;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .score-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* 倒计时环 */
+  .timer-wrap {
+    position: relative; width: 64px; height: 64px; flex-shrink: 0;
+  }
+  .timer-svg { transform: rotate(-90deg); }
+  .timer-track { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 5; }
+  .timer-arc {
+    fill: none; stroke-width: 5; stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear, stroke 0.3s;
+  }
+  .timer-text {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 800; color: var(--gold);
+    transition: color 0.3s;
+  }
+  .timer-text.urgent { color: #EF4444; }
+
+  /* 题目卡 */
+  .question-wrap { perspective: 1200px; margin-bottom: 24px; }
+  .question-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 20px; padding: 32px 36px;
+    text-align: center; position: relative; overflow: hidden;
+    transition: opacity 0.25s, transform 0.25s;
+  }
+  .question-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(124,58,237,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .question-card.slide-out {
+    opacity: 0; transform: translateX(-40px) scale(0.96);
+  }
+  .question-card.slide-in {
+    animation: slideInQ 0.3s ease forwards;
+  }
+  @keyframes slideInQ {
+    from { opacity: 0; transform: translateX(40px) scale(0.96); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+  }
+  .question-num {
+    font-size: 12px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+  }
+  .question-text {
+    font-size: 22px; font-weight: 700; line-height: 1.5;
+    color: var(--text);
+  }
+
+  /* 选项 */
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .option-btn {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px; border-radius: 14px;
+    background: rgba(255,255,255,0.04); border: 1.5px solid var(--border);
+    color: var(--text); font-size: 15px; font-weight: 500;
+    cursor: pointer; text-align: left;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    position: relative; overflow: hidden;
+  }
+  .option-btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(124,58,237,0); transition: background 0.15s;
+  }
+  .option-btn:hover:not(:disabled)::before { background: rgba(124,58,237,0.08); }
+  .option-btn:hover:not(:disabled) { border-color: rgba(124,58,237,0.5); transform: translateY(-1px); }
+  .option-btn:active:not(:disabled) { transform: scale(0.98); }
+  .option-btn:disabled { cursor: not-allowed; }
+  .option-label {
+    width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+    background: rgba(255,255,255,0.08); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; transition: all 0.2s;
+  }
+  .option-text { flex: 1; line-height: 1.4; }
+  .option-result { flex-shrink: 0; font-size: 18px; opacity: 0; transition: opacity 0.2s; }
+
+  /* 选项状态 */
+  .option-btn.correct {
+    background: rgba(34,197,94,0.12); border-color: #22C55E;
+  }
+  .option-btn.correct .option-label { background: #22C55E; border-color: #22C55E; color: white; }
+  .option-btn.correct .option-result { opacity: 1; }
+  .option-btn.wrong {
+    background: rgba(239,68,68,0.12); border-color: #EF4444;
+  }
+  .option-btn.wrong .option-label { background: #EF4444; border-color: #EF4444; color: white; }
+  .option-btn.wrong .option-result { opacity: 1; }
+  .option-btn.reveal {
+    background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.5);
+  }
+  .option-btn.reveal .option-label { background: rgba(34,197,94,0.3); border-color: #22C55E; color: #22C55E; }
+
+  /* 答题反馈条 */
+  .feedback-bar {
+    margin-top: 16px; padding: 12px 20px; border-radius: 12px;
+    font-size: 14px; font-weight: 600; text-align: center;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.25s, transform 0.25s;
+  }
+  .feedback-bar.show { opacity: 1; transform: translateY(0); }
+  .feedback-bar.correct-fb { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #4ADE80; }
+  .feedback-bar.wrong-fb { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #F87171; }
+  .feedback-bar.timeout-fb { background: rgba(245,200,66,0.15); border: 1px solid rgba(245,200,66,0.3); color: var(--gold); }
+
+  /* ─── 右侧数据 ─── */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 24px; overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-right .panel-title { margin-top: 20px; }
+  .panel-right .panel-title:first-child { margin-top: 0; }
+
+  .streak-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; margin-bottom: 16px;
+    text-align: center;
+  }
+  .streak-fire { font-size: 40px; display: block; margin-bottom: 8px; animation: burnFire 1.2s ease-in-out infinite; }
+  @keyframes burnFire {
+    0%,100% { transform: scale(1) rotate(-3deg); }
+    50% { transform: scale(1.15) rotate(3deg); }
+  }
+  .streak-num {
+    font-size: 48px; font-weight: 900; line-height: 1;
+    background: linear-gradient(135deg, #F5C842, #F97316);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .streak-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .streak-bonus {
+    margin-top: 10px; padding: 4px 12px; border-radius: 20px;
+    background: rgba(245,200,66,0.1); border: 1px solid rgba(245,200,66,0.2);
+    font-size: 11px; color: var(--gold); display: inline-block;
+  }
+
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .stat-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px; text-align: center;
+  }
+  .stat-num {
+    font-size: 24px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  .speed-list { display: flex; flex-direction: column; gap: 8px; }
+  .speed-row-item { }
+  .speed-row-header { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; }
+  .speed-q-label { color: var(--muted); }
+  .speed-time { color: var(--gold); font-weight: 600; }
+  .speed-bar-bg { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+  .speed-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+
+  .history-list { display: flex; flex-direction: column; gap: 6px; }
+  .history-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .history-rank { width: 20px; color: var(--muted); text-align: center; flex-shrink: 0; font-size: 11px; }
+  .history-score { font-weight: 700; flex: 1; }
+  .history-grade {
+    width: 24px; height: 24px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; flex-shrink: 0;
+  }
+  .grade-s { background: rgba(245,200,66,0.2); color: var(--gold); }
+  .grade-a { background: rgba(124,58,237,0.2); color: #A78BFA; }
+  .grade-b { background: rgba(34,197,94,0.15); color: #4ADE80; }
+  .grade-c { background: rgba(255,255,255,0.08); color: var(--muted); }
+
+  /* ─── 结算弹窗 ─── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+    z-index: 200; display: none; align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: linear-gradient(145deg, #1A0A38, #2A0D52);
+    border: 1px solid rgba(245,200,66,0.25); border-radius: 28px;
+    padding: 40px 36px; text-align: center; position: relative;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 80px rgba(124,58,237,0.15);
+    animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 580px; width: 92%; max-height: 90vh; overflow-y: auto;
+  }
+  @keyframes modalPop {
+    from { opacity: 0; transform: scale(0.75) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-grade-badge {
+    width: 80px; height: 80px; border-radius: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 42px; font-weight: 900; margin: 0 auto 20px;
+    animation: badgePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+  }
+  @keyframes badgePop {
+    from { opacity: 0; transform: scale(0); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .modal-title { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+  .modal-score-big {
+    font-size: 56px; font-weight: 900; line-height: 1;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 4px;
+  }
+  .modal-score-max { font-size: 16px; color: var(--muted); margin-bottom: 28px; }
+  .modal-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin-bottom: 28px;
+  }
+  .modal-stat-box {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 10px;
+  }
+  .modal-stat-num {
+    font-size: 22px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), #F97316);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .modal-stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .modal-review { text-align: left; margin-bottom: 28px; }
+  .modal-review-title { font-size: 13px; color: var(--muted); margin-bottom: 12px; font-weight: 600; letter-spacing: 0.5px; }
+  .review-list { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
+  .review-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; border-radius: 8px;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .review-item.r-correct { border-color: rgba(34,197,94,0.2); }
+  .review-item.r-wrong { border-color: rgba(239,68,68,0.2); }
+  .review-item.r-timeout { border-color: rgba(245,200,66,0.2); }
+  .review-icon { font-size: 14px; flex-shrink: 0; }
+  .review-q { flex: 1; color: var(--muted); }
+  .review-time { color: var(--gold); font-weight: 600; flex-shrink: 0; }
+
+  .modal-actions { display: flex; gap: 12px; justify-content: center; }
+  .modal-btn {
+    border: none; border-radius: 14px; padding: 14px 36px;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .modal-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .modal-btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; }
+  .modal-btn.secondary { background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: var(--text); }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: rgba(255,255,255,0.06); border: none;
+    border-radius: 8px; padding: 6px 10px;
+    color: var(--muted); cursor: pointer; font-size: 16px; transition: background 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.12); }
+
+  /* ─── 连对加成提示 ─── */
+  .combo-toast {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: linear-gradient(135deg, rgba(245,200,66,0.9), rgba(249,115,22,0.9));
+    color: #1A0A2E; font-size: 15px; font-weight: 800;
+    padding: 10px 24px; border-radius: 40px;
+    box-shadow: 0 8px 32px rgba(245,200,66,0.4);
+    z-index: 150; opacity: 0; pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+  }
+  .combo-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ─── 撒花动画 ─── */
+  .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 190; }
+  .confetti-piece {
+    position: absolute; width: 8px; height: 8px; border-radius: 2px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ─── 底部状态栏 ─── */
+  .statusbar {
+    padding: 10px 24px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 20px;
+    font-size: 12px; color: var(--muted);
+    background: rgba(13,7,32,0.95);
+    flex-shrink: 0;
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* 滚动条美化 */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ─── 导航 ─── -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    🎮 <span>GameHub</span> 中台
+    <div class="nav-badge">Demo</div>
+  </a>
+  <div class="nav-tabs">
+    <a href="wheel.html" class="nav-tab">大转盘</a>
+    <a href="nine-grid.html" class="nav-tab">九宫格</a>
+    <a href="scratch-card.html" class="nav-tab">刮刮乐</a>
+    <a href="shake-dice.html" class="nav-tab">摇骰子</a>
+    <a href="smash-egg.html" class="nav-tab">砸金蛋</a>
+    <a href="red-packet-rain.html" class="nav-tab">红包雨</a>
+    <a href="quiz.html" class="nav-tab active">问答闯关</a>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <span style="font-size:13px;color:var(--muted)">活动：夏日大促 2026</span>
+    <div style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:6px;padding:4px 10px;font-size:12px;color:#22C55E;font-weight:600">进行中</div>
+  </div>
+</nav>
+
+<!-- ─── 主体三列 ─── -->
+<div class="main">
+
+  <!-- 左侧配置 -->
+  <div class="panel-left">
+
+    <div class="panel-title">题库选择</div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>选择题库</div>
+      <div id="bankList">
+        <div class="bank-item active" data-bank="general" onclick="selectBank(this, 'general')">
+          <span class="bank-icon">🌍</span>
+          <div class="bank-info">
+            <div class="bank-name">通识百科</div>
+            <div class="bank-meta">10题 · 常识类</div>
+          </div>
+          <div class="bank-check">✓</div>
+        </div>
+        <div class="bank-item" data-bank="brand" onclick="selectBank(this, 'brand')">
+          <span class="bank-icon">🏷️</span>
+          <div class="bank-info">
+            <div class="bank-name">品牌知识</div>
+            <div class="bank-meta">可自定义 · 品牌故事/价值观</div>
+          </div>
+          <div class="bank-check"></div>
+        </div>
+        <div class="bank-item" data-bank="product" onclick="selectBank(this, 'product')">
+          <span class="bank-icon">📦</span>
+          <div class="bank-info">
+            <div class="bank-name">产品知识</div>
+            <div class="bank-meta">可自定义 · 产品特性/功能</div>
+          </div>
+          <div class="bank-check"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-title">游戏规则</div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#A78BFA"></span>计时设置</div>
+      <div class="rule-row">
+        <span class="rule-label">每题限时</span>
+        <div class="seg-btn-group">
+          <button class="seg-btn" data-time="10" onclick="setTime(this,10)">10秒</button>
+          <button class="seg-btn active" data-time="15" onclick="setTime(this,15)">15秒</button>
+          <button class="seg-btn" data-time="20" onclick="setTime(this,20)">20秒</button>
+        </div>
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">总题数</span>
+        <div class="seg-btn-group">
+          <button class="seg-btn" data-count="5" onclick="setCount(this,5)">5题</button>
+          <button class="seg-btn active" data-count="10" onclick="setCount(this,10)">10题</button>
+          <button class="seg-btn" data-count="15" onclick="setCount(this,15)">15题</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-title">奖励设置</div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#EC4899"></span>奖品配置</div>
+      <div class="prize-input-row">
+        <span class="prize-label-sm">满分奖品</span>
+        <input class="prize-input-full" type="text" id="fullPrize" value="88元京东卡" placeholder="满分奖品名称">
+      </div>
+      <div class="prize-input-row">
+        <span class="prize-label-sm">及格奖品</span>
+        <input class="prize-input-full" type="text" id="passPrize" value="5元优惠券" placeholder="及格奖品名称">
+      </div>
+      <div style="margin-top:10px;padding:8px 12px;border-radius:8px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);font-size:11px;color:var(--muted);line-height:1.6">
+        满分：250分 &nbsp;·&nbsp; 及格线：60分<br>
+        连对3题 +5分&nbsp;·&nbsp;连对5题 +10分
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 游戏中心 -->
+  <div class="game-center" id="gameCenter">
+
+    <!-- 待开始 -->
+    <div class="start-screen" id="startScreen">
+      <div class="start-icon">🧠</div>
+      <div class="start-title">问答闯关</div>
+      <div class="start-sub">考验你的知识储备<br>答对得分，连续答对有额外奖励！</div>
+      <button class="start-btn" onclick="startGame()">开始挑战</button>
+    </div>
+
+    <!-- 游戏中 -->
+    <div class="game-screen" id="gameScreen" style="display:none">
+
+      <div class="game-header">
+        <div class="game-progress">
+          <div>
+            <div class="progress-label">题目进度</div>
+            <div class="progress-val" id="progressVal">1/10</div>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressBar" style="width:10%"></div>
+          </div>
+        </div>
+
+        <div class="score-display">
+          <div class="score-num" id="scoreDisplay">0</div>
+          <div class="score-label">当前分数</div>
+        </div>
+
+        <div class="timer-wrap">
+          <svg class="timer-svg" width="64" height="64" viewBox="0 0 64 64">
+            <circle class="timer-track" cx="32" cy="32" r="27"/>
+            <circle class="timer-arc" id="timerArc" cx="32" cy="32" r="27"
+              stroke="var(--gold)"
+              stroke-dasharray="169.6"
+              stroke-dashoffset="0"/>
+          </svg>
+          <div class="timer-text" id="timerText">15</div>
+        </div>
+      </div>
+
+      <div class="question-wrap">
+        <div class="question-card" id="questionCard">
+          <div class="question-num" id="questionNum">第 1 题</div>
+          <div class="question-text" id="questionText">题目加载中...</div>
+        </div>
+      </div>
+
+      <div class="options-grid" id="optionsGrid"></div>
+
+      <div class="feedback-bar" id="feedbackBar"></div>
+
+    </div>
+
+  </div>
+
+  <!-- 右侧数据 -->
+  <div class="panel-right">
+
+    <div class="panel-title">连对加成</div>
+    <div class="streak-box">
+      <span class="streak-fire" id="streakFire">🔥</span>
+      <div class="streak-num" id="streakNum">0</div>
+      <div class="streak-label">连续答对</div>
+      <div class="streak-bonus" id="streakBonus">连对3题 +5分</div>
+    </div>
+
+    <div class="panel-title">数据统计</div>
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-num" id="statCorrect">0</div>
+        <div class="stat-label">答对题数</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statAcc">—</div>
+        <div class="stat-label">正确率</div>
+      </div>
+    </div>
+
+    <div class="panel-title">答题速度</div>
+    <div class="card" style="padding:12px 14px">
+      <div class="speed-list" id="speedList">
+        <div style="font-size:12px;color:var(--muted);text-align:center;padding:12px 0">游戏开始后显示</div>
+      </div>
+    </div>
+
+    <div class="panel-title">历史记录</div>
+    <div class="card" style="padding:12px 14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:12px;color:var(--muted)">历史最高</span>
+        <span style="font-size:18px;font-weight:800;color:var(--gold)" id="bestScore">—</span>
+      </div>
+      <div class="history-list" id="historyList">
+        <div style="font-size:12px;color:var(--muted);text-align:center;padding:8px 0">暂无记录</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- 结算弹窗 -->
+<div class="modal-overlay" id="resultModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-grade-badge" id="gradeBadge"></div>
+    <div class="modal-title">本局成绩</div>
+    <div class="modal-score-big" id="finalScore">0</div>
+    <div class="modal-score-max" id="finalScoreMax">/ 250 分</div>
+    <div class="modal-stats">
+      <div class="modal-stat-box">
+        <div class="modal-stat-num" id="finalCorrect">0/10</div>
+        <div class="modal-stat-label">答对题数</div>
+      </div>
+      <div class="modal-stat-box">
+        <div class="modal-stat-num" id="finalAvgTime">0s</div>
+        <div class="modal-stat-label">平均用时</div>
+      </div>
+      <div class="modal-stat-box">
+        <div class="modal-stat-num" id="finalPrize">—</div>
+        <div class="modal-stat-label">获得奖品</div>
+      </div>
+    </div>
+    <div class="modal-review">
+      <div class="modal-review-title">📋 题目回顾</div>
+      <div class="review-list" id="reviewList"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeModal()">查看配置</button>
+      <button class="modal-btn primary" onclick="restartGame()">再来一局</button>
+    </div>
+  </div>
+</div>
+
+<!-- 连对提示 -->
+<div class="combo-toast" id="comboToast"></div>
+
+<!-- 撒花 -->
+<div class="confetti" id="confettiContainer"></div>
+
+<!-- 底部状态栏 -->
+<div class="statusbar">
+  <div class="status-dot"></div>
+  <span>问答闯关 · 已就绪</span>
+  <span>|</span>
+  <span id="statusInfo">共10题 · 每题15秒 · 满分250分</span>
+  <span>|</span>
+  <span id="statusTime">2026-07-06</span>
+</div>
+
+<script>
+// ─── 题库数据 ───
+const QUESTION_BANKS = {
+  general: [
+    { q: '世界上最大的洲是？', opts: ['东亚', '亚洲', '欧洲', '非洲'], ans: 1 },
+    { q: '水的沸点是多少摄氏度（标准大气压）？', opts: ['50°C', '80°C', '100°C', '120°C'], ans: 2 },
+    { q: '中国的首都是？', opts: ['上海', '北京', '广州', '深圳'], ans: 1 },
+    { q: '一年通常有多少天？', opts: ['360天', '365天', '366天', '370天'], ans: 1 },
+    { q: '太阳系中最大的行星是？', opts: ['土星', '木星', '海王星', '天王星'], ans: 1 },
+    { q: '人体最大的器官是？', opts: ['心脏', '肝脏', '皮肤', '大脑'], ans: 2 },
+    { q: '彩虹通常有几种颜色？', opts: ['5种', '6种', '7种', '8种'], ans: 2 },
+    { q: '光速约为每秒多少万千米？', opts: ['约10万千米', '约20万千米', '约30万千米', '约40万千米'], ans: 2 },
+    { q: '世界第一高峰是？', opts: ['K2', '珠穆朗玛峰', '洛子峰', '马卡鲁峰'], ans: 1 },
+    { q: 'DNA的中文全称是？', opts: ['脱氧核糖核酸', '核糖核酸', '蛋白质', '氨基酸'], ans: 0 },
+    { q: '最接近地球的行星是？', opts: ['火星', '金星', '木星', '土星'], ans: 1 },
+    { q: '人体血液中占比最多的成分是？', opts: ['红细胞', '白细胞', '血浆', '血小板'], ans: 2 },
+    { q: '哪个国家拥有最长的海岸线？', opts: ['俄罗斯', '美国', '加拿大', '澳大利亚'], ans: 2 },
+    { q: '一个八边形有几条对角线？', opts: ['16条', '20条', '24条', '28条'], ans: 1 },
+    { q: '人类有多少块骨头（成年）？', opts: ['186块', '206块', '226块', '246块'], ans: 1 },
+  ],
+  brand: [
+    { q: '（品牌知识示例）我们的品牌成立于哪一年？', opts: ['2015年', '2016年', '2017年', '2018年'], ans: 1 },
+    { q: '（品牌知识示例）品牌核心价值观是什么？', opts: ['创新', '诚信', '共赢', '卓越'], ans: 3 },
+    { q: '（品牌知识示例）公司总部位于？', opts: ['北京', '上海', '杭州', '深圳'], ans: 2 },
+    { q: '（品牌知识示例）品牌Slogan是？', opts: ['连接美好', '品质生活', '与你同行', '创造未来'], ans: 0 },
+    { q: '（品牌知识示例）品牌代言人是？', opts: ['明星A', '明星B', '明星C', '明星D'], ans: 1 },
+    { q: '（品牌知识示例）品牌主色调是？', opts: ['蓝色', '红色', '紫色', '橙色'], ans: 2 },
+    { q: '（品牌知识示例）品牌首款产品类型？', opts: ['电商平台', '社交软件', '支付工具', '云服务'], ans: 0 },
+    { q: '（品牌知识示例）目前服务用户数？', opts: ['1000万', '5000万', '1亿', '3亿'], ans: 2 },
+    { q: '（品牌知识示例）获得过哪个重量级奖项？', opts: ['红点奖', 'IF奖', '金钻奖', '品牌大赏'], ans: 3 },
+    { q: '（品牌知识示例）战略方向是？', opts: ['出海全球', '下沉市场', '精品路线', '生态闭环'], ans: 0 },
+  ],
+  product: [
+    { q: '（产品知识示例）旗舰产品的核心功能是？', opts: ['数据分析', 'AI推荐', '智能客服', '内容生产'], ans: 1 },
+    { q: '（产品知识示例）最新版本号是？', opts: ['v2.0', 'v3.0', 'v4.0', 'v5.0'], ans: 2 },
+    { q: '（产品知识示例）产品支持哪些平台？', opts: ['仅iOS', '仅Android', 'iOS+Android', '全平台'], ans: 3 },
+    { q: '（产品知识示例）DAU峰值约为多少？', opts: ['100万', '500万', '1000万', '2000万'], ans: 2 },
+    { q: '（产品知识示例）产品的核心用户群体是？', opts: ['学生群体', '白领人群', '中老年', '企业客户'], ans: 1 },
+    { q: '（产品知识示例）产品最受欢迎的功能是？', opts: ['消息通知', '个性化推荐', '社交分享', '积分体系'], ans: 1 },
+    { q: '（产品知识示例）产品的NPS得分是？', opts: ['30分', '45分', '60分', '75分'], ans: 2 },
+    { q: '（产品知识示例）下一版本重点优化方向？', opts: ['性能优化', '新功能', 'UI改版', '安全加固'], ans: 0 },
+    { q: '（产品知识示例）产品月活增长率是？', opts: ['5%', '10%', '20%', '35%'], ans: 2 },
+    { q: '（产品知识示例）产品竞品中最大的威胁是？', opts: ['A产品', 'B产品', 'C产品', 'D产品'], ans: 1 },
+  ]
+};
+
+const OPTION_LABELS = ['A', 'B', 'C', 'D'];
+
+// ─── 游戏状态 ───
+let config = {
+  bank: 'general',
+  timeLimit: 15,
+  totalCount: 10,
+};
+
+let state = {
+  questions: [],
+  currentIdx: 0,
+  score: 0,
+  streak: 0,
+  maxStreak: 0,
+  correctCount: 0,
+  answered: false,
+  timerInterval: null,
+  timeLeft: 15,
+  questionStartTime: 0,
+  roundLog: [],     // [{q, correct, timeUsed, result}]
+  running: false,
+};
+
+let historyRecords = [];
+const MAX_SCORE_PER_Q = 25; // 10分答对 + 15秒剩余时间奖励最多15分
+
+// ─── 配置控制 ───
+function selectBank(el, bank) {
+  document.querySelectorAll('.bank-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  config.bank = bank;
+}
+
+function setTime(btn, t) {
+  document.querySelectorAll('[data-time]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  config.timeLimit = t;
+  updateStatusBar();
+}
+
+function setCount(btn, c) {
+  document.querySelectorAll('[data-count]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  config.totalCount = c;
+  updateStatusBar();
+}
+
+function updateStatusBar() {
+  const max = config.totalCount * MAX_SCORE_PER_Q;
+  document.getElementById('statusInfo').textContent =
+    `共${config.totalCount}题 · 每题${config.timeLimit}秒 · 满分${max}分`;
+}
+
+// ─── 开始游戏 ───
+function startGame() {
+  const bank = QUESTION_BANKS[config.bank];
+  // 随机抽取题目
+  const shuffled = [...bank].sort(() => Math.random() - 0.5);
+  state.questions = shuffled.slice(0, Math.min(config.totalCount, bank.length));
+  state.currentIdx = 0;
+  state.score = 0;
+  state.streak = 0;
+  state.maxStreak = 0;
+  state.correctCount = 0;
+  state.roundLog = [];
+  state.running = true;
+
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('gameScreen').style.display = 'block';
+
+  // 重置右侧数据
+  document.getElementById('statCorrect').textContent = '0';
+  document.getElementById('statAcc').textContent = '—';
+  document.getElementById('speedList').innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px 0">游戏进行中...</div>';
+  updateStreakUI();
+
+  renderQuestion(false);
+}
+
+// ─── 渲染题目 ───
+function renderQuestion(withAnim) {
+  const q = state.questions[state.currentIdx];
+  const card = document.getElementById('questionCard');
+  const total = state.questions.length;
+
+  if (withAnim) {
+    card.classList.add('slide-out');
+    setTimeout(() => {
+      card.classList.remove('slide-out');
+      _fillQuestion(q, total);
+      card.classList.add('slide-in');
+      setTimeout(() => card.classList.remove('slide-in'), 350);
+    }, 260);
+  } else {
+    _fillQuestion(q, total);
+  }
+
+  // 进度
+  document.getElementById('progressVal').textContent = `${state.currentIdx + 1}/${total}`;
+  document.getElementById('progressBar').style.width = `${((state.currentIdx + 1) / total) * 100}%`;
+
+  startTimer();
+}
+
+function _fillQuestion(q, total) {
+  document.getElementById('questionNum').textContent = `第 ${state.currentIdx + 1} 题 · 共${total}题`;
+  document.getElementById('questionText').textContent = q.q;
+
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `
+      <span class="option-label">${OPTION_LABELS[i]}</span>
+      <span class="option-text">${opt}</span>
+      <span class="option-result">${i === q.ans ? '✓' : '✗'}</span>
+    `;
+    btn.onclick = () => handleAnswer(i);
+    grid.appendChild(btn);
+  });
+
+  // 隐藏反馈栏
+  const fb = document.getElementById('feedbackBar');
+  fb.className = 'feedback-bar';
+  fb.textContent = '';
+
+  state.answered = false;
+  state.questionStartTime = Date.now();
+}
+
+// ─── 计时器 ───
+function startTimer() {
+  clearInterval(state.timerInterval);
+  state.timeLeft = config.timeLimit;
+  updateTimerUI(state.timeLeft, config.timeLimit);
+
+  state.timerInterval = setInterval(() => {
+    state.timeLeft--;
+    updateTimerUI(state.timeLeft, config.timeLimit);
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timerInterval);
+      if (!state.answered) handleTimeout();
+    }
+  }, 1000);
+}
+
+function updateTimerUI(left, total) {
+  const circumference = 169.6; // 2 * π * 27
+  const offset = circumference * (1 - left / total);
+  const arc = document.getElementById('timerArc');
+  const txt = document.getElementById('timerText');
+
+  arc.style.strokeDashoffset = offset;
+  txt.textContent = left;
+
+  if (left <= 5) {
+    arc.style.stroke = '#EF4444';
+    txt.classList.add('urgent');
+  } else if (left <= 8) {
+    arc.style.stroke = '#F97316';
+    txt.classList.remove('urgent');
+  } else {
+    arc.style.stroke = 'var(--gold)';
+    txt.classList.remove('urgent');
+  }
+}
+
+// ─── 处理答题 ───
+function handleAnswer(idx) {
+  if (state.answered) return;
+  state.answered = true;
+  clearInterval(state.timerInterval);
+
+  const q = state.questions[state.currentIdx];
+  const timeUsed = (Date.now() - state.questionStartTime) / 1000;
+  const isCorrect = idx === q.ans;
+
+  // 锁定所有按钮
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+
+  if (isCorrect) {
+    // 正确
+    btns[idx].classList.add('correct');
+    const timeBonus = Math.min(Math.floor(state.timeLeft), config.timeLimit);
+    let gained = 10 + timeBonus;
+    state.streak++;
+    state.maxStreak = Math.max(state.maxStreak, state.streak);
+    state.correctCount++;
+
+    // 连对加成
+    let comboBonus = 0;
+    if (state.streak === 3) comboBonus = 5;
+    else if (state.streak === 5) comboBonus = 10;
+    else if (state.streak > 5 && state.streak % 5 === 0) comboBonus = 10;
+
+    gained += comboBonus;
+    state.score += gained;
+
+    state.roundLog.push({ q: q.q, result: 'correct', timeUsed, gained });
+
+    // 显示反馈
+    let fbText = `✓ 答对了！+${10}分 + 时间奖励+${timeBonus}分`;
+    if (comboBonus > 0) fbText += ` + 连对加成+${comboBonus}分`;
+    showFeedback('correct-fb', fbText);
+
+    if (comboBonus > 0) {
+      showComboToast(`🔥 连对${state.streak}题！额外 +${comboBonus}分`);
+    }
+  } else {
+    // 错误
+    btns[idx].classList.add('wrong');
+    btns[q.ans].classList.add('reveal');
+    state.streak = 0;
+    state.roundLog.push({ q: q.q, result: 'wrong', timeUsed, gained: 0 });
+    showFeedback('wrong-fb', `✗ 答错了，正确答案是 ${OPTION_LABELS[q.ans]}：${q.opts[q.ans]}`);
+  }
+
+  // 更新分数显示
+  animateScore(state.score);
+  updateStreakUI();
+  updateStats();
+
+  // 0.8s 后进入下一题
+  setTimeout(() => nextQuestion(), 900);
+}
+
+function handleTimeout() {
+  if (state.answered) return;
+  state.answered = true;
+  const q = state.questions[state.currentIdx];
+  const timeUsed = config.timeLimit;
+
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+  btns[q.ans].classList.add('reveal');
+  state.streak = 0;
+  state.roundLog.push({ q: q.q, result: 'timeout', timeUsed, gained: 0 });
+  showFeedback('timeout-fb', `⏰ 时间到！正确答案是 ${OPTION_LABELS[q.ans]}：${q.opts[q.ans]}`);
+
+  updateStreakUI();
+  updateStats();
+  setTimeout(() => nextQuestion(), 1000);
+}
+
+function nextQuestion() {
+  state.currentIdx++;
+  if (state.currentIdx >= state.questions.length) {
+    endGame();
+    return;
+  }
+  renderQuestion(true);
+  // 更新进度
+  document.getElementById('progressVal').textContent = `${state.currentIdx + 1}/${state.questions.length}`;
+  document.getElementById('progressBar').style.width = `${((state.currentIdx + 1) / state.questions.length) * 100}%`;
+}
+
+// ─── 结束游戏 ───
+function endGame() {
+  state.running = false;
+  clearInterval(state.timerInterval);
+
+  // 保存记录
+  const record = {
+    score: state.score,
+    correct: state.correctCount,
+    total: state.questions.length,
+    grade: calcGrade(state.score, state.questions.length),
+    ts: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+  };
+  historyRecords.unshift(record);
+  if (historyRecords.length > 5) historyRecords = historyRecords.slice(0, 5);
+  updateHistoryUI();
+
+  // 若分数较高撒花
+  const maxScore = state.questions.length * MAX_SCORE_PER_Q;
+  if (state.score >= maxScore * 0.8) launchConfetti();
+
+  // 显示弹窗
+  showResultModal();
+  updateSpeedList();
+}
+
+function calcGrade(score, total) {
+  const max = total * MAX_SCORE_PER_Q;
+  const pct = score / max;
+  if (pct >= 0.9) return 'S';
+  if (pct >= 0.75) return 'A';
+  if (pct >= 0.55) return 'B';
+  return 'C';
+}
+
+// ─── 结算弹窗 ───
+function showResultModal() {
+  const total = state.questions.length;
+  const maxScore = total * MAX_SCORE_PER_Q;
+  const grade = calcGrade(state.score, total);
+  const avgTime = state.roundLog.reduce((s, l) => s + l.timeUsed, 0) / state.roundLog.length;
+
+  // 奖品
+  const fullPrize = document.getElementById('fullPrize').value || '满分奖品';
+  const passPrize = document.getElementById('passPrize').value || '及格奖品';
+  const passLine = maxScore * 0.6;
+  let prize = '暂无奖品';
+  if (state.score >= maxScore) prize = fullPrize;
+  else if (state.score >= passLine) prize = passPrize;
+
+  // 评级样式
+  const gradeStyles = {
+    S: { bg: 'rgba(245,200,66,0.2)', color: '#F5C842', emoji: '👑' },
+    A: { bg: 'rgba(124,58,237,0.25)', color: '#A78BFA', emoji: '🌟' },
+    B: { bg: 'rgba(34,197,94,0.2)', color: '#4ADE80', emoji: '✨' },
+    C: { bg: 'rgba(255,255,255,0.1)', color: 'var(--muted)', emoji: '💡' },
+  };
+  const gs = gradeStyles[grade];
+  const badge = document.getElementById('gradeBadge');
+  badge.style.background = gs.bg;
+  badge.style.color = gs.color;
+  badge.textContent = grade;
+
+  document.getElementById('finalScore').textContent = state.score;
+  document.getElementById('finalScoreMax').textContent = `/ ${maxScore} 分`;
+  document.getElementById('finalCorrect').textContent = `${state.correctCount}/${total}`;
+  document.getElementById('finalAvgTime').textContent = `${avgTime.toFixed(1)}s`;
+  document.getElementById('finalPrize').textContent = prize;
+
+  // 题目回顾
+  const reviewList = document.getElementById('reviewList');
+  reviewList.innerHTML = state.roundLog.map((log, i) => {
+    const icon = log.result === 'correct' ? '✅' : log.result === 'timeout' ? '⏰' : '❌';
+    const cls = log.result === 'correct' ? 'r-correct' : log.result === 'timeout' ? 'r-timeout' : 'r-wrong';
+    const shortQ = log.q.length > 20 ? log.q.slice(0, 20) + '…' : log.q;
+    return `<div class="review-item ${cls}">
+      <span class="review-icon">${icon}</span>
+      <span class="review-q">Q${i+1}. ${shortQ}</span>
+      <span class="review-time">${log.timeUsed.toFixed(1)}s${log.gained > 0 ? ' +'+log.gained : ''}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('resultModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('resultModal').classList.remove('show');
+}
+
+function restartGame() {
+  closeModal();
+  document.getElementById('gameScreen').style.display = 'none';
+  document.getElementById('startScreen').style.display = 'flex';
+  state.running = false;
+}
+
+// ─── 辅助函数 ───
+function showFeedback(cls, text) {
+  const fb = document.getElementById('feedbackBar');
+  fb.className = `feedback-bar ${cls} show`;
+  fb.textContent = text;
+}
+
+function animateScore(target) {
+  const el = document.getElementById('scoreDisplay');
+  const cur = parseInt(el.textContent) || 0;
+  const diff = target - cur;
+  if (diff <= 0) { el.textContent = target; return; }
+  let v = cur;
+  const step = Math.ceil(diff / 12);
+  const id = setInterval(() => {
+    v = Math.min(v + step, target);
+    el.textContent = v;
+    if (v >= target) clearInterval(id);
+  }, 30);
+}
+
+function updateStreakUI() {
+  document.getElementById('streakNum').textContent = state.streak;
+  const fire = document.getElementById('streakFire');
+  fire.textContent = state.streak >= 5 ? '🔥' : state.streak >= 3 ? '🔥' : '🔥';
+  fire.style.filter = state.streak >= 5 ? 'hue-rotate(0deg) saturate(2)' : state.streak >= 3 ? 'none' : 'grayscale(0.5)';
+
+  const bonus = document.getElementById('streakBonus');
+  if (state.streak >= 5) {
+    bonus.textContent = '🔥 连对5题！+10分加成';
+    bonus.style.background = 'rgba(239,68,68,0.15)';
+    bonus.style.borderColor = 'rgba(239,68,68,0.3)';
+    bonus.style.color = '#F87171';
+  } else if (state.streak >= 3) {
+    bonus.textContent = '🌟 连对3题！+5分加成';
+    bonus.style.background = 'rgba(245,200,66,0.15)';
+    bonus.style.borderColor = 'rgba(245,200,66,0.3)';
+    bonus.style.color = 'var(--gold)';
+  } else {
+    bonus.textContent = '连对3题 +5分 · 连对5题 +10分';
+    bonus.style.background = 'rgba(245,200,66,0.08)';
+    bonus.style.borderColor = 'rgba(245,200,66,0.2)';
+    bonus.style.color = 'var(--gold)';
+  }
+}
+
+function updateStats() {
+  const done = state.roundLog.length;
+  document.getElementById('statCorrect').textContent = state.correctCount;
+  document.getElementById('statAcc').textContent = done > 0
+    ? Math.round((state.correctCount / done) * 100) + '%'
+    : '—';
+}
+
+function updateSpeedList() {
+  const list = document.getElementById('speedList');
+  if (state.roundLog.length === 0) return;
+  const maxTime = config.timeLimit;
+  list.innerHTML = state.roundLog.map((log, i) => {
+    const pct = Math.round((log.timeUsed / maxTime) * 100);
+    const color = log.result === 'correct' ? '#22C55E' : log.result === 'timeout' ? 'var(--gold)' : '#EF4444';
+    return `<div class="speed-row-item">
+      <div class="speed-row-header">
+        <span class="speed-q-label">第${i+1}题</span>
+        <span class="speed-time">${log.timeUsed.toFixed(1)}s</span>
+      </div>
+      <div class="speed-bar-bg">
+        <div class="speed-bar-fill" style="width:${pct}%;background:${color}"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateHistoryUI() {
+  const best = Math.max(...historyRecords.map(r => r.score));
+  document.getElementById('bestScore').textContent = best;
+
+  const list = document.getElementById('historyList');
+  if (historyRecords.length === 0) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:8px 0">暂无记录</div>';
+    return;
+  }
+  list.innerHTML = historyRecords.map((r, i) => {
+    const gradeClass = { S: 'grade-s', A: 'grade-a', B: 'grade-b', C: 'grade-c' }[r.grade];
+    return `<div class="history-item">
+      <span class="history-rank">${i + 1}</span>
+      <span class="history-score">${r.score}分 <span style="color:var(--muted);font-weight:400">${r.correct}/${r.total}题</span></span>
+      <span style="font-size:11px;color:var(--muted)">${r.ts}</span>
+      <span class="history-grade ${gradeClass}">${r.grade}</span>
+    </div>`;
+  }).join('');
+}
+
+function showComboToast(msg) {
+  const toast = document.getElementById('comboToast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._tid);
+  toast._tid = setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ─── 撒花 ───
+function launchConfetti() {
+  const container = document.getElementById('confettiContainer');
+  container.innerHTML = '';
+  const colors = ['#F5C842', '#7C3AED', '#EC4899', '#22C55E', '#3B82F6', '#F97316', '#fff'];
+  for (let i = 0; i < 80; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top = '-10px';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    p.style.animationDelay = (Math.random() * 1.2) + 's';
+    p.style.width = (6 + Math.random() * 6) + 'px';
+    p.style.height = (6 + Math.random() * 6) + 'px';
+    container.appendChild(p);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 4500);
+}
+
+// ─── 初始化 ───
+updateStatusBar();
+updateHistoryUI();
+
+// 状态栏时间
+const d = new Date();
+document.getElementById('statusTime').textContent =
+  d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+</script>
+</body>
+</html>

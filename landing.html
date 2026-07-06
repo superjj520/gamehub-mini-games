@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameHub 中台 — 低成本快速上线任意互动小游戏</title>
+  <style>
+    :root {
+      --gold: #F5C842;
+      --bg: #0D0720;
+      --accent: #7C3AED;
+      --accent2: #EC4899;
+      --text: #E2E8F0;
+      --text-muted: #94A3B8;
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.08);
+      --card-hover: rgba(124,58,237,0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ===== 背景光晕 ===== */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: -200px;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -200px;
+      right: -200px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(236,72,153,0.14) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== 导航 ===== */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 64px;
+      background: rgba(13,7,32,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .nav-logo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .btn-nav {
+      background: var(--gold);
+      color: #1a0a00;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-nav:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ===== 通用区块 ===== */
+    section {
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(245,200,66,0.1);
+      border: 1px solid rgba(245,200,66,0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 16px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--accent2) 60%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ===== Hero ===== */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 64px;
+      overflow: hidden;
+    }
+
+    .hero-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 80px 24px;
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+    }
+    .hero-tag span { color: var(--gold); font-weight: 600; }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 5vw, 4.2rem);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .hero-title .line2 {
+      display: block;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--accent2) 50%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+      max-width: 520px;
+      margin-bottom: 40px;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold) 0%, #e8a020 100%);
+      color: #1a0a00;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(245,200,66,0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(245,200,66,0.45);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--card-border);
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-outline:hover {
+      border-color: var(--accent);
+      background: rgba(124,58,237,0.1);
+    }
+
+    /* ===== 转盘装饰（纯CSS）===== */
+    .wheel-deco {
+      position: relative;
+      width: 340px;
+      height: 340px;
+      margin: 0 auto;
+    }
+
+    .wheel-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid rgba(245,200,66,0.3);
+      box-shadow: 0 0 40px rgba(124,58,237,0.4), inset 0 0 40px rgba(124,58,237,0.15);
+    }
+
+    .wheel-spin {
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      overflow: hidden;
+      animation: spinWheel 12s linear infinite;
+    }
+
+    @keyframes spinWheel {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* 8个扇形 */
+    .wheel-spin::before,
+    .wheel-spin::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+    }
+
+    .wheel-segment {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      transform-origin: 100% 100%;
+    }
+
+    .wheel-segment:nth-child(1)  { transform: rotate(0deg);    background: rgba(245,200,66,0.85); }
+    .wheel-segment:nth-child(2)  { transform: rotate(45deg);   background: rgba(236,72,153,0.75); }
+    .wheel-segment:nth-child(3)  { transform: rotate(90deg);   background: rgba(124,58,237,0.85); }
+    .wheel-segment:nth-child(4)  { transform: rotate(135deg);  background: rgba(245,200,66,0.55); }
+    .wheel-segment:nth-child(5)  { transform: rotate(180deg);  background: rgba(236,72,153,0.85); }
+    .wheel-segment:nth-child(6)  { transform: rotate(225deg);  background: rgba(124,58,237,0.65); }
+    .wheel-segment:nth-child(7)  { transform: rotate(270deg);  background: rgba(245,200,66,0.75); }
+    .wheel-segment:nth-child(8)  { transform: rotate(315deg);  background: rgba(236,72,153,0.55); }
+
+    /* 分割线 */
+    .wheel-dividers {
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      animation: spinWheel 12s linear infinite;
+    }
+    .wheel-dividers::before,
+    .wheel-dividers::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: rgba(13,7,32,0.7);
+      transform: translateY(-50%);
+    }
+    .wheel-dividers::after {
+      transform: translateY(-50%) rotate(90deg);
+    }
+    .wheel-line {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      animation: spinWheel 12s linear infinite;
+    }
+    .wheel-line::before,
+    .wheel-line::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: rgba(13,7,32,0.7);
+    }
+    .wheel-line::before { transform: translateY(-50%) rotate(45deg); }
+    .wheel-line::after  { transform: translateY(-50%) rotate(-45deg); }
+
+    /* 中心圆 */
+    .wheel-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 4px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      z-index: 10;
+      box-shadow: 0 0 20px rgba(245,200,66,0.5);
+    }
+
+    /* 指针 */
+    .wheel-pointer {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 24px solid var(--gold);
+      z-index: 11;
+      filter: drop-shadow(0 2px 4px rgba(245,200,66,0.6));
+    }
+
+    /* 外环光晕 */
+    .wheel-glow {
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      background: radial-gradient(circle, transparent 45%, rgba(124,58,237,0.12) 70%, transparent 100%);
+      animation: pulseGlow 3s ease-in-out infinite;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.04); }
+    }
+
+    /* 奖品标签 */
+    .wheel-labels {
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      animation: spinWheel 12s linear infinite;
+    }
+    .wheel-label {
+      position: absolute;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: rgba(13,7,32,0.9);
+      white-space: nowrap;
+      transform-origin: center;
+    }
+
+    /* ===== 数据亮点 ===== */
+    #stats {
+      padding: 60px 0;
+      border-top: 1px solid var(--card-border);
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(124,58,237,0.04);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 32px 16px;
+      border-right: 1px solid var(--card-border);
+    }
+    .stat-item:last-child { border-right: none; }
+
+    .stat-num {
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, var(--gold), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-unit {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ===== 场景卡 ===== */
+    #scenarios {
+      padding: 100px 0;
+    }
+
+    .scenarios-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .scroll-track {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 8px 24px 24px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      scroll-snap-type: x mandatory;
+    }
+    .scroll-track::-webkit-scrollbar { display: none; }
+
+    .scene-card {
+      flex: 0 0 220px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px 20px;
+      scroll-snap-align: start;
+      transition: transform 0.25s, border-color 0.25s, background 0.25s;
+      cursor: default;
+    }
+    .scene-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(124,58,237,0.4);
+      background: var(--card-hover);
+    }
+
+    .scene-icon {
+      font-size: 2.2rem;
+      margin-bottom: 14px;
+    }
+
+    .scene-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .scene-tags {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .scene-tag {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .scene-tag::before {
+      content: '';
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ===== 游戏组件 ===== */
+    #games {
+      padding: 100px 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.1) 0%, transparent 60%);
+    }
+
+    .games-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .games-track {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 8px 24px 24px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(124,58,237,0.3) transparent;
+      scroll-snap-type: x mandatory;
+    }
+    .games-track::-webkit-scrollbar { height: 4px; }
+    .games-track::-webkit-scrollbar-track { background: transparent; }
+    .games-track::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.3); border-radius: 2px; }
+
+    .game-card {
+      flex: 0 0 220px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 28px 20px;
+      scroll-snap-align: start;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .game-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(245,200,66,0.3);
+      box-shadow: 0 12px 40px rgba(124,58,237,0.25);
+    }
+
+    .game-emoji {
+      font-size: 2.8rem;
+      line-height: 1;
+    }
+
+    .game-name {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .game-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .game-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(124,58,237,0.2);
+      color: #a78bfa;
+      border: 1px solid rgba(124,58,237,0.25);
+      font-weight: 600;
+    }
+
+    .btn-preview {
+      background: transparent;
+      border: 1px solid rgba(245,200,66,0.4);
+      color: var(--gold);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: background 0.2s, border-color 0.2s;
+      display: block;
+    }
+    .btn-preview:hover {
+      background: rgba(245,200,66,0.1);
+      border-color: var(--gold);
+    }
+
+    /* ===== 核心能力 ===== */
+    #capabilities {
+      padding: 100px 0;
+    }
+
+    .cap-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .cap-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .cap-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 36px 32px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      transition: transform 0.25s, border-color 0.25s, background 0.25s;
+    }
+    .cap-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(124,58,237,0.35);
+      background: var(--card-hover);
+    }
+
+    .cap-icon {
+      font-size: 2.2rem;
+      flex-shrink: 0;
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(124,58,237,0.15);
+      border-radius: 14px;
+      border: 1px solid rgba(124,58,237,0.25);
+    }
+
+    .cap-body h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .cap-body p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ===== 接入流程 ===== */
+    #how {
+      padding: 100px 0;
+      background: radial-gradient(ellipse at 50% 50%, rgba(236,72,153,0.07) 0%, transparent 60%);
+    }
+
+    .how-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .steps-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: start;
+      gap: 0;
+    }
+
+    .step-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 36px 28px;
+      text-align: center;
+      transition: transform 0.25s, border-color 0.25s;
+    }
+    .step-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(124,58,237,0.4);
+    }
+
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      font-size: 1.1rem;
+      font-weight: 900;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+    }
+
+    .step-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .step-desc {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    .step-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .step-arrow {
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      padding-top: 80px;
+      color: var(--text-muted);
+      font-size: 1.4rem;
+    }
+
+    /* ===== 定价 ===== */
+    #pricing {
+      padding: 100px 0;
+    }
+
+    .pricing-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr 1fr;
+      gap: 20px;
+      align-items: start;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .price-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 36px 28px;
+      transition: transform 0.25s;
+    }
+    .price-card:hover { transform: translateY(-4px); }
+
+    .price-card.featured {
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 48px rgba(245,200,66,0.15);
+      position: relative;
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--gold), #e8a020);
+      color: #1a0a00;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 4px 16px;
+      border-radius: 20px;
+      white-space: nowrap;
+      letter-spacing: 0.06em;
+    }
+
+    .plan-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .plan-price {
+      font-size: 2.4rem;
+      font-weight: 900;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .price-card.featured .plan-price {
+      background: linear-gradient(135deg, var(--gold), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .plan-price-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .plan-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .plan-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .plan-features li .check {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(124,58,237,0.2);
+      border: 1px solid rgba(124,58,237,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.6rem;
+      color: #a78bfa;
+    }
+    .price-card.featured .plan-features li .check {
+      background: rgba(245,200,66,0.15);
+      border-color: rgba(245,200,66,0.35);
+      color: var(--gold);
+    }
+
+    .btn-plan {
+      width: 100%;
+      padding: 13px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      display: block;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .btn-plan-outline {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+    }
+    .btn-plan-outline:hover {
+      border-color: var(--accent);
+      background: rgba(124,58,237,0.1);
+    }
+
+    .btn-plan-gold {
+      background: linear-gradient(135deg, var(--gold), #e8a020);
+      color: #1a0a00;
+      border: none;
+      box-shadow: 0 4px 16px rgba(245,200,66,0.3);
+    }
+    .btn-plan-gold:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(245,200,66,0.45);
+    }
+
+    /* ===== 底部 ===== */
+    footer {
+      background: rgba(0,0,0,0.3);
+      border-top: 1px solid var(--card-border);
+      padding: 48px 0 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 40px;
+    }
+
+    .footer-brand .brand-logo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-brand p {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      max-width: 260px;
+    }
+
+    .footer-col h4 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-col ul a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color 0.2s;
+    }
+    .footer-col ul a:hover { color: var(--text); }
+
+    .footer-bottom {
+      border-top: 1px solid var(--card-border);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-bottom p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .footer-contact {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-contact a {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-contact a:hover { color: var(--gold); }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 768px) {
+      nav { padding: 0 16px; }
+      .nav-links { display: none; }
+
+      .hero-inner {
+        grid-template-columns: 1fr;
+        padding: 60px 16px;
+        gap: 48px;
+      }
+
+      .wheel-deco { display: none; }
+
+      .stats-grid { grid-template-columns: 1fr; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--card-border); }
+      .stat-item:last-child { border-bottom: none; }
+
+      .cap-grid { grid-template-columns: 1fr; }
+
+      .steps-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .step-arrow { display: none; }
+
+      .pricing-grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+      }
+
+      .footer-top {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+      }
+      .footer-brand { grid-column: 1 / -1; }
+
+      .footer-bottom {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 导航 -->
+  <nav>
+    <a class="nav-logo" href="#">🎮 GameHub 中台</a>
+    <ul class="nav-links">
+      <li><a href="#games">游戏组件</a></li>
+      <li><a href="#how">接入方式</a></li>
+      <li><a href="#pricing">定价</a></li>
+      <li><a href="index.html" class="btn-nav">免费试用</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section id="hero">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-tag">
+          <span>✦</span> 小游戏中台 · 开箱即用 · 运营自助
+        </div>
+        <h1 class="hero-title">
+          低成本，快速上线
+          <span class="line2">任意互动小游戏</span>
+        </h1>
+        <p class="hero-sub">
+          从转盘到飞行棋，开箱即用的游戏组件库 + 后端奖池引擎，运营自助配置，无需开发介入。
+        </p>
+        <div class="hero-cta">
+          <a href="index.html" class="btn-primary">免费体验 Demo</a>
+          <a href="#pricing" class="btn-outline">联系我们</a>
+        </div>
+      </div>
+
+      <!-- 纯CSS转盘装饰 -->
+      <div class="wheel-deco">
+        <div class="wheel-glow"></div>
+        <div class="wheel-ring"></div>
+        <div class="wheel-spin">
+          <div class="wheel-segment"></div>
+          <div class="wheel-segment"></div>
+          <div class="wheel-segment"></div>
+          <div class="wheel-segment"></div>
+          <div class="wheel-segment"></div>
+          <div class="wheel-segment"></div>
+          <div class="wheel-segment"></div>
+          <div class="wheel-segment"></div>
+        </div>
+        <div class="wheel-dividers"></div>
+        <div class="wheel-line"></div>
+        <div class="wheel-pointer"></div>
+        <div class="wheel-center">🎮</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 核心数据 -->
+  <section id="stats">
+    <div class="section-inner">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-num">5<span class="stat-unit" style="font-size:1.8rem">+</span></div>
+          <div class="stat-label">开箱即用组件</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">10<span class="stat-unit">分钟</span></div>
+          <div class="stat-label">快速接入上线</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">0<span class="stat-unit">代码</span></div>
+          <div class="stat-label">运营自助配置</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 适用场景 -->
+  <section id="scenarios">
+    <div class="section-inner">
+      <div class="scenarios-header">
+        <div class="section-label">适用场景</div>
+        <h2 class="section-title">覆盖全行业营销增长需求</h2>
+        <p style="color:var(--text-muted);font-size:0.95rem;">无论你在哪个行业，都能找到契合的互动玩法</p>
+      </div>
+    </div>
+    <div class="scroll-track">
+      <div class="scene-card">
+        <div class="scene-icon">🛍️</div>
+        <div class="scene-title">电商促销</div>
+        <div class="scene-tags">
+          <div class="scene-tag">大促预热活动</div>
+          <div class="scene-tag">首单奖励发放</div>
+          <div class="scene-tag">节日限时互动</div>
+        </div>
+      </div>
+      <div class="scene-card">
+        <div class="scene-icon">📱</div>
+        <div class="scene-title">App 促活</div>
+        <div class="scene-tags">
+          <div class="scene-tag">签到每日奖励</div>
+          <div class="scene-tag">会员专属权益</div>
+          <div class="scene-tag">新人引导任务</div>
+        </div>
+      </div>
+      <div class="scene-card">
+        <div class="scene-icon">🎓</div>
+        <div class="scene-title">教育激励</div>
+        <div class="scene-tags">
+          <div class="scene-tag">答题积分奖励</div>
+          <div class="scene-tag">课程打卡解锁</div>
+          <div class="scene-tag">成就勋章系统</div>
+        </div>
+      </div>
+      <div class="scene-card">
+        <div class="scene-icon">🏪</div>
+        <div class="scene-title">本地生活</div>
+        <div class="scene-tags">
+          <div class="scene-tag">到店有礼互动</div>
+          <div class="scene-tag">核销游戏体验</div>
+          <div class="scene-tag">复购积分激励</div>
+        </div>
+      </div>
+      <div class="scene-card">
+        <div class="scene-icon">🎮</div>
+        <div class="scene-title">游戏社区</div>
+        <div class="scene-tags">
+          <div class="scene-tag">成就解锁系统</div>
+          <div class="scene-tag">赛季专属奖励</div>
+          <div class="scene-tag">每日登录任务</div>
+        </div>
+      </div>
+      <div class="scene-card">
+        <div class="scene-icon">💼</div>
+        <div class="scene-title">企业内训</div>
+        <div class="scene-tags">
+          <div class="scene-tag">培训打卡激励</div>
+          <div class="scene-tag">知识竞赛对战</div>
+          <div class="scene-tag">积分兑换商城</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 游戏组件 -->
+  <section id="games">
+    <div class="section-inner">
+      <div class="games-header">
+        <div class="section-label">游戏组件库</div>
+        <h2 class="section-title">5款核心游戏组件</h2>
+        <p style="color:var(--text-muted);font-size:0.95rem;">覆盖 80% 营销互动场景，开箱即用，风格可定制</p>
+      </div>
+    </div>
+    <div class="games-track">
+      <div class="game-card">
+        <div class="game-emoji">🎡</div>
+        <div class="game-name">大转盘</div>
+        <div class="game-desc">经典抽奖方式，视觉冲击强，适合大促首选。支持权重控奖，防刷奖池。</div>
+        <div class="game-chips">
+          <span class="chip">权重控奖</span>
+          <span class="chip">多皮肤</span>
+          <span class="chip">防作弊</span>
+        </div>
+        <a href="wheel.html" class="btn-preview">立即预览</a>
+      </div>
+      <div class="game-card">
+        <div class="game-emoji">🔲</div>
+        <div class="game-name">九宫格</div>
+        <div class="game-desc">宫格翻转抽奖，互动感强，适合中秋、年货节等节日场景活动。</div>
+        <div class="game-chips">
+          <span class="chip">节日主题</span>
+          <span class="chip">连续抽奖</span>
+          <span class="chip">动效丰富</span>
+        </div>
+        <a href="nine-grid.html" class="btn-preview">立即预览</a>
+      </div>
+      <div class="game-card">
+        <div class="game-emoji">🪙</div>
+        <div class="game-name">刮刮乐</div>
+        <div class="game-desc">触摸刮奖体验，神秘感十足，适合优惠券派发和新客激活场景。</div>
+        <div class="game-chips">
+          <span class="chip">触摸刮涂</span>
+          <span class="chip">优惠券</span>
+          <span class="chip">新客专享</span>
+        </div>
+        <a href="scratch-card.html" class="btn-preview">立即预览</a>
+      </div>
+      <div class="game-card">
+        <div class="game-emoji">🎲</div>
+        <div class="game-name">摇骰子</div>
+        <div class="game-desc">重力感应摇奖，手势互动体验，适合年轻用户群体和游戏化运营。</div>
+        <div class="game-chips">
+          <span class="chip">摇一摇</span>
+          <span class="chip">重力感应</span>
+          <span class="chip">年轻化</span>
+        </div>
+        <a href="shake-dice.html" class="btn-preview">立即预览</a>
+      </div>
+      <div class="game-card">
+        <div class="game-emoji">🥚</div>
+        <div class="game-name">砸金蛋</div>
+        <div class="game-desc">一锤定乾坤的紧张感，适合线下门店扫码、会员日特权等高参与场景。</div>
+        <div class="game-chips">
+          <span class="chip">砸蛋动效</span>
+          <span class="chip">线下核销</span>
+          <span class="chip">会员权益</span>
+        </div>
+        <a href="smash-egg.html" class="btn-preview">立即预览</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 核心能力 -->
+  <section id="capabilities">
+    <div class="section-inner">
+      <div class="cap-header">
+        <div class="section-label">平台能力</div>
+        <h2 class="section-title">中台核心能力，<span class="gradient-text">让运营真正自由</span></h2>
+      </div>
+      <div class="cap-grid">
+        <div class="cap-card">
+          <div class="cap-icon">🎯</div>
+          <div class="cap-body">
+            <h3>后端控奖，防作弊</h3>
+            <p>奖池概率由服务端实时计算，前端无法破解或预判结果。自动识别异常请求，保护每一份真实奖励的安全发放。</p>
+          </div>
+        </div>
+        <div class="cap-card">
+          <div class="cap-icon">⚡</div>
+          <div class="cap-body">
+            <h3>10 分钟接入，运营自助</h3>
+            <p>复制一段嵌入代码即可上线。奖品配置、中奖概率、活动时间全部由运营在后台自助操作，无需提工单。</p>
+          </div>
+        </div>
+        <div class="cap-card">
+          <div class="cap-icon">🎨</div>
+          <div class="cap-body">
+            <h3>多套皮肤，品牌定制</h3>
+            <p>内置节日、电商、游戏等多套视觉皮肤，支持上传品牌色和 Logo，保持与主站品牌一致的用户体验。</p>
+          </div>
+        </div>
+        <div class="cap-card">
+          <div class="cap-icon">📊</div>
+          <div class="cap-body">
+            <h3>实时数据，效果可见</h3>
+            <p>参与人数、中奖分布、奖品消耗进度全部实时可查。活动结束后自动生成数据报告，支持导出分析。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 接入方式 -->
+  <section id="how">
+    <div class="section-inner">
+      <div class="how-header">
+        <div class="section-label">接入方式</div>
+        <h2 class="section-title">3步完成接入，<span class="gradient-text">最快 10 分钟上线</span></h2>
+      </div>
+      <div class="steps-row">
+        <div class="step-card">
+          <div class="step-icon">🎮</div>
+          <div class="step-num">1</div>
+          <div class="step-title">选择游戏组件</div>
+          <div class="step-desc">从大转盘、九宫格、刮刮乐等 5 款组件中选择适合你活动场景的游戏类型，支持预览效果。</div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <div class="step-icon">⚙️</div>
+          <div class="step-num">2</div>
+          <div class="step-title">配置奖池和规则</div>
+          <div class="step-desc">在运营后台填写奖品名称、数量、中奖概率和活动时间。无需写代码，表单填写即可完成所有配置。</div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <div class="step-icon">🚀</div>
+          <div class="step-num">3</div>
+          <div class="step-title">复制代码，上线活动</div>
+          <div class="step-desc">系统自动生成嵌入代码，粘贴到你的页面即可。活动立即生效，数据实时同步至后台。</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:40px;">
+        <a href="admin.html" class="btn-outline" style="display:inline-block;">进入运营后台 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 定价 -->
+  <section id="pricing">
+    <div class="section-inner">
+      <div class="pricing-header">
+        <div class="section-label">定价方案</div>
+        <h2 class="section-title">按需选择，<span class="gradient-text">灵活扩展</span></h2>
+        <p style="color:var(--text-muted);font-size:0.95rem;margin-top:8px;">从免费起步，随业务增长平滑升级</p>
+      </div>
+      <div class="pricing-grid">
+        <!-- Basic -->
+        <div class="price-card">
+          <div class="plan-name">Basic</div>
+          <div class="plan-price">免费</div>
+          <div class="plan-price-sub">永久免费，无需信用卡</div>
+          <ul class="plan-features">
+            <li><span class="check">✓</span>3 个游戏组件</li>
+            <li><span class="check">✓</span>每月 1 万次参与</li>
+            <li><span class="check">✓</span>基础数据统计</li>
+            <li><span class="check">✓</span>标准皮肤主题</li>
+            <li><span class="check">✓</span>社区支持</li>
+          </ul>
+          <a href="index.html" class="btn-plan btn-plan-outline">免费开始</a>
+        </div>
+
+        <!-- Pro（推荐） -->
+        <div class="price-card featured">
+          <div class="featured-badge">推荐</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">联系报价</div>
+          <div class="plan-price-sub">按月订阅，随时可取消</div>
+          <ul class="plan-features">
+            <li><span class="check">✓</span>全部游戏组件</li>
+            <li><span class="check">✓</span>不限参与次数</li>
+            <li><span class="check">✓</span>完整运营后台</li>
+            <li><span class="check">✓</span>自定义品牌皮肤</li>
+            <li><span class="check">✓</span>实时数据报告</li>
+            <li><span class="check">✓</span>优先技术支持</li>
+          </ul>
+          <a href="#contact" class="btn-plan btn-plan-gold">立即咨询</a>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="price-card">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price">定制报价</div>
+          <div class="plan-price-sub">私有部署，按需定制</div>
+          <ul class="plan-features">
+            <li><span class="check">✓</span>私有化独立部署</li>
+            <li><span class="check">✓</span>专属视觉皮肤</li>
+            <li><span class="check">✓</span>定制化游戏玩法</li>
+            <li><span class="check">✓</span>专属客户经理</li>
+            <li><span class="check">✓</span>SLA 保障协议</li>
+          </ul>
+          <a href="#contact" class="btn-plan btn-plan-outline">联系商务</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 底部 -->
+  <footer id="contact">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="brand-logo">🎮 GameHub 中台</div>
+          <p>低成本、快速上线任意互动小游戏的中台解决方案。帮助运营团队自助配置游戏活动，无需开发介入。</p>
+        </div>
+        <div class="footer-col">
+          <h4>产品</h4>
+          <ul>
+            <li><a href="index.html">游戏 Demo</a></li>
+            <li><a href="#games">组件库</a></li>
+            <li><a href="admin.html">运营后台</a></li>
+            <li><a href="#pricing">定价方案</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>游戏</h4>
+          <ul>
+            <li><a href="wheel.html">大转盘</a></li>
+            <li><a href="nine-grid.html">九宫格</a></li>
+            <li><a href="scratch-card.html">刮刮乐</a></li>
+            <li><a href="shake-dice.html">摇骰子</a></li>
+            <li><a href="smash-egg.html">砸金蛋</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>联系我们</h4>
+          <ul>
+            <li><a href="mailto:hello@gamehub.com">hello@gamehub.com</a></li>
+            <li><a href="#">商务合作</a></li>
+            <li><a href="#">技术支持</a></li>
+            <li><a href="#">加入我们</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 GameHub 中台. 保留所有权利。</p>
+        <div class="footer-contact">
+          <a href="#">隐私政策</a>
+          <a href="#">服务条款</a>
+          <a href="mailto:hello@gamehub.com">📧 hello@gamehub.com</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // 导航滚动透明度
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 40) {
+        nav.style.background = 'rgba(13,7,32,0.95)';
+      } else {
+        nav.style.background = 'rgba(13,7,32,0.85)';
+      }
+    });
+
+    // 滚动入场动画
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.cap-card, .step-card, .price-card, .scene-card, .game-card').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(24px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease, border-color 0.25s, background 0.25s, box-shadow 0.25s';
+      observer.observe(el);
+    });
+
+    // 场景卡片拖动滚动（移动端友好）
+    ['.scroll-track', '.games-track'].forEach(sel => {
+      const el = document.querySelector(sel);
+      if (!el) return;
+      let isDown = false, startX, scrollLeft;
+      el.addEventListener('mousedown', e => {
+        isDown = true;
+        startX = e.pageX - el.offsetLeft;
+        scrollLeft = el.scrollLeft;
+        el.style.cursor = 'grabbing';
+      });
+      el.addEventListener('mouseleave', () => { isDown = false; el.style.cursor = ''; });
+      el.addEventListener('mouseup', () => { isDown = false; el.style.cursor = ''; });
+      el.addEventListener('mousemove', e => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - el.offsetLeft;
+        el.scrollLeft = scrollLeft - (x - startX);
+      });
+    });
+  </script>
+</body>
+</html>

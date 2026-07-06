@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 夹娃娃机 Demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: inherit;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+  }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    padding: 7px 16px; border-radius: 8px;
+    font-size: 14px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+  }
+  .nav-tab:hover { background: var(--card); color: var(--text); }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22C55E;
+    box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .status-text { font-size: 12px; color: var(--muted); }
+
+  /* ─── 主体布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: calc(100vh - 117px);
+  }
+
+  /* ─── 左侧面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-title {
+    font-size: 12px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* 娃娃列表 */
+  .doll-list { display: flex; flex-direction: column; gap: 8px; }
+  .doll-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    position: relative;
+  }
+  .doll-item:hover { border-color: rgba(124,58,237,0.4); }
+  .doll-emoji-block {
+    width: 34px; height: 34px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+    background: rgba(255,255,255,0.05);
+  }
+  .doll-info { flex: 1; min-width: 0; }
+  .doll-name { font-size: 13px; font-weight: 600; }
+  .doll-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .doll-prob-badge {
+    font-size: 12px; font-weight: 700; color: var(--gold);
+    background: rgba(245,200,66,0.1);
+    padding: 3px 8px; border-radius: 20px;
+    border: 1px solid rgba(245,200,66,0.2);
+    flex-shrink: 0;
+  }
+  .rare-badge {
+    font-size: 10px; font-weight: 700; color: #EC4899;
+    background: rgba(236,72,153,0.1);
+    padding: 2px 6px; border-radius: 10px;
+    border: 1px solid rgba(236,72,153,0.2);
+    margin-left: 4px;
+  }
+
+  /* 规则配置 */
+  .rule-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-label { color: var(--muted); }
+  .rule-value { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .rule-input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: var(--text);
+    font-size: 13px;
+    width: 64px; text-align: center;
+    outline: none;
+  }
+  .rule-input:focus { border-color: var(--accent); }
+
+  /* 速度切换 */
+  .speed-btns { display: flex; gap: 6px; }
+  .speed-btn {
+    padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted); cursor: pointer; transition: all 0.2s;
+  }
+  .speed-btn.active {
+    background: rgba(124,58,237,0.2);
+    border-color: var(--accent); color: var(--text);
+  }
+
+  /* ─── 中间游戏区 ─── */
+  .game-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .game-center::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .game-title-area { text-align: center; margin-bottom: 20px; }
+  .game-name {
+    font-size: 26px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .game-subtitle { color: var(--muted); font-size: 13px; margin-top: 5px; }
+
+  /* ─── 夹娃娃机主体 ─── */
+  .machine-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+  }
+
+  /* 顶部彩灯装饰 */
+  .machine-lights {
+    display: flex; gap: 8px; margin-bottom: 6px;
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+  .light-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .light-dot:nth-child(1)  { background: #FF4444; box-shadow: 0 0 6px #FF4444; animation: lightBlink 1.1s ease-in-out infinite; }
+  .light-dot:nth-child(2)  { background: #FF8800; box-shadow: 0 0 6px #FF8800; animation: lightBlink 1.1s ease-in-out infinite 0.15s; }
+  .light-dot:nth-child(3)  { background: var(--gold); box-shadow: 0 0 6px var(--gold); animation: lightBlink 1.1s ease-in-out infinite 0.3s; }
+  .light-dot:nth-child(4)  { background: #44FF88; box-shadow: 0 0 6px #44FF88; animation: lightBlink 1.1s ease-in-out infinite 0.45s; }
+  .light-dot:nth-child(5)  { background: #44AAFF; box-shadow: 0 0 6px #44AAFF; animation: lightBlink 1.1s ease-in-out infinite 0.6s; }
+  .light-dot:nth-child(6)  { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); animation: lightBlink 1.1s ease-in-out infinite 0.75s; }
+  .light-dot:nth-child(7)  { background: #FF4444; box-shadow: 0 0 6px #FF4444; animation: lightBlink 1.1s ease-in-out infinite 0.9s; }
+  .light-dot:nth-child(8)  { background: #FF8800; box-shadow: 0 0 6px #FF8800; animation: lightBlink 1.1s ease-in-out infinite 1.05s; }
+  .light-dot:nth-child(9)  { background: var(--gold); box-shadow: 0 0 6px var(--gold); animation: lightBlink 1.1s ease-in-out infinite 0.2s; }
+  .light-dot:nth-child(10) { background: #44FF88; box-shadow: 0 0 6px #44FF88; animation: lightBlink 1.1s ease-in-out infinite 0.35s; }
+  .light-dot:nth-child(11) { background: #44AAFF; box-shadow: 0 0 6px #44AAFF; animation: lightBlink 1.1s ease-in-out infinite 0.5s; }
+  .light-dot:nth-child(12) { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); animation: lightBlink 1.1s ease-in-out infinite 0.65s; }
+  @keyframes lightBlink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+  /* 机器主体外框 */
+  .machine-body {
+    width: 420px;
+    background: linear-gradient(160deg, #1a1040 0%, #0d0720 50%, #150e35 100%);
+    border-radius: 20px 20px 12px 12px;
+    border: 2px solid rgba(68,170,255,0.4);
+    box-shadow:
+      0 0 0 1px rgba(68,170,255,0.1),
+      0 0 30px rgba(68,170,255,0.15),
+      0 0 60px rgba(124,58,237,0.1),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+    padding: 14px 14px 0 14px;
+    position: relative;
+  }
+
+  /* 机器顶部标题装饰 */
+  .machine-header {
+    text-align: center; margin-bottom: 10px;
+    padding: 6px 0;
+  }
+  .machine-title-text {
+    font-size: 15px; font-weight: 900;
+    background: linear-gradient(135deg, var(--gold), #fde68a);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 3px;
+  }
+
+  /* 玻璃展示区 */
+  .glass-area {
+    width: 100%;
+    height: 280px;
+    background: linear-gradient(170deg,
+      rgba(20,40,80,0.7) 0%,
+      rgba(10,20,50,0.8) 60%,
+      rgba(5,10,30,0.9) 100%);
+    border-radius: 12px;
+    border: 2px solid rgba(68,170,255,0.3);
+    box-shadow:
+      inset 0 2px 20px rgba(0,0,0,0.5),
+      inset 0 0 40px rgba(68,170,255,0.05),
+      0 0 20px rgba(68,170,255,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  /* 玻璃反光效果 */
+  .glass-area::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 60px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%);
+    border-radius: 10px 10px 0 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .glass-area::after {
+    content: '';
+    position: absolute;
+    top: 5px; left: 8px;
+    width: 3px; height: 60px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* 出货口 */
+  .exit-slot {
+    position: absolute;
+    bottom: 0; right: 20px;
+    width: 50px; height: 20px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 6px 6px 0 0;
+    border: 1px solid rgba(68,170,255,0.3);
+    border-bottom: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: var(--muted);
+    z-index: 20;
+  }
+
+  /* 抓手导轨 */
+  .claw-rail {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 8px;
+    background: linear-gradient(90deg,
+      transparent 0%, rgba(68,170,255,0.4) 20%,
+      rgba(68,170,255,0.6) 50%, rgba(68,170,255,0.4) 80%, transparent 100%);
+    border-radius: 0 0 2px 2px;
+    z-index: 5;
+  }
+
+  /* 抓手整体容器 */
+  .claw-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    transition: left 0.05s linear;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* 抓手滑块（在导轨上移动的部分）*/
+  .claw-slider {
+    width: 24px; height: 10px;
+    background: linear-gradient(90deg, rgba(68,170,255,0.6), rgba(100,180,255,0.8));
+    border-radius: 4px;
+    box-shadow: 0 0 8px rgba(68,170,255,0.4);
+  }
+
+  /* 抓手臂（竖线）*/
+  .claw-arm {
+    width: 4px;
+    background: linear-gradient(180deg, rgba(68,170,255,0.8), rgba(68,170,255,0.4));
+    border-radius: 2px;
+    height: 60px; /* JS动态改变 */
+    transition: height 0.05s linear;
+    box-shadow: 0 0 4px rgba(68,170,255,0.3);
+  }
+
+  /* 三爪抓手 */
+  .claw-fingers {
+    display: flex;
+    gap: 2px;
+    align-items: flex-start;
+    position: relative;
+  }
+  .claw-finger {
+    width: 5px;
+    height: 22px;
+    border-radius: 0 0 6px 6px;
+    background: linear-gradient(180deg, rgba(68,170,255,0.9), rgba(100,200,255,0.6));
+    box-shadow: 0 2px 6px rgba(68,170,255,0.3);
+    transition: transform 0.2s ease;
+  }
+  .claw-finger:first-child {
+    transform-origin: top center;
+    transform: rotate(-28deg) translateX(-2px);
+    border-radius: 2px 0 8px 6px;
+  }
+  .claw-finger:last-child {
+    transform-origin: top center;
+    transform: rotate(28deg) translateX(2px);
+    border-radius: 0 2px 6px 8px;
+  }
+  .claw-finger:nth-child(2) {
+    height: 26px;
+  }
+
+  /* 爪子夹紧状态 */
+  .claw-fingers.gripping .claw-finger:first-child {
+    transform: rotate(-8deg) translateX(-1px);
+  }
+  .claw-fingers.gripping .claw-finger:last-child {
+    transform: rotate(8deg) translateX(1px);
+  }
+
+  /* 抓住的娃娃（随爪子移动） */
+  .claw-caught-doll {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 28px;
+    line-height: 1;
+    display: none;
+    filter: drop-shadow(0 0 8px rgba(245,200,66,0.6));
+    animation: dollSwing 0.3s ease-in-out infinite alternate;
+  }
+  @keyframes dollSwing {
+    0% { transform: translateX(-50%) rotate(-3deg); }
+    100% { transform: translateX(-50%) rotate(3deg); }
+  }
+
+  /* 娃娃区域 */
+  .dolls-area {
+    position: absolute;
+    bottom: 24px; left: 0; right: 0;
+    height: 160px;
+    padding: 0 12px;
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  /* 单个娃娃 */
+  .doll-obj {
+    width: 46px; height: 46px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    cursor: default;
+    position: relative;
+    transition: transform 0.3s, opacity 0.3s;
+  }
+  .doll-obj.floating { animation: dollFloat 2.5s ease-in-out infinite; }
+  .doll-obj:nth-child(2n) { animation-delay: -0.8s; }
+  .doll-obj:nth-child(3n) { animation-delay: -1.5s; }
+  .doll-obj:nth-child(4n) { animation-delay: -0.3s; }
+  @keyframes dollFloat {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  .doll-obj.grabbed { opacity: 0; transform: scale(0); }
+  .doll-obj.rare {
+    background: rgba(236,72,153,0.08);
+    border: 1px solid rgba(236,72,153,0.2);
+    box-shadow: 0 0 10px rgba(236,72,153,0.15);
+  }
+  .doll-obj.normal {
+    background: rgba(124,58,237,0.06);
+    border: 1px solid rgba(124,58,237,0.15);
+  }
+
+  /* 地板反光 */
+  .dolls-floor {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 24px;
+    background: linear-gradient(180deg, transparent, rgba(68,170,255,0.05));
+    border-radius: 0 0 10px 10px;
+  }
+
+  /* ─── 机器底部操作区 ─── */
+  .machine-bottom {
+    background: linear-gradient(160deg, #120d30, #0d0720);
+    border-radius: 0 0 12px 12px;
+    border: 2px solid rgba(68,170,255,0.4);
+    border-top: none;
+    padding: 14px 20px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    width: 420px;
+  }
+
+  /* 投币口 */
+  .coin-slot-area {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .coin-slot {
+    width: 44px; height: 16px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 8px;
+    border: 2px solid rgba(68,170,255,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+  .coin-slot::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px; height: 4px;
+    background: rgba(68,170,255,0.3);
+    border-radius: 2px;
+  }
+  .coin-slot-label { font-size: 10px; color: var(--muted); }
+
+  /* 出货槽 */
+  .exit-tray {
+    flex: 1;
+    height: 36px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 8px;
+    border: 1px solid rgba(68,170,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--muted);
+    position: relative;
+    overflow: hidden;
+  }
+  .tray-doll {
+    font-size: 22px;
+    display: none;
+    animation: trayBounce 0.5s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  @keyframes trayBounce {
+    0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  /* 机会显示 */
+  .chance-display {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .chance-coins {
+    display: flex; gap: 4px;
+  }
+  .chance-coin {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 6px rgba(245,200,66,0.5);
+    transition: all 0.3s;
+  }
+  .chance-coin.used {
+    background: rgba(255,255,255,0.1);
+    box-shadow: none;
+  }
+  .chance-label { font-size: 10px; color: var(--muted); }
+
+  /* ─── 操作按钮区 ─── */
+  .game-actions {
+    display: flex; gap: 12px; margin-top: 16px; align-items: center;
+  }
+  .btn-primary {
+    padding: 12px 28px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: white; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(124,58,237,0.5); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-secondary {
+    padding: 12px 20px; border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border); color: var(--text); font-size: 14px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+  .btn-grab {
+    padding: 12px 32px; border-radius: 10px;
+    background: linear-gradient(135deg, #22C55E, #16A34A);
+    border: none; color: white; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(34,197,94,0.4);
+    letter-spacing: 0.5px;
+  }
+  .btn-grab:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(34,197,94,0.5); }
+  .btn-grab:active { transform: translateY(0); }
+  .btn-grab:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .game-hint {
+    font-size: 12px; color: var(--muted);
+    margin-top: 10px; text-align: center;
+  }
+  .game-hint kbd {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px; font-size: 11px;
+  }
+
+  /* 状态提示文字 */
+  .game-status-text {
+    height: 20px;
+    font-size: 13px; font-weight: 600;
+    text-align: center; margin-top: 8px;
+    color: var(--gold);
+    transition: opacity 0.3s;
+  }
+
+  /* 失败抖动 */
+  @keyframes clawShake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+  }
+  .claw-container.shaking {
+    animation: clawShake 0.5s ease-in-out;
+  }
+
+  /* ─── 右侧数据面板 ─── */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+
+  /* 统计卡 */
+  .stats-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 16px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 12px;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .stat-value { font-size: 22px; font-weight: 800; color: var(--gold); }
+  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* 娃娃分布 */
+  .dist-list { display: flex; flex-direction: column; gap: 10px; }
+  .dist-item {}
+  .dist-header {
+    display: flex; justify-content: space-between;
+    font-size: 12px; margin-bottom: 5px;
+  }
+  .dist-name { color: var(--text); }
+  .dist-count { color: var(--muted); }
+  .dist-bar-bg {
+    height: 6px; background: rgba(255,255,255,0.06);
+    border-radius: 3px; overflow: hidden;
+  }
+  .dist-bar-fill {
+    height: 100%; border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  /* 夹取记录 */
+  .record-list { display: flex; flex-direction: column; gap: 6px; }
+  .record-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    animation: recordIn 0.3s ease forwards;
+  }
+  @keyframes recordIn {
+    0% { opacity: 0; transform: translateX(10px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  .record-emoji { font-size: 18px; }
+  .record-info { flex: 1; min-width: 0; }
+  .record-prize { font-size: 12px; font-weight: 600; }
+  .record-time { font-size: 11px; color: var(--muted); }
+  .record-tag {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 7px; border-radius: 10px;
+  }
+  .record-tag.win { background: rgba(245,200,66,0.15); color: var(--gold); }
+  .record-tag.lose { background: rgba(255,255,255,0.05); color: var(--muted); }
+
+  /* ─── 中奖弹窗 ─── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: linear-gradient(135deg, #1A0A2E, #2D1060);
+    border: 1px solid rgba(245,200,66,0.35);
+    border-radius: 20px; padding: 36px 32px;
+    text-align: center; position: relative;
+    width: 340px;
+    transform: scale(0.85);
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+    box-shadow: 0 0 60px rgba(245,200,66,0.2), 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .modal-overlay.show .modal { transform: scale(1); }
+  .modal-emoji { font-size: 72px; margin-bottom: 12px; display: block;
+    animation: modalEmojiIn 0.5s cubic-bezier(.34,1.56,.64,1) forwards; }
+  @keyframes modalEmojiIn {
+    0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+  .modal-title {
+    font-size: 14px; font-weight: 600; color: var(--muted);
+    margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .modal-prize-name {
+    font-size: 26px; font-weight: 900;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .modal-desc { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .modal-btn {
+    padding: 13px 32px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: white; font-size: 15px; font-weight: 700;
+    cursor: pointer; width: 100%;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    transition: all 0.2s;
+  }
+  .modal-btn:hover { transform: translateY(-1px); }
+  .modal-close {
+    position: absolute; top: 14px; right: 16px;
+    background: none; border: none; color: var(--muted);
+    font-size: 20px; cursor: pointer; line-height: 1;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  /* 粒子画布 */
+  #particleCanvas {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 199;
+  }
+
+  /* ─── 底部状态栏 ─── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 10px 32px;
+    display: flex; align-items: center; gap: 16px;
+    background: rgba(13,7,32,0.8);
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .footer-status { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+  .footer-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 4px #22C55E;
+  }
+  .footer-sep { color: var(--border); }
+  .footer-ver { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- 粒子画布 -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- 顶部导航 -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">
+    🎮 <span>GameHub 中台</span>
+    <span class="nav-badge">Demo</span>
+  </a>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="wheel.html">大转盘</a>
+    <a class="nav-tab" href="nine-grid.html">九宫格</a>
+    <a class="nav-tab" href="scratch-card.html">刮刮乐</a>
+    <a class="nav-tab" href="shake-dice.html">摇骰子</a>
+    <a class="nav-tab" href="smash-egg.html">砸金蛋</a>
+    <a class="nav-tab active" href="claw-machine.html">夹娃娃机</a>
+  </div>
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span class="status-text">线上环境</span>
+  </div>
+</nav>
+
+<!-- 主体三列布局 -->
+<div class="main">
+
+  <!-- 左侧：配置面板 -->
+  <div class="panel-left">
+    <div class="panel-title">机器配置</div>
+
+    <!-- 娃娃奖品列表 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>娃娃奖品池（6种）</div>
+      <div class="doll-list" id="dollConfigList"></div>
+    </div>
+
+    <!-- 游戏规则 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>游戏规则</div>
+      <div class="rule-row">
+        <span class="rule-label">每日机会次数</span>
+        <div class="rule-value">
+          <input class="rule-input" id="dailyLimit" type="number" value="10" min="1" max="99">
+          <span style="color:var(--muted);font-size:12px">次/天</span>
+        </div>
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">抓手速度</span>
+        <div class="rule-value">
+          <div class="speed-btns">
+            <button class="speed-btn" data-speed="slow" onclick="setSpeed('slow')">慢</button>
+            <button class="speed-btn active" data-speed="medium" onclick="setSpeed('medium')">中</button>
+            <button class="speed-btn" data-speed="fast" onclick="setSpeed('fast')">快</button>
+          </div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">今日已用次数</span>
+        <div class="rule-value" id="usedCountDisplay" style="color:var(--gold)">0 次</div>
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">剩余次数</span>
+        <div class="rule-value" id="remainCountDisplay" style="color:#22C55E">10 次</div>
+      </div>
+    </div>
+
+    <!-- 成功率说明 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>抓取成功率说明</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.9">
+        🎯 系统根据爪子停止时的水平位置判断是否抓到娃娃<br>
+        📍 越接近娃娃中心，抓取成功率越高<br>
+        🐻 稀有娃娃（🐻🦊）概率降低约 50%<br>
+        ⭐ 普通娃娃（🐱🐶🐸⭐）按标准概率计算<br>
+        🔄 每次下爪会随机判定，充满惊喜
+      </div>
+    </div>
+  </div>
+
+  <!-- 中间：游戏区 -->
+  <div class="game-center">
+    <div class="game-title-area">
+      <div class="game-name">🕹️ 夹娃娃机</div>
+      <div class="game-subtitle">移动抓手，精准下爪，夹走你心爱的娃娃！</div>
+    </div>
+
+    <div class="machine-wrapper">
+      <!-- 顶部彩灯 -->
+      <div class="machine-lights">
+        <div class="light-dot"></div>
+        <div class="light-dot"></div>
+        <div class="light-dot"></div>
+        <div class="light-dot"></div>
+        <div class="light-dot"></div>
+        <div class="light-dot"></div>
+        <div class="light-dot"></div>
+        <div class="light-dot"></div>
+        <div class="light-dot"></div>
+        <div class="light-dot"></div>
+        <div class="light-dot"></div>
+        <div class="light-dot"></div>
+      </div>
+
+      <!-- 机器主体 -->
+      <div class="machine-body">
+        <div class="machine-header">
+          <span class="machine-title-text">✦ CLAW MACHINE ✦</span>
+        </div>
+
+        <!-- 玻璃展示区 -->
+        <div class="glass-area" id="glassArea">
+          <div class="claw-rail"></div>
+
+          <!-- 抓手 -->
+          <div class="claw-container" id="clawContainer">
+            <div class="claw-slider"></div>
+            <div class="claw-arm" id="clawArm"></div>
+            <div class="claw-fingers" id="clawFingers">
+              <div class="claw-finger"></div>
+              <div class="claw-finger"></div>
+              <div class="claw-finger"></div>
+            </div>
+            <!-- 抓住时的娃娃 -->
+            <div class="claw-caught-doll" id="clawCaughtDoll"></div>
+          </div>
+
+          <!-- 娃娃区 -->
+          <div class="dolls-area" id="dollsArea"></div>
+          <div class="dolls-floor"></div>
+
+          <!-- 出货口 -->
+          <div class="exit-slot">出货口</div>
+        </div>
+      </div>
+
+      <!-- 机器底部 -->
+      <div class="machine-bottom">
+        <div class="coin-slot-area">
+          <div class="coin-slot"></div>
+          <div class="coin-slot-label">投币口</div>
+        </div>
+        <div class="exit-tray" id="exitTray">
+          <span id="trayDoll" class="tray-doll"></span>
+          <span id="trayEmpty" style="font-size:11px;color:var(--muted)">等待出货...</span>
+        </div>
+        <div class="chance-display">
+          <div class="chance-coins" id="chanceCoins"></div>
+          <div class="chance-label">剩余机会</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="game-actions">
+      <button class="btn-primary" id="btnCoin" onclick="startGame()">🪙 投币开始</button>
+      <button class="btn-grab" id="btnGrab" onclick="grabClaw()" disabled>👇 抓取</button>
+      <button class="btn-secondary" onclick="resetGame()">↺ 重置</button>
+    </div>
+    <div class="game-hint">抓手移动中点击「抓取」或按 <kbd>Space</kbd> 下爪</div>
+    <div class="game-status-text" id="gameStatusText">投币后游戏开始，移动抓手选好位置再下爪！</div>
+  </div>
+
+  <!-- 右侧：数据面板 -->
+  <div class="panel-right">
+    <div class="panel-title">游戏数据</div>
+
+    <!-- 统计卡 -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">游戏次数</div>
+        <div class="stat-value" id="statTotal">0</div>
+        <div class="stat-sub">累计投币</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">夹到次数</div>
+        <div class="stat-value" id="statWin">0</div>
+        <div class="stat-sub">成功抓取</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">成功率</div>
+        <div class="stat-value" id="statRate">0%</div>
+        <div class="stat-sub">抓取成功率</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">最近夹到</div>
+        <div class="stat-value" id="statLast" style="font-size:26px">—</div>
+        <div class="stat-sub">上次获得</div>
+      </div>
+    </div>
+
+    <!-- 娃娃分布 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>娃娃夹取分布</div>
+      <div class="dist-list" id="distList"></div>
+    </div>
+
+    <!-- 夹取记录 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>夹取记录（最近8条）</div>
+      <div class="record-list" id="recordList">
+        <div style="font-size:12px;color:var(--muted);text-align:center;padding:16px 0">
+          暂无记录，快去夹娃娃吧！
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 底部状态栏 -->
+<div class="footer">
+  <div class="footer-status">
+    <div class="footer-dot"></div>
+    系统正常运行
+  </div>
+  <span class="footer-sep">|</span>
+  <span class="footer-ver">夹娃娃机 v1.0</span>
+  <span class="footer-sep">|</span>
+  <span class="footer-ver" id="footerChance">剩余机会：10 次</span>
+  <span class="footer-sep">|</span>
+  <span class="footer-ver" id="footerTime"></span>
+</div>
+
+<!-- 中奖弹窗 -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <span class="modal-emoji" id="modalEmoji">🐻</span>
+    <div class="modal-title">恭喜夹到！</div>
+    <div class="modal-prize-name" id="modalPrizeName">熊猫娃娃</div>
+    <div class="modal-desc" id="modalDesc">超稀有！这只熊猫在等你很久了！</div>
+    <button class="modal-btn" onclick="closeModal()">太棒了，继续玩！</button>
+  </div>
+</div>
+
+<script>
+// ─── 娃娃配置 ───
+const DOLLS = [
+  { id: 'panda',  emoji: '🐻', name: '熊猫娃娃', prob: 0.10, rare: true,  color: '#EC4899', desc: '超稀有！这只熊猫在等你很久了！' },
+  { id: 'fox',    emoji: '🦊', name: '狐狸娃娃', prob: 0.15, rare: true,  color: '#F97316', desc: '狡猾的小狐狸被你抓住啦！' },
+  { id: 'cat',    emoji: '🐱', name: '猫咪娃娃', prob: 0.20, rare: false, color: '#A78BFA', desc: '喵～猫咪娃娃很喜欢你！' },
+  { id: 'dog',    emoji: '🐶', name: '小狗娃娃', prob: 0.20, rare: false, color: '#60A5FA', desc: '汪汪！小狗娃娃被你夹回家啦！' },
+  { id: 'frog',   emoji: '🐸', name: '青蛙娃娃', prob: 0.20, rare: false, color: '#34D399', desc: '呱呱！绿色的幸运就在你手中！' },
+  { id: 'star',   emoji: '⭐', name: '星星玩偶', prob: 0.15, rare: false, color: '#FCD34D', desc: '闪闪发光的星星属于你！' },
+];
+
+// ─── 游戏状态 ───
+let state = {
+  phase: 'idle',       // idle | moving | dropping | rising | sliding | done
+  chances: 10,
+  maxChances: 10,
+  usedToday: 0,
+  clawX: 50,           // 抓手水平位置（百分比）
+  clawArmHeight: 55,   // 爪臂当前高度（px）
+  clawArmMin: 55,
+  clawArmMax: 185,
+  movingDir: 1,
+  speedPx: 1.8,        // 每帧移动px（会换算成%）
+  speedName: 'medium',
+  caughtDoll: null,
+  caughtDollEl: null,
+  totalGames: 0,
+  totalWins: 0,
+  lastWin: null,
+  records: [],
+  dollCounts: {},      // 每种娃娃夹到次数
+  animFrame: null,
+  glassWidth: 392,     // 玻璃区宽度，JS里动态读
+};
+
+const SPEEDS = { slow: 0.9, medium: 1.8, fast: 3.2 };
+
+// 初始化娃娃计数
+DOLLS.forEach(d => { state.dollCounts[d.id] = 0; });
+
+// ─── 初始化页面 ───
+function init() {
+  renderDollConfig();
+  renderDolls();
+  updateChanceCoins();
+  updateDistList();
+  updateStats();
+  updateFooter();
+  setInterval(updateFooterTime, 1000);
+  updateFooterTime();
+
+  // 键盘监听
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (state.phase === 'moving') grabClaw();
+    }
+  });
+}
+
+// ─── 渲染左侧娃娃配置列表 ───
+function renderDollConfig() {
+  const el = document.getElementById('dollConfigList');
+  el.innerHTML = DOLLS.map(d => `
+    <div class="doll-item">
+      <div class="doll-emoji-block">${d.emoji}</div>
+      <div class="doll-info">
+        <div class="doll-name">${d.name}${d.rare ? '<span class="rare-badge">稀有</span>' : ''}</div>
+        <div class="doll-meta">库存充足 · 随机分布</div>
+      </div>
+      <div class="doll-prob-badge">${Math.round(d.prob*100)}%</div>
+    </div>
+  `).join('');
+}
+
+// ─── 渲染娃娃到展示区 ───
+function renderDolls() {
+  const area = document.getElementById('dollsArea');
+  // 生成 14 个娃娃，随机分配种类，稀有的少一些
+  const dollPool = [];
+  // 保证每种至少有 1 个，再随机补充
+  DOLLS.forEach(d => dollPool.push(d.id));
+  // 再加 8 个随机（普通为主）
+  const normalDolls = DOLLS.filter(d => !d.rare);
+  for (let i = 0; i < 8; i++) {
+    dollPool.push(normalDolls[Math.floor(Math.random() * normalDolls.length)].id);
+  }
+  // 打乱
+  dollPool.sort(() => Math.random() - 0.5);
+
+  area.innerHTML = dollPool.map((id, idx) => {
+    const d = DOLLS.find(x => x.id === id);
+    return `<div class="doll-obj ${d.rare ? 'rare' : 'normal'} floating"
+               data-id="${id}"
+               data-idx="${idx}"
+               style="animation-delay:${(idx * 0.3).toFixed(1)}s">
+              ${d.emoji}
+            </div>`;
+  }).join('');
+}
+
+// ─── 更新机会硬币显示 ───
+function updateChanceCoins() {
+  const el = document.getElementById('chanceCoins');
+  const maxShow = Math.min(state.maxChances, 8);
+  let html = '';
+  for (let i = 0; i < maxShow; i++) {
+    const used = i >= state.chances;
+    html += `<div class="chance-coin ${used ? 'used' : ''}"></div>`;
+  }
+  el.innerHTML = html;
+  document.getElementById('usedCountDisplay').textContent = state.usedToday + ' 次';
+  const remain = state.chances;
+  document.getElementById('remainCountDisplay').textContent = remain + ' 次';
+  document.getElementById('footerChance').textContent = '剩余机会：' + remain + ' 次';
+}
+
+// ─── 设置速度 ───
+function setSpeed(name) {
+  state.speedName = name;
+  state.speedPx = SPEEDS[name];
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.speed === name);
+  });
+}
+
+// ─── 投币开始 ───
+function startGame() {
+  const limit = parseInt(document.getElementById('dailyLimit').value) || 10;
+  state.maxChances = limit;
+
+  if (state.chances <= 0) {
+    setStatus('今日机会已用完，明天再来吧！');
+    return;
+  }
+  if (state.phase !== 'idle' && state.phase !== 'done') return;
+
+  state.chances--;
+  state.usedToday++;
+  state.totalGames++;
+  updateChanceCoins();
+  updateStats();
+
+  // 重置爪子位置和状态
+  state.clawX = 50;
+  state.clawArmHeight = state.clawArmMin;
+  state.movingDir = 1;
+  state.caughtDoll = null;
+  state.caughtDollEl = null;
+
+  // 隐藏之前夹到的娃娃
+  document.getElementById('clawCaughtDoll').style.display = 'none';
+  document.getElementById('clawFingers').classList.remove('gripping');
+
+  // 清空出货槽
+  document.getElementById('trayDoll').style.display = 'none';
+  document.getElementById('trayEmpty').style.display = 'inline';
+
+  // 更新按钮
+  document.getElementById('btnCoin').disabled = true;
+  document.getElementById('btnGrab').disabled = false;
+
+  setStatus('抓手移动中，点击「抓取」或按空格键下爪！');
+
+  state.phase = 'moving';
+  requestAnimationFrame(gameLoop);
+}
+
+// ─── 主游戏循环 ───
+function gameLoop() {
+  if (state.phase === 'idle' || state.phase === 'done') return;
+
+  const glass = document.getElementById('glassArea');
+  const glassW = glass.offsetWidth;
+  const container = document.getElementById('clawContainer');
+
+  if (state.phase === 'moving') {
+    // 读取每帧速度（换算为%）
+    const stepPct = (state.speedPx / glassW) * 100;
+    state.clawX += stepPct * state.movingDir;
+    // 碰壁反弹（考虑爪子宽度约24px）
+    const margin = (24 / glassW) * 100 * 0.5;
+    if (state.clawX >= 100 - margin) { state.clawX = 100 - margin; state.movingDir = -1; }
+    if (state.clawX <= margin) { state.clawX = margin; state.movingDir = 1; }
+    applyClawPosition(glassW);
+  }
+  else if (state.phase === 'dropping') {
+    state.clawArmHeight += 3.5;
+    if (state.clawArmHeight >= state.clawArmMax) {
+      state.clawArmHeight = state.clawArmMax;
+      applyClawArm();
+      // 判断是否夹到娃娃
+      checkCatch(glassW);
+      return; // 不继续loop，checkCatch会处理后续
+    }
+    applyClawArm();
+  }
+  else if (state.phase === 'rising') {
+    state.clawArmHeight -= 3;
+    if (state.clawArmHeight <= state.clawArmMin) {
+      state.clawArmHeight = state.clawArmMin;
+      applyClawArm();
+      // 上升完毕，如果有娃娃则滑到出口
+      if (state.caughtDoll) {
+        state.phase = 'sliding';
+        slideToExit(glassW, container);
+        return;
+      } else {
+        // 失败，抖动
+        container.classList.add('shaking');
+        setTimeout(() => {
+          container.classList.remove('shaking');
+          finishRound(false);
+        }, 600);
+        return;
+      }
+    }
+    applyClawArm();
+  }
+  else if (state.phase === 'sliding') {
+    // 由 slideToExit 接管
+    return;
+  }
+
+  state.animFrame = requestAnimationFrame(gameLoop);
+}
+
+// ─── 应用爪子水平位置 ───
+function applyClawPosition(glassW) {
+  const container = document.getElementById('clawContainer');
+  container.style.left = state.clawX + '%';
+  container.style.transform = 'translateX(-50%)';
+}
+
+// ─── 应用爪臂高度 ───
+function applyClawArm() {
+  document.getElementById('clawArm').style.height = state.clawArmHeight + 'px';
+}
+
+// ─── 下爪按钮 ───
+function grabClaw() {
+  if (state.phase !== 'moving') return;
+  state.phase = 'dropping';
+  document.getElementById('btnGrab').disabled = true;
+  document.getElementById('clawFingers').classList.remove('gripping');
+  setStatus('正在下爪...');
+  requestAnimationFrame(gameLoop);
+}
+
+// ─── 判断是否夹到娃娃 ───
+function checkCatch(glassW) {
+  const clawPixelX = (state.clawX / 100) * glassW;
+
+  // 获取所有娃娃元素的位置
+  const dollEls = document.querySelectorAll('.doll-obj:not(.grabbed)');
+  let closestDoll = null;
+  let closestDollData = null;
+  let closestDist = Infinity;
+
+  const glassRect = document.getElementById('glassArea').getBoundingClientRect();
+
+  dollEls.forEach(el => {
+    const rect = el.getBoundingClientRect();
+    const dollCenterX = rect.left - glassRect.left + rect.width / 2;
+    const dist = Math.abs(clawPixelX - dollCenterX);
+    if (dist < closestDist) {
+      closestDist = dist;
+      closestDoll = el;
+      closestDollData = DOLLS.find(d => d.id === el.dataset.id);
+    }
+  });
+
+  // 判断距离阈值（±40px 内有机会）
+  const threshold = 46;
+  let success = false;
+
+  if (closestDoll && closestDist < threshold) {
+    // 距离越近，成功率越高；稀有娃娃额外打折
+    let prob = 1 - (closestDist / threshold) * 0.65;
+    if (closestDollData && closestDollData.rare) prob *= 0.55;
+    success = Math.random() < prob;
+  }
+
+  // 爪子夹紧动画
+  document.getElementById('clawFingers').classList.add('gripping');
+
+  if (success && closestDollData) {
+    state.caughtDoll = closestDollData;
+    state.caughtDollEl = closestDoll;
+
+    // 显示随爪子的娃娃
+    const caughtEl = document.getElementById('clawCaughtDoll');
+    caughtEl.textContent = closestDollData.emoji;
+    caughtEl.style.display = 'block';
+
+    // 标记原娃娃为被夹走
+    closestDoll.classList.add('grabbed');
+
+    setStatus('夹住了！正在上升...');
+  } else {
+    state.caughtDoll = null;
+    setStatus('没夹到，爪子上升中...');
+  }
+
+  state.phase = 'rising';
+  state.animFrame = requestAnimationFrame(gameLoop);
+}
+
+// ─── 滑向出口动画 ───
+function slideToExit(glassW, container) {
+  const targetX = 88; // 右侧出货口位置（%）
+  const startX = state.clawX;
+  const startTime = performance.now();
+  const duration = 700;
+
+  function slide(now) {
+    const t = Math.min((now - startTime) / duration, 1);
+    const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+    const curX = startX + (targetX - startX) * ease;
+    state.clawX = curX;
+    container.style.left = curX + '%';
+
+    if (t < 1) {
+      requestAnimationFrame(slide);
+    } else {
+      // 娃娃掉入出货槽
+      dropToTray();
+    }
+  }
+  requestAnimationFrame(slide);
+}
+
+// ─── 娃娃掉入出货槽 ───
+function dropToTray() {
+  const d = state.caughtDoll;
+  document.getElementById('clawCaughtDoll').style.display = 'none';
+  document.getElementById('clawFingers').classList.remove('gripping');
+
+  // 出货槽显示娃娃
+  const trayDoll = document.getElementById('trayDoll');
+  const trayEmpty = document.getElementById('trayEmpty');
+  trayDoll.textContent = d.emoji;
+  trayDoll.style.display = 'inline';
+  trayEmpty.style.display = 'none';
+
+  // 更新数据
+  state.totalWins++;
+  state.lastWin = d;
+  state.dollCounts[d.id]++;
+  addRecord(true, d);
+  updateStats();
+  updateDistList();
+  finishRound(true);
+
+  // 粒子
+  spawnParticles();
+
+  // 延迟弹窗
+  setTimeout(() => showModal(d), 400);
+}
+
+// ─── 回合结束 ───
+function finishRound(won) {
+  state.phase = 'done';
+  document.getElementById('btnCoin').disabled = state.chances <= 0;
+  document.getElementById('btnGrab').disabled = true;
+
+  if (!won) {
+    addRecord(false, null);
+    setStatus('很遗憾，没有夹到，再试一次吧！');
+  }
+  updateChanceCoins();
+}
+
+// ─── 重置游戏 ───
+function resetGame() {
+  if (state.animFrame) cancelAnimationFrame(state.animFrame);
+  state.phase = 'idle';
+  state.clawX = 50;
+  state.clawArmHeight = state.clawArmMin;
+  state.caughtDoll = null;
+
+  document.getElementById('clawContainer').style.left = '50%';
+  document.getElementById('clawArm').style.height = state.clawArmMin + 'px';
+  document.getElementById('clawCaughtDoll').style.display = 'none';
+  document.getElementById('clawFingers').classList.remove('gripping');
+  document.getElementById('clawContainer').classList.remove('shaking');
+
+  document.getElementById('trayDoll').style.display = 'none';
+  document.getElementById('trayEmpty').style.display = 'inline';
+  document.getElementById('btnCoin').disabled = false;
+  document.getElementById('btnGrab').disabled = true;
+
+  // 补充机会
+  const limit = parseInt(document.getElementById('dailyLimit').value) || 10;
+  state.maxChances = limit;
+  state.chances = limit;
+  state.usedToday = 0;
+  updateChanceCoins();
+
+  // 重新放置娃娃
+  renderDolls();
+  setStatus('机器已重置，快来投币开始吧！');
+}
+
+// ─── 设置状态文字 ───
+function setStatus(text) {
+  document.getElementById('gameStatusText').textContent = text;
+}
+
+// ─── 弹窗 ───
+function showModal(d) {
+  document.getElementById('modalEmoji').textContent = d.emoji;
+  document.getElementById('modalPrizeName').textContent = d.name;
+  document.getElementById('modalDesc').textContent = d.desc;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+// ─── 更新统计 ───
+function updateStats() {
+  document.getElementById('statTotal').textContent = state.totalGames;
+  document.getElementById('statWin').textContent = state.totalWins;
+  const rate = state.totalGames > 0
+    ? Math.round((state.totalWins / state.totalGames) * 100) + '%'
+    : '0%';
+  document.getElementById('statRate').textContent = rate;
+  document.getElementById('statLast').textContent = state.lastWin ? state.lastWin.emoji : '—';
+}
+
+// ─── 更新分布列表 ───
+function updateDistList() {
+  const el = document.getElementById('distList');
+  const total = Object.values(state.dollCounts).reduce((a, b) => a + b, 0);
+  el.innerHTML = DOLLS.map((d, i) => {
+    const cnt = state.dollCounts[d.id];
+    const pct = total > 0 ? Math.round((cnt / total) * 100) : 0;
+    const barColors = ['#EC4899','#F97316','#A78BFA','#60A5FA','#34D399','#FCD34D'];
+    return `
+      <div class="dist-item">
+        <div class="dist-header">
+          <span class="dist-name">${d.emoji} ${d.name}</span>
+          <span class="dist-count">${cnt} 个 · ${pct}%</span>
+        </div>
+        <div class="dist-bar-bg">
+          <div class="dist-bar-fill" style="width:${pct}%;background:${barColors[i]}"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ─── 添加记录 ───
+function addRecord(won, doll) {
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' +
+                  now.getMinutes().toString().padStart(2,'0') + ':' +
+                  now.getSeconds().toString().padStart(2,'0');
+  state.records.unshift({ won, doll, time: timeStr });
+  if (state.records.length > 8) state.records.pop();
+  renderRecords();
+}
+
+function renderRecords() {
+  const el = document.getElementById('recordList');
+  if (state.records.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px 0">暂无记录，快去夹娃娃吧！</div>';
+    return;
+  }
+  el.innerHTML = state.records.map(r => `
+    <div class="record-item">
+      <div class="record-emoji">${r.won ? r.doll.emoji : '❌'}</div>
+      <div class="record-info">
+        <div class="record-prize">${r.won ? r.doll.name : '未夹到'}</div>
+        <div class="record-time">${r.time}</div>
+      </div>
+      <div class="record-tag ${r.won ? 'win' : 'lose'}">${r.won ? '成功' : '失败'}</div>
+    </div>
+  `).join('');
+}
+
+// ─── 底部时间 ───
+function updateFooterTime() {
+  const now = new Date();
+  document.getElementById('footerTime').textContent =
+    now.toLocaleTimeString('zh-CN', { hour12: false });
+}
+
+function updateFooter() {
+  updateFooterTime();
+}
+
+// ─── 粒子效果 ───
+(function initParticles() {
+  const canvas = document.getElementById('particleCanvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  window.spawnParticles = function() {
+    const colors = ['#F5C842','#EC4899','#7C3AED','#44AAFF','#34D399'];
+    for (let i = 0; i < 60; i++) {
+      particles.push({
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+        vx: (Math.random() - 0.5) * 12,
+        vy: (Math.random() - 0.8) * 12,
+        size: Math.random() * 8 + 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        life: 1,
+        decay: Math.random() * 0.015 + 0.012,
+        shape: Math.random() > 0.5 ? 'circle' : 'star',
+      });
+    }
+    if (!window._particleRunning) {
+      window._particleRunning = true;
+      requestAnimationFrame(drawParticles);
+    }
+  };
+
+  function drawParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles = particles.filter(p => p.life > 0);
+    particles.forEach(p => {
+      ctx.save();
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = p.color;
+      ctx.translate(p.x, p.y);
+      if (p.shape === 'star') {
+        drawStar(ctx, 0, 0, 5, p.size, p.size * 0.45);
+      } else {
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.35;
+      p.vx *= 0.97;
+      p.life -= p.decay;
+    });
+    if (particles.length > 0) {
+      requestAnimationFrame(drawParticles);
+    } else {
+      window._particleRunning = false;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  function drawStar(ctx, x, y, spikes, outerR, innerR) {
+    let rot = (Math.PI / 2) * 3;
+    const step = Math.PI / spikes;
+    ctx.beginPath();
+    ctx.moveTo(x, y - outerR);
+    for (let i = 0; i < spikes; i++) {
+      ctx.lineTo(x + Math.cos(rot) * outerR, y + Math.sin(rot) * outerR);
+      rot += step;
+      ctx.lineTo(x + Math.cos(rot) * innerR, y + Math.sin(rot) * innerR);
+      rot += step;
+    }
+    ctx.lineTo(x, y - outerR);
+    ctx.closePath();
+    ctx.fill();
+  }
+})();
+
+// ─── 启动 ───
+init();
+</script>
+</body>
+</html>

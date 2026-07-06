@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameHub 小游戏中台</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --deep: #1A0A2E;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --bg: #0D0720;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── 导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 40px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
+  }
+  .nav-logo .highlight { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+  }
+  .nav-right {
+    display: flex; align-items: center; gap: 16px;
+    font-size: 13px; color: var(--muted);
+  }
+  .nav-status {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #22C55E;
+    box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+  }
+
+  /* ─── Hero ─── */
+  .hero {
+    text-align: center;
+    padding: 72px 40px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 800px 400px at 50% 0%, rgba(124,58,237,0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 20px; padding: 5px 14px;
+    font-size: 12px; font-weight: 600; color: #A78BFA;
+    letter-spacing: 0.5px; margin-bottom: 20px;
+  }
+  .hero-title {
+    font-size: 52px; font-weight: 900;
+    line-height: 1.1; letter-spacing: -1.5px;
+    margin-bottom: 16px;
+  }
+  .hero-title .line1 { display: block; }
+  .hero-title .line2 {
+    display: block;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-desc {
+    font-size: 17px; color: var(--muted);
+    max-width: 520px; margin: 0 auto 36px;
+    line-height: 1.6;
+  }
+  .hero-stats {
+    display: flex; justify-content: center; gap: 40px;
+  }
+  .hero-stat-item {
+    text-align: center;
+  }
+  .hero-stat-num {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ─── Phase 标签 ─── */
+  .section {
+    max-width: 1200px; margin: 0 auto;
+    padding: 0 40px 60px;
+  }
+  .section-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 24px;
+  }
+  .section-title {
+    font-size: 20px; font-weight: 800;
+  }
+  .phase-badge {
+    padding: 4px 12px; border-radius: 8px;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .phase-badge.p1 {
+    background: rgba(34,197,94,0.15);
+    color: #22C55E;
+    border: 1px solid rgba(34,197,94,0.3);
+  }
+  .phase-badge.p2 {
+    background: rgba(245,200,66,0.1);
+    color: var(--gold);
+    border: 1px solid rgba(245,200,66,0.2);
+  }
+  .phase-badge.p3 {
+    background: rgba(255,255,255,0.05);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .section-line {
+    flex: 1; height: 1px; background: var(--border);
+  }
+  .section-desc {
+    font-size: 13px; color: var(--muted);
+  }
+
+  /* ─── 游戏卡片网格 ─── */
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .game-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none; color: inherit;
+    display: block;
+    position: relative;
+  }
+  .game-card:hover {
+    border-color: rgba(124,58,237,0.5);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.3), 0 0 0 1px rgba(124,58,237,0.2);
+  }
+  .game-card.ready:hover {
+    border-color: rgba(245,200,66,0.5);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.3), 0 0 0 1px rgba(245,200,66,0.2);
+  }
+  .game-card.locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .game-card.locked:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--border);
+  }
+
+  /* 卡片顶部彩色横条 */
+  .card-bar {
+    height: 4px;
+  }
+
+  /* 卡片主体 */
+  .card-body {
+    padding: 20px;
+  }
+  .card-icon {
+    font-size: 40px; margin-bottom: 12px;
+    display: block;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+  }
+  .card-name {
+    font-size: 17px; font-weight: 800;
+    margin-bottom: 6px; letter-spacing: -0.3px;
+  }
+  .card-desc {
+    font-size: 12px; color: var(--muted);
+    line-height: 1.5; margin-bottom: 16px;
+  }
+
+  .card-tags {
+    display: flex; flex-wrap: wrap; gap: 5px;
+    margin-bottom: 16px;
+  }
+  .tag {
+    padding: 3px 8px; border-radius: 5px;
+    font-size: 11px; font-weight: 600;
+    background: rgba(255,255,255,0.07);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-status {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600;
+  }
+  .card-status.live { color: #22C55E; }
+  .card-status.soon { color: var(--gold); }
+  .card-status.plan { color: var(--muted); }
+  .card-status .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+  .card-status.live .dot { background: #22C55E; box-shadow: 0 0 5px #22C55E; }
+  .card-status.soon .dot { background: var(--gold); }
+  .card-status.plan .dot { background: var(--muted); }
+
+  .card-arrow {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; transition: background 0.2s;
+  }
+  .game-card:hover .card-arrow {
+    background: rgba(124,58,237,0.3);
+  }
+
+  /* 锁标记 */
+  .lock-badge {
+    position: absolute; top: 14px; right: 14px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 6px; padding: 3px 8px;
+    font-size: 11px; color: var(--muted);
+  }
+
+  /* ─── 中台能力区 ─── */
+  .platform-section {
+    background: rgba(255,255,255,0.02);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 56px 40px;
+    margin-bottom: 60px;
+  }
+  .platform-inner {
+    max-width: 1200px; margin: 0 auto;
+  }
+  .platform-title {
+    text-align: center;
+    font-size: 28px; font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .platform-sub {
+    text-align: center; color: var(--muted);
+    font-size: 14px; margin-bottom: 40px;
+  }
+  .platform-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .platform-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .platform-icon {
+    font-size: 28px; margin-bottom: 12px;
+  }
+  .platform-name {
+    font-size: 15px; font-weight: 700; margin-bottom: 6px;
+  }
+  .platform-desc {
+    font-size: 12px; color: var(--muted); line-height: 1.5;
+  }
+  .platform-features {
+    margin-top: 12px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .pf-item {
+    font-size: 11px; color: var(--muted);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .pf-item::before {
+    content: '✓';
+    color: #22C55E; font-weight: 700; font-size: 10px;
+  }
+
+  /* ─── 底部 ─── */
+  .footer {
+    text-align: center;
+    padding: 32px 40px;
+    border-top: 1px solid var(--border);
+    color: var(--muted); font-size: 13px;
+  }
+  .footer-version {
+    margin-top: 6px; font-size: 11px; opacity: 0.5;
+  }
+
+  @media (max-width: 768px) {
+    .hero-title { font-size: 32px; }
+    .platform-grid { grid-template-columns: 1fr 1fr; }
+    .games-grid { grid-template-columns: 1fr 1fr; }
+    .hero-stats { gap: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 导航 -->
+<nav class="nav">
+  <div class="nav-logo">
+    🎮 <span class="highlight">GameHub</span> 中台
+    <div class="nav-badge">v0.1 Demo</div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-status">
+      <div class="status-dot"></div>
+      <span>服务正常</span>
+    </div>
+    <span style="color:var(--border)">|</span>
+    <span>Phase 1 · 5组件</span>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-tag">✦ 小游戏中台服务平台</div>
+  <h1 class="hero-title">
+    <span class="line1">搭积木式</span>
+    <span class="line2">玩转小游戏活动</span>
+  </h1>
+  <p class="hero-desc">开箱即用的游戏组件库，运营自助配置奖池与规则，<br>无需开发介入，低成本快速上线互动活动。</p>
+  <div class="hero-stats">
+    <div class="hero-stat-item">
+      <div class="hero-stat-num">14</div>
+      <div class="hero-stat-label">已上线组件</div>
+    </div>
+    <div class="hero-stat-item">
+      <div class="hero-stat-num">3</div>
+      <div class="hero-stat-label">完整 Phase</div>
+    </div>
+    <div class="hero-stat-item">
+      <div class="hero-stat-num">4</div>
+      <div class="hero-stat-label">皮肤主题</div>
+    </div>
+    <div class="hero-stat-item">
+      <div class="hero-stat-num">∞</div>
+      <div class="hero-stat-label">活动复用</div>
+    </div>
+  </div>
+</div>
+
+<!-- Phase 1 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">游戏组件库</div>
+    <div class="phase-badge p1">Phase 1 · 已上线</div>
+    <div class="section-line"></div>
+    <div class="section-desc">5个核心组件，覆盖 80% 营销互动场景</div>
+  </div>
+
+  <div class="games-grid">
+
+    <a href="wheel.html" class="game-card ready">
+      <div class="card-bar" style="background:linear-gradient(90deg,#7C3AED,#F5C842)"></div>
+      <div class="card-body">
+        <span class="card-icon">🎡</span>
+        <div class="card-name">大转盘</div>
+        <div class="card-desc">旋转指针停在扇形格上，经典抽奖互动，视觉冲击强</div>
+        <div class="card-tags">
+          <span class="tag">概率可控</span>
+          <span class="tag">4套皮肤</span>
+          <span class="tag">保底机制</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-status live"><div class="dot"></div>已上线</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="nine-grid.html" class="game-card ready">
+      <div class="card-bar" style="background:linear-gradient(90deg,#EC4899,#F97316)"></div>
+      <div class="card-body">
+        <span class="card-icon">🔲</span>
+        <div class="card-name">九宫格</div>
+        <div class="card-desc">光标绕8格跑动后缓停，节奏感强，适合积分兑换场景</div>
+        <div class="card-tags">
+          <span class="tag">跑马灯</span>
+          <span class="tag">速度渐变</span>
+          <span class="tag">8种奖品</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-status live"><div class="dot"></div>已上线</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="scratch-card.html" class="game-card ready">
+      <div class="card-bar" style="background:linear-gradient(90deg,#10B981,#06B6D4)"></div>
+      <div class="card-body">
+        <span class="card-icon">🎴</span>
+        <div class="card-name">刮刮乐</div>
+        <div class="card-desc">Canvas 真实刮除体验，刮开35%自动揭示，首单触发最佳</div>
+        <div class="card-tags">
+          <span class="tag">Canvas渲染</span>
+          <span class="tag">面积检测</span>
+          <span class="tag">自动揭示</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-status live"><div class="dot"></div>已上线</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="shake-dice.html" class="game-card ready">
+      <div class="card-bar" style="background:linear-gradient(90deg,#F59E0B,#EF4444)"></div>
+      <div class="card-body">
+        <span class="card-icon">🎲</span>
+        <div class="card-name">摇骰子</div>
+        <div class="card-desc">CSS 3D骰子翻滚动画，双骰点数组合判断奖品，趣味性强</div>
+        <div class="card-tags">
+          <span class="tag">3D动画</span>
+          <span class="tag">单/双骰</span>
+          <span class="tag">点数规则</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-status live"><div class="dot"></div>已上线</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="smash-egg.html" class="game-card ready">
+      <div class="card-bar" style="background:linear-gradient(90deg,#F5C842,#EC4899)"></div>
+      <div class="card-body">
+        <span class="card-icon">🥚</span>
+        <div class="card-name">砸金蛋</div>
+        <div class="card-desc">9颗金蛋布局，点击破壳碎片飞散，节日大促首选</div>
+        <div class="card-tags">
+          <span class="tag">破壳动画</span>
+          <span class="tag">碎片特效</span>
+          <span class="tag">多蛋布局</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-status live"><div class="dot"></div>已上线</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- Phase 2 -->
+<div class="section" style="padding-top:0">
+  <div class="section-header">
+    <div class="section-title">Phase 2</div>
+    <div class="phase-badge p1">已上线</div>
+    <div class="section-line"></div>
+    <div class="section-desc">差异化组件，建立留存壁垒</div>
+  </div>
+
+  <div class="games-grid">
+
+    <a href="flying-chess.html" class="game-card ready">
+      <div class="card-bar" style="background:linear-gradient(90deg,#4338CA,#7C3AED)"></div>
+      <div class="card-body">
+        <span class="card-icon">✈️</span>
+        <div class="card-name">飞行棋</div>
+        <div class="card-desc">掷骰走格子，30格闯关，奖励/惩罚/传送格，强留存设计</div>
+        <div class="card-tags"><span class="tag">格子事件</span><span class="tag">任务闯关</span><span class="tag">通关奖励</span></div>
+        <div class="card-footer">
+          <div class="card-status live"><div class="dot"></div>已上线</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="monopoly.html" class="game-card ready">
+      <div class="card-bar" style="background:linear-gradient(90deg,#065F46,#10B981)"></div>
+      <div class="card-body">
+        <span class="card-icon">🏙️</span>
+        <div class="card-name">大富翁</div>
+        <div class="card-desc">环形棋盘24格，机会/命运卡，双人对战，会员成长旅程最佳载体</div>
+        <div class="card-tags"><span class="tag">地图引擎</span><span class="tag">双人对战</span><span class="tag">机会命运</span></div>
+        <div class="card-footer">
+          <div class="card-status live"><div class="dot"></div>已上线</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="slot-machine.html" class="game-card ready">
+      <div class="card-bar" style="background:linear-gradient(90deg,#7F1D1D,#EF4444)"></div>
+      <div class="card-body">
+        <span class="card-icon">🎰</span>
+        <div class="card-name">老虎机</div>
+        <div class="card-desc">三列滚轮错开缓停，7种符号赔率，金币押注系统，视觉刺激强</div>
+        <div class="card-tags"><span class="tag">滚轮动画</span><span class="tag">赔率系统</span><span class="tag">押注金币</span></div>
+        <div class="card-footer">
+          <div class="card-status live"><div class="dot"></div>已上线</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="red-packet-rain.html" class="game-card ready">
+      <div class="card-bar" style="background:linear-gradient(90deg,#9D174D,#EC4899)"></div>
+      <div class="card-body">
+        <span class="card-icon">🌧️</span>
+        <div class="card-name">红包雨</div>
+        <div class="card-desc">限时30秒点击下落红包，3种稀有度，难度递增，大促预热利器</div>
+        <div class="card-tags"><span class="tag">限时互动</span><span class="tag">稀有红包</span><span class="tag">评级系统</span></div>
+        <div class="card-footer">
+          <div class="card-status live"><div class="dot"></div>已上线</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="claw-machine.html" class="game-card ready">
+      <div class="card-bar" style="background:linear-gradient(90deg,#0C4A6E,#0EA5E9)"></div>
+      <div class="card-body">
+        <span class="card-icon">🕹️</span>
+        <div class="card-name">夹娃娃机</div>
+        <div class="card-desc">CSS真实机器外观，爪子左右移动点击抓取，盲盒实物场景专属</div>
+        <div class="card-tags"><span class="tag">实时操控</span><span class="tag">爪子动画</span><span class="tag">盲盒联动</span></div>
+        <div class="card-footer">
+          <div class="card-status live"><div class="dot"></div>已上线</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- 中台能力 -->
+<div class="platform-section">
+  <div class="platform-inner">
+    <div class="platform-title">中台核心能力</div>
+    <div class="platform-sub">游戏组件背后，这四个引擎决定中台价值</div>
+    <div class="platform-grid">
+
+      <div class="platform-card">
+        <div class="platform-icon">🎯</div>
+        <div class="platform-name">RNG 奖池引擎</div>
+        <div class="platform-desc">后端权威控制中奖概率，前端只做动画展示，结果无法被预测或篡改。</div>
+        <div class="platform-features">
+          <div class="pf-item">概率精确到小数点后两位</div>
+          <div class="pf-item">库存实时扣减，不超发</div>
+          <div class="pf-item">保底机制可配置</div>
+          <div class="pf-item">同步/异步两种模式</div>
+        </div>
+      </div>
+
+      <div class="platform-card">
+        <div class="platform-icon">⚙️</div>
+        <div class="platform-name">规则配置系统</div>
+        <div class="platform-desc">运营通过后台自助配置活动，无需改代码，上线只需几分钟。</div>
+        <div class="platform-features">
+          <div class="pf-item">每日/总次数限制</div>
+          <div class="pf-item">用户条件触发（消费/注册）</div>
+          <div class="pf-item">时间窗口控制</div>
+          <div class="pf-item">历史活动模板复用</div>
+        </div>
+      </div>
+
+      <div class="platform-card">
+        <div class="platform-icon">🛡️</div>
+        <div class="platform-name">防作弊保障</div>
+        <div class="platform-desc">多维度防刷机制，保护奖品预算不被薅羊毛，审计日志完整留存。</div>
+        <div class="platform-features">
+          <div class="pf-item">账号维度限频</div>
+          <div class="pf-item">设备指纹识别</div>
+          <div class="pf-item">IP 异常检测</div>
+          <div class="pf-item">操作审计日志</div>
+        </div>
+      </div>
+
+      <div class="platform-card">
+        <div class="platform-icon">📊</div>
+        <div class="platform-name">数据看板</div>
+        <div class="platform-desc">实时查看活动效果，奖品发放进度一目了然，支持导出报表。</div>
+        <div class="platform-features">
+          <div class="pf-item">参与人数/次数统计</div>
+          <div class="pf-item">各奖品发放进度</div>
+          <div class="pf-item">中奖率实时分布</div>
+          <div class="pf-item">用户参与时段热力图</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Phase 3 -->
+<div class="section" style="padding-top:0">
+  <div class="section-header">
+    <div class="section-title">Phase 3</div>
+    <div class="phase-badge p1">已上线</div>
+    <div class="section-line"></div>
+    <div class="section-desc">高粘性深度玩法，留存利器</div>
+  </div>
+  <div class="games-grid">
+
+    <a href="flip-match.html" class="game-card ready">
+      <div class="card-bar" style="background:linear-gradient(90deg,#0E7490,#06B6D4)"></div>
+      <div class="card-body">
+        <span class="card-icon">🃏</span>
+        <div class="card-name">翻牌配对</div>
+        <div class="card-desc">4×4记忆翻牌，3D翻转动画，限时计分，益智型强互动</div>
+        <div class="card-tags"><span class="tag">3D翻转</span><span class="tag">限时计分</span><span class="tag">三档难度</span></div>
+        <div class="card-footer">
+          <div class="card-status live"><div class="dot"></div>已上线</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="shake.html" class="game-card ready">
+      <div class="card-bar" style="background:linear-gradient(90deg,#7C3AED,#A855F7)"></div>
+      <div class="card-body">
+        <span class="card-icon">📱</span>
+        <div class="card-name">摇一摇</div>
+        <div class="card-desc">手机摇动触发抽奖，桌面端可模拟，移动场景专属互动</div>
+        <div class="card-tags"><span class="tag">重力感应</span><span class="tag">桌面模拟</span><span class="tag">冷却控制</span></div>
+        <div class="card-footer">
+          <div class="card-status live"><div class="dot"></div>已上线</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="quiz.html" class="game-card ready">
+      <div class="card-bar" style="background:linear-gradient(90deg,#D97706,#F59E0B)"></div>
+      <div class="card-body">
+        <span class="card-icon">❓</span>
+        <div class="card-name">问答闯关</div>
+        <div class="card-desc">10题限时单选，连对加成，S级评分，知识营销/品牌活动首选</div>
+        <div class="card-tags"><span class="tag">题库可配</span><span class="tag">连对加成</span><span class="tag">详细回顾</span></div>
+        <div class="card-footer">
+          <div class="card-status live"><div class="dot"></div>已上线</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="daily-checkin.html" class="game-card ready">
+      <div class="card-bar" style="background:linear-gradient(90deg,#065F46,#10B981)"></div>
+      <div class="card-body">
+        <span class="card-icon">📅</span>
+        <div class="card-name">每日签到</div>
+        <div class="card-desc">7日连签奖励递增，等级系统，补签券，月历视图，留存神器</div>
+        <div class="card-tags"><span class="tag">连签递增</span><span class="tag">等级成长</span><span class="tag">本地持久化</span></div>
+        <div class="card-footer">
+          <div class="card-status live"><div class="dot"></div>已上线</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- 底部 -->
+<div class="footer">
+  <div>GameHub 小游戏中台 · Phase 1 + Phase 2 + Phase 3 · 全部 14 个组件已就绪</div>
+  <div class="footer-version">v0.3.0 · 纯前端演示版本 · 后端接入文档待出</div>
+</div>
+
+<script>
+  // 大转盘跳转到 wheel.html（兜底，index.html 自身也是大转盘入口）
+  // 如果 wheel.html 不存在就跳回原来的 index.html
+  // 导航跳转链接已写在各卡片 href 上，无需额外 JS
+</script>
+</body>
+</html>

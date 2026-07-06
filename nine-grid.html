@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 九宫格 Demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --deep: #1A0A2E;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --bg: #0D0720;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+  }
+  .nav-tabs {
+    display: flex; gap: 4px;
+  }
+  .nav-tab {
+    padding: 7px 16px; border-radius: 8px;
+    font-size: 14px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s;
+    text-decoration: none; display: inline-flex; align-items: center;
+  }
+  .nav-tab.active, .nav-tab:hover {
+    background: var(--card); color: var(--text);
+  }
+  .nav-tab.active { color: var(--gold); }
+
+  /* ─── 主体布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    height: calc(100vh - 61px);
+  }
+
+  /* ─── 左侧配置面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-title {
+    font-size: 13px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* 奖品列表 */
+  .prize-list { display: flex; flex-direction: column; gap: 8px; }
+  .prize-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .prize-item:hover { border-color: rgba(124,58,237,0.5); }
+  .prize-item.active { border-color: var(--accent); background: rgba(124,58,237,0.1); }
+  .prize-color {
+    width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
+  }
+  .prize-info { flex: 1; min-width: 0; }
+  .prize-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prize-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .prize-prob {
+    font-size: 12px; font-weight: 700;
+    color: var(--gold);
+  }
+
+  /* 规则配置 */
+  .rule-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-label { color: var(--muted); }
+  .rule-input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: var(--text);
+    font-size: 13px;
+    width: 80px; text-align: center;
+    outline: none;
+  }
+  .rule-input:focus { border-color: var(--accent); }
+
+  .toggle {
+    width: 36px; height: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px; position: relative; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle::after {
+    content: ''; position: absolute;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: white; top: 2px; left: 2px;
+    transition: transform 0.2s;
+  }
+  .toggle.on::after { transform: translateX(16px); }
+
+  /* ─── 中间游戏区 ─── */
+  .game-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .game-center::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .game-title-area {
+    text-align: center; margin-bottom: 28px;
+  }
+  .game-name {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .game-subtitle { color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+  /* ─── 九宫格 ─── */
+  .grid-wrapper {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* 外框光晕 */
+  .grid-glow {
+    position: absolute;
+    inset: -24px;
+    background: radial-gradient(circle, rgba(245,200,66,0.18), transparent 65%);
+    border-radius: 24px;
+    animation: gridPulse 2.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes gridPulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.03); }
+  }
+
+  .nine-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 140px);
+    grid-template-rows: repeat(3, 140px);
+    gap: 10px;
+    padding: 16px;
+    background: rgba(245,200,66,0.06);
+    border: 2px solid rgba(245,200,66,0.25);
+    border-radius: 20px;
+    box-shadow: 0 0 40px rgba(124,58,237,0.2);
+  }
+
+  /* 奖品格 */
+  .grid-cell {
+    border-radius: 14px;
+    border: 2px solid rgba(255,255,255,0.08);
+    background: linear-gradient(145deg, rgba(28,14,56,0.9), rgba(20,8,44,0.9));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: default;
+    transition: border-color 0.1s, box-shadow 0.1s, background 0.1s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* 格子内底部光效 */
+  .grid-cell::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 40%;
+    background: linear-gradient(to top, rgba(124,58,237,0.06), transparent);
+    pointer-events: none;
+  }
+
+  .cell-emoji {
+    font-size: 32px;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    transition: transform 0.15s;
+  }
+  .cell-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(240,234,248,0.85);
+    text-align: center;
+    line-height: 1.3;
+    padding: 0 6px;
+  }
+  .cell-prob {
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* 高亮状态 */
+  .grid-cell.lit {
+    border-color: var(--gold);
+    background: linear-gradient(145deg, rgba(124,58,237,0.5), rgba(236,72,153,0.3));
+    box-shadow:
+      0 0 20px rgba(245,200,66,0.6),
+      0 0 40px rgba(245,200,66,0.2),
+      inset 0 0 16px rgba(245,200,66,0.08);
+  }
+  .grid-cell.lit .cell-emoji {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 8px rgba(245,200,66,0.8));
+  }
+  .grid-cell.lit .cell-name { color: var(--gold); }
+
+  /* 闪烁动画（中奖时） */
+  .grid-cell.blink {
+    animation: cellBlink 0.35s ease-in-out;
+  }
+  @keyframes cellBlink {
+    0%   { border-color: var(--gold); box-shadow: 0 0 20px rgba(245,200,66,0.6); }
+    50%  { border-color: #fff; box-shadow: 0 0 40px rgba(255,255,255,0.9), 0 0 80px rgba(245,200,66,0.5); }
+    100% { border-color: var(--gold); box-shadow: 0 0 20px rgba(245,200,66,0.6); }
+  }
+
+  /* 中心开始按钮 */
+  .grid-start {
+    border-radius: 14px;
+    background: linear-gradient(145deg, #FFE066, #F5A623, #C9882A);
+    border: 3px solid rgba(255,255,255,0.8);
+    box-shadow:
+      0 4px 24px rgba(245,166,35,0.55),
+      inset 0 2px 6px rgba(255,255,255,0.3),
+      inset 0 -2px 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .grid-start::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    animation: startShine 3s ease-in-out infinite;
+  }
+  @keyframes startShine {
+    0%, 100% { left: -100%; }
+    50% { left: 150%; }
+  }
+  .grid-start:hover:not(:disabled) {
+    transform: scale(1.04);
+    box-shadow: 0 6px 32px rgba(245,166,35,0.8), inset 0 2px 6px rgba(255,255,255,0.3);
+  }
+  .grid-start:active:not(:disabled) { transform: scale(0.97); }
+  .grid-start:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    animation: none;
+  }
+  .grid-start:disabled::before { display: none; }
+
+  .start-icon { font-size: 28px; line-height: 1; }
+  .start-text {
+    font-size: 14px; font-weight: 800;
+    color: #5D2D00;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  /* 剩余次数 */
+  .chance-display {
+    margin-top: 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .chance-dots { display: flex; gap: 6px; }
+  .chance-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  .chance-dot.used {
+    background: var(--gold);
+    box-shadow: 0 0 8px rgba(245,200,66,0.6);
+  }
+  .chance-text { font-size: 13px; color: var(--muted); }
+  .chance-num { color: var(--gold); font-weight: 700; }
+
+  /* ─── 右侧数据面板 ─── */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .stat-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 16px;
+  }
+  .stat-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 26px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* 中奖记录 */
+  .log-list { display: flex; flex-direction: column; gap: 6px; }
+  .log-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid transparent;
+    font-size: 12px; animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .log-item.win { border-color: rgba(245,200,66,0.2); }
+  .log-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .log-prize { font-weight: 600; flex: 1; }
+  .log-time { color: var(--muted); }
+
+  /* 奖品分布条 */
+  .dist-list { display: flex; flex-direction: column; gap: 8px; }
+  .dist-row { }
+  .dist-header {
+    display: flex; justify-content: space-between;
+    font-size: 12px; margin-bottom: 4px;
+  }
+  .dist-cnt { color: var(--muted); }
+  .dist-bar-bg {
+    height: 5px; background: rgba(255,255,255,0.08);
+    border-radius: 3px; overflow: hidden;
+  }
+  .dist-bar-fill {
+    height: 100%; border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  /* ─── 中奖弹窗 ─── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: none; align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: linear-gradient(145deg, #1E0D40, #2A0D50);
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 24px;
+    padding: 40px 32px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 60px rgba(245,200,66,0.1);
+    animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 320px; width: 90%;
+  }
+  @keyframes modalPop {
+    from { opacity: 0; transform: scale(0.7); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .modal-emoji {
+    font-size: 64px; margin-bottom: 16px;
+    display: block;
+    animation: emojiBounce 0.6s ease 0.1s both;
+  }
+  @keyframes emojiBounce {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+  .modal-label {
+    font-size: 13px; color: var(--muted); margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .modal-prize {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  .modal-desc { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+  .modal-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 12px;
+    padding: 12px 40px;
+    color: white; font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .modal-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: rgba(255,255,255,0.08); border: none;
+    border-radius: 8px; padding: 6px 10px;
+    color: var(--muted); cursor: pointer; font-size: 16px;
+  }
+
+  /* 粒子效果 */
+  .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 199; }
+  .confetti-piece {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ─── 底部状态栏 ─── */
+  .statusbar {
+    padding: 10px 24px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 20px;
+    font-size: 12px; color: var(--muted);
+    background: rgba(13,7,32,0.95);
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #22C55E;
+    box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* 响应式 */
+  @media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; grid-template-rows: auto; height: auto; }
+    .panel-left, .panel-right { display: none; }
+    .game-center { min-height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 导航 -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html" style="text-decoration:none;color:inherit">
+    🎮 <span>GameHub</span> 中台
+    <div class="nav-badge">Demo</div>
+  </a>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="wheel.html">大转盘</a>
+    <a class="nav-tab active" href="nine-grid.html">九宫格</a>
+    <a class="nav-tab" href="scratch-card.html">刮刮乐</a>
+    <a class="nav-tab" href="shake-dice.html">摇骰子</a>
+    <a class="nav-tab" href="smash-egg.html">砸金蛋</a>
+    <a class="nav-tab" href="red-packet-rain.html">红包雨</a>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <span style="font-size:13px;color:var(--muted)">活动：夏日大促 2026</span>
+    <div style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:6px;padding:4px 10px;font-size:12px;color:#22C55E;font-weight:600">进行中</div>
+  </div>
+</nav>
+
+<!-- 主体 -->
+<div class="main">
+
+  <!-- 左侧：配置面板 -->
+  <div class="panel-left">
+    <div class="panel-title">奖品配置</div>
+    <div class="card">
+      <div class="card-title">
+        <span class="dot"></span>奖品池
+        <span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:400">外围8格</span>
+      </div>
+      <div class="prize-list" id="prizeConfig"></div>
+    </div>
+
+    <div class="panel-title">游戏规则</div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#22C55E"></span>参与限制</div>
+      <div class="rule-row">
+        <span class="rule-label">每日次数上限</span>
+        <input class="rule-input" type="number" value="3" min="1" max="99" id="dailyLimit">
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">活动总次数</span>
+        <input class="rule-input" type="number" value="10" min="1" max="999">
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">保底机制</span>
+        <div class="toggle on" id="guaranteeToggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">保底触发第</span>
+        <input class="rule-input" type="number" value="5" min="2" max="20">
+      </div>
+    </div>
+
+    <div class="panel-title">九宫格说明</div>
+    <div class="card" style="font-size:13px;color:var(--muted);line-height:1.8">
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <span style="color:var(--gold)">①</span> 点击中心按钮开始抽奖
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <span style="color:var(--gold)">②</span> 光标顺时针跑动，先快后慢
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <span style="color:var(--gold)">③</span> 停止后高亮格子闪烁3次
+      </div>
+      <div style="display:flex;gap:8px">
+        <span style="color:var(--gold)">④</span> 弹出中奖结果弹窗
+      </div>
+    </div>
+  </div>
+
+  <!-- 中间：游戏 -->
+  <div class="game-center">
+    <div class="game-title-area">
+      <div class="game-name">九宫格转盘</div>
+      <div class="game-subtitle">一圈好运，八方财气</div>
+    </div>
+
+    <div class="grid-wrapper">
+      <div class="grid-glow"></div>
+      <div class="nine-grid" id="nineGrid">
+        <!-- 由 JS 生成 -->
+      </div>
+    </div>
+
+    <div class="chance-display">
+      <div class="chance-dots" id="chanceDots"></div>
+      <div class="chance-text">今日剩余 <span class="chance-num" id="chanceNum">3</span> 次</div>
+    </div>
+  </div>
+
+  <!-- 右侧：数据 -->
+  <div class="panel-right">
+    <div class="panel-title">实时数据</div>
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-label">参与次数</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statWin">0</div>
+        <div class="stat-label">中奖次数</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statRate">0%</div>
+        <div class="stat-label">中奖率</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statUsers">1</div>
+        <div class="stat-label">参与用户</div>
+      </div>
+    </div>
+
+    <div class="panel-title">奖品分布</div>
+    <div class="card">
+      <div class="dist-list" id="distList"></div>
+    </div>
+
+    <div class="panel-title">中奖记录</div>
+    <div class="card" style="padding:12px">
+      <div class="log-list" id="logList">
+        <div style="text-align:center;color:var(--muted);font-size:13px;padding:16px 0" id="logEmpty">暂无记录，快来抽奖吧！</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 底部状态栏 -->
+<div class="statusbar">
+  <div class="status-dot"></div>
+  <span>服务正常</span>
+  <span style="color:var(--border)">|</span>
+  <span>RNG引擎：后端权威模式（模拟）</span>
+  <span style="color:var(--border)">|</span>
+  <span>奖池剩余：充足</span>
+  <span style="margin-left:auto">GameHub 小游戏中台 v0.1.0-demo</span>
+</div>
+
+<!-- 中奖弹窗 -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="confetti" id="confettiLayer"></div>
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <span class="modal-emoji" id="modalEmoji">🎉</span>
+    <div class="modal-label">恭喜获得</div>
+    <div class="modal-prize" id="modalPrize">奖品名称</div>
+    <div class="modal-desc" id="modalDesc">奖品已发放到您的账户</div>
+    <button class="modal-btn" onclick="closeModal()">太棒了，收下！</button>
+  </div>
+</div>
+
+<script>
+// ─── 奖品数据 ───
+// 顺序对应外围8格顺时针（从左上角开始）：
+// 格子索引顺序: 0(左上) 1(上中) 2(右上) 3(右中) 4(右下) 5(下中) 6(左下) 7(左中)
+const PRIZES = [
+  { name: '100元券',   emoji: '🎫', prob: 10, color: '#F5C842', won: 0, type: 'win'  },
+  { name: '50元券',    emoji: '🧧', prob: 12, color: '#EF4444', won: 0, type: 'win'  },
+  { name: '20元券',    emoji: '💰', prob: 15, color: '#10B981', won: 0, type: 'win'  },
+  { name: '积分×500',  emoji: '⭐', prob: 8,  color: '#F59E0B', won: 0, type: 'win'  },
+  { name: '积分×100',  emoji: '🌟', prob: 20, color: '#8B5CF6', won: 0, type: 'win'  },
+  { name: '优惠券×2',  emoji: '🎟️', prob: 15, color: '#3B82F6', won: 0, type: 'win'  },
+  { name: '谢谢参与',  emoji: '😊', prob: 10, color: '#6B7280', won: 0, type: 'miss' },
+  { name: '谢谢参与',  emoji: '🙏', prob: 10, color: '#6B7280', won: 0, type: 'miss' },
+];
+
+// 九宫格中，外围格子在3x3网格中的位置索引（从左上角0开始，行优先）
+// 0 1 2
+// 3 4 5
+// 6 7 8
+// 外围顺时针顺序：0,1,2,5,8,7,6,3
+const OUTER_ORDER = [0, 1, 2, 5, 8, 7, 6, 3]; // 对应奖品索引0~7
+const CENTER_POS = 4; // 中心格位置
+
+let totalSpins = 0, winSpins = 0;
+let dailyRemain = 3;
+let running = false;
+let litIndex = -1; // 当前点亮的外围格下标（0~7）
+
+// ─── 构建九宫格 DOM ───
+function buildGrid() {
+  const grid = document.getElementById('nineGrid');
+  grid.innerHTML = '';
+
+  for (let pos = 0; pos < 9; pos++) {
+    if (pos === CENTER_POS) {
+      // 中心按钮
+      const btn = document.createElement('button');
+      btn.className = 'grid-start';
+      btn.id = 'startBtn';
+      btn.onclick = startSpin;
+      btn.innerHTML = `
+        <span class="start-icon">🎰</span>
+        <span class="start-text">开始<br>抽奖</span>
+      `;
+      grid.appendChild(btn);
+    } else {
+      // 找到该位置在OUTER_ORDER中的索引，对应奖品
+      const prizeIdx = OUTER_ORDER.indexOf(pos);
+      const p = PRIZES[prizeIdx];
+      const cell = document.createElement('div');
+      cell.className = 'grid-cell';
+      cell.id = `cell-${prizeIdx}`; // 用奖品索引做ID
+      cell.innerHTML = `
+        <span class="cell-emoji">${p.emoji}</span>
+        <span class="cell-name">${p.name}</span>
+        <span class="cell-prob">${p.prob}%</span>
+      `;
+      grid.appendChild(cell);
+    }
+  }
+}
+
+// ─── 点亮某个外围格（prizeIdx: 0~7）───
+function setLit(prizeIdx) {
+  // 清除旧高亮
+  if (litIndex >= 0) {
+    document.getElementById(`cell-${litIndex}`)?.classList.remove('lit');
+  }
+  litIndex = prizeIdx;
+  if (prizeIdx >= 0) {
+    document.getElementById(`cell-${prizeIdx}`)?.classList.add('lit');
+  }
+}
+
+// ─── 概率抽奖（后端决定结果，这里模拟）───
+function getResult() {
+  const rand = Math.random() * 100;
+  let acc = 0;
+  for (let i = 0; i < PRIZES.length; i++) {
+    acc += PRIZES[i].prob;
+    if (rand < acc) return i;
+  }
+  return PRIZES.length - 1;
+}
+
+// ─── 开始抽奖 ───
+function startSpin() {
+  if (running || dailyRemain <= 0) return;
+  running = true;
+  dailyRemain--;
+  document.getElementById('startBtn').disabled = true;
+
+  const resultIdx = getResult(); // 目标奖品索引（0~7）
+
+  // 速度配置
+  // 外圈共8格，顺时针跑
+  // 前2圈快(50ms)，第3圈减速(逐渐从50ms到300ms)，最后几格极慢(300ms)
+  // 总格数 = 2圈(16格) + 第3圈(8格) + 额外追加到结果格
+
+  // 计算从当前lit位置顺时针走到resultIdx需要的步数
+  // 先跑完指定步数，最后停在resultIdx
+
+  const FAST_INTERVAL = 50;   // 快速间隔(ms)
+  const SLOW_INTERVAL = 300;  // 最慢间隔(ms)
+
+  // 决策：至少跑2整圈(16步)再减速
+  // 计算到达resultIdx最少需要几步（从当前位置）
+  const startPos = litIndex < 0 ? 0 : litIndex;
+
+  // 总步数 = 2整圈 + 1减速圈 + 凑到停在resultIdx
+  // 先凑整：24步(3圈)之后，再步进到resultIdx
+  const baseSteps = 24; // 3整圈
+  // 3圈后当前位置 = (startPos + baseSteps) % 8
+  const posAfterBase = (startPos + baseSteps) % 8;
+  // 还需要几步才能到resultIdx
+  let extraSteps = (resultIdx - posAfterBase + 8) % 8;
+  if (extraSteps === 0) extraSteps = 8; // 至少再跑一整圈
+
+  const totalSteps = baseSteps + extraSteps;
+
+  // 建立每一步的间隔时间数组
+  const intervals = [];
+  for (let i = 0; i < totalSteps; i++) {
+    if (i < 16) {
+      // 前16步：快速
+      intervals.push(FAST_INTERVAL);
+    } else if (i < 24) {
+      // 第3圈（步16~23）：线性减速 50 -> 180
+      const t = (i - 16) / 8;
+      intervals.push(Math.round(FAST_INTERVAL + (180 - FAST_INTERVAL) * t));
+    } else {
+      // 最后extraSteps步：继续减速到最慢
+      const t = (i - 24) / Math.max(extraSteps - 1, 1);
+      intervals.push(Math.round(180 + (SLOW_INTERVAL - 180) * t));
+    }
+  }
+
+  let step = 0;
+  let currentPos = startPos;
+
+  function runStep() {
+    currentPos = (currentPos + 1) % 8;
+    setLit(currentPos);
+
+    step++;
+    if (step < totalSteps) {
+      setTimeout(runStep, intervals[step]);
+    } else {
+      // 停下，等300ms后闪烁
+      setTimeout(() => {
+        blinkResult(currentPos, () => {
+          // 更新数据
+          PRIZES[resultIdx].won++;
+          totalSpins++;
+          if (PRIZES[resultIdx].type === 'win') winSpins++;
+          updateStats();
+          updateChance();
+          addLog(PRIZES[resultIdx]);
+          updateDist();
+          renderPrizeConfig();
+
+          // 弹窗
+          setTimeout(() => {
+            showModal(PRIZES[resultIdx]);
+            running = false;
+            if (dailyRemain > 0) {
+              document.getElementById('startBtn').disabled = false;
+            }
+          }, 150);
+        });
+      }, 300);
+    }
+  }
+
+  // 启动
+  setTimeout(runStep, intervals[0]);
+}
+
+// ─── 闪烁3次 ───
+function blinkResult(prizeIdx, callback) {
+  const cell = document.getElementById(`cell-${prizeIdx}`);
+  if (!cell) { callback(); return; }
+
+  let count = 0;
+  const total = 3;
+
+  function doBlink() {
+    cell.classList.add('blink');
+    setTimeout(() => {
+      cell.classList.remove('blink');
+      count++;
+      if (count < total) {
+        setTimeout(doBlink, 200);
+      } else {
+        callback();
+      }
+    }, 350);
+  }
+  doBlink();
+}
+
+// ─── 显示弹窗 ───
+function showModal(prize) {
+  document.getElementById('modalEmoji').textContent = prize.emoji;
+  document.getElementById('modalPrize').textContent = prize.name;
+  document.getElementById('modalDesc').textContent =
+    prize.type === 'win' ? '奖品已发放到您的账户，请注意查收 ✓' : '感谢您的参与，下次好运！';
+  document.getElementById('modalOverlay').classList.add('show');
+  if (prize.type === 'win') launchConfetti();
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  // 清除粒子
+  document.getElementById('confettiLayer').innerHTML = '';
+}
+
+// ─── 粒子效果 ───
+function launchConfetti() {
+  const layer = document.getElementById('confettiLayer');
+  layer.innerHTML = '';
+  const colors = ['#F5C842', '#EC4899', '#7C3AED', '#10B981', '#EF4444', '#3B82F6'];
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `
+      left:${Math.random() * 100}vw;
+      background:${colors[Math.floor(Math.random() * colors.length)]};
+      animation-duration:${1.5 + Math.random() * 1.5}s;
+      animation-delay:${Math.random() * 0.5}s;
+      transform:rotate(${Math.random() * 360}deg);
+      opacity:0.9;
+    `;
+    layer.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+}
+
+// ─── 更新统计 ───
+function updateStats() {
+  document.getElementById('statTotal').textContent = totalSpins;
+  document.getElementById('statWin').textContent = winSpins;
+  document.getElementById('statRate').textContent = totalSpins > 0
+    ? Math.round(winSpins / totalSpins * 100) + '%' : '0%';
+}
+
+function updateChance() {
+  document.getElementById('chanceNum').textContent = dailyRemain;
+  const dots = document.getElementById('chanceDots');
+  const total = parseInt(document.getElementById('dailyLimit').value) || 3;
+  dots.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'chance-dot' + (i >= dailyRemain ? ' used' : '');
+    dots.appendChild(d);
+  }
+  if (dailyRemain <= 0) {
+    const btn = document.getElementById('startBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="start-icon">🚫</span><span class="start-text">今日<br>已满</span>';
+    }
+  }
+}
+
+function addLog(prize) {
+  const list = document.getElementById('logList');
+  const empty = document.getElementById('logEmpty');
+  if (empty) empty.remove();
+
+  const now = new Date();
+  const time = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
+
+  const item = document.createElement('div');
+  item.className = 'log-item' + (prize.type === 'win' ? ' win' : '');
+  item.innerHTML = `
+    <div class="log-dot" style="background:${prize.color}"></div>
+    <div class="log-prize">${prize.emoji} ${prize.name}</div>
+    <div class="log-time">${time}</div>
+  `;
+  list.insertBefore(item, list.firstChild);
+  if (list.children.length > 8) list.removeChild(list.lastChild);
+}
+
+function updateDist() {
+  const list = document.getElementById('distList');
+  const totalWon = PRIZES.reduce((s, p) => s + p.won, 0);
+  list.innerHTML = PRIZES.map(p => {
+    const pct = totalWon > 0 ? Math.round(p.won / totalWon * 100) : 0;
+    return `<div class="dist-row">
+      <div class="dist-header">
+        <span>${p.emoji} ${p.name}</span>
+        <span class="dist-cnt">${p.won}次</span>
+      </div>
+      <div class="dist-bar-bg">
+        <div class="dist-bar-fill" style="width:${pct}%;background:${p.color}"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── 渲染左侧奖品配置列表 ───
+function renderPrizeConfig() {
+  const list = document.getElementById('prizeConfig');
+  list.innerHTML = PRIZES.map((p, i) => `
+    <div class="prize-item" onclick="selectPrize(${i})" id="pi-${i}">
+      <div class="prize-color" style="background:${p.color}"></div>
+      <div class="prize-info">
+        <div class="prize-name">${p.emoji} ${p.name}</div>
+        <div class="prize-meta">概率 ${p.prob}% · 已发 ${p.won}</div>
+      </div>
+      <div class="prize-prob">${p.prob}%</div>
+    </div>
+  `).join('');
+}
+
+function selectPrize(i) {
+  document.querySelectorAll('.prize-item').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('pi-' + i);
+  if (el) el.classList.add('active');
+}
+
+// ─── 监听每日次数变化 ───
+document.getElementById('dailyLimit').addEventListener('change', function() {
+  dailyRemain = parseInt(this.value) || 3;
+  updateChance();
+});
+
+// ─── 初始化 ───
+buildGrid();
+renderPrizeConfig();
+updateStats();
+updateChance();
+updateDist();
+</script>
+</body>
+</html>

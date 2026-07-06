@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 飞行棋 Demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: inherit;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+  }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    padding: 7px 16px; border-radius: 8px;
+    font-size: 14px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s;
+    text-decoration: none; display: inline-flex; align-items: center;
+  }
+  .nav-tab.active, .nav-tab:hover { background: var(--card); color: var(--text); }
+  .nav-tab.active { color: var(--gold); }
+
+  /* ─── 主体三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* ─── 左侧配置面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-title {
+    font-size: 13px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold); flex-shrink: 0;
+  }
+  .rule-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-label { color: var(--muted); }
+  .rule-input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: var(--text);
+    font-size: 13px;
+    width: 72px; text-align: center;
+    outline: none;
+  }
+  .rule-input:focus { border-color: var(--accent); }
+
+  /* 概率滑块组 */
+  .prob-group { display: flex; flex-direction: column; gap: 10px; }
+  .prob-row {
+    display: flex; align-items: center; gap: 10px; font-size: 12px;
+  }
+  .prob-label {
+    width: 54px; flex-shrink: 0;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .prob-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .prob-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,0.1);
+    outline: none; cursor: pointer;
+  }
+  .prob-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); cursor: pointer;
+    border: 2px solid white;
+  }
+  .prob-val {
+    width: 34px; text-align: right;
+    color: var(--muted); font-size: 12px;
+  }
+
+  /* 奖品列表 */
+  .reward-list { display: flex; flex-direction: column; gap: 6px; }
+  .reward-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 8px;
+    background: rgba(245,200,66,0.06);
+    border: 1px solid rgba(245,200,66,0.12);
+    font-size: 12px;
+  }
+  .reward-item-icon { font-size: 16px; }
+  .reward-item-name { flex: 1; }
+  .reward-item-badge {
+    padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 600;
+    background: rgba(245,200,66,0.15); color: var(--gold);
+  }
+
+  /* 进度展示 */
+  .progress-display {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 14px;
+  }
+  .progress-num {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .progress-sep { color: var(--muted); font-size: 18px; }
+  .progress-total { color: var(--muted); font-size: 16px; }
+  .progress-bar-wrap {
+    margin-top: 10px; height: 6px;
+    background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* ─── 中间游戏区 ─── */
+  .game-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 24px;
+    position: relative;
+    overflow: hidden;
+    overflow-y: auto;
+  }
+  .game-center::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 500px;
+    background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%);
+    top: 30%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .game-title-area { text-align: center; margin-bottom: 20px; }
+  .game-name {
+    font-size: 26px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .game-subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+  /* ─── 骰子区域 ─── */
+  .dice-area {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 24px;
+    perspective: 500px;
+  }
+
+  /* CSS 3D 骰子（小号） */
+  .dice {
+    width: 56px; height: 56px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.05s linear;
+    filter: drop-shadow(0 6px 18px rgba(0,0,0,0.5));
+  }
+  .face {
+    position: absolute;
+    width: 56px; height: 56px;
+    background: #FAFAFA;
+    border-radius: 10px;
+    border: 2px solid rgba(0,0,0,0.08);
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.9), inset 0 -2px 4px rgba(0,0,0,0.1);
+    display: grid;
+    padding: 8px;
+  }
+  .face.front  { transform: translateZ(28px); }
+  .face.back   { transform: rotateY(180deg) translateZ(28px); }
+  .face.left   { transform: rotateY(-90deg) translateZ(28px); }
+  .face.right  { transform: rotateY(90deg)  translateZ(28px); }
+  .face.top    { transform: rotateX(90deg)  translateZ(28px); }
+  .face.bottom { transform: rotateX(-90deg) translateZ(28px); }
+  .pip {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #1A1A1A;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+    align-self: center; justify-self: center;
+  }
+  .pips-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+  .pips-2 { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; }
+  .pips-2 .pip:nth-child(1) { grid-column: 1; grid-row: 1; }
+  .pips-2 .pip:nth-child(2) { grid-column: 3; grid-row: 3; }
+  .pips-3 { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; }
+  .pips-3 .pip:nth-child(1) { grid-column: 1; grid-row: 1; }
+  .pips-3 .pip:nth-child(2) { grid-column: 2; grid-row: 2; }
+  .pips-3 .pip:nth-child(3) { grid-column: 3; grid-row: 3; }
+  .pips-4 { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; }
+  .pips-4 .pip:nth-child(1) { grid-column: 1; grid-row: 1; }
+  .pips-4 .pip:nth-child(2) { grid-column: 3; grid-row: 1; }
+  .pips-4 .pip:nth-child(3) { grid-column: 1; grid-row: 3; }
+  .pips-4 .pip:nth-child(4) { grid-column: 3; grid-row: 3; }
+  .pips-5 { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; }
+  .pips-5 .pip:nth-child(1) { grid-column: 1; grid-row: 1; }
+  .pips-5 .pip:nth-child(2) { grid-column: 3; grid-row: 1; }
+  .pips-5 .pip:nth-child(3) { grid-column: 2; grid-row: 2; }
+  .pips-5 .pip:nth-child(4) { grid-column: 1; grid-row: 3; }
+  .pips-5 .pip:nth-child(5) { grid-column: 3; grid-row: 3; }
+  .pips-6 { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; }
+  .pips-6 .pip:nth-child(1) { grid-column: 1; grid-row: 1; }
+  .pips-6 .pip:nth-child(2) { grid-column: 3; grid-row: 1; }
+  .pips-6 .pip:nth-child(3) { grid-column: 1; grid-row: 2; }
+  .pips-6 .pip:nth-child(4) { grid-column: 3; grid-row: 2; }
+  .pips-6 .pip:nth-child(5) { grid-column: 1; grid-row: 3; }
+  .pips-6 .pip:nth-child(6) { grid-column: 3; grid-row: 3; }
+
+  /* 骰子结果数字 */
+  .dice-result-info {
+    text-align: center;
+  }
+  .dice-result-num {
+    font-size: 40px; font-weight: 900;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+    min-height: 48px;
+  }
+  .dice-result-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* 投骰子按钮 */
+  .roll-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 14px;
+    padding: 14px 40px;
+    color: white; font-size: 16px; font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    position: relative; overflow: hidden;
+    letter-spacing: 0.5px;
+  }
+  .roll-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,0.5); }
+  .roll-btn:active:not(:disabled) { transform: translateY(0); }
+  .roll-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .roll-btn .btn-shine {
+    position: absolute; inset: 0;
+    background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+    transform: translateX(-100%);
+  }
+  .roll-btn:hover:not(:disabled) .btn-shine {
+    animation: shine 0.6s ease forwards;
+  }
+  @keyframes shine {
+    to { transform: translateX(100%); }
+  }
+
+  /* 次数显示 */
+  .rolls-left {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--muted);
+  }
+  .rolls-left-num {
+    font-weight: 700;
+    color: var(--gold);
+    font-size: 15px;
+  }
+
+  /* ─── 棋盘 ─── */
+  .board-wrap {
+    width: 100%;
+    max-width: 620px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .board-label {
+    font-size: 12px; color: var(--muted);
+    text-align: center; margin-bottom: 14px;
+    letter-spacing: 0.5px;
+  }
+  .board {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .board-row {
+    display: flex;
+    gap: 6px;
+  }
+  /* 偶数行反向（蛇形） */
+  .board-row.reverse { flex-direction: row-reverse; }
+
+  /* 单个格子 */
+  .cell {
+    flex: 1;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: default;
+    transition: transform 0.15s, box-shadow 0.15s;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 10px;
+  }
+  .cell:hover { transform: scale(1.04); }
+
+  /* 格子类型颜色 */
+  .cell-normal  { background: rgba(255,255,255,0.05); }
+  .cell-reward  { background: rgba(245,200,66,0.12); border-color: rgba(245,200,66,0.25); }
+  .cell-penalty { background: rgba(236,72,153,0.12); border-color: rgba(236,72,153,0.25); }
+  .cell-portal  { background: rgba(99,179,237,0.12); border-color: rgba(99,179,237,0.25); }
+  .cell-finish  {
+    background: linear-gradient(135deg, rgba(245,200,66,0.2), rgba(236,72,153,0.2));
+    border-color: rgba(245,200,66,0.4);
+    box-shadow: 0 0 12px rgba(245,200,66,0.2);
+  }
+  .cell-start {
+    background: rgba(124,58,237,0.15);
+    border-color: rgba(124,58,237,0.35);
+  }
+
+  /* 格子编号 */
+  .cell-num {
+    font-size: 9px;
+    color: rgba(240,234,248,0.3);
+    position: absolute;
+    top: 3px; left: 5px;
+    font-weight: 600;
+    line-height: 1;
+  }
+  /* 格子图标 */
+  .cell-icon { font-size: 14px; line-height: 1; }
+  /* 格子文字（特殊格子） */
+  .cell-text {
+    font-size: 9px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.2;
+    padding: 0 2px;
+    margin-top: 1px;
+  }
+
+  /* 棋子（火箭） */
+  .piece {
+    position: absolute;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    box-shadow: 0 0 12px rgba(124,58,237,0.7), 0 0 4px rgba(236,72,153,0.5);
+    z-index: 10;
+    transition: none; /* JS控制 */
+    pointer-events: none;
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+  .piece.moving {
+    animation: pieceBounce 0.12s ease-in-out;
+  }
+  @keyframes pieceBounce {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.3) translateY(-3px); }
+    100% { transform: scale(1); }
+  }
+
+  /* 格子高亮（棋子所在） */
+  .cell.has-piece {
+    box-shadow: 0 0 0 2px var(--accent), 0 0 16px rgba(124,58,237,0.4);
+  }
+
+  /* 落格事件弹出气泡 */
+  .event-bubble {
+    position: absolute;
+    background: rgba(13,7,32,0.95);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 13px; font-weight: 600;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.2s, transform 0.2s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    top: -8px; left: 50%;
+    transform-origin: bottom center;
+  }
+  .event-bubble.show {
+    opacity: 1;
+    transform: translateY(-48px) translateX(-50%);
+  }
+
+  /* ─── 事件提示横幅 ─── */
+  .event-banner {
+    width: 100%;
+    max-width: 620px;
+    min-height: 44px;
+    border-radius: 10px;
+    padding: 10px 18px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px; font-weight: 600;
+    transition: all 0.3s;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .event-banner.reward { background: rgba(245,200,66,0.12); border-color: rgba(245,200,66,0.3); color: var(--gold); }
+  .event-banner.penalty { background: rgba(236,72,153,0.12); border-color: rgba(236,72,153,0.3); color: #F472B6; }
+  .event-banner.portal { background: rgba(99,179,237,0.12); border-color: rgba(99,179,237,0.3); color: #63B3ED; }
+  .event-banner.normal { background: rgba(255,255,255,0.04); border-color: var(--border); color: var(--muted); }
+  .event-icon { font-size: 20px; flex-shrink: 0; }
+
+  /* ─── 右侧数据面板 ─── */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 24px 18px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .stat-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--muted); }
+  .stat-val { font-weight: 700; }
+  .stat-val.gold { color: var(--gold); }
+  .stat-val.green { color: #4ADE80; }
+  .stat-val.purple { color: #A78BFA; }
+  .stat-val.pink { color: #F472B6; }
+
+  /* 进度条（右侧） */
+  .right-progress-bar {
+    height: 6px; border-radius: 3px;
+    background: rgba(255,255,255,0.08);
+    margin-top: 8px; overflow: hidden;
+  }
+  .right-progress-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* 事件日志 */
+  .log-list {
+    display: flex; flex-direction: column; gap: 6px;
+    max-height: 340px; overflow-y: auto;
+  }
+  .log-list::-webkit-scrollbar { width: 4px; }
+  .log-list::-webkit-scrollbar-track { background: transparent; }
+  .log-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+  .log-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 7px 8px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    font-size: 11px; line-height: 1.4;
+    animation: logSlide 0.25s ease;
+  }
+  @keyframes logSlide {
+    from { opacity: 0; transform: translateX(8px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .log-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+  .log-text { color: var(--muted); flex: 1; }
+  .log-text strong { color: var(--text); }
+  .log-step {
+    font-size: 10px; color: rgba(240,234,248,0.25);
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .log-empty { color: var(--muted); font-size: 12px; text-align: center; padding: 20px 0; }
+
+  /* ─── 通关弹窗 ─── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(6px);
+    z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal-box {
+    background: #1A0A2E;
+    border: 1px solid rgba(124,58,237,0.4);
+    border-radius: 20px;
+    padding: 40px 48px;
+    text-align: center;
+    max-width: 480px; width: 90%;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(245,200,66,0.1);
+    transform: scale(0.85);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .modal-overlay.show .modal-box { transform: scale(1); }
+  .modal-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    color: var(--muted); text-transform: uppercase; margin-bottom: 8px;
+  }
+  .modal-emoji { font-size: 56px; display: block; animation: bounceIn 0.5s ease 0.15s both; }
+  @keyframes bounceIn {
+    from { transform: scale(0); opacity: 0; }
+    60%  { transform: scale(1.25); }
+    to   { transform: scale(1); opacity: 1; }
+  }
+  .modal-title {
+    font-size: 30px; font-weight: 900; margin: 10px 0 6px;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .modal-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+  .modal-stats {
+    display: flex; gap: 16px; justify-content: center;
+    margin-bottom: 24px;
+  }
+  .modal-stat {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 20px;
+    text-align: center; flex: 1;
+  }
+  .modal-stat-num {
+    font-size: 22px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .modal-stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .modal-rewards {
+    background: rgba(245,200,66,0.06);
+    border: 1px solid rgba(245,200,66,0.15);
+    border-radius: 10px; padding: 12px 16px;
+    text-align: left; margin-bottom: 24px;
+    font-size: 12px;
+  }
+  .modal-rewards-title { color: var(--muted); margin-bottom: 8px; font-size: 11px; letter-spacing: 0.5px; }
+  .modal-reward-item { display: flex; align-items: center; gap: 6px; padding: 3px 0; color: var(--gold); }
+  .modal-reward-item span { color: var(--text); }
+  .modal-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 12px;
+    padding: 13px 48px;
+    color: white; font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+  }
+  .modal-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  /* 粒子 */
+  .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 199; overflow: hidden; }
+  .confetti-piece {
+    position: absolute;
+    width: 8px; height: 8px; border-radius: 2px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0%   { transform: translateY(-20px) rotate(0deg);   opacity: 1; }
+    100% { transform: translateY(110vh) rotate(760deg); opacity: 0; }
+  }
+
+  /* ─── 底部状态栏 ─── */
+  .statusbar {
+    padding: 10px 24px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 20px;
+    font-size: 12px; color: var(--muted);
+    background: rgba(13,7,32,0.95);
+    flex-shrink: 0;
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #22C55E;
+    box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .status-sep { color: var(--border); }
+
+  /* 响应式 */
+  @media (max-width: 960px) {
+    .main { grid-template-columns: 1fr; }
+    .panel-left, .panel-right { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">
+    🎮 <span>GameHub</span> 中台
+    <div class="nav-badge">Demo</div>
+  </a>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="wheel.html">大转盘</a>
+    <a class="nav-tab" href="nine-grid.html">九宫格</a>
+    <a class="nav-tab" href="scratch-card.html">刮刮乐</a>
+    <a class="nav-tab" href="shake-dice.html">摇骰子</a>
+    <a class="nav-tab" href="smash-egg.html">砸金蛋</a>
+    <a class="nav-tab active" href="flying-chess.html">飞行棋</a>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <span style="font-size:13px;color:var(--muted)">活动：夏日大促 2026</span>
+    <div style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:6px;padding:4px 10px;font-size:12px;color:#22C55E;font-weight:600">进行中</div>
+  </div>
+</nav>
+
+<!-- 主体 -->
+<div class="main">
+
+  <!-- ─── 左侧配置面板 ─── -->
+  <div class="panel-left">
+    <div class="panel-title">游戏配置</div>
+
+    <!-- 基础规则 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>基础规则</div>
+      <div class="rule-row">
+        <span class="rule-label">每日投骰上限</span>
+        <input class="rule-input" type="number" id="maxRolls" value="5" min="1" max="20" onchange="applyConfig()">
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">骰子面数</span>
+        <input class="rule-input" type="number" id="diceFaces" value="6" min="3" max="6" onchange="applyConfig()">
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">总格数</span>
+        <input class="rule-input" type="number" value="30" disabled style="opacity:0.5">
+      </div>
+    </div>
+
+    <!-- 格子概率配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>格子类型概率</div>
+      <div class="prob-group">
+        <div class="prob-row">
+          <div class="prob-label">
+            <span class="prob-dot" style="background:#6B7280"></span>
+            <span style="font-size:11px;color:var(--muted)">普通</span>
+          </div>
+          <input class="prob-slider" type="range" id="probNormal" min="40" max="80" value="60" oninput="syncProb()">
+          <span class="prob-val" id="probNormalVal">60%</span>
+        </div>
+        <div class="prob-row">
+          <div class="prob-label">
+            <span class="prob-dot" style="background:#F5C842"></span>
+            <span style="font-size:11px;color:var(--muted)">奖励</span>
+          </div>
+          <input class="prob-slider" type="range" id="probReward" min="5" max="30" value="15" oninput="syncProb()">
+          <span class="prob-val" id="probRewardVal">15%</span>
+        </div>
+        <div class="prob-row">
+          <div class="prob-label">
+            <span class="prob-dot" style="background:#EC4899"></span>
+            <span style="font-size:11px;color:var(--muted)">惩罚</span>
+          </div>
+          <input class="prob-slider" type="range" id="probPenalty" min="0" max="20" value="10" oninput="syncProb()">
+          <span class="prob-val" id="probPenaltyVal">10%</span>
+        </div>
+        <div class="prob-row">
+          <div class="prob-label">
+            <span class="prob-dot" style="background:#63B3ED"></span>
+            <span style="font-size:11px;color:var(--muted)">传送</span>
+          </div>
+          <input class="prob-slider" type="range" id="probPortal" min="0" max="20" value="10" oninput="syncProb()">
+          <span class="prob-val" id="probPortalVal">10%</span>
+        </div>
+        <div style="margin-top:8px;padding:8px;background:rgba(255,255,255,0.03);border-radius:6px;font-size:11px;color:var(--muted);text-align:center">
+          注：固定格（第5、8、12、15、20、25、28格）不受概率影响
+        </div>
+      </div>
+    </div>
+
+    <!-- 奖品列表 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖励格奖品库</div>
+      <div class="reward-list">
+        <div class="reward-item">
+          <span class="reward-item-icon">🎁</span>
+          <span class="reward-item-name">积分 ×50</span>
+          <span class="reward-item-badge">第5格</span>
+        </div>
+        <div class="reward-item">
+          <span class="reward-item-icon">🎫</span>
+          <span class="reward-item-name">20元优惠券</span>
+          <span class="reward-item-badge">第15格</span>
+        </div>
+        <div class="reward-item">
+          <span class="reward-item-icon">🧧</span>
+          <span class="reward-item-name">50元优惠券</span>
+          <span class="reward-item-badge">第25格</span>
+        </div>
+        <div class="reward-item" style="background:rgba(124,58,237,0.06);border-color:rgba(124,58,237,0.2)">
+          <span class="reward-item-icon">⭐</span>
+          <span class="reward-item-name">积分 ×20</span>
+          <span class="reward-item-badge" style="background:rgba(124,58,237,0.15);color:#A78BFA">随机奖励</span>
+        </div>
+        <div class="reward-item" style="background:rgba(124,58,237,0.06);border-color:rgba(124,58,237,0.2)">
+          <span class="reward-item-icon">💎</span>
+          <span class="reward-item-name">10元优惠券</span>
+          <span class="reward-item-badge" style="background:rgba(124,58,237,0.15);color:#A78BFA">随机奖励</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 当前进度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>当前进度</div>
+      <div class="progress-display">
+        <span class="progress-num" id="leftPos">0</span>
+        <span class="progress-sep">/</span>
+        <span class="progress-total">30 格</span>
+      </div>
+      <div class="progress-bar-wrap" style="margin-top:12px">
+        <div class="progress-bar-fill" id="leftProgressBar" style="width:0%"></div>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between">
+        <span>🚀 起点</span>
+        <span>🏁 终点</span>
+      </div>
+    </div>
+
+  </div><!-- /panel-left -->
+
+  <!-- ─── 中间游戏区 ─── -->
+  <div class="game-center" id="gameCenter">
+
+    <div class="game-title-area">
+      <div class="game-name">✈ 飞行棋闯关</div>
+      <div class="game-subtitle">投骰前行，挑战30格通关！</div>
+    </div>
+
+    <!-- 骰子与操作区 -->
+    <div class="dice-area">
+      <!-- 小CSS 3D骰子 -->
+      <div class="dice" id="dice">
+        <div class="face front">
+          <div class="pips-1"><div class="pip"></div></div>
+        </div>
+        <div class="face back">
+          <div class="pips-6">
+            <div class="pip"></div><div class="pip"></div>
+            <div class="pip"></div><div class="pip"></div>
+            <div class="pip"></div><div class="pip"></div>
+          </div>
+        </div>
+        <div class="face left">
+          <div class="pips-3">
+            <div class="pip"></div><div class="pip"></div><div class="pip"></div>
+          </div>
+        </div>
+        <div class="face right">
+          <div class="pips-4">
+            <div class="pip"></div><div class="pip"></div>
+            <div class="pip"></div><div class="pip"></div>
+          </div>
+        </div>
+        <div class="face top">
+          <div class="pips-2">
+            <div class="pip"></div><div class="pip"></div>
+          </div>
+        </div>
+        <div class="face bottom">
+          <div class="pips-5">
+            <div class="pip"></div><div class="pip"></div>
+            <div class="pip"></div><div class="pip"></div><div class="pip"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 结果信息 -->
+      <div class="dice-result-info">
+        <div class="dice-result-num" id="diceNum">-</div>
+        <div class="dice-result-label">本次点数</div>
+      </div>
+
+      <!-- 投骰按钮 + 次数 -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <button class="roll-btn" id="rollBtn" onclick="rollDice()">
+          <span class="btn-shine"></span>
+          🎲 投骰子
+        </button>
+        <div class="rolls-left">
+          今日剩余：<span class="rolls-left-num" id="rollsLeftNum">5</span> 次
+        </div>
+      </div>
+    </div>
+
+    <!-- 事件提示横幅 -->
+    <div class="event-banner" id="eventBanner" style="margin-bottom:14px;max-width:620px;width:100%">
+      <span class="event-icon">🎲</span>
+      <span id="eventText">点击「投骰子」开始你的飞行之旅！</span>
+    </div>
+
+    <!-- 棋盘 -->
+    <div class="board-wrap">
+      <div class="board-label">📍 共 30 格 · 蛇形路径</div>
+      <div class="board" id="board"></div>
+      <!-- 棋子 -->
+      <div class="piece" id="piece">🚀</div>
+    </div>
+
+  </div><!-- /game-center -->
+
+  <!-- ─── 右侧数据面板 ─── -->
+  <div class="panel-right">
+    <div class="panel-title">本局数据</div>
+
+    <!-- 位置进度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>位置进度</div>
+      <div class="stat-row">
+        <span class="stat-label">当前位置</span>
+        <span class="stat-val gold" id="rightPos">第 0 格</span>
+      </div>
+      <div class="right-progress-bar">
+        <div class="right-progress-fill" id="rightProgressBar" style="width:0%"></div>
+      </div>
+      <div style="margin-top:6px;font-size:11px;color:var(--muted);text-align:right" id="rightProgressPct">0 / 30</div>
+    </div>
+
+    <!-- 本局统计 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>本局统计</div>
+      <div class="stat-row">
+        <span class="stat-label">已掷骰次数</span>
+        <span class="stat-val purple" id="statRolls">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">获得奖励次数</span>
+        <span class="stat-val gold" id="statRewards">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">触发惩罚次数</span>
+        <span class="stat-val pink" id="statPenalties">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">触发传送次数</span>
+        <span class="stat-val" style="color:#63B3ED" id="statPortals">0</span>
+      </div>
+    </div>
+
+    <!-- 历史记录 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>历史记录</div>
+      <div class="stat-row">
+        <span class="stat-label">历史通关次数</span>
+        <span class="stat-val green" id="statWins">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">历史掷骰总数</span>
+        <span class="stat-val purple" id="statTotalRolls">0</span>
+      </div>
+    </div>
+
+    <!-- 事件日志 -->
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title"><span class="dot"></span>本局事件日志</div>
+      <div class="log-list" id="logList">
+        <div class="log-empty" id="logEmpty">暂无记录，开始掷骰！</div>
+      </div>
+    </div>
+
+  </div><!-- /panel-right -->
+
+</div><!-- /main -->
+
+<!-- 通关弹窗 -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-label">🏁 通关成功</div>
+    <span class="modal-emoji">🎊</span>
+    <div class="modal-title">恭喜通关！</div>
+    <div class="modal-subtitle" id="modalSubtitle">你用了 X 步完成了飞行之旅！</div>
+    <div class="modal-stats">
+      <div class="modal-stat">
+        <div class="modal-stat-num" id="modalSteps">-</div>
+        <div class="modal-stat-label">用了几步</div>
+      </div>
+      <div class="modal-stat">
+        <div class="modal-stat-num" id="modalRewardsCount">-</div>
+        <div class="modal-stat-label">获得奖励</div>
+      </div>
+    </div>
+    <div class="modal-rewards" id="modalRewardsList">
+      <div class="modal-rewards-title">🎁 本局获得奖励</div>
+      <div id="modalRewardsItems"></div>
+    </div>
+    <button class="modal-btn" onclick="restartGame()">🚀 再来一局</button>
+  </div>
+</div>
+
+<!-- 粒子容器 -->
+<div class="confetti" id="confetti"></div>
+
+<!-- 底部状态栏 -->
+<div class="statusbar">
+  <div class="status-dot"></div>
+  <span>GameHub 小游戏中台</span>
+  <span class="status-sep">|</span>
+  <span>飞行棋 · 单人闯关模式</span>
+  <span class="status-sep">|</span>
+  <span id="statusInfo">等待开始...</span>
+  <span class="status-sep">|</span>
+  <span style="margin-left:auto;opacity:0.5">v1.0.0</span>
+</div>
+
+<script>
+// ─── 游戏状态 ───
+const TOTAL = 30;
+
+// 固定格子类型（index 从1开始）
+const FIXED_CELLS = {
+  1:  { type: 'start',   icon: '🚀', text: '起点' },
+  5:  { type: 'reward',  icon: '🎁', text: '积分×50', reward: { name: '积分 ×50', icon: '🎁' } },
+  8:  { type: 'penalty', icon: '😅', text: '退2格' },
+  12: { type: 'portal',  icon: '🌀', text: '随机跳' },
+  15: { type: 'reward',  icon: '🎫', text: '20元券', reward: { name: '20元优惠券', icon: '🎫' } },
+  20: { type: 'penalty', icon: '💀', text: '回起点' },
+  25: { type: 'reward',  icon: '🧧', text: '50元券', reward: { name: '50元优惠券', icon: '🧧' } },
+  28: { type: 'portal',  icon: '🌀', text: '随机跳' },
+  30: { type: 'finish',  icon: '🏁', text: '终点！' },
+};
+
+// 随机奖励池
+const RANDOM_REWARDS = [
+  { name: '积分 ×20', icon: '⭐' },
+  { name: '10元优惠券', icon: '💎' },
+];
+
+// 动态生成的格子类型（非固定格）
+let dynamicCells = {};
+
+// 游戏数据
+let state = {
+  pos: 0,
+  rollsToday: 0,
+  maxRolls: 5,
+  diceFaces: 6,
+  rolling: false,
+  moving: false,
+  rewardsCollected: [],
+  statRolls: 0,
+  statRewards: 0,
+  statPenalties: 0,
+  statPortals: 0,
+  // 历史
+  historyWins: 0,
+  historyTotalRolls: 0,
+};
+
+// 骰子各面展示到正面的旋转角度
+const DICE_ROTATIONS = {
+  1: 'rotateX(0deg) rotateY(0deg)',
+  2: 'rotateX(-90deg) rotateY(0deg)',
+  3: 'rotateY(90deg) rotateX(0deg)',
+  4: 'rotateY(-90deg) rotateX(0deg)',
+  5: 'rotateX(90deg) rotateY(0deg)',
+  6: 'rotateX(180deg) rotateY(0deg)',
+};
+
+// ─── 初始化 ───
+function init() {
+  generateDynamicCells();
+  renderBoard();
+  placePiece(0, false);
+  updateUI();
+  updateConfig();
+}
+
+// 生成非固定格的随机类型
+function generateDynamicCells() {
+  dynamicCells = {};
+  const pNormal  = parseInt(document.getElementById('probNormal').value)  / 100;
+  const pReward  = parseInt(document.getElementById('probReward').value)  / 100;
+  const pPenalty = parseInt(document.getElementById('probPenalty').value) / 100;
+  // pPortal = 剩余
+
+  for (let i = 2; i <= TOTAL - 1; i++) {
+    if (FIXED_CELLS[i]) continue;
+    const r = Math.random();
+    if (r < pReward) {
+      dynamicCells[i] = { type: 'reward', icon: '⭐', text: '奖励', reward: RANDOM_REWARDS[Math.floor(Math.random() * RANDOM_REWARDS.length)] };
+    } else if (r < pReward + pPenalty) {
+      dynamicCells[i] = { type: 'penalty', icon: '🔴', text: '惩罚' };
+    } else if (r < pReward + pPenalty + (1 - pNormal - pReward - pPenalty)) {
+      dynamicCells[i] = { type: 'portal', icon: '🌀', text: '传送' };
+    } else {
+      dynamicCells[i] = { type: 'normal', icon: '', text: '' };
+    }
+  }
+}
+
+// 获取格子信息
+function getCellInfo(idx) {
+  if (idx <= 0) return { type: 'start', icon: '🚀', text: '起点' };
+  if (FIXED_CELLS[idx]) return FIXED_CELLS[idx];
+  if (dynamicCells[idx]) return dynamicCells[idx];
+  return { type: 'normal', icon: '', text: '' };
+}
+
+// ─── 渲染棋盘 ───
+function renderBoard() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+
+  // 三行：第1行格子1-10，第2行格子11-20（反向），第3行格子21-30（正向）
+  const rows = [
+    { cells: range(1, 10),  reverse: false },
+    { cells: range(11, 20), reverse: true  },
+    { cells: range(21, 30), reverse: false },
+  ];
+
+  rows.forEach(({ cells, reverse }) => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'board-row' + (reverse ? ' reverse' : '');
+    cells.forEach(idx => {
+      const info = getCellInfo(idx);
+      const cell = document.createElement('div');
+      cell.className = 'cell cell-' + info.type;
+      cell.id = 'cell-' + idx;
+      cell.innerHTML = `
+        <span class="cell-num">${idx}</span>
+        ${info.icon ? `<span class="cell-icon">${info.icon}</span>` : ''}
+        ${info.text ? `<span class="cell-text">${info.text}</span>` : ''}
+      `;
+      rowEl.appendChild(cell);
+    });
+    board.appendChild(rowEl);
+  });
+}
+
+function range(a, b) {
+  const r = [];
+  for (let i = a; i <= b; i++) r.push(i);
+  return r;
+}
+
+// ─── 棋子定位 ───
+function placePiece(pos, animate) {
+  const piece = document.getElementById('piece');
+  // 移除旧高亮
+  document.querySelectorAll('.cell.has-piece').forEach(c => c.classList.remove('has-piece'));
+
+  if (pos === 0) {
+    // 起始：隐藏在格1左上
+    const cell = document.getElementById('cell-1');
+    if (cell) {
+      positionPieceOnCell(piece, cell);
+      piece.style.opacity = '1';
+    }
+    return;
+  }
+
+  const cellId = 'cell-' + Math.min(pos, TOTAL);
+  const cell = document.getElementById(cellId);
+  if (!cell) return;
+
+  cell.classList.add('has-piece');
+
+  if (animate) {
+    piece.classList.remove('moving');
+    void piece.offsetWidth; // reflow
+    piece.classList.add('moving');
+    setTimeout(() => piece.classList.remove('moving'), 150);
+  }
+
+  positionPieceOnCell(piece, cell);
+}
+
+function positionPieceOnCell(piece, cell) {
+  const board = document.querySelector('.board-wrap');
+  const bRect = board.getBoundingClientRect();
+  const cRect = cell.getBoundingClientRect();
+  const x = cRect.left - bRect.left + cRect.width / 2 - 11;
+  const y = cRect.top  - bRect.top  + cRect.height / 2 - 11;
+  piece.style.left = x + 'px';
+  piece.style.top  = y + 'px';
+}
+
+// ─── 骰子动画 ───
+let diceAnimFrame = null;
+function animateDice(finalNum, onDone) {
+  const dice = document.getElementById('dice');
+  const diceNumEl = document.getElementById('diceNum');
+  const start = performance.now();
+  const duration = 1000; // 1秒滚动
+
+  function frame(ts) {
+    const elapsed = ts - start;
+    const progress = Math.min(elapsed / duration, 1);
+
+    // 随机旋转（模拟摇动）
+    const rx = Math.random() * 720;
+    const ry = Math.random() * 720;
+    dice.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+
+    // 数字跳动
+    const displayNum = Math.floor(Math.random() * 6) + 1;
+    diceNumEl.textContent = displayNum;
+
+    if (progress < 1) {
+      diceAnimFrame = requestAnimationFrame(frame);
+    } else {
+      // 停在最终面
+      dice.style.transition = 'transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)';
+      dice.style.transform = DICE_ROTATIONS[finalNum];
+      diceNumEl.textContent = finalNum;
+      setTimeout(() => {
+        dice.style.transition = '';
+        onDone();
+      }, 450);
+    }
+  }
+  diceAnimFrame = requestAnimationFrame(frame);
+}
+
+// ─── 投骰主流程 ───
+function rollDice() {
+  if (state.rolling || state.moving) return;
+  if (state.rollsToday >= state.maxRolls) {
+    showEvent('normal', '⛔', '今日投骰次数已用完，明天再来！');
+    return;
+  }
+  if (state.pos >= TOTAL) {
+    showEvent('normal', '🏁', '你已通关！点击「再来一局」重新挑战');
+    return;
+  }
+
+  state.rolling = true;
+  state.rollsToday++;
+  state.statRolls++;
+  state.historyTotalRolls++;
+  updateUI();
+  updateStatusBar('掷骰中...');
+
+  const faces = parseInt(document.getElementById('diceFaces').value) || 6;
+  const result = Math.floor(Math.random() * faces) + 1;
+
+  // 禁用按钮
+  document.getElementById('rollBtn').disabled = true;
+
+  animateDice(result, () => {
+    state.rolling = false;
+    movePiece(result);
+  });
+}
+
+// ─── 逐格移动 ───
+function movePiece(steps) {
+  state.moving = true;
+  const startPos = state.pos;
+  let moved = 0;
+
+  function step() {
+    if (moved < steps) {
+      state.pos = Math.min(state.pos + 1, TOTAL);
+      moved++;
+      placePiece(state.pos, true);
+      updateProgress();
+
+      if (state.pos >= TOTAL) {
+        // 到达终点，直接触发通关
+        setTimeout(() => {
+          state.moving = false;
+          triggerFinish();
+        }, 200);
+        return;
+      }
+      setTimeout(step, 150);
+    } else {
+      // 移动结束，触发格子事件
+      state.moving = false;
+      setTimeout(() => triggerCellEvent(state.pos), 150);
+    }
+  }
+  step();
+}
+
+// ─── 触发格子事件 ───
+function triggerCellEvent(pos) {
+  const info = getCellInfo(pos);
+  const type = info.type;
+
+  if (type === 'finish') {
+    triggerFinish();
+    return;
+  }
+
+  let extraDelay = 0;
+
+  if (type === 'reward') {
+    const reward = info.reward || RANDOM_REWARDS[0];
+    state.statRewards++;
+    state.rewardsCollected.push(reward);
+    showEvent('reward', info.icon, `🎉 奖励！获得 ${reward.name}`);
+    addLog('reward', info.icon, `<strong>落在奖励格</strong> 第${pos}格 · 获得 ${reward.name}`, pos);
+    flashCell(pos, 'reward');
+
+  } else if (type === 'penalty') {
+    state.statPenalties++;
+    if (pos === 20) {
+      // 回到起点
+      showEvent('penalty', '💀', '回到起点！重新出发...');
+      addLog('penalty', '💀', `<strong>惩罚！</strong> 第${pos}格 · 回到起点`, pos);
+      flashCell(pos, 'penalty');
+      extraDelay = 800;
+      setTimeout(() => {
+        state.pos = 0;
+        placePiece(0, false);
+        updateProgress();
+        enableRoll();
+      }, extraDelay);
+      updateUI();
+      return;
+    } else {
+      // 后退2格
+      const newPos = Math.max(state.pos - 2, 0);
+      showEvent('penalty', info.icon, `😅 惩罚！后退 2 格（第${pos}格 → 第${newPos}格）`);
+      addLog('penalty', info.icon, `<strong>惩罚！</strong> 第${pos}格 · 后退2格到第${newPos}格`, pos);
+      flashCell(pos, 'penalty');
+      extraDelay = 700;
+      setTimeout(() => {
+        state.pos = newPos;
+        placePiece(newPos, true);
+        updateProgress();
+        enableRoll();
+      }, extraDelay);
+      updateUI();
+      return;
+    }
+
+  } else if (type === 'portal') {
+    state.statPortals++;
+    // 随机跳（排除起点、当前格、终点）
+    const candidates = [];
+    for (let i = 1; i < TOTAL; i++) {
+      if (i !== pos) candidates.push(i);
+    }
+    const dest = candidates[Math.floor(Math.random() * candidates.length)];
+    showEvent('portal', '🌀', `传送！跳到第 ${dest} 格！`);
+    addLog('portal', '🌀', `<strong>传送门！</strong> 第${pos}格 · 跳至第${dest}格`, pos);
+    flashCell(pos, 'portal');
+    extraDelay = 700;
+    setTimeout(() => {
+      state.pos = dest;
+      placePiece(dest, true);
+      updateProgress();
+      enableRoll();
+    }, extraDelay);
+    updateUI();
+    return;
+
+  } else {
+    // 普通格
+    const normalTexts = ['继续前进！', '稳步前行~', '没有特殊事件，继续！', '普通格，加油！'];
+    showEvent('normal', '👣', normalTexts[Math.floor(Math.random() * normalTexts.length)]);
+    addLog('normal', '👣', `<strong>普通格</strong> 落在第${pos}格`, pos);
+  }
+
+  updateUI();
+  enableRoll();
+}
+
+function enableRoll() {
+  const canRoll = state.rollsToday < state.maxRolls && state.pos < TOTAL;
+  document.getElementById('rollBtn').disabled = !canRoll;
+  if (!canRoll && state.rollsToday >= state.maxRolls) {
+    updateStatusBar('今日次数已用完');
+  } else if (state.pos >= TOTAL) {
+    updateStatusBar('🏁 通关！');
+  } else {
+    updateStatusBar(`当前第 ${state.pos} 格，剩余 ${state.maxRolls - state.rollsToday} 次`);
+  }
+}
+
+// ─── 通关 ───
+function triggerFinish() {
+  state.pos = TOTAL;
+  state.historyWins++;
+  placePiece(TOTAL, false);
+  updateProgress();
+  updateUI();
+  addLog('finish', '🏁', `<strong>通关！</strong> 用了 ${state.statRolls} 步抵达终点`, TOTAL);
+  updateStatusBar('🎊 通关！');
+  document.getElementById('rollBtn').disabled = true;
+
+  setTimeout(() => {
+    showModal();
+    launchConfetti();
+  }, 400);
+}
+
+// ─── 通关弹窗 ───
+function showModal() {
+  document.getElementById('modalSubtitle').textContent = `你用了 ${state.statRolls} 步完成了飞行之旅！`;
+  document.getElementById('modalSteps').textContent = state.statRolls;
+  document.getElementById('modalRewardsCount').textContent = state.rewardsCollected.length;
+
+  const itemsEl = document.getElementById('modalRewardsItems');
+  if (state.rewardsCollected.length === 0) {
+    itemsEl.innerHTML = '<div style="color:var(--muted);font-size:12px">本局未获得奖励</div>';
+  } else {
+    itemsEl.innerHTML = state.rewardsCollected.map(r =>
+      `<div class="modal-reward-item">${r.icon} <span>${r.name}</span></div>`
+    ).join('');
+  }
+
+  document.getElementById('modal').classList.add('show');
+}
+
+function restartGame() {
+  document.getElementById('modal').classList.remove('show');
+  clearConfetti();
+  resetGame();
+}
+
+// ─── 重置游戏 ───
+function resetGame() {
+  state.pos = 0;
+  state.rollsToday = 0;
+  state.rolling = false;
+  state.moving = false;
+  state.rewardsCollected = [];
+  state.statRolls = 0;
+  state.statRewards = 0;
+  state.statPenalties = 0;
+  state.statPortals = 0;
+
+  // 重新生成格子
+  generateDynamicCells();
+  renderBoard();
+  placePiece(0, false);
+  updateProgress();
+  updateUI();
+  document.getElementById('rollBtn').disabled = false;
+  document.getElementById('diceNum').textContent = '-';
+
+  // 重置骰子
+  const dice = document.getElementById('dice');
+  dice.style.transform = 'rotateX(0deg) rotateY(0deg)';
+
+  // 清空日志
+  const logList = document.getElementById('logList');
+  logList.innerHTML = '<div class="log-empty" id="logEmpty">暂无记录，开始掷骰！</div>';
+
+  showEvent('normal', '🎲', '新的一局已开始，投骰出发！');
+  updateStatusBar('新局已开始，等待投骰...');
+}
+
+// ─── UI更新 ───
+function updateProgress() {
+  const pct = Math.round((state.pos / TOTAL) * 100);
+  // 左侧
+  document.getElementById('leftPos').textContent = state.pos;
+  document.getElementById('leftProgressBar').style.width = pct + '%';
+  // 右侧
+  document.getElementById('rightPos').textContent = `第 ${state.pos} 格`;
+  document.getElementById('rightProgressBar').style.width = pct + '%';
+  document.getElementById('rightProgressPct').textContent = `${state.pos} / ${TOTAL}`;
+}
+
+function updateUI() {
+  updateProgress();
+  document.getElementById('rollsLeftNum').textContent = Math.max(0, state.maxRolls - state.rollsToday);
+  document.getElementById('statRolls').textContent = state.statRolls;
+  document.getElementById('statRewards').textContent = state.statRewards;
+  document.getElementById('statPenalties').textContent = state.statPenalties;
+  document.getElementById('statPortals').textContent = state.statPortals;
+  document.getElementById('statWins').textContent = state.historyWins;
+  document.getElementById('statTotalRolls').textContent = state.historyTotalRolls;
+}
+
+function updateStatusBar(msg) {
+  document.getElementById('statusInfo').textContent = msg;
+}
+
+// ─── 事件横幅 ───
+function showEvent(type, icon, text) {
+  const banner = document.getElementById('eventBanner');
+  const textEl = document.getElementById('eventText');
+  banner.className = 'event-banner ' + type;
+  document.querySelector('#eventBanner .event-icon').textContent = icon;
+  textEl.textContent = text;
+}
+
+// ─── 格子闪光 ───
+function flashCell(pos, type) {
+  const cell = document.getElementById('cell-' + pos);
+  if (!cell) return;
+  const colors = { reward: '#F5C842', penalty: '#EC4899', portal: '#63B3ED' };
+  const c = colors[type] || '#fff';
+  cell.style.boxShadow = `0 0 0 3px ${c}, 0 0 20px ${c}55`;
+  setTimeout(() => { cell.style.boxShadow = ''; }, 800);
+}
+
+// ─── 日志 ───
+function addLog(type, icon, html, step) {
+  const logList = document.getElementById('logList');
+  const empty = document.getElementById('logEmpty');
+  if (empty) empty.remove();
+
+  const item = document.createElement('div');
+  item.className = 'log-item';
+  item.innerHTML = `
+    <span class="log-icon">${icon}</span>
+    <span class="log-text">${html}</span>
+    <span class="log-step">#${state.statRolls}</span>
+  `;
+  logList.insertBefore(item, logList.firstChild);
+
+  // 最多保留20条
+  while (logList.children.length > 20) {
+    logList.removeChild(logList.lastChild);
+  }
+}
+
+// ─── 粒子特效 ───
+function launchConfetti() {
+  const container = document.getElementById('confetti');
+  container.innerHTML = '';
+  const colors = ['#F5C842','#EC4899','#7C3AED','#63B3ED','#4ADE80','#FBBF24','#F87171'];
+  for (let i = 0; i < 80; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `
+      left: ${Math.random() * 100}%;
+      top: -10px;
+      background: ${colors[Math.floor(Math.random() * colors.length)]};
+      animation-duration: ${1.5 + Math.random() * 2.5}s;
+      animation-delay: ${Math.random() * 1.2}s;
+      width: ${6 + Math.random() * 8}px;
+      height: ${6 + Math.random() * 8}px;
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+    `;
+    container.appendChild(p);
+  }
+  setTimeout(clearConfetti, 5000);
+}
+
+function clearConfetti() {
+  document.getElementById('confetti').innerHTML = '';
+}
+
+// ─── 配置同步 ───
+function syncProb() {
+  document.getElementById('probNormalVal').textContent  = document.getElementById('probNormal').value + '%';
+  document.getElementById('probRewardVal').textContent  = document.getElementById('probReward').value + '%';
+  document.getElementById('probPenaltyVal').textContent = document.getElementById('probPenalty').value + '%';
+  document.getElementById('probPortalVal').textContent  = document.getElementById('probPortal').value + '%';
+}
+
+function applyConfig() {
+  state.maxRolls  = parseInt(document.getElementById('maxRolls').value)  || 5;
+  state.diceFaces = parseInt(document.getElementById('diceFaces').value) || 6;
+  updateUI();
+}
+
+function updateConfig() {
+  applyConfig();
+  syncProb();
+}
+
+// ─── 窗口 resize 重新定位棋子 ───
+window.addEventListener('resize', () => {
+  placePiece(state.pos, false);
+});
+
+// ─── 启动 ───
+window.addEventListener('load', () => {
+  init();
+  updateStatusBar('等待投骰...');
+});
+</script>
+</body>
+</html>

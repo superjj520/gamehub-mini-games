@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 翻牌配对</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: inherit;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+  }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    padding: 7px 16px; border-radius: 8px;
+    font-size: 14px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+  }
+  .nav-tab.active, .nav-tab:hover {
+    background: var(--card); color: var(--text);
+  }
+  .nav-tab.active { color: var(--gold); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22C55E;
+    box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; } 50% { opacity: 0.5; }
+  }
+  .status-text { font-size: 12px; color: var(--muted); }
+
+  /* ─── 主体布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: calc(100vh - 117px);
+  }
+
+  /* ─── 左侧面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-title {
+    font-size: 12px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* 难度选择 */
+  .difficulty-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .diff-btn {
+    padding: 10px 6px; border-radius: 8px; text-align: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s;
+    font-size: 12px; color: var(--muted);
+  }
+  .diff-btn:hover { border-color: rgba(124,58,237,0.5); color: var(--text); }
+  .diff-btn.active {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.15);
+    color: var(--text);
+  }
+  .diff-btn .diff-name { font-weight: 700; font-size: 13px; margin-bottom: 3px; }
+  .diff-btn .diff-desc { color: var(--muted); font-size: 11px; }
+  .diff-btn.active .diff-name { color: var(--gold); }
+
+  /* 规则行 */
+  .rule-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-label { color: var(--muted); }
+  .rule-value { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+
+  /* 开关 */
+  .toggle-wrap { display: flex; align-items: center; gap: 8px; }
+  .toggle {
+    width: 38px; height: 20px; border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    position: relative; cursor: pointer;
+    transition: background 0.2s;
+    border: none; outline: none; flex-shrink: 0;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle::after {
+    content: '';
+    position: absolute; top: 3px; left: 3px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: white; transition: left 0.2s;
+  }
+  .toggle.on::after { left: 21px; }
+  .toggle-label { font-size: 12px; color: var(--muted); }
+  .toggle-label.on { color: var(--gold); }
+
+  /* 速度按钮 */
+  .speed-btns { display: flex; gap: 6px; }
+  .speed-btn {
+    padding: 5px 10px; border-radius: 6px; font-size: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border); color: var(--muted);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .speed-btn.active {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.15);
+    color: var(--gold);
+  }
+
+  /* 开始按钮 */
+  .btn-primary {
+    padding: 12px 28px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: white; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    width: 100%;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(124,58,237,0.5); }
+  .btn-primary:active { transform: translateY(0); }
+
+  /* emoji 预览 */
+  .emoji-preview {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;
+  }
+  .emoji-chip {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+  }
+
+  /* ─── 中间游戏区 ─── */
+  .game-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .game-center::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .game-title-area {
+    text-align: center; margin-bottom: 24px;
+  }
+  .game-name {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .game-subtitle { color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+  /* 牌盘 */
+  .board-wrap {
+    position: relative;
+    z-index: 1;
+  }
+  .board {
+    display: grid;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  /* 单张牌 */
+  .card-cell {
+    perspective: 600px;
+    cursor: pointer;
+  }
+  .card-cell.disabled { cursor: not-allowed; pointer-events: none; }
+
+  .card-inner {
+    position: relative;
+    width: 80px; height: 90px;
+    transform-style: preserve-3d;
+    transition: transform var(--flip-speed, 0.4s) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-cell.flipped .card-inner { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute; inset: 0;
+    border-radius: 12px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    display: flex; align-items: center; justify-content: center;
+    user-select: none;
+  }
+
+  /* 牌背面 */
+  .card-back {
+    background: linear-gradient(135deg, #1A0A2E 0%, #2D1060 50%, #1A0A2E 100%);
+    border: 1px solid rgba(124,58,237,0.3);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+    animation: floatCard 3s ease-in-out infinite;
+    animation-delay: var(--float-delay, 0s);
+    overflow: hidden;
+  }
+  /* 装饰花纹 */
+  .card-back::before {
+    content: '';
+    position: absolute; inset: 8px;
+    border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 8px;
+  }
+  .card-back::after {
+    content: '✦';
+    font-size: 22px;
+    color: rgba(124,58,237,0.35);
+    text-shadow: 0 0 10px rgba(124,58,237,0.5);
+  }
+  .card-back-corner {
+    position: absolute;
+    font-size: 8px; color: rgba(245,200,66,0.25);
+    line-height: 1;
+  }
+  .card-back-corner.tl { top: 5px; left: 6px; }
+  .card-back-corner.tr { top: 5px; right: 6px; }
+  .card-back-corner.bl { bottom: 5px; left: 6px; }
+  .card-back-corner.br { bottom: 5px; right: 6px; }
+
+  @keyframes floatCard {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-3px); }
+  }
+
+  /* 牌正面 */
+  .card-front {
+    transform: rotateY(180deg);
+    font-size: 36px;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .card-front.color-0 { background: linear-gradient(135deg, rgba(239,68,68,0.25), rgba(239,68,68,0.1)); }
+  .card-front.color-1 { background: linear-gradient(135deg, rgba(245,158,11,0.25), rgba(245,158,11,0.1)); }
+  .card-front.color-2 { background: linear-gradient(135deg, rgba(16,185,129,0.25), rgba(16,185,129,0.1)); }
+  .card-front.color-3 { background: linear-gradient(135deg, rgba(59,130,246,0.25), rgba(59,130,246,0.1)); }
+  .card-front.color-4 { background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(139,92,246,0.1)); }
+  .card-front.color-5 { background: linear-gradient(135deg, rgba(236,72,153,0.25), rgba(236,72,153,0.1)); }
+  .card-front.color-6 { background: linear-gradient(135deg, rgba(245,200,66,0.25), rgba(245,200,66,0.1)); }
+  .card-front.color-7 { background: linear-gradient(135deg, rgba(20,184,166,0.25), rgba(20,184,166,0.1)); }
+  .card-front.color-8 { background: linear-gradient(135deg, rgba(251,113,133,0.25), rgba(251,113,133,0.1)); }
+  .card-front.color-9 { background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(99,102,241,0.1)); }
+
+  /* 配对成功动画 */
+  .card-cell.matched .card-inner {
+    animation: matchPop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+  .card-cell.matched .card-front {
+    border-color: rgba(34,197,94,0.6);
+    box-shadow: 0 0 16px rgba(34,197,94,0.4), 0 0 32px rgba(34,197,94,0.2);
+  }
+  @keyframes matchPop {
+    0% { transform: rotateY(180deg) scale(1); }
+    40% { transform: rotateY(180deg) scale(1.18); }
+    100% { transform: rotateY(180deg) scale(1); }
+  }
+
+  /* 配对后淡出消除 */
+  .card-cell.matched.fade-out .card-inner {
+    animation: matchFadeOut 0.4s ease forwards;
+  }
+  @keyframes matchFadeOut {
+    0% { transform: rotateY(180deg) scale(1); opacity: 1; }
+    60% { transform: rotateY(180deg) scale(1.08); opacity: 0.6; }
+    100% { transform: rotateY(180deg) scale(0.85); opacity: 0.35; }
+  }
+
+  /* 不匹配抖动 */
+  .card-cell.wrong .card-inner {
+    animation: wrongShake 0.45s ease;
+  }
+  @keyframes wrongShake {
+    0%,100% { transform: rotateY(180deg) translateX(0); }
+    20% { transform: rotateY(180deg) translateX(-6px); }
+    40% { transform: rotateY(180deg) translateX(6px); }
+    60% { transform: rotateY(180deg) translateX(-4px); }
+    80% { transform: rotateY(180deg) translateX(4px); }
+  }
+
+  /* 游戏状态提示 */
+  .game-status-bar {
+    margin-top: 20px;
+    font-size: 13px; color: var(--muted);
+    text-align: center; min-height: 20px;
+  }
+  .game-status-bar span { color: var(--gold); font-weight: 600; }
+
+  /* 等待开始遮罩 */
+  .board-overlay {
+    position: absolute; inset: 0;
+    background: rgba(13,7,32,0.75);
+    backdrop-filter: blur(4px);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 12px;
+    z-index: 10;
+    transition: opacity 0.3s;
+  }
+  .board-overlay.hidden { opacity: 0; pointer-events: none; }
+  .overlay-icon { font-size: 48px; }
+  .overlay-text { font-size: 16px; font-weight: 700; color: var(--muted); }
+
+  /* ─── 右侧数据面板 ─── */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+
+  /* 统计卡 */
+  .stats-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 16px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 12px;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .stat-value { font-size: 22px; font-weight: 800; color: var(--gold); }
+  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* 倒计时进度条 */
+  .timer-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px; margin-bottom: 16px;
+  }
+  .timer-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .timer-label { font-size: 11px; color: var(--muted); }
+  .timer-val {
+    font-size: 24px; font-weight: 900;
+    color: #22C55E; font-variant-numeric: tabular-nums;
+    transition: color 0.5s;
+  }
+  .timer-val.warn { color: var(--gold); }
+  .timer-val.danger { color: #EF4444; animation: timerPulse 0.5s ease-in-out infinite; }
+  @keyframes timerPulse {
+    0%,100% { opacity: 1; } 50% { opacity: 0.6; }
+  }
+  .timer-bar-bg {
+    height: 8px; background: rgba(255,255,255,0.08);
+    border-radius: 4px; overflow: hidden;
+  }
+  .timer-bar-fill {
+    height: 100%; border-radius: 4px;
+    background: #22C55E;
+    transition: width 0.5s linear, background 0.5s;
+  }
+  .timer-bar-fill.warn { background: var(--gold); }
+  .timer-bar-fill.danger { background: #EF4444; }
+
+  /* 历史最佳 */
+  .best-list { display: flex; flex-direction: column; gap: 8px; }
+  .best-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .best-name { color: var(--muted); }
+  .best-score { color: var(--gold); font-weight: 700; }
+  .best-detail { color: var(--muted); font-size: 11px; }
+
+  /* 事件日志 */
+  .log-list {
+    display: flex; flex-direction: column; gap: 5px;
+    max-height: 200px; overflow-y: auto;
+  }
+  .log-list::-webkit-scrollbar { width: 4px; }
+  .log-list::-webkit-scrollbar-track { background: transparent; }
+  .log-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+  .log-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 6px 8px; border-radius: 7px;
+    background: rgba(255,255,255,0.02);
+    font-size: 11px; animation: logSlide 0.2s ease;
+  }
+  @keyframes logSlide {
+    from { opacity: 0; transform: translateX(8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .log-time { color: var(--muted); flex-shrink: 0; }
+  .log-text { color: var(--text); flex: 1; }
+  .log-item.match .log-text { color: #22C55E; }
+  .log-item.fail .log-text { color: #EF4444; }
+  .log-item.info .log-text { color: var(--gold); }
+
+  /* 评级徽章 */
+  .rank-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 56px; height: 56px; border-radius: 50%;
+    font-size: 26px; font-weight: 900;
+    margin: 0 auto 8px;
+  }
+  .rank-S { background: linear-gradient(135deg, #F5C842, #FDE68A); color: #1A0A2E; box-shadow: 0 0 20px rgba(245,200,66,0.5); }
+  .rank-A { background: linear-gradient(135deg, #22C55E, #86EFAC); color: #1A0A2E; box-shadow: 0 0 20px rgba(34,197,94,0.5); }
+  .rank-B { background: linear-gradient(135deg, #3B82F6, #93C5FD); color: #1A0A2E; box-shadow: 0 0 20px rgba(59,130,246,0.5); }
+  .rank-C { background: linear-gradient(135deg, #9CA3AF, #D1D5DB); color: #1A0A2E; }
+
+  /* ─── 通关弹窗 ─── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: linear-gradient(135deg, #1A0A2E, #2D1060);
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 20px; padding: 36px 32px;
+    text-align: center; position: relative;
+    width: 360px;
+    transform: scale(0.85);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .modal-overlay.show .modal { transform: scale(1); }
+  .modal-title {
+    font-size: 22px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 6px; margin-top: 8px;
+  }
+  .modal-desc { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+  .modal-stats {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px; margin-bottom: 24px;
+  }
+  .modal-stat {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 8px;
+  }
+  .modal-stat-label { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
+  .modal-stat-value { font-size: 18px; font-weight: 800; color: var(--gold); }
+  .modal-btn {
+    padding: 13px 32px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: white; font-size: 15px; font-weight: 700;
+    cursor: pointer; width: 100%;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    transition: all 0.2s;
+  }
+  .modal-btn:hover { transform: translateY(-1px); }
+
+  /* 失败弹窗样式 */
+  .modal-fail .modal-title {
+    background: linear-gradient(135deg, #EF4444, #F97316);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .modal-fail { border-color: rgba(239,68,68,0.3); }
+
+  /* 粒子画布 */
+  #particleCanvas {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 199;
+  }
+
+  /* ─── 底部状态栏 ─── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 10px 32px;
+    display: flex; align-items: center; gap: 16px;
+    background: rgba(13,7,32,0.8);
+    font-size: 12px; flex-shrink: 0;
+  }
+  .footer-status { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+  .footer-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 4px #22C55E;
+  }
+  .footer-sep { color: var(--border); }
+  .footer-ver { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- 粒子画布 -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- 顶部导航 -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">
+    🎮 <span>GameHub 中台</span>
+    <span class="nav-badge">Demo</span>
+  </a>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="wheel.html">大转盘</a>
+    <a class="nav-tab" href="nine-grid.html">九宫格</a>
+    <a class="nav-tab" href="scratch-card.html">刮刮乐</a>
+    <a class="nav-tab" href="shake-dice.html">摇骰子</a>
+    <a class="nav-tab" href="smash-egg.html">砸金蛋</a>
+    <a class="nav-tab" href="red-packet-rain.html">红包雨</a>
+    <a class="nav-tab active" href="flip-match.html">翻牌配对</a>
+  </div>
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span class="status-text">线上环境</span>
+  </div>
+</nav>
+
+<!-- 主体 -->
+<div class="main">
+
+  <!-- 左侧：配置面板 -->
+  <div class="panel-left">
+    <div class="panel-title">游戏配置</div>
+
+    <!-- 难度选择 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>难度选择</div>
+      <div class="difficulty-grid">
+        <div class="diff-btn" data-diff="easy" onclick="setDifficulty('easy',this)">
+          <div class="diff-name">简单</div>
+          <div class="diff-desc">3×4 / 6对</div>
+        </div>
+        <div class="diff-btn active" data-diff="normal" onclick="setDifficulty('normal',this)">
+          <div class="diff-name">中等</div>
+          <div class="diff-desc">4×4 / 8对</div>
+        </div>
+        <div class="diff-btn" data-diff="hard" onclick="setDifficulty('hard',this)">
+          <div class="diff-name">困难</div>
+          <div class="diff-desc">4×5 / 10对</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 规则配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>规则配置</div>
+      <div class="rule-row">
+        <span class="rule-label">限时模式</span>
+        <div class="rule-value">
+          <div class="toggle-wrap">
+            <button class="toggle on" id="timerToggle" onclick="toggleTimer()"></button>
+            <span class="toggle-label on" id="timerLabel">60秒倒计时</span>
+          </div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">翻牌速度</span>
+        <div class="rule-value">
+          <div class="speed-btns">
+            <div class="speed-btn" data-speed="0.3" onclick="setSpeed(0.3,this)">快</div>
+            <div class="speed-btn active" data-speed="0.4" onclick="setSpeed(0.4,this)">中</div>
+            <div class="speed-btn" data-speed="0.5" onclick="setSpeed(0.5,this)">慢</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 参与emoji预览 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>本局 Emoji</div>
+      <div class="emoji-preview" id="emojiPreview"></div>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted)">当前选中 <span id="emojiCount" style="color:var(--gold)">8</span> 对 emoji 参与配对</div>
+    </div>
+
+    <!-- 评分规则说明 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>评分规则</div>
+      <div id="rankRules" style="font-size:12px;line-height:1.8;color:var(--muted)"></div>
+    </div>
+
+    <!-- 开始按钮 -->
+    <button class="btn-primary" id="startBtn" onclick="startGame()">开始游戏</button>
+  </div>
+
+  <!-- 中间：游戏区 -->
+  <div class="game-center">
+    <div class="game-title-area">
+      <div class="game-name">翻牌配对</div>
+      <div class="game-subtitle" id="gameSubtitle">找出所有相同的 Emoji 对</div>
+    </div>
+
+    <div class="board-wrap">
+      <div class="board" id="board"></div>
+      <div class="board-overlay" id="boardOverlay">
+        <div class="overlay-icon">🃏</div>
+        <div class="overlay-text">点击「开始游戏」开始挑战</div>
+      </div>
+    </div>
+
+    <div class="game-status-bar" id="gameStatusBar">选择难度并点击开始</div>
+  </div>
+
+  <!-- 右侧：数据面板 -->
+  <div class="panel-right">
+    <div class="panel-title">实时数据</div>
+
+    <!-- 倒计时 -->
+    <div class="timer-card" id="timerCard">
+      <div class="timer-header">
+        <span class="timer-label">剩余时间</span>
+        <span class="timer-val" id="timerVal">60</span>
+      </div>
+      <div class="timer-bar-bg">
+        <div class="timer-bar-fill" id="timerBar" style="width:100%"></div>
+      </div>
+    </div>
+
+    <!-- 步数/配对/剩余 -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">当前步数</div>
+        <div class="stat-value" id="statSteps">0</div>
+        <div class="stat-sub">步</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">已配对</div>
+        <div class="stat-value" id="statMatched">0</div>
+        <div class="stat-sub">对</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">剩余对数</div>
+        <div class="stat-value" id="statRemain">—</div>
+        <div class="stat-sub">对</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">用时</div>
+        <div class="stat-value" id="statTime">0</div>
+        <div class="stat-sub">秒</div>
+      </div>
+    </div>
+
+    <!-- 历史最佳 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>历史最佳</div>
+      <div class="best-list" id="bestList"></div>
+    </div>
+
+    <!-- 事件日志 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>本局日志</div>
+      <div class="log-list" id="logList">
+        <div class="log-item info">
+          <span class="log-time">--:--</span>
+          <span class="log-text">等待游戏开始…</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 底部状态栏 -->
+<div class="footer">
+  <div class="footer-status">
+    <div class="footer-dot"></div>
+    <span>线上环境</span>
+  </div>
+  <span class="footer-sep">|</span>
+  <span class="footer-ver">翻牌配对 v1.0</span>
+  <span class="footer-sep">|</span>
+  <span class="footer-ver" id="footerDiff">难度：中等</span>
+  <span class="footer-sep">|</span>
+  <span class="footer-ver" id="footerStatus">等待开始</span>
+</div>
+
+<!-- 通关弹窗 -->
+<div class="modal-overlay" id="winModal">
+  <div class="modal" id="winModalBody">
+    <div id="rankBadgeWrap" style="display:flex;justify-content:center;margin-bottom:4px"></div>
+    <div class="modal-title" id="winTitle">通关成功！</div>
+    <div class="modal-desc" id="winDesc">你找出了所有配对！</div>
+    <div class="modal-stats">
+      <div class="modal-stat">
+        <div class="modal-stat-label">步数</div>
+        <div class="modal-stat-value" id="mSteps">—</div>
+      </div>
+      <div class="modal-stat">
+        <div class="modal-stat-label">用时</div>
+        <div class="modal-stat-value" id="mTime">—</div>
+      </div>
+      <div class="modal-stat">
+        <div class="modal-stat-label">评级</div>
+        <div class="modal-stat-value" id="mRank">—</div>
+      </div>
+    </div>
+    <button class="modal-btn" onclick="restartGame()">再来一局</button>
+  </div>
+</div>
+
+<script>
+// ──────────────────────────────────────────────
+// 配置与状态
+// ──────────────────────────────────────────────
+const EMOJIS = ['🎁','🎀','🎊','🎉','🎈','🎆','🎇','✨','🎐','🎑'];
+
+const DIFFICULTIES = {
+  easy:   { cols: 3, rows: 4, pairs: 6,  time: 60, label: '简单', rankS: 10, rankA: 14, rankB: 18 },
+  normal: { cols: 4, rows: 4, pairs: 8,  time: 60, label: '中等', rankS: 16, rankA: 20, rankB: 25 },
+  hard:   { cols: 4, rows: 5, pairs: 10, time: 90, label: '困难', rankS: 18, rankA: 24, rankB: 30 }
+};
+
+let state = {
+  diff: 'normal',
+  timerOn: true,
+  flipSpeed: 0.4,
+  cards: [],           // { id, emoji, idx, flipped, matched }
+  flippedIdx: [],      // 当前翻开的牌索引（最多2）
+  steps: 0,
+  matched: 0,
+  totalPairs: 8,
+  timeLeft: 60,
+  elapsed: 0,
+  started: false,
+  over: false,
+  locked: false,
+  timerInterval: null,
+  startTs: null
+};
+
+// ──────────────────────────────────────────────
+// 初始化
+// ──────────────────────────────────────────────
+function init() {
+  updateEmojiPreview();
+  updateRankRules();
+  renderBestList();
+  buildBoard(false); // 先渲染占位牌背
+}
+
+function updateEmojiPreview() {
+  const cfg = DIFFICULTIES[state.diff];
+  const emojis = EMOJIS.slice(0, cfg.pairs);
+  const wrap = document.getElementById('emojiPreview');
+  wrap.innerHTML = emojis.map((e,i) =>
+    `<div class="emoji-chip">${e}</div>`
+  ).join('');
+  document.getElementById('emojiCount').textContent = cfg.pairs;
+}
+
+function updateRankRules() {
+  const cfg = DIFFICULTIES[state.diff];
+  document.getElementById('rankRules').innerHTML =
+    `<div style="display:flex;flex-direction:column;gap:6px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:#F5C842;font-weight:700;min-width:16px">S</span>
+        <span>${cfg.rankS} 步以内</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:#22C55E;font-weight:700;min-width:16px">A</span>
+        <span>${cfg.rankA} 步以内</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:#3B82F6;font-weight:700;min-width:16px">B</span>
+        <span>${cfg.rankB} 步以内</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="color:#9CA3AF;font-weight:700;min-width:16px">C</span>
+        <span>更多步数</span>
+      </div>
+    </div>`;
+}
+
+// ──────────────────────────────────────────────
+// 配置操作
+// ──────────────────────────────────────────────
+function setDifficulty(diff, el) {
+  if (state.started && !state.over) return;
+  state.diff = diff;
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('footerDiff').textContent = '难度：' + DIFFICULTIES[diff].label;
+  updateEmojiPreview();
+  updateRankRules();
+  buildBoard(false);
+}
+
+function toggleTimer() {
+  if (state.started && !state.over) return;
+  state.timerOn = !state.timerOn;
+  const btn = document.getElementById('timerToggle');
+  const lbl = document.getElementById('timerLabel');
+  btn.classList.toggle('on', state.timerOn);
+  lbl.classList.toggle('on', state.timerOn);
+  lbl.textContent = state.timerOn ? (DIFFICULTIES[state.diff].time + '秒倒计时') : '无限时间';
+  document.getElementById('timerCard').style.opacity = state.timerOn ? '1' : '0.4';
+}
+
+function setSpeed(speed, el) {
+  if (state.started && !state.over) return;
+  state.flipSpeed = speed;
+  document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.documentElement.style.setProperty('--flip-speed', speed + 's');
+}
+
+// ──────────────────────────────────────────────
+// 生成牌组
+// ──────────────────────────────────────────────
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function generateCards(pairs) {
+  const emojis = EMOJIS.slice(0, pairs);
+  const doubled = [...emojis, ...emojis];
+  shuffle(doubled);
+  return doubled.map((emoji, i) => ({
+    id: i,
+    emoji,
+    emojiIdx: emojis.indexOf(emoji),
+    flipped: false,
+    matched: false
+  }));
+}
+
+// ──────────────────────────────────────────────
+// 渲染牌盘
+// ──────────────────────────────────────────────
+function buildBoard(interactive) {
+  const cfg = DIFFICULTIES[state.diff];
+  const board = document.getElementById('board');
+  board.style.gridTemplateColumns = `repeat(${cfg.cols}, 80px)`;
+
+  if (!interactive) {
+    // 占位：只渲染背面
+    board.innerHTML = Array(cfg.pairs * 2).fill(0).map((_, i) =>
+      `<div class="card-cell" style="--float-delay:${(i*0.15 % 2).toFixed(2)}s">
+        <div class="card-inner">
+          <div class="card-face card-back">
+            <span class="card-back-corner tl">♦</span>
+            <span class="card-back-corner tr">♦</span>
+            <span class="card-back-corner bl">♦</span>
+            <span class="card-back-corner br">♦</span>
+          </div>
+          <div class="card-face card-front color-0"></div>
+        </div>
+      </div>`
+    ).join('');
+    return;
+  }
+
+  board.innerHTML = state.cards.map((c, i) =>
+    `<div class="card-cell" id="cell-${i}" data-idx="${i}"
+         style="--float-delay:${(i*0.12 % 2).toFixed(2)}s"
+         onclick="flipCard(${i})">
+      <div class="card-inner">
+        <div class="card-face card-back">
+          <span class="card-back-corner tl">♦</span>
+          <span class="card-back-corner tr">♦</span>
+          <span class="card-back-corner bl">♦</span>
+          <span class="card-back-corner br">♦</span>
+        </div>
+        <div class="card-face card-front color-${c.emojiIdx % 10}">${c.emoji}</div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+// ──────────────────────────────────────────────
+// 游戏流程
+// ──────────────────────────────────────────────
+function startGame() {
+  clearInterval(state.timerInterval);
+  const cfg = DIFFICULTIES[state.diff];
+
+  state.cards = generateCards(cfg.pairs);
+  state.flippedIdx = [];
+  state.steps = 0;
+  state.matched = 0;
+  state.totalPairs = cfg.pairs;
+  state.timeLeft = cfg.time;
+  state.elapsed = 0;
+  state.started = true;
+  state.over = false;
+  state.locked = false;
+  state.startTs = Date.now();
+
+  // 重置UI
+  document.getElementById('statSteps').textContent = '0';
+  document.getElementById('statMatched').textContent = '0';
+  document.getElementById('statRemain').textContent = cfg.pairs;
+  document.getElementById('statTime').textContent = '0';
+  document.getElementById('timerVal').textContent = cfg.time;
+  document.getElementById('timerVal').className = 'timer-val';
+  document.getElementById('timerBar').style.width = '100%';
+  document.getElementById('timerBar').className = 'timer-bar-fill';
+  document.getElementById('footerStatus').textContent = '游戏中';
+  document.getElementById('gameSubtitle').textContent = `找出所有 ${cfg.pairs} 对 Emoji`;
+  document.getElementById('gameStatusBar').innerHTML = '翻开牌开始配对，加油！';
+  document.getElementById('logList').innerHTML = '';
+
+  buildBoard(true);
+  document.getElementById('boardOverlay').classList.add('hidden');
+  document.getElementById('winModal').classList.remove('show');
+
+  addLog('info', '游戏开始！难度：' + cfg.label);
+
+  if (state.timerOn) {
+    state.timerInterval = setInterval(tickTimer, 1000);
+  } else {
+    // 无限时，计时器只计已用时
+    state.timerInterval = setInterval(() => {
+      state.elapsed = Math.floor((Date.now() - state.startTs) / 1000);
+      document.getElementById('statTime').textContent = state.elapsed;
+    }, 500);
+  }
+}
+
+function restartGame() {
+  document.getElementById('winModal').classList.remove('show');
+  startGame();
+}
+
+function tickTimer() {
+  state.elapsed = Math.floor((Date.now() - state.startTs) / 1000);
+  document.getElementById('statTime').textContent = state.elapsed;
+  state.timeLeft--;
+  const cfg = DIFFICULTIES[state.diff];
+  const pct = (state.timeLeft / cfg.time) * 100;
+
+  const tv = document.getElementById('timerVal');
+  const tb = document.getElementById('timerBar');
+  tv.textContent = state.timeLeft;
+
+  if (state.timeLeft <= 10) {
+    tv.className = 'timer-val danger';
+    tb.className = 'timer-bar-fill danger';
+  } else if (state.timeLeft <= 20) {
+    tv.className = 'timer-val warn';
+    tb.className = 'timer-bar-fill warn';
+  }
+  tb.style.width = Math.max(0, pct) + '%';
+
+  if (state.timeLeft <= 0) {
+    clearInterval(state.timerInterval);
+    state.over = true;
+    state.started = false;
+    gameOver(false);
+  }
+}
+
+// ──────────────────────────────────────────────
+// 翻牌逻辑
+// ──────────────────────────────────────────────
+function flipCard(idx) {
+  if (!state.started || state.over || state.locked) return;
+  const card = state.cards[idx];
+  if (card.flipped || card.matched) return;
+  if (state.flippedIdx.length >= 2) return;
+
+  card.flipped = true;
+  const cell = document.getElementById(`cell-${idx}`);
+  cell.classList.add('flipped');
+  state.flippedIdx.push(idx);
+
+  if (state.flippedIdx.length === 2) {
+    state.steps++;
+    document.getElementById('statSteps').textContent = state.steps;
+    state.locked = true;
+    checkMatch();
+  }
+}
+
+function checkMatch() {
+  const [i1, i2] = state.flippedIdx;
+  const c1 = state.cards[i1];
+  const c2 = state.cards[i2];
+
+  if (c1.emoji === c2.emoji) {
+    // 配对成功
+    setTimeout(() => {
+      c1.matched = true; c2.matched = true;
+      const cell1 = document.getElementById(`cell-${i1}`);
+      const cell2 = document.getElementById(`cell-${i2}`);
+      cell1.classList.add('matched');
+      cell2.classList.add('matched');
+
+      // 短暂延迟后淡出
+      setTimeout(() => {
+        cell1.classList.add('fade-out');
+        cell2.classList.add('fade-out');
+        cell1.classList.add('disabled');
+        cell2.classList.add('disabled');
+      }, 400);
+
+      state.matched++;
+      state.flippedIdx = [];
+      state.locked = false;
+      document.getElementById('statMatched').textContent = state.matched;
+      document.getElementById('statRemain').textContent = state.totalPairs - state.matched;
+      addLog('match', `配对成功 ${c1.emoji} ×2，已匹配 ${state.matched} 对`);
+      document.getElementById('gameStatusBar').innerHTML = `配对成功 <span>${c1.emoji}</span> ！继续翻牌`;
+
+      if (state.matched === state.totalPairs) {
+        setTimeout(() => gameOver(true), 500);
+      }
+    }, state.flipSpeed * 1000 * 0.6);
+  } else {
+    // 不匹配
+    addLog('fail', `不匹配 ${c1.emoji} vs ${c2.emoji}`);
+    document.getElementById('gameStatusBar').innerHTML = `不匹配，稍后翻回 <span>${c1.emoji}</span> 和 <span>${c2.emoji}</span>`;
+    const cell1 = document.getElementById(`cell-${i1}`);
+    const cell2 = document.getElementById(`cell-${i2}`);
+    cell1.classList.add('wrong');
+    cell2.classList.add('wrong');
+    setTimeout(() => {
+      cell1.classList.remove('wrong');
+      cell2.classList.remove('wrong');
+      cell1.classList.remove('flipped');
+      cell2.classList.remove('flipped');
+      c1.flipped = false;
+      c2.flipped = false;
+      state.flippedIdx = [];
+      state.locked = false;
+      document.getElementById('gameStatusBar').innerHTML = '继续翻牌配对';
+    }, 800);
+  }
+}
+
+// ──────────────────────────────────────────────
+// 游戏结束
+// ──────────────────────────────────────────────
+function gameOver(win) {
+  clearInterval(state.timerInterval);
+  state.over = true;
+  state.started = false;
+  state.elapsed = Math.floor((Date.now() - state.startTs) / 1000);
+  document.getElementById('statTime').textContent = state.elapsed;
+
+  const cfg = DIFFICULTIES[state.diff];
+  let rank = 'C';
+  if (win) {
+    if (state.steps <= cfg.rankS) rank = 'S';
+    else if (state.steps <= cfg.rankA) rank = 'A';
+    else if (state.steps <= cfg.rankB) rank = 'B';
+    else rank = 'C';
+  }
+
+  document.getElementById('footerStatus').textContent = win ? '通关' : '超时失败';
+  document.getElementById('gameStatusBar').innerHTML = win ? '🎉 全部配对完成！' : '⏰ 时间到，游戏结束';
+
+  if (win) {
+    saveBest(state.diff, state.steps, state.elapsed, rank);
+    addLog('info', `通关！步数 ${state.steps}，用时 ${state.elapsed}s，评级 ${rank}`);
+    showWinModal(rank, win);
+    launchParticles();
+  } else {
+    addLog('fail', `超时失败，已匹配 ${state.matched}/${state.totalPairs} 对`);
+    showWinModal(rank, false);
+  }
+
+  renderBestList();
+}
+
+function showWinModal(rank, win) {
+  const modal = document.getElementById('winModal');
+  const body = document.getElementById('winModalBody');
+  const title = document.getElementById('winTitle');
+  const desc = document.getElementById('winDesc');
+  const badge = document.getElementById('rankBadgeWrap');
+
+  document.getElementById('mSteps').textContent = state.steps + ' 步';
+  document.getElementById('mTime').textContent = state.elapsed + ' 秒';
+  document.getElementById('mRank').textContent = win ? rank : '—';
+
+  if (win) {
+    body.classList.remove('modal-fail');
+    title.textContent = '通关成功！';
+    desc.textContent = `用 ${state.steps} 步找出全部 ${state.totalPairs} 对！`;
+    badge.innerHTML = `<div class="rank-badge rank-${rank}">${rank}</div>`;
+  } else {
+    body.classList.add('modal-fail');
+    title.textContent = '时间到！';
+    desc.textContent = `已配对 ${state.matched}/${state.totalPairs} 对，再试一次！`;
+    badge.innerHTML = `<div style="font-size:48px;margin-bottom:4px">⏰</div>`;
+  }
+
+  setTimeout(() => modal.classList.add('show'), 200);
+}
+
+// ──────────────────────────────────────────────
+// 历史最佳（localStorage）
+// ──────────────────────────────────────────────
+function getBests() {
+  try { return JSON.parse(localStorage.getItem('flipMatchBests') || '{}'); }
+  catch { return {}; }
+}
+
+function saveBest(diff, steps, time, rank) {
+  const bests = getBests();
+  const key = diff;
+  const cur = bests[key];
+  if (!cur || steps < cur.steps || (steps === cur.steps && time < cur.time)) {
+    bests[key] = { steps, time, rank };
+    localStorage.setItem('flipMatchBests', JSON.stringify(bests));
+  }
+}
+
+function renderBestList() {
+  const bests = getBests();
+  const list = document.getElementById('bestList');
+  const diffs = ['easy','normal','hard'];
+  const labels = { easy:'简单', normal:'中等', hard:'困难' };
+
+  list.innerHTML = diffs.map(d => {
+    const b = bests[d];
+    return `<div class="best-item">
+      <span class="best-name">${labels[d]}</span>
+      ${b
+        ? `<span class="best-score">${b.rank}</span>
+           <span class="best-detail">${b.steps}步 / ${b.time}s</span>`
+        : `<span class="best-detail" style="color:var(--muted)">尚无记录</span>`
+      }
+    </div>`;
+  }).join('');
+}
+
+// ──────────────────────────────────────────────
+// 事件日志
+// ──────────────────────────────────────────────
+function addLog(type, text) {
+  const list = document.getElementById('logList');
+  const now = new Date();
+  const time = now.getMinutes().toString().padStart(2,'0') + ':' + now.getSeconds().toString().padStart(2,'0');
+  const item = document.createElement('div');
+  item.className = `log-item ${type}`;
+  item.innerHTML = `<span class="log-time">${time}</span><span class="log-text">${text}</span>`;
+  list.insertBefore(item, list.firstChild);
+  // 最多保留30条
+  while (list.children.length > 30) list.removeChild(list.lastChild);
+}
+
+// ──────────────────────────────────────────────
+// 粒子特效
+// ──────────────────────────────────────────────
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let animFrameId = null;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function launchParticles() {
+  particles = [];
+  const colors = ['#F5C842','#EC4899','#7C3AED','#22C55E','#3B82F6','#F97316'];
+  for (let i = 0; i < 120; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: canvas.height + 10,
+      vx: (Math.random() - 0.5) * 4,
+      vy: -(Math.random() * 8 + 4),
+      size: Math.random() * 6 + 3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      alpha: 1,
+      rot: Math.random() * Math.PI * 2,
+      rotV: (Math.random() - 0.5) * 0.15,
+      shape: Math.random() < 0.5 ? 'rect' : 'circle'
+    });
+  }
+  cancelAnimationFrame(animFrameId);
+  animateParticles();
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  let alive = false;
+  for (const p of particles) {
+    p.x += p.vx; p.y += p.vy;
+    p.vy += 0.18; // 重力
+    p.alpha -= 0.012;
+    p.rot += p.rotV;
+    if (p.alpha <= 0) continue;
+    alive = true;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, p.alpha);
+    ctx.fillStyle = p.color;
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    if (p.shape === 'rect') {
+      ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size * 0.6);
+    } else {
+      ctx.beginPath();
+      ctx.arc(0, 0, p.size/2, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+  if (alive) {
+    animFrameId = requestAnimationFrame(animateParticles);
+  } else {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+// ──────────────────────────────────────────────
+// 启动
+// ──────────────────────────────────────────────
+document.documentElement.style.setProperty('--flip-speed', state.flipSpeed + 's');
+init();
+</script>
+</body>
+</html>

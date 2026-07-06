@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 砸金蛋 Demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --deep: #1A0A2E;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --bg: #0D0720;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+  }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    padding: 7px 16px; border-radius: 8px;
+    font-size: 14px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s;
+    text-decoration: none; display: inline-flex; align-items: center;
+  }
+  .nav-tab.active, .nav-tab:hover {
+    background: var(--card); color: var(--text);
+  }
+  .nav-tab.active { color: var(--gold); }
+
+  /* ─── 主体布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    height: calc(100vh - 61px - 41px);
+  }
+
+  /* ─── 左侧配置面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-title {
+    font-size: 13px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* 奖品列表 */
+  .prize-list { display: flex; flex-direction: column; gap: 8px; }
+  .prize-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+  .prize-color {
+    width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
+  }
+  .prize-info { flex: 1; min-width: 0; }
+  .prize-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prize-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .prize-prob { font-size: 12px; font-weight: 700; color: var(--gold); }
+
+  /* 规则配置 */
+  .rule-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-label { color: var(--muted); }
+  .rule-input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: var(--text);
+    font-size: 13px;
+    width: 80px; text-align: center;
+    outline: none;
+  }
+  .rule-input:focus { border-color: var(--accent); }
+
+  /* 重置按钮 */
+  .reset-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 10px;
+    color: white; font-size: 14px; font-weight: 700;
+    cursor: pointer; margin-top: 4px;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .reset-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .reset-btn:active { transform: scale(0.98); }
+
+  /* ─── 中间游戏区 ─── */
+  .game-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .game-center::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .game-title-area {
+    text-align: center; margin-bottom: 32px;
+  }
+  .game-name {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .game-subtitle { color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+  /* ─── 金蛋网格 ─── */
+  .egg-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* 单颗蛋的容器 */
+  .egg-wrap {
+    position: relative;
+    width: 120px; height: 140px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .egg-wrap.smashed { cursor: not-allowed; }
+
+  /* 蛋壳 CSS */
+  .egg-shell {
+    position: relative;
+    width: 80px; height: 100px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: linear-gradient(145deg, #FFE066 0%, #F5C842 35%, #C9882A 80%, #A0661A 100%);
+    box-shadow:
+      0 8px 24px rgba(197,143,42,0.5),
+      0 2px 6px rgba(0,0,0,0.4),
+      inset 0 -4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.15s, filter 0.3s;
+    animation: bob 2.8s ease-in-out infinite;
+  }
+  /* 光泽高光 */
+  .egg-shell::before {
+    content: '';
+    position: absolute;
+    top: 12px; left: 16px;
+    width: 22px; height: 32px;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 100%);
+    border-radius: 50%;
+    transform: rotate(-20deg);
+  }
+  /* 蛋序号 */
+  .egg-num {
+    position: absolute;
+    bottom: -22px;
+    font-size: 12px; font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  /* 浮动动画 */
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  /* 悬停效果（未砸状态） */
+  .egg-wrap:not(.smashed):not(.cracking) .egg-shell:hover {
+    transform: scale(1.06) translateY(-4px);
+    filter: brightness(1.15) drop-shadow(0 6px 16px rgba(245,200,66,0.6));
+    animation-play-state: paused;
+  }
+
+  /* ─── 砸蛋过程动画 ─── */
+
+  /* 裂缝层 */
+  .egg-crack {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 80px; height: 100px;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .egg-crack svg {
+    width: 100%; height: 100%;
+  }
+
+  /* 裂缝动画 */
+  @keyframes crackAppear {
+    0%   { opacity: 0; stroke-dashoffset: 60; }
+    40%  { opacity: 1; stroke-dashoffset: 0; }
+    100% { opacity: 1; stroke-dashoffset: 0; }
+  }
+
+  /* 蛋壳碎片 */
+  .egg-fragment {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .egg-fragment div {
+    width: 0; height: 0;
+  }
+
+  /* 碎片飞散 keyframe 由 JS 动态注入 */
+
+  /* 奖品展示（蛋砸完后显示） */
+  .egg-prize {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 42px;
+    opacity: 0;
+    z-index: 5;
+    pointer-events: none;
+    transition: none;
+    text-align: center;
+  }
+  .egg-prize.show {
+    animation: prizeAppear 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.1s forwards;
+  }
+  @keyframes prizeAppear {
+    0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    60%  { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+
+  /* 砸过的蛋变灰 */
+  .egg-wrap.smashed .egg-shell {
+    background: linear-gradient(145deg, #555 0%, #333 100%);
+    box-shadow: none;
+    filter: grayscale(1) brightness(0.5);
+    animation: none;
+  }
+  .egg-wrap.smashed .egg-shell::before { opacity: 0; }
+
+  /* 砸蛋中状态 */
+  .egg-wrap.cracking .egg-shell {
+    animation: shake 0.3s ease;
+    animation-fill-mode: forwards;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    20%       { transform: translateX(-4px) rotate(-3deg); }
+    40%       { transform: translateX(4px) rotate(3deg); }
+    60%       { transform: translateX(-3px) rotate(-2deg); }
+    80%       { transform: translateX(3px) rotate(2deg); }
+  }
+
+  /* 次数展示 */
+  .chance-display {
+    margin-top: 28px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .chance-dots { display: flex; gap: 6px; }
+  .chance-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  .chance-dot.used {
+    background: var(--gold);
+    box-shadow: 0 0 8px rgba(245,200,66,0.6);
+  }
+  .chance-text { font-size: 13px; color: var(--muted); }
+  .chance-num { color: var(--gold); font-weight: 700; }
+
+  /* ─── 右侧数据面板 ─── */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .stat-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 16px;
+  }
+  .stat-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 26px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* 奖品分布 */
+  .dist-list { display: flex; flex-direction: column; gap: 8px; }
+  .dist-row {}
+  .dist-header {
+    display: flex; justify-content: space-between;
+    font-size: 12px; margin-bottom: 4px;
+  }
+  .dist-name {}
+  .dist-cnt { color: var(--muted); }
+  .dist-bar-bg {
+    height: 5px; background: rgba(255,255,255,0.08);
+    border-radius: 3px; overflow: hidden;
+  }
+  .dist-bar-fill {
+    height: 100%; border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  /* 砸蛋记录 */
+  .log-list { display: flex; flex-direction: column; gap: 6px; }
+  .log-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid transparent;
+    font-size: 12px; animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .log-item.win { border-color: rgba(245,200,66,0.2); }
+  .log-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .log-prize { font-weight: 600; flex: 1; }
+  .log-time { color: var(--muted); }
+  .log-egg-num {
+    font-size: 11px; color: var(--muted);
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px; padding: 2px 6px;
+    flex-shrink: 0;
+  }
+
+  /* ─── 中奖弹窗 ─── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: none; align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: linear-gradient(145deg, #1E0D40, #2A0D50);
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 24px;
+    padding: 40px 32px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 60px rgba(245,200,66,0.1);
+    animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 320px; width: 90%;
+  }
+  @keyframes modalPop {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .modal-emoji {
+    font-size: 72px; margin-bottom: 16px;
+    display: block;
+    animation: bounceIn 0.6s ease 0.1s both;
+  }
+  @keyframes bounceIn {
+    0%   { transform: scale(0) rotate(-15deg); }
+    60%  { transform: scale(1.2) rotate(5deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+  .modal-label {
+    font-size: 13px; color: var(--muted); margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .modal-prize {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  .modal-desc { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+  .modal-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 12px;
+    padding: 12px 40px;
+    color: white; font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .modal-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: rgba(255,255,255,0.08); border: none;
+    border-radius: 8px; padding: 6px 10px;
+    color: var(--muted); cursor: pointer; font-size: 16px;
+  }
+  .modal-egg-badge {
+    display: inline-block;
+    background: rgba(245,200,66,0.12);
+    border: 1px solid rgba(245,200,66,0.25);
+    border-radius: 6px; padding: 4px 12px;
+    font-size: 12px; color: var(--gold);
+    margin-bottom: 14px;
+  }
+
+  /* 粒子 */
+  .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 199; }
+  .confetti-piece {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* 底部状态栏 */
+  .statusbar {
+    padding: 10px 24px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 20px;
+    font-size: 12px; color: var(--muted);
+    background: rgba(13,7,32,0.95);
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #22C55E;
+    box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
+  /* 响应式 */
+  @media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; height: auto; }
+    .panel-left, .panel-right { display: none; }
+    .game-center { min-height: 100vh; }
+  }
+
+  /* 全部砸完提示 */
+  .no-chance-tip {
+    font-size: 13px; color: var(--muted);
+    margin-top: 12px; display: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- 导航 -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html" style="text-decoration:none;color:inherit">
+    🎮 <span>GameHub</span> 中台
+    <div class="nav-badge">Demo</div>
+  </a>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="wheel.html">大转盘</a>
+    <a class="nav-tab" href="nine-grid.html">九宫格</a>
+    <a class="nav-tab" href="scratch-card.html">刮刮乐</a>
+    <a class="nav-tab" href="shake-dice.html">摇骰子</a>
+    <a class="nav-tab active" href="smash-egg.html">砸金蛋</a>
+    <a class="nav-tab" href="red-packet-rain.html">红包雨</a>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <span style="font-size:13px;color:var(--muted)">活动：夏日大促 2026</span>
+    <div style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:6px;padding:4px 10px;font-size:12px;color:#22C55E;font-weight:600">进行中</div>
+  </div>
+</nav>
+
+<!-- 主体 -->
+<div class="main">
+
+  <!-- 左侧：配置面板 -->
+  <div class="panel-left">
+    <div class="panel-title">奖品配置</div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品池 <span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:400">共6种奖品</span></div>
+      <div class="prize-list" id="prizeConfig"></div>
+    </div>
+
+    <div class="panel-title">游戏规则</div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#22C55E"></span>参与限制</div>
+      <div class="rule-row">
+        <span class="rule-label">蛋的数量</span>
+        <span class="rule-value" style="font-size:13px;font-weight:700">9 颗（固定）</span>
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">每日砸蛋次数</span>
+        <input class="rule-input" type="number" value="3" min="1" max="9" id="dailyLimit">
+      </div>
+      <div class="rule-row" style="border-bottom:none;padding-bottom:4px">
+        <span class="rule-label">已用次数</span>
+        <span class="rule-value" id="usedCount" style="color:var(--gold);font-weight:700">0</span>
+      </div>
+    </div>
+
+    <div class="panel-title">操作</div>
+    <div class="card" style="padding:14px">
+      <button class="reset-btn" onclick="resetEggs()">🔄 重置金蛋</button>
+    </div>
+  </div>
+
+  <!-- 中间：游戏区 -->
+  <div class="game-center">
+    <div class="game-title-area">
+      <div class="game-name">✨ 砸金蛋 ✨</div>
+      <div class="game-subtitle">点击金蛋，砸出好运与惊喜</div>
+    </div>
+
+    <!-- 9颗金蛋 3x3 -->
+    <div class="egg-grid" id="eggGrid"></div>
+
+    <!-- 次数显示 -->
+    <div class="chance-display">
+      <div class="chance-dots" id="chanceDots"></div>
+      <div class="chance-text">今日剩余 <span class="chance-num" id="chanceNum">3</span> 次</div>
+    </div>
+    <div class="no-chance-tip" id="noChanceTip">今日次数已用完，明日再来 🌙</div>
+  </div>
+
+  <!-- 右侧：数据 -->
+  <div class="panel-right">
+    <div class="panel-title">实时数据</div>
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-label">砸蛋次数</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statWin">0</div>
+        <div class="stat-label">中奖次数</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statRate">0%</div>
+        <div class="stat-label">中奖率</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statUsers">1</div>
+        <div class="stat-label">参与用户</div>
+      </div>
+    </div>
+
+    <div class="panel-title">奖品分布</div>
+    <div class="card">
+      <div class="dist-list" id="distList"></div>
+    </div>
+
+    <div class="panel-title">砸蛋记录</div>
+    <div class="card" style="padding:12px">
+      <div class="log-list" id="logList">
+        <div style="color:var(--muted);font-size:12px;text-align:center;padding:12px 0">暂无记录</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 中奖弹窗 -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <span class="modal-emoji" id="modalEmoji">🎉</span>
+    <div class="modal-egg-badge" id="modalEggBadge">第 1 颗蛋</div>
+    <div class="modal-label">恭喜获得</div>
+    <div class="modal-prize" id="modalPrize">100元优惠券</div>
+    <div class="modal-desc" id="modalDesc">已存入您的账户，请及时使用</div>
+    <button class="modal-btn" onclick="closeModal()">好的，收下了！</button>
+  </div>
+</div>
+
+<!-- 粒子容器 -->
+<div class="confetti" id="confettiContainer"></div>
+
+<!-- 底部状态栏 -->
+<div class="statusbar">
+  <div class="status-dot"></div>
+  <span>系统运行正常</span>
+  <span style="color:var(--border)">|</span>
+  <span>砸金蛋 v2.1.0</span>
+  <span style="color:var(--border)">|</span>
+  <span>活动时间：2026-07-01 ~ 2026-07-31</span>
+  <span style="margin-left:auto" id="currentTime"></span>
+</div>
+
+<script>
+/* ============================================================
+   数据定义
+   ============================================================ */
+const PRIZES = [
+  { id: 'p1', name: '100元优惠券', emoji: '💯', prob: 5,  color: '#EC4899', desc: '满100可用，活动专属券', win: true },
+  { id: 'p2', name: '50元优惠券',  emoji: '🎫', prob: 10, color: '#F97316', desc: '满50可用，活动专属券',  win: true },
+  { id: 'p3', name: '20元优惠券',  emoji: '🎟️', prob: 15, color: '#F5C842', desc: '满20可用，立减20元',   win: true },
+  { id: 'p4', name: '积分 × 500', emoji: '⭐', prob: 10, color: '#7C3AED', desc: '积分已自动入账',       win: true },
+  { id: 'p5', name: '积分 × 100', emoji: '✨', prob: 30, color: '#06B6D4', desc: '积分已自动入账',       win: true },
+  { id: 'p6', name: '谢谢参与',    emoji: '🥚', prob: 30, color: '#6B7280', desc: '感谢您的参与，下次再来', win: false },
+];
+
+/* 游戏状态 */
+let dailyLimit   = 3;
+let chancesLeft  = 3;
+let chancesUsed  = 0;
+let isAnimating  = false;   // 是否正在播放动画（防止重复点击）
+let smashed      = new Array(9).fill(false);  // 哪颗蛋已砸
+let eggPrizes    = [];      // 每颗蛋预分配的奖品索引
+
+/* 统计 */
+let stats = { total: 0, win: 0, users: 1, dist: {} };
+PRIZES.forEach(p => stats.dist[p.id] = 0);
+
+/* 砸蛋记录 */
+let logs = [];
+
+/* ============================================================
+   初始化
+   ============================================================ */
+function init() {
+  buildPrizeConfig();
+  buildEggGrid();
+  buildDistList();
+  renderChanceDots();
+  updateStats();
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // 监听每日次数输入
+  document.getElementById('dailyLimit').addEventListener('change', function() {
+    let v = parseInt(this.value) || 3;
+    v = Math.max(1, Math.min(9, v));
+    this.value = v;
+    dailyLimit  = v;
+    chancesLeft = Math.max(0, v - chancesUsed);
+    renderChanceDots();
+    updateChanceDisplay();
+  });
+
+  // 预分配每颗蛋的奖品
+  assignEggPrizes();
+}
+
+/* 预先给9颗蛋各分配一个奖品（模拟后端概率） */
+function assignEggPrizes() {
+  eggPrizes = [];
+  for (let i = 0; i < 9; i++) {
+    eggPrizes.push(rollPrize());
+  }
+}
+
+function rollPrize() {
+  const r = Math.random() * 100;
+  let acc = 0;
+  for (let i = 0; i < PRIZES.length; i++) {
+    acc += PRIZES[i].prob;
+    if (r < acc) return i;
+  }
+  return PRIZES.length - 1;
+}
+
+/* ============================================================
+   左侧奖品配置渲染
+   ============================================================ */
+function buildPrizeConfig() {
+  const el = document.getElementById('prizeConfig');
+  el.innerHTML = PRIZES.map(p => `
+    <div class="prize-item">
+      <div class="prize-color" style="background:${p.color};opacity:0.85"></div>
+      <div class="prize-info">
+        <div class="prize-name">${p.emoji} ${p.name}</div>
+        <div class="prize-meta">${p.desc}</div>
+      </div>
+      <span class="prize-prob">${p.prob}%</span>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   金蛋网格渲染
+   ============================================================ */
+function buildEggGrid() {
+  const grid = document.getElementById('eggGrid');
+  grid.innerHTML = '';
+  for (let i = 0; i < 9; i++) {
+    const wrap = document.createElement('div');
+    wrap.className = 'egg-wrap';
+    wrap.id = `egg-${i}`;
+    // 随机化每颗蛋的浮动延迟，让它们不同步
+    const delay = (Math.random() * 2).toFixed(2);
+    wrap.innerHTML = `
+      <div class="egg-shell" style="animation-delay:${delay}s" id="shell-${i}"></div>
+      <div class="egg-crack" id="crack-${i}">
+        <svg viewBox="0 0 80 100" fill="none">
+          <polyline id="crack-path-${i}"
+            points="40,15 34,35 44,50 30,70 38,90"
+            stroke="rgba(80,40,0,0.9)" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round"
+            stroke-dasharray="60" stroke-dashoffset="60"
+            style="transition:stroke-dashoffset 0.3s ease"/>
+          <polyline
+            points="40,15 46,32 37,48 50,65 42,88"
+            stroke="rgba(80,40,0,0.6)" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round"
+            stroke-dasharray="60" stroke-dashoffset="60"
+            id="crack-path2-${i}"
+            style="transition:stroke-dashoffset 0.35s ease 0.05s"/>
+        </svg>
+      </div>
+      <div class="egg-prize" id="prize-${i}"></div>
+      <span class="egg-num">№${i + 1}</span>
+    `;
+    wrap.addEventListener('click', () => smashEgg(i));
+    grid.appendChild(wrap);
+  }
+}
+
+/* ============================================================
+   砸蛋主逻辑
+   ============================================================ */
+function smashEgg(idx) {
+  if (isAnimating) return;
+  if (smashed[idx]) return;
+  if (chancesLeft <= 0) {
+    showNoChanceTip();
+    return;
+  }
+
+  isAnimating = true;
+  smashed[idx] = true;
+  chancesLeft--;
+  chancesUsed++;
+
+  // 更新配置面板已用次数
+  document.getElementById('usedCount').textContent = chancesUsed;
+
+  // 获取奖品
+  const prizeIdx = eggPrizes[idx];
+  const prize    = PRIZES[prizeIdx];
+
+  // 更新统计
+  stats.total++;
+  if (prize.win) stats.win++;
+  stats.dist[prize.id]++;
+  updateStats();
+  renderChanceDots();
+  updateChanceDisplay();
+
+  // 1. 抖动蛋
+  const wrap  = document.getElementById(`egg-${idx}`);
+  const shell = document.getElementById(`shell-${idx}`);
+  wrap.classList.add('cracking');
+  shell.style.animationPlayState = 'paused';
+
+  // 2. 显示裂缝
+  setTimeout(() => {
+    const crack     = document.getElementById(`crack-${idx}`);
+    const crackPath  = document.getElementById(`crack-path-${idx}`);
+    const crackPath2 = document.getElementById(`crack-path2-${idx}`);
+    crack.style.opacity = '1';
+    crackPath.style.strokeDashoffset  = '0';
+    crackPath2.style.strokeDashoffset = '0';
+  }, 100);
+
+  // 3. 生成碎片并爆炸
+  setTimeout(() => {
+    spawnFragments(wrap, idx);
+  }, 350);
+
+  // 4. 隐藏蛋壳，显示奖品
+  setTimeout(() => {
+    shell.style.opacity = '0';
+    shell.style.transform = 'scale(0.3)';
+    shell.style.transition = 'all 0.25s ease';
+
+    const crackEl = document.getElementById(`crack-${idx}`);
+    crackEl.style.opacity = '0';
+
+    wrap.classList.remove('cracking');
+    wrap.classList.add('smashed');
+
+    const prizeEl = document.getElementById(`prize-${idx}`);
+    prizeEl.textContent = prize.emoji;
+    prizeEl.classList.add('show');
+  }, 650);
+
+  // 5. 弹出中奖弹窗
+  setTimeout(() => {
+    isAnimating = false;
+    showModal(idx, prize);
+  }, 1200);
+}
+
+/* ============================================================
+   生成碎片飞散效果
+   ============================================================ */
+function spawnFragments(wrap, idx) {
+  // 生成8块碎片，每块飞向不同方向
+  const directions = [
+    { dx: -80, dy: -60 },
+    { dx:   0, dy: -90 },
+    { dx:  80, dy: -60 },
+    { dx: -100,dy:   0 },
+    { dx:  100,dy:   0 },
+    { dx: -70, dy:  70 },
+    { dx:   0, dy:  90 },
+    { dx:  70, dy:  70 },
+  ];
+  // 碎片颜色
+  const colors = ['#FFE066','#F5C842','#C9882A','#A0661A','#FFD700','#E8B84B'];
+
+  directions.forEach((dir, i) => {
+    const frag = document.createElement('div');
+    frag.style.cssText = `
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
+      pointer-events: none;
+      z-index: 10;
+      border-left:   ${6 + Math.random()*6}px solid transparent;
+      border-right:  ${6 + Math.random()*6}px solid transparent;
+      border-bottom: ${10 + Math.random()*8}px solid ${colors[i % colors.length]};
+      transform: translate(-50%,-50%);
+      animation: fragFly-${idx}-${i} 0.6s ease-out forwards;
+    `;
+
+    // 动态注入 keyframe
+    const keyframeName = `fragFly-${idx}-${i}`;
+    if (!document.getElementById(`kf-${keyframeName}`)) {
+      const styleTag = document.createElement('style');
+      styleTag.id = `kf-${keyframeName}`;
+      const rot = (Math.random() * 360 - 180).toFixed(0);
+      styleTag.textContent = `
+        @keyframes ${keyframeName} {
+          0%   { transform: translate(-50%,-50%) scale(1) rotate(0deg); opacity: 1; }
+          100% { transform: translate(calc(-50% + ${dir.dx}px), calc(-50% + ${dir.dy}px)) scale(0.3) rotate(${rot}deg); opacity: 0; }
+        }
+      `;
+      document.head.appendChild(styleTag);
+    }
+
+    wrap.appendChild(frag);
+    // 动画结束后移除
+    setTimeout(() => frag.remove(), 700);
+  });
+}
+
+/* ============================================================
+   弹窗
+   ============================================================ */
+function showModal(eggIdx, prize) {
+  document.getElementById('modalEmoji').textContent   = prize.emoji;
+  document.getElementById('modalPrize').textContent   = prize.name;
+  document.getElementById('modalDesc').textContent    = prize.desc;
+  document.getElementById('modalEggBadge').textContent = `第 ${eggIdx + 1} 颗蛋`;
+
+  // 谢谢参与样式不同
+  const prizeEl = document.getElementById('modalPrize');
+  if (prize.win) {
+    prizeEl.style.background = 'linear-gradient(135deg, #F5C842, #EC4899)';
+  } else {
+    prizeEl.style.background = 'linear-gradient(135deg, #9CA3AF, #6B7280)';
+  }
+  prizeEl.style.webkitBackgroundClip = 'text';
+  prizeEl.style.webkitTextFillColor  = 'transparent';
+
+  document.getElementById('modalOverlay').classList.add('show');
+
+  // 中奖才放粒子
+  if (prize.win) launchConfetti();
+
+  // 更新记录
+  addLog(eggIdx, prize);
+  renderDistList();
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  clearConfetti();
+
+  // 检查次数
+  if (chancesLeft <= 0) {
+    document.getElementById('noChanceTip').style.display = 'block';
+  }
+}
+
+/* ============================================================
+   粒子
+   ============================================================ */
+function launchConfetti() {
+  const container = document.getElementById('confettiContainer');
+  const colors = ['#F5C842','#EC4899','#7C3AED','#22C55E','#F97316','#06B6D4','#FFE066'];
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left    = Math.random() * 100 + 'vw';
+    p.style.top     = '-10px';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.width   = (6 + Math.random() * 8) + 'px';
+    p.style.height  = (6 + Math.random() * 8) + 'px';
+    p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    p.style.animationDuration  = (1.5 + Math.random() * 2) + 's';
+    p.style.animationDelay     = Math.random() * 0.5 + 's';
+    container.appendChild(p);
+  }
+  setTimeout(clearConfetti, 3500);
+}
+
+function clearConfetti() {
+  document.getElementById('confettiContainer').innerHTML = '';
+}
+
+/* ============================================================
+   次数 UI
+   ============================================================ */
+function renderChanceDots() {
+  const container = document.getElementById('chanceDots');
+  container.innerHTML = '';
+  for (let i = 0; i < dailyLimit; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'chance-dot' + (i < chancesUsed ? ' used' : '');
+    container.appendChild(dot);
+  }
+}
+
+function updateChanceDisplay() {
+  document.getElementById('chanceNum').textContent = chancesLeft;
+}
+
+function showNoChanceTip() {
+  // 轻微抖动提示
+  const tip = document.getElementById('noChanceTip');
+  tip.style.display = 'block';
+  tip.style.color = '#EC4899';
+  setTimeout(() => { tip.style.color = 'var(--muted)'; }, 600);
+}
+
+/* ============================================================
+   重置金蛋
+   ============================================================ */
+function resetEggs() {
+  smashed      = new Array(9).fill(false);
+  chancesLeft  = dailyLimit;
+  chancesUsed  = 0;
+  isAnimating  = false;
+
+  document.getElementById('usedCount').textContent = 0;
+  document.getElementById('noChanceTip').style.display = 'none';
+
+  // 重新分配奖品
+  assignEggPrizes();
+
+  // 重建蛋格子（清除所有动画状态）
+  buildEggGrid();
+
+  renderChanceDots();
+  updateChanceDisplay();
+}
+
+/* ============================================================
+   统计 & 日志
+   ============================================================ */
+function updateStats() {
+  document.getElementById('statTotal').textContent = stats.total;
+  document.getElementById('statWin').textContent   = stats.win;
+  const rate = stats.total > 0 ? Math.round(stats.win / stats.total * 100) : 0;
+  document.getElementById('statRate').textContent  = rate + '%';
+  document.getElementById('statUsers').textContent = stats.users;
+}
+
+function addLog(eggIdx, prize) {
+  const now  = new Date();
+  const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  logs.unshift({ egg: eggIdx + 1, prize, time });
+  if (logs.length > 8) logs.pop();
+  renderLogs();
+}
+
+function renderLogs() {
+  const el = document.getElementById('logList');
+  if (logs.length === 0) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px 0">暂无记录</div>';
+    return;
+  }
+  el.innerHTML = logs.map(l => `
+    <div class="log-item ${l.prize.win ? 'win' : ''}">
+      <div class="log-dot" style="background:${l.prize.color}"></div>
+      <span class="log-prize">${l.prize.emoji} ${l.prize.name}</span>
+      <span class="log-egg-num">№${l.egg}</span>
+      <span class="log-time">${l.time}</span>
+    </div>
+  `).join('');
+}
+
+function buildDistList() {
+  renderDistList();
+}
+
+function renderDistList() {
+  const el    = document.getElementById('distList');
+  const total = stats.total || 1;
+  el.innerHTML = PRIZES.map(p => {
+    const cnt  = stats.dist[p.id];
+    const pct  = Math.round(cnt / total * 100);
+    return `
+      <div class="dist-row">
+        <div class="dist-header">
+          <span class="dist-name">${p.emoji} ${p.name}</span>
+          <span class="dist-cnt">${cnt} 次</span>
+        </div>
+        <div class="dist-bar-bg">
+          <div class="dist-bar-fill" style="width:${pct}%;background:${p.color}"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ============================================================
+   时钟
+   ============================================================ */
+function updateClock() {
+  const now = new Date();
+  const str = now.getFullYear() + '-'
+    + String(now.getMonth()+1).padStart(2,'0') + '-'
+    + String(now.getDate()).padStart(2,'0') + ' '
+    + String(now.getHours()).padStart(2,'0') + ':'
+    + String(now.getMinutes()).padStart(2,'0') + ':'
+    + String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('currentTime').textContent = str;
+}
+
+/* ============================================================
+   启动
+   ============================================================ */
+init();
+</script>
+</body>
+</html>

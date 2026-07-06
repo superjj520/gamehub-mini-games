@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 大转盘</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --deep: #1A0A2E;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --bg: #0D0720;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: var(--text);
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+  }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    padding: 7px 16px; border-radius: 8px;
+    font-size: 14px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    height: calc(100vh - 61px);
+  }
+
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-title {
+    font-size: 13px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+
+  .prize-list { display: flex; flex-direction: column; gap: 8px; }
+  .prize-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .prize-item:hover { border-color: rgba(124,58,237,0.5); }
+  .prize-item.active { border-color: var(--accent); background: rgba(124,58,237,0.1); }
+  .prize-color { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; }
+  .prize-info { flex: 1; min-width: 0; }
+  .prize-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prize-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .prize-prob { font-size: 12px; font-weight: 700; color: var(--gold); }
+
+  .rule-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-label { color: var(--muted); }
+  .rule-input {
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: 6px; padding: 4px 8px; color: var(--text);
+    font-size: 13px; width: 80px; text-align: center; outline: none;
+  }
+  .rule-input:focus { border-color: var(--accent); }
+  .toggle {
+    width: 36px; height: 20px; background: rgba(255,255,255,0.1);
+    border-radius: 10px; position: relative; cursor: pointer; transition: background 0.2s;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle::after {
+    content: ''; position: absolute;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: white; top: 2px; left: 2px; transition: transform 0.2s;
+  }
+  .toggle.on::after { transform: translateX(16px); }
+
+  .game-center {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 32px; position: relative; overflow: hidden;
+  }
+  .game-center::before {
+    content: ''; position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .game-title-area { text-align: center; margin-bottom: 32px; }
+  .game-name {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .game-subtitle { color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+  .wheel-container { position: relative; width: 340px; height: 340px; flex-shrink: 0; }
+  .wheel-glow {
+    position: absolute; inset: -20px;
+    background: radial-gradient(circle, rgba(245,200,66,0.2), transparent 65%);
+    border-radius: 50%; animation: pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+  }
+  #wheelCanvas { position: relative; z-index: 2; filter: drop-shadow(0 0 30px rgba(245,200,66,0.3)); }
+
+  .wheel-pointer {
+    position: absolute; top: -10px; left: 50%;
+    transform: translateX(-50%); z-index: 10;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+  }
+  .spin-btn-wrap {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); z-index: 10;
+  }
+  .spin-btn {
+    width: 70px; height: 70px; border-radius: 50%;
+    background: linear-gradient(145deg, #FFE066, #F5A623);
+    border: 4px solid rgba(255,255,255,0.9);
+    box-shadow: 0 4px 20px rgba(245,166,35,0.5), inset 0 2px 4px rgba(255,255,255,0.3);
+    cursor: pointer; font-size: 13px; font-weight: 800; color: #5D2D00;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    line-height: 1.2; transition: transform 0.15s, box-shadow 0.15s; letter-spacing: -0.3px;
+  }
+  .spin-btn:hover:not(:disabled) {
+    transform: scale(1.08);
+    box-shadow: 0 6px 28px rgba(245,166,35,0.7), inset 0 2px 4px rgba(255,255,255,0.3);
+  }
+  .spin-btn:active:not(:disabled) { transform: scale(0.96); }
+  .spin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .chance-display { margin-top: 28px; display: flex; align-items: center; gap: 12px; }
+  .chance-dots { display: flex; gap: 6px; }
+  .chance-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(255,255,255,0.15); border: 1px solid var(--border); transition: all 0.3s;
+  }
+  .chance-dot.used { background: var(--gold); box-shadow: 0 0 8px rgba(245,200,66,0.6); }
+  .chance-text { font-size: 13px; color: var(--muted); }
+  .chance-num { color: var(--gold); font-weight: 700; }
+
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 24px; overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .stat-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px; text-align: center;
+  }
+  .stat-num {
+    font-size: 26px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .log-list { display: flex; flex-direction: column; gap: 6px; }
+  .log-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.03); border: 1px solid transparent;
+    font-size: 12px; animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .log-item.win { border-color: rgba(245,200,66,0.2); }
+  .log-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .log-prize { font-weight: 600; flex: 1; }
+  .log-time { color: var(--muted); }
+
+  .dist-list { display: flex; flex-direction: column; gap: 8px; }
+  .dist-row { }
+  .dist-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+  .dist-cnt { color: var(--muted); }
+  .dist-bar-bg { height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+  .dist-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+    z-index: 200; display: none; align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: linear-gradient(145deg, #1E0D40, #2A0D50);
+    border: 1px solid rgba(245,200,66,0.3); border-radius: 24px;
+    padding: 40px 32px; text-align: center; position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 60px rgba(245,200,66,0.1);
+    animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 320px; width: 90%;
+  }
+  @keyframes modalPop {
+    from { opacity: 0; transform: scale(0.7); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .modal-emoji { font-size: 64px; margin-bottom: 16px; display: block; animation: bounce 0.6s ease 0.1s; }
+  @keyframes bounce {
+    0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); }
+  }
+  .modal-label { font-size: 13px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  .modal-prize {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  .modal-desc { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+  .modal-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 12px; padding: 12px 40px;
+    color: white; font-size: 15px; font-weight: 700; cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .modal-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: rgba(255,255,255,0.08); border: none;
+    border-radius: 8px; padding: 6px 10px;
+    color: var(--muted); cursor: pointer; font-size: 16px;
+  }
+
+  .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 199; }
+  .confetti-piece {
+    position: absolute; width: 8px; height: 8px; border-radius: 2px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  .statusbar {
+    padding: 10px 24px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 20px;
+    font-size: 12px; color: var(--muted);
+    background: rgba(13,7,32,0.95);
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    🎮 <span>GameHub</span> 中台
+    <div class="nav-badge">Demo</div>
+  </a>
+  <div class="nav-tabs">
+    <a href="wheel.html" class="nav-tab active">大转盘</a>
+    <a href="nine-grid.html" class="nav-tab">九宫格</a>
+    <a href="scratch-card.html" class="nav-tab">刮刮乐</a>
+    <a href="shake-dice.html" class="nav-tab">摇骰子</a>
+    <a href="smash-egg.html" class="nav-tab">砸金蛋</a>
+    <a href="red-packet-rain.html" class="nav-tab">红包雨</a>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <span style="font-size:13px;color:var(--muted)">活动：夏日大促 2026</span>
+    <div style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);border-radius:6px;padding:4px 10px;font-size:12px;color:#22C55E;font-weight:600">进行中</div>
+  </div>
+</nav>
+
+<div class="main">
+  <!-- 左侧配置 -->
+  <div class="panel-left">
+    <div class="panel-title">奖品配置</div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品池 <span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:400">共8个格子</span></div>
+      <div class="prize-list" id="prizeConfig"></div>
+    </div>
+
+    <div class="panel-title">游戏规则</div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#22C55E"></span>参与限制</div>
+      <div class="rule-row">
+        <span class="rule-label">每日次数上限</span>
+        <input class="rule-input" type="number" value="3" min="1" max="99" id="dailyLimit">
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">活动总次数</span>
+        <input class="rule-input" type="number" value="10" min="1" max="999">
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">保底机制</span>
+        <div class="toggle on" id="guaranteeToggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">保底触发第</span>
+        <input class="rule-input" type="number" value="5" min="2" max="20">
+      </div>
+    </div>
+
+    <div class="panel-title">皮肤</div>
+    <div class="card">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div onclick="setSkin('default')" id="skin-default" style="padding:10px;border-radius:8px;border:2px solid var(--accent);cursor:pointer;text-align:center;font-size:12px;font-weight:600">
+          <div style="height:28px;background:linear-gradient(135deg,#7C3AED,#EC4899);border-radius:4px;margin-bottom:6px"></div>夜光紫金
+        </div>
+        <div onclick="setSkin('red')" id="skin-red" style="padding:10px;border-radius:8px;border:1px solid var(--border);cursor:pointer;text-align:center;font-size:12px;font-weight:600">
+          <div style="height:28px;background:linear-gradient(135deg,#EF4444,#F97316);border-radius:4px;margin-bottom:6px"></div>喜庆红
+        </div>
+        <div onclick="setSkin('ocean')" id="skin-ocean" style="padding:10px;border-radius:8px;border:1px solid var(--border);cursor:pointer;text-align:center;font-size:12px;font-weight:600">
+          <div style="height:28px;background:linear-gradient(135deg,#0891B2,#06B6D4);border-radius:4px;margin-bottom:6px"></div>海洋蓝
+        </div>
+        <div onclick="setSkin('gold')" id="skin-gold" style="padding:10px;border-radius:8px;border:1px solid var(--border);cursor:pointer;text-align:center;font-size:12px;font-weight:600">
+          <div style="height:28px;background:linear-gradient(135deg,#D97706,#F59E0B);border-radius:4px;margin-bottom:6px"></div>土豪金
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 中间游戏 -->
+  <div class="game-center">
+    <div class="game-title-area">
+      <div class="game-name">夏日大转盘</div>
+      <div class="game-subtitle">转动命运，赢取大奖</div>
+    </div>
+
+    <div class="wheel-container">
+      <div class="wheel-glow"></div>
+      <svg class="wheel-pointer" width="30" height="40" viewBox="0 0 30 40">
+        <polygon points="15,38 2,2 28,2" fill="url(#pointerGrad)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+        <circle cx="15" cy="5" r="4" fill="white" opacity="0.9"/>
+        <defs>
+          <linearGradient id="pointerGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFE066"/>
+            <stop offset="100%" stop-color="#F5A623"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <canvas id="wheelCanvas" width="340" height="340"></canvas>
+      <div class="spin-btn-wrap">
+        <button class="spin-btn" id="spinBtn" onclick="spin()">
+          <span>开始</span><span>抽奖</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="chance-display">
+      <div class="chance-dots" id="chanceDots"></div>
+      <div class="chance-text">今日剩余 <span class="chance-num" id="chanceNum">3</span> 次</div>
+    </div>
+  </div>
+
+  <!-- 右侧数据 -->
+  <div class="panel-right">
+    <div class="panel-title">实时数据</div>
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-num" id="statTotal">0</div><div class="stat-label">参与次数</div></div>
+      <div class="stat-box"><div class="stat-num" id="statWin">0</div><div class="stat-label">中奖次数</div></div>
+      <div class="stat-box"><div class="stat-num" id="statRate">0%</div><div class="stat-label">中奖率</div></div>
+      <div class="stat-box"><div class="stat-num" id="statUsers">1</div><div class="stat-label">参与用户</div></div>
+    </div>
+
+    <div class="panel-title">奖品分布</div>
+    <div class="card"><div class="dist-list" id="distList"></div></div>
+
+    <div class="panel-title">中奖记录</div>
+    <div class="card" style="padding:12px">
+      <div class="log-list" id="logList">
+        <div style="text-align:center;color:var(--muted);font-size:13px;padding:16px 0">暂无记录，快来抽奖吧！</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="statusbar">
+  <div class="status-dot"></div>
+  <span>服务正常</span>
+  <span style="color:var(--border)">|</span>
+  <span>RNG引擎：后端权威模式（模拟）</span>
+  <span style="color:var(--border)">|</span>
+  <span>奖池剩余：充足</span>
+  <span style="margin-left:auto">GameHub 小游戏中台 v0.1.0</span>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="confetti" id="confettiEl"></div>
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <span class="modal-emoji" id="modalEmoji">🎉</span>
+    <div class="modal-label">恭喜获得</div>
+    <div class="modal-prize" id="modalPrize">奖品名称</div>
+    <div class="modal-desc" id="modalDesc">奖品已发放到您的账户</div>
+    <button class="modal-btn" onclick="closeModal()">太棒了，收下！</button>
+  </div>
+</div>
+
+<script>
+const SKINS = {
+  default: [
+    ['#4C1D95','#6D28D9'],['#7C3AED','#8B5CF6'],['#2D1B69','#4C1D95'],['#6D28D9','#7C3AED'],
+    ['#1E1B4B','#3730A3'],['#4338CA','#6366F1'],['#312E81','#4338CA'],['#5B21B6','#7C3AED'],
+  ],
+  red: [
+    ['#7F1D1D','#991B1B'],['#DC2626','#EF4444'],['#7F1D1D','#B91C1C'],['#EF4444','#F87171'],
+    ['#450A0A','#7F1D1D'],['#B91C1C','#DC2626'],['#991B1B','#EF4444'],['#DC2626','#F97316'],
+  ],
+  ocean: [
+    ['#0C4A6E','#075985'],['#0284C7','#0EA5E9'],['#0C4A6E','#0369A1'],['#0EA5E9','#38BDF8'],
+    ['#082F49','#0C4A6E'],['#0369A1','#0284C7'],['#075985','#0EA5E9'],['#0284C7','#06B6D4'],
+  ],
+  gold: [
+    ['#78350F','#92400E'],['#B45309','#D97706'],['#78350F','#A16207'],['#D97706','#F59E0B'],
+    ['#451A03','#78350F'],['#A16207','#B45309'],['#92400E','#D97706'],['#B45309','#F59E0B'],
+  ],
+};
+let currentSkin = 'default';
+
+const PRIZES = [
+  { name: '100元优惠券', emoji: '🎫', prob: 5,  color: '#F5C842', stock: 50,  won: 0, type: 'win' },
+  { name: '谢谢参与',    emoji: '😊', prob: 30, color: '#6B7280', stock: 999, won: 0, type: 'miss' },
+  { name: '50元红包',    emoji: '🧧', prob: 8,  color: '#EF4444', stock: 100, won: 0, type: 'win' },
+  { name: '谢谢参与',    emoji: '😊', prob: 25, color: '#6B7280', stock: 999, won: 0, type: 'miss' },
+  { name: '免单券×1',   emoji: '🛒', prob: 3,  color: '#8B5CF6', stock: 20,  won: 0, type: 'win' },
+  { name: '谢谢参与',    emoji: '😊', prob: 20, color: '#6B7280', stock: 999, won: 0, type: 'miss' },
+  { name: '20元券',      emoji: '💰', prob: 7,  color: '#10B981', stock: 200, won: 0, type: 'win' },
+  { name: '积分×100',   emoji: '⭐', prob: 2,  color: '#F59E0B', stock: 500, won: 0, type: 'win' },
+];
+
+let totalSpins = 0, winSpins = 0, dailyRemain = 3;
+let currentAngle = 0, spinning = false;
+
+const canvas = document.getElementById('wheelCanvas');
+const ctx = canvas.getContext('2d');
+const CX = 170, CY = 170, R = 155;
+
+function drawWheel(angle = 0) {
+  ctx.clearRect(0, 0, 340, 340);
+  const n = PRIZES.length;
+  const arc = (2 * Math.PI) / n;
+  const colors = SKINS[currentSkin];
+
+  ctx.save();
+  ctx.translate(CX, CY);
+  ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(245,200,66,0.4)';
+  ctx.beginPath(); ctx.arc(0, 0, R + 10, 0, 2 * Math.PI);
+  ctx.strokeStyle = 'rgba(245,200,66,0.6)'; ctx.lineWidth = 3; ctx.stroke();
+  ctx.restore();
+
+  for (let i = 0; i < n; i++) {
+    const startAngle = angle + i * arc - Math.PI / 2;
+    const endAngle = startAngle + arc;
+    const mid = (startAngle + endAngle) / 2;
+    const [c1, c2] = colors[i % colors.length];
+
+    ctx.save();
+    ctx.translate(CX, CY);
+
+    const grad = ctx.createRadialGradient(0, 0, R * 0.3, 0, 0, R);
+    grad.addColorStop(0, c2); grad.addColorStop(1, c1);
+
+    ctx.beginPath(); ctx.moveTo(0, 0);
+    ctx.arc(0, 0, R, startAngle, endAngle); ctx.closePath();
+    ctx.fillStyle = grad; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 1.5; ctx.stroke();
+
+    const dotR = R * 0.85;
+    ctx.beginPath();
+    ctx.arc(Math.cos(mid)*dotR, Math.sin(mid)*dotR, 4, 0, 2*Math.PI);
+    ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fill();
+
+    ctx.save();
+    ctx.translate(Math.cos(mid)*R*0.62, Math.sin(mid)*R*0.62);
+    ctx.rotate(mid + Math.PI/2);
+    ctx.font = '20px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(PRIZES[i].emoji, 0, -10);
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(Math.cos(mid)*R*0.62, Math.sin(mid)*R*0.62);
+    ctx.rotate(mid + Math.PI/2);
+    ctx.font = 'bold 11px -apple-system, PingFang SC, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 4;
+    const words = PRIZES[i].name;
+    if (words.length > 5) { ctx.fillText(words.slice(0,4), 0, 8); ctx.fillText(words.slice(4), 0, 20); }
+    else { ctx.fillText(words, 0, 12); }
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.translate(CX, CY);
+  const cGrad = ctx.createRadialGradient(0,-5,0,0,0,42);
+  cGrad.addColorStop(0,'#FFE88A'); cGrad.addColorStop(0.5,'#F5C842'); cGrad.addColorStop(1,'#C9882A');
+  ctx.beginPath(); ctx.arc(0,0,42,0,2*Math.PI);
+  ctx.fillStyle = cGrad; ctx.shadowBlur = 16; ctx.shadowColor = 'rgba(245,200,66,0.6)'; ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 2.5; ctx.stroke();
+  ctx.restore();
+}
+
+function getResult() {
+  const rand = Math.random() * 100;
+  let acc = 0;
+  for (let i = 0; i < PRIZES.length; i++) {
+    acc += PRIZES[i].prob;
+    if (rand < acc) return i;
+  }
+  return PRIZES.length - 1;
+}
+
+function spin() {
+  if (spinning || dailyRemain <= 0) return;
+  spinning = true; dailyRemain--;
+  document.getElementById('spinBtn').disabled = true;
+
+  const resultIdx = getResult();
+  const arc = 360 / PRIZES.length;
+  const targetCenter = resultIdx * arc + arc / 2;
+  const extraRounds = (5 + Math.floor(Math.random() * 3)) * 360;
+  const currentDeg = (currentAngle * 180 / Math.PI) % 360;
+  const targetDeg = extraRounds + (360 - targetCenter + (360 - currentDeg) % 360);
+  const duration = 4000 + Math.random() * 1000;
+  const startTime = performance.now();
+  const startAngle = currentAngle;
+
+  function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+
+  function animate(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    currentAngle = startAngle + (targetDeg * easeOut(progress) * Math.PI) / 180;
+    drawWheel(currentAngle);
+    if (progress < 1) { requestAnimationFrame(animate); return; }
+
+    spinning = false;
+    PRIZES[resultIdx].won++;
+    totalSpins++;
+    if (PRIZES[resultIdx].type === 'win') winSpins++;
+    updateStats(); updateChance(); addLog(PRIZES[resultIdx]); updateDist();
+    setTimeout(() => {
+      showModal(PRIZES[resultIdx]);
+      document.getElementById('spinBtn').disabled = false;
+    }, 200);
+  }
+  requestAnimationFrame(animate);
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent = totalSpins;
+  document.getElementById('statWin').textContent = winSpins;
+  document.getElementById('statRate').textContent = totalSpins > 0 ? Math.round(winSpins/totalSpins*100)+'%' : '0%';
+}
+
+function updateChance() {
+  document.getElementById('chanceNum').textContent = dailyRemain;
+  const dots = document.getElementById('chanceDots');
+  const total = parseInt(document.getElementById('dailyLimit').value) || 3;
+  dots.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'chance-dot' + (i >= dailyRemain ? ' used' : '');
+    dots.appendChild(d);
+  }
+  if (dailyRemain <= 0) {
+    document.getElementById('spinBtn').disabled = true;
+    document.getElementById('spinBtn').innerHTML = '<span>今日</span><span>已满</span>';
+  }
+}
+
+function addLog(prize) {
+  const list = document.getElementById('logList');
+  const empty = list.querySelector('div[style]');
+  if (empty) empty.remove();
+  const now = new Date();
+  const time = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
+  const item = document.createElement('div');
+  item.className = 'log-item' + (prize.type==='win'?' win':'');
+  item.innerHTML = `<div class="log-dot" style="background:${prize.color}"></div><div class="log-prize">${prize.emoji} ${prize.name}</div><div class="log-time">${time}</div>`;
+  list.insertBefore(item, list.firstChild);
+  if (list.children.length > 8) list.removeChild(list.lastChild);
+}
+
+function updateDist() {
+  const total = PRIZES.reduce((s,p)=>s+p.won,0);
+  document.getElementById('distList').innerHTML = PRIZES.map(p => {
+    const pct = total>0 ? Math.round(p.won/total*100) : 0;
+    return `<div class="dist-row"><div class="dist-header"><span>${p.emoji} ${p.name}</span><span class="dist-cnt">${p.won}次</span></div><div class="dist-bar-bg"><div class="dist-bar-fill" style="width:${pct}%;background:${p.color}"></div></div></div>`;
+  }).join('');
+}
+
+function showModal(prize) {
+  document.getElementById('modalEmoji').textContent = prize.emoji;
+  document.getElementById('modalPrize').textContent = prize.name;
+  document.getElementById('modalDesc').textContent = prize.type==='win' ? '奖品已发放到您的账户，请注意查收 ✓' : '感谢您的参与，下次好运！';
+  document.getElementById('modalOverlay').classList.add('show');
+  if (prize.type === 'win') launchConfetti();
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  document.getElementById('confettiEl').innerHTML = '';
+}
+
+function launchConfetti() {
+  const el = document.getElementById('confettiEl');
+  const colors = ['#F5C842','#EC4899','#7C3AED','#10B981','#EF4444','#3B82F6'];
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${1.5+Math.random()*1.5}s;animation-delay:${Math.random()*0.5}s;`;
+    el.appendChild(p);
+    setTimeout(()=>p.remove(), 3000);
+  }
+}
+
+function setSkin(name) {
+  currentSkin = name;
+  document.querySelectorAll('[id^="skin-"]').forEach(el => el.style.border = '1px solid var(--border)');
+  document.getElementById('skin-'+name).style.border = '2px solid var(--accent)';
+  drawWheel(currentAngle);
+}
+
+function renderPrizeConfig() {
+  document.getElementById('prizeConfig').innerHTML = PRIZES.map((p,i) =>
+    `<div class="prize-item" onclick="document.querySelectorAll('.prize-item').forEach(e=>e.classList.remove('active'));this.classList.add('active')">
+      <div class="prize-color" style="background:${p.color}"></div>
+      <div class="prize-info"><div class="prize-name">${p.emoji} ${p.name}</div><div class="prize-meta">库存 ${p.stock===999?'不限':p.stock} · 已发 ${p.won}</div></div>
+      <div class="prize-prob">${p.prob}%</div>
+    </div>`
+  ).join('');
+}
+
+drawWheel(0); renderPrizeConfig(); updateStats(); updateChance(); updateDist();
+</script>
+</body>
+</html>
