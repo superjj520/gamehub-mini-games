@@ -1161,6 +1161,11 @@ function triggerWin() {
   stopTimer();
   document.getElementById('faceBtn').textContent = '😎';
 
+  // 排行榜 + 成就 + 奖励
+  if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'扫雷',score:elapsedSec||500,result:'胜利'});
+  if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('puzzle',1);
+  if (typeof GameUser !== 'undefined') { GameUser.addExp(25); GameUser.addCoins(20,'扫雷'); }
+
   // 更新最佳时间
   if (bestTime[currentDiff] === null || elapsedSec < bestTime[currentDiff]) {
     bestTime[currentDiff] = elapsedSec;
@@ -1458,6 +1463,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

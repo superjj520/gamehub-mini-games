@@ -1174,6 +1174,12 @@ function showModal(d1, d2, sum, result) {
   document.getElementById('modalOverlay').classList.add('show');
 
   if (result.win) spawnConfetti();
+
+  // 排行榜 / 成就 / 经验金币
+  const diceTotal = sum;
+  if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'摇骰子',score:diceTotal||0,result:'点数:'+diceTotal});
+  if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('spin',1);
+  if (typeof GameUser !== 'undefined') { GameUser.addExp(5); GameUser.addCoins(4,'摇骰子'); }
 }
 
 function closeModal() {
@@ -1247,6 +1253,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

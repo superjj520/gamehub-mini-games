@@ -1579,6 +1579,11 @@ function showLevelClear() {
 
   updateBestScore();
   updateRightPanel();
+
+  // 排行榜 / 成就 / 经验金币
+  if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'弹弓',score:GAME.score||0,result:(GAME.score||0)+'分'});
+  if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('skill',1);
+  if (typeof GameUser !== 'undefined') { GameUser.addExp(12); GameUser.addCoins(10,'弹弓'); }
 }
 
 // ── 游戏结束（石子耗尽未全清） ──
@@ -1612,6 +1617,11 @@ function showGameOver() {
   btns.appendChild(btnCont);
 
   updateBestScore();
+
+  // 排行榜 / 成就 / 经验金币
+  if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'弹弓',score:GAME.score||0,result:(GAME.score||0)+'分'});
+  if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('skill',1);
+  if (typeof GameUser !== 'undefined') { GameUser.addExp(12); GameUser.addCoins(10,'弹弓'); }
 }
 
 // ── 更新历史最高分 ──
@@ -1847,6 +1857,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

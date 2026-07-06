@@ -1317,6 +1317,11 @@ function winGame() {
   state = STATE.WIN;
   clearInterval(timerInterval);
 
+  // 排行榜 + 成就 + 奖励
+  if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'迷宫',score:score||elapsed||500,result:'通关'});
+  if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('puzzle',1);
+  if (typeof GameUser !== 'undefined') { GameUser.addExp(20); GameUser.addCoins(15,'迷宫'); }
+
   // 时间加成：剩余每秒1分
   const timeBonus = timeLimit > 0 ? Math.max(0, timeLeft) : 0;
   score += timeBonus;
@@ -1673,6 +1678,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

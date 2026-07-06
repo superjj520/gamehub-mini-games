@@ -1355,6 +1355,11 @@ function triggerGameOver() {
   document.getElementById('finalSub').textContent   =
     `跳了 ${G.jumps} 步 · 完美落地 ${G.perfectStreak} 次` + (newBest ? ' 🎉 新记录！' : '');
   document.getElementById('overlayEnd').classList.remove('hidden');
+
+  // 排行榜 / 成就 / 经验金币
+  if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'跳一跳',score:G.score||0,result:(G.score||0)+'分'});
+  if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('skill',1);
+  if (typeof GameUser !== 'undefined') { GameUser.addExp(12); GameUser.addCoins(10,'跳一跳'); }
 }
 
 /* ─── 开始/重新开始游戏 ─── */
@@ -1711,6 +1716,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

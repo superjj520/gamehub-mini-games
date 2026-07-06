@@ -1057,6 +1057,13 @@ function endGame() {
   if (state.history.length > 5) state.history.pop();
   updateHistory();
 
+  // 排行榜 / 成就 / 经验金币
+  const totalScore = state.coins;
+  const count = state.clicks;
+  if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'红包雨',score:totalScore||0,result:'抢了'+count+'个'});
+  if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('spin',1);
+  if (typeof GameUser !== 'undefined') { GameUser.addExp(10); GameUser.addCoins(8,'红包雨'); }
+
   // 弹窗
   setTimeout(() => showModal(), 400);
 }
@@ -1213,6 +1220,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

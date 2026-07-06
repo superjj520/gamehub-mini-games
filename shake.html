@@ -955,6 +955,12 @@ function revealPrize(prize) {
     if (prize.isWin) STATE.wins++;
     updateStats();
 
+    // 排行榜 / 成就 / 经验金币
+    const result_text = prize.name;
+    if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'摇一摇',score:50,result:result_text||'完成'});
+    if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('spin',1);
+    if (typeof GameUser !== 'undefined') { GameUser.addExp(5); GameUser.addCoins(4,'摇一摇'); }
+
     // 启动冷却
     startCooldown();
     STATE.isPlaying = false;
@@ -1125,6 +1131,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

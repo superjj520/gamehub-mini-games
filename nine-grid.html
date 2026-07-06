@@ -899,6 +899,13 @@ function showModal(prize) {
     prize.type === 'win' ? '奖品已发放到您的账户，请注意查收 ✓' : '感谢您的参与，下次好运！';
   document.getElementById('modalOverlay').classList.add('show');
   if (prize.type === 'win') launchConfetti();
+
+  // 排行榜 / 成就 / 经验金币
+  const prize_name = prize.name;
+  const prize_score = prize.type === 'win' ? 100 : 50;
+  if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'九宫格',score:prize_score||50,result:prize_name});
+  if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('spin',1);
+  if (typeof GameUser !== 'undefined') { GameUser.addExp(10); GameUser.addCoins(8,'九宫格'); }
 }
 
 function closeModal() {
@@ -1052,6 +1059,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

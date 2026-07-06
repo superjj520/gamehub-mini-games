@@ -1459,6 +1459,11 @@ function endGame() {
   updateHistory();
   checkPrize();
   showResultModal();
+
+  // 排行榜 / 成就 / 经验金币
+  if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'钓鱼',score:state.score||0,result:'钓到了'});
+  if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('skill',1);
+  if (typeof GameUser !== 'undefined') { GameUser.addExp(15); GameUser.addCoins(12,'钓鱼'); }
 }
 
 function resetGame() {
@@ -1749,6 +1754,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

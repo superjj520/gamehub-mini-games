@@ -1248,6 +1248,12 @@ function startOpen() {
       updateCounts();
       addRecord(prize);
 
+      // 排行榜 / 成就 / 经验金币
+      const prize_name = prize.name;
+      if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'礼盒',score:50,result:prize_name||'已开箱'});
+      if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('spin',1);
+      if (typeof GameUser !== 'undefined') { GameUser.addExp(8); GameUser.addCoins(6,'礼盒'); }
+
       // 延迟0.9s弹出胜利弹窗（仅一等/二等奖）
       const delay = prize.tier <= 2 ? 900 : 1200;
       setTimeout(() => {
@@ -1479,6 +1485,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

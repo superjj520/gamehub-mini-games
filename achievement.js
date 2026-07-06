@@ -18,314 +18,64 @@ const GameAchievement = (() => {
   const DEFINITIONS = {
 
     // ══════════════ 抽奖类（10个） ══════════════
-    first_spin: {
-      name: '初次体验',
-      desc: '第一次抽转盘',
-      icon: '🎡',
-      category: 'lottery'
-    },
-    lucky_streak: {
-      name: '连续好运',
-      desc: '连续3次中奖',
-      icon: '🍀',
-      category: 'lottery'
-    },
-    big_winner: {
-      name: '大赢家',
-      desc: '累计中奖10次',
-      icon: '🏆',
-      category: 'lottery'
-    },
-    hundred_spins: {
-      name: '百转不厌',
-      desc: '累计抽奖100次',
-      icon: '💫',
-      category: 'lottery'
-    },
-    jackpot: {
-      name: '头彩',
-      desc: '抽到一等奖',
-      icon: '🎰',
-      category: 'lottery'
-    },
-    scratch_master: {
-      name: '刮刮达人',
-      desc: '刮刮乐累计10次',
-      icon: '🎟️',
-      category: 'lottery'
-    },
-    gacha_collector: {
-      name: '扭蛋狂人',
-      desc: '扭蛋累计50次',
-      icon: '🥚',
-      category: 'lottery'
-    },
-    blind_box_god: {
-      name: '盲盒欧皇',
-      desc: '抽到SSR',
-      icon: '✨',
-      category: 'lottery'
-    },
-    full_wheel: {
-      name: '全转一圈',
-      desc: '转盘停在每个扇区至少一次',
-      icon: '🎯',
-      category: 'lottery'
-    },
-    no_miss: {
-      name: '零遗漏',
-      desc: '连续10次不谢谢参与',
-      icon: '🔥',
-      category: 'lottery'
-    },
+    first_spin:     { name: '初次体验',   desc: '第一次抽转盘',           icon: '🎡', category: 'lottery',   coins: 20  },
+    lucky_streak:   { name: '连续好运',   desc: '连续3次中奖',             icon: '🍀', category: 'lottery',   coins: 50  },
+    big_winner:     { name: '大赢家',     desc: '累计中奖10次',            icon: '🏆', category: 'lottery',   coins: 80  },
+    hundred_spins:  { name: '百转不厌',   desc: '累计抽奖100次',           icon: '💫', category: 'lottery',   coins: 100 },
+    jackpot:        { name: '头彩',       desc: '抽到一等奖',              icon: '🎰', category: 'lottery',   coins: 200 },
+    scratch_master: { name: '刮刮达人',   desc: '刮刮乐累计10次',          icon: '🎟️', category: 'lottery',  coins: 60  },
+    gacha_collector:{ name: '扭蛋狂人',   desc: '扭蛋累计50次',            icon: '🥚', category: 'lottery',   coins: 120 },
+    blind_box_god:  { name: '盲盒欧皇',   desc: '抽到SSR',                 icon: '✨', category: 'lottery',   coins: 300 },
+    full_wheel:     { name: '全转一圈',   desc: '转盘停在每个扇区至少一次', icon: '🎯', category: 'lottery',  coins: 150 },
+    no_miss:        { name: '零遗漏',     desc: '连续10次不谢谢参与',       icon: '🔥', category: 'lottery',  coins: 100 },
 
     // ══════════════ 益智类（10个） ══════════════
-    sudoku_beginner: {
-      name: '数独入门',
-      desc: '完成第一个数独',
-      icon: '🔢',
-      category: 'puzzle'
-    },
-    sudoku_master: {
-      name: '数独大师',
-      desc: '困难难度无错完成',
-      icon: '🧠',
-      category: 'puzzle'
-    },
-    tetris_100: {
-      name: '方块玩家',
-      desc: '俄罗斯方块消除100行',
-      icon: '🟦',
-      category: 'puzzle'
-    },
-    match3_combo: {
-      name: '连消王',
-      desc: '消消乐连消5次以上',
-      icon: '💎',
-      category: 'puzzle'
-    },
-    puzzle_complete: {
-      name: '拼图达人',
-      desc: '完成5×5拼图',
-      icon: '🧩',
-      category: 'puzzle'
-    },
-    maze_speedrun: {
-      name: '迷宫速通',
-      desc: '迷宫60秒内完成',
-      icon: '🏃',
-      category: 'puzzle'
-    },
-    minesweeper_pro: {
-      name: '扫雷专家',
-      desc: '困难模式完成扫雷',
-      icon: '💣',
-      category: 'puzzle'
-    },
-    sokoban_perfect: {
-      name: '推箱精英',
-      desc: '100步内通关第5关',
-      icon: '📦',
-      category: 'puzzle'
-    },
-    game2048_1024: {
-      name: '千里之行',
-      desc: '2048游戏达到1024',
-      icon: '🔢',
-      category: 'puzzle'
-    },
-    game2048_2048: {
-      name: '登峰造极',
-      desc: '2048游戏达到2048',
-      icon: '👑',
-      category: 'puzzle'
-    },
+    sudoku_beginner:  { name: '数独入门', desc: '完成第一个数独',           icon: '🔢', category: 'puzzle', coins: 30  },
+    sudoku_master:    { name: '数独大师', desc: '困难难度无错完成',          icon: '🧠', category: 'puzzle', coins: 200 },
+    tetris_100:       { name: '方块玩家', desc: '俄罗斯方块消除100行',       icon: '🟦', category: 'puzzle', coins: 80  },
+    match3_combo:     { name: '连消王',   desc: '消消乐连消5次以上',         icon: '💎', category: 'puzzle', coins: 60  },
+    puzzle_complete:  { name: '拼图达人', desc: '完成5×5拼图',              icon: '🧩', category: 'puzzle', coins: 50  },
+    maze_speedrun:    { name: '迷宫速通', desc: '迷宫60秒内完成',            icon: '🏃', category: 'puzzle', coins: 100 },
+    minesweeper_pro:  { name: '扫雷专家', desc: '困难模式完成扫雷',          icon: '💣', category: 'puzzle', coins: 150 },
+    sokoban_perfect:  { name: '推箱精英', desc: '100步内通关第5关',          icon: '📦', category: 'puzzle', coins: 120 },
+    game2048_1024:    { name: '千里之行', desc: '2048游戏达到1024',          icon: '🔢', category: 'puzzle', coins: 80  },
+    game2048_2048:    { name: '登峰造极', desc: '2048游戏达到2048',          icon: '👑', category: 'puzzle', coins: 500 },
 
     // ══════════════ 技巧类（10个） ══════════════
-    whack_100: {
-      name: '地鼠猎手',
-      desc: '打地鼠命中100只',
-      icon: '🔨',
-      category: 'skill'
-    },
-    fruit_ninja: {
-      name: '切果无双',
-      desc: '切水果连斩10次',
-      icon: '🍉',
-      category: 'skill'
-    },
-    archery_bullseye: {
-      name: '百步穿杨',
-      desc: '射箭连续3次10环',
-      icon: '🎯',
-      category: 'skill'
-    },
-    fishing_legend: {
-      name: '钓鱼传说',
-      desc: '钓到鲨鱼',
-      icon: '🦈',
-      category: 'skill'
-    },
-    slingshot_ace: {
-      name: '弹弓高手',
-      desc: '弹弓射击5发全中',
-      icon: '🪃',
-      category: 'skill'
-    },
-    snake_long: {
-      name: '长蛇阵',
-      desc: '贪吃蛇长度达到30',
-      icon: '🐍',
-      category: 'skill'
-    },
-    jump_perfect: {
-      name: '跳跃大师',
-      desc: '跳一跳连续完美着陆10次',
-      icon: '🦘',
-      category: 'skill'
-    },
-    pinball_500: {
-      name: '弹珠高手',
-      desc: '弹珠机单局500分',
-      icon: '⚪',
-      category: 'skill'
-    },
-    ring_ace: {
-      name: '套圈达人',
-      desc: '套圈连中5个',
-      icon: '⭕',
-      category: 'skill'
-    },
-    catch_100: {
-      name: '接物达人',
-      desc: '接金币单局接到100个',
-      icon: '🪙',
-      category: 'skill'
-    },
+    whack_100:      { name: '地鼠猎手', desc: '打地鼠命中100只',       icon: '🔨', category: 'skill', coins: 80  },
+    fruit_ninja:    { name: '切果无双', desc: '切水果连斩10次',         icon: '🍉', category: 'skill', coins: 60  },
+    archery_bullseye:{ name: '百步穿杨', desc: '射箭连续3次10环',       icon: '🎯', category: 'skill', coins: 100 },
+    fishing_legend: { name: '钓鱼传说', desc: '钓到鲨鱼',              icon: '🦈', category: 'skill', coins: 200 },
+    slingshot_ace:  { name: '弹弓高手', desc: '弹弓射击5发全中',        icon: '🪃', category: 'skill', coins: 80  },
+    snake_long:     { name: '长蛇阵',   desc: '贪吃蛇长度达到30',       icon: '🐍', category: 'skill', coins: 100 },
+    jump_perfect:   { name: '跳跃大师', desc: '跳一跳连续完美着陆10次', icon: '🦘', category: 'skill', coins: 100 },
+    pinball_500:    { name: '弹珠高手', desc: '弹珠机单局500分',         icon: '⚪', category: 'skill', coins: 80  },
+    ring_ace:       { name: '套圈达人', desc: '套圈连中5个',             icon: '⭕', category: 'skill', coins: 60  },
+    catch_100:      { name: '接物达人', desc: '接金币单局接到100个',     icon: '🪙', category: 'skill', coins: 120 },
 
     // ══════════════ 留存类（10个） ══════════════
-    day1: {
-      name: '初来乍到',
-      desc: '第一次登录',
-      icon: '👋',
-      category: 'retention'
-    },
-    day3: {
-      name: '三日之约',
-      desc: '连续签到3天',
-      icon: '📅',
-      category: 'retention'
-    },
-    day7: {
-      name: '一周坚持',
-      desc: '连续签到7天',
-      icon: '🗓️',
-      category: 'retention'
-    },
-    day30: {
-      name: '月度常客',
-      desc: '累计登录30天',
-      icon: '🎖️',
-      category: 'retention'
-    },
-    checkin_streak: {
-      name: '连签达人',
-      desc: '7日连续签到',
-      icon: '✅',
-      category: 'retention'
-    },
-    energy_full: {
-      name: '能量爆满',
-      desc: '能量收集满100',
-      icon: '⚡',
-      category: 'retention'
-    },
-    tree_harvest: {
-      name: '丰收时刻',
-      desc: '成长树第一次结果',
-      icon: '🌳',
-      category: 'retention'
-    },
-    stamp_complete: {
-      name: '集章完成',
-      desc: '集卡集章集满一套',
-      icon: '📮',
-      category: 'retention'
-    },
-    progress_milestone: {
-      name: '里程碑',
-      desc: '进度解锁达到第5个节点',
-      icon: '🏁',
-      category: 'retention'
-    },
-    collector: {
-      name: '收藏家',
-      desc: '盲盒图鉴收集超过10张',
-      icon: '🗂️',
-      category: 'retention'
-    },
+    day1:               { name: '初来乍到', desc: '第一次登录',              icon: '👋',  category: 'retention', coins: 10  },
+    day3:               { name: '三日之约', desc: '连续签到3天',              icon: '📅',  category: 'retention', coins: 30  },
+    day7:               { name: '一周坚持', desc: '连续签到7天',              icon: '🗓️', category: 'retention', coins: 70  },
+    day30:              { name: '月度常客', desc: '累计登录30天',             icon: '🎖️', category: 'retention', coins: 300 },
+    checkin_streak:     { name: '连签达人', desc: '7日连续签到',              icon: '✅',  category: 'retention', coins: 100 },
+    energy_full:        { name: '能量爆满', desc: '能量收集满100',             icon: '⚡',  category: 'retention', coins: 50  },
+    tree_harvest:       { name: '丰收时刻', desc: '成长树第一次结果',          icon: '🌳',  category: 'retention', coins: 60  },
+    stamp_complete:     { name: '集章完成', desc: '集卡集章集满一套',          icon: '📮',  category: 'retention', coins: 80  },
+    progress_milestone: { name: '里程碑',   desc: '进度解锁达到第5个节点',     icon: '🏁',  category: 'retention', coins: 50  },
+    collector:          { name: '收藏家',   desc: '盲盒图鉴收集超过10张',      icon: '🗂️', category: 'retention', coins: 80  },
 
     // ══════════════ 社交类（10个） ══════════════
-    vote_first: {
-      name: '第一票',
-      desc: '投票PK第一次投票',
-      icon: '🗳️',
-      category: 'social'
-    },
-    test_all: {
-      name: '全科测试',
-      desc: '性格测试完成全部4套',
-      icon: '📝',
-      category: 'social'
-    },
-    bomb_survivor: {
-      name: '炸弹幸存者',
-      desc: '数字炸弹不被炸中3局',
-      icon: '💥',
-      category: 'social'
-    },
-    cup_streak: {
-      name: '三杯连胜',
-      desc: '三杯游戏连胜5次',
-      icon: '🥤',
-      category: 'social'
-    },
-    quiz_perfect: {
-      name: '满分学霸',
-      desc: '问答闯关10题全对',
-      icon: '🎓',
-      category: 'social'
-    },
-    team_mvp: {
-      name: '团队MVP',
-      desc: '组队挑战个人贡献第一',
-      icon: '🌟',
-      category: 'social'
-    },
-    rank_top3: {
-      name: '登上领奖台',
-      desc: '好友排行榜进前3',
-      icon: '🥇',
-      category: 'social'
-    },
-    name_gen: {
-      name: '起名大师',
-      desc: '名字生成器生成10个',
-      icon: '✍️',
-      category: 'social'
-    },
-    share_first: {
-      name: '分享达人',
-      desc: '第一次分享游戏结果',
-      icon: '📤',
-      category: 'social'
-    },
-    all_games: {
-      name: '全能玩家',
-      desc: '玩过10种不同游戏',
-      icon: '🎮',
-      category: 'social'
-    }
+    vote_first:   { name: '第一票',     desc: '投票PK第一次投票',         icon: '🗳️', category: 'social', coins: 20  },
+    test_all:     { name: '全科测试',   desc: '性格测试完成全部4套',       icon: '📝',  category: 'social', coins: 60  },
+    bomb_survivor:{ name: '炸弹幸存者', desc: '数字炸弹不被炸中3局',       icon: '💥',  category: 'social', coins: 80  },
+    cup_streak:   { name: '三杯连胜',   desc: '三杯游戏连胜5次',           icon: '🥤',  category: 'social', coins: 60  },
+    quiz_perfect: { name: '满分学霸',   desc: '问答闯关10题全对',          icon: '🎓',  category: 'social', coins: 100 },
+    team_mvp:     { name: '团队MVP',    desc: '组队挑战个人贡献第一',      icon: '🌟',  category: 'social', coins: 150 },
+    rank_top3:    { name: '登上领奖台', desc: '好友排行榜进前3',            icon: '🥇',  category: 'social', coins: 200 },
+    name_gen:     { name: '起名大师',   desc: '名字生成器生成10个',         icon: '✍️', category: 'social', coins: 40  },
+    share_first:  { name: '分享达人',   desc: '第一次分享游戏结果',         icon: '📤',  category: 'social', coins: 50  },
+    all_games:    { name: '全能玩家',   desc: '玩过10种不同游戏',           icon: '🎮',  category: 'social', coins: 500 },
   };
 
   // ─── 读取存储 ───
@@ -461,6 +211,16 @@ const GameAchievement = (() => {
         text-overflow: ellipsis;
       }
 
+      /* 金币奖励 */
+      .ga-coins {
+        font-size: 13px;
+        font-weight: 800;
+        color: #F5C842;
+        flex-shrink: 0;
+        margin-left: 4px;
+        white-space: nowrap;
+      }
+
       /* 粒子点 */
       .ga-particle {
         position: absolute;
@@ -530,6 +290,9 @@ const GameAchievement = (() => {
     // 创建 Toast DOM
     const toast = document.createElement('div');
     toast.className = 'ga-toast';
+    const coinsHtml = definition.coins
+      ? `<div class="ga-coins">+🪙${definition.coins}</div>`
+      : '';
     toast.innerHTML = `
       <div class="ga-icon">${definition.icon}</div>
       <div class="ga-text">
@@ -537,6 +300,7 @@ const GameAchievement = (() => {
         <div class="ga-name">${definition.name}</div>
         <div class="ga-desc">${definition.desc}</div>
       </div>
+      ${coinsHtml}
     `;
 
     container.appendChild(toast);
@@ -594,6 +358,11 @@ const GameAchievement = (() => {
       unlockedAt: Date.now()
     };
     saveState(state);
+
+    // 发放金币奖励
+    if (def.coins && typeof GameUser !== 'undefined') {
+      try { GameUser.addCoins(def.coins, '成就：' + def.name); } catch(e) {}
+    }
 
     // 弹出 Toast
     enqueueToast(def);
