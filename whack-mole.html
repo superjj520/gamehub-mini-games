@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 打地鼠</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.97);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: inherit;
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+
+  /* 导航链接滚动横排 */
+  .nav-links-wrap {
+    flex: 1;
+    overflow-x: auto;
+    margin: 0 20px;
+    scrollbar-width: none;
+  }
+  .nav-links-wrap::-webkit-scrollbar { display: none; }
+  .nav-links {
+    display: flex;
+    gap: 2px;
+    white-space: nowrap;
+  }
+  .nav-link {
+    padding: 6px 13px; border-radius: 7px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-link:hover { background: var(--card); color: var(--text); }
+  .nav-link.active { background: var(--card); color: var(--gold); }
+
+  .nav-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.4} }
+  .status-text { font-size: 12px; color: var(--muted); }
+
+  /* ─── 主体三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: calc(100vh - 57px - 42px);
+  }
+
+  /* ─── 通用面板样式 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 20px;
+    background: var(--deep);
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* 难度选择 */
+  .difficulty-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 7px;
+  }
+  .diff-btn {
+    padding: 10px 6px; border-radius: 8px; text-align: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s;
+    font-size: 12px; color: var(--muted);
+  }
+  .diff-btn:hover { border-color: rgba(124,58,237,0.5); color: var(--text); }
+  .diff-btn.active {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.15);
+    color: var(--text);
+  }
+  .diff-btn .diff-name { font-weight: 700; font-size: 13px; margin-bottom: 3px; }
+  .diff-btn .diff-desc { color: var(--muted); font-size: 11px; }
+  .diff-btn.active .diff-name { color: var(--gold); }
+
+  /* 游戏时长选择 */
+  .time-btns { display: flex; gap: 6px; }
+  .time-btn {
+    flex: 1; padding: 9px 6px; border-radius: 8px;
+    text-align: center; font-size: 13px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s;
+    color: var(--muted); font-weight: 600;
+  }
+  .time-btn:hover { border-color: rgba(124,58,237,0.5); color: var(--text); }
+  .time-btn.active {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.15);
+    color: var(--gold);
+  }
+
+  /* 概率滑块 */
+  .prob-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px; gap: 10px;
+  }
+  .prob-row:last-child { margin-bottom: 0; }
+  .prob-label { font-size: 12px; color: var(--muted); flex-shrink: 0; width: 80px; }
+  .prob-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.1);
+    outline: none;
+  }
+  .prob-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(124,58,237,0.6);
+  }
+  .prob-val {
+    font-size: 12px; font-weight: 700;
+    color: var(--gold); width: 32px; text-align: right;
+  }
+
+  /* 奖品阈值设置 */
+  .prize-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+  }
+  .prize-row:last-child { margin-bottom: 0; }
+  .prize-icon { font-size: 20px; width: 28px; text-align: center; }
+  .prize-input-wrap { flex: 1; position: relative; }
+  .prize-input {
+    width: 100%; padding: 7px 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    font-size: 13px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .prize-input:focus { border-color: var(--accent); }
+  .prize-label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+  /* 按钮 */
+  .btn-primary {
+    padding: 12px 28px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: white; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    width: 100%;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(124,58,237,0.5); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ─── 中间游戏区 ─── */
+  /* 分数+计时横幅 */
+  .game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 520px;
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+  .score-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 20px;
+    text-align: center;
+    flex: 1;
+  }
+  .score-box .label {
+    font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.8px;
+    margin-bottom: 4px;
+  }
+  .score-box .value {
+    font-size: 28px; font-weight: 800;
+    line-height: 1.1;
+  }
+  .score-box.score-main .value { color: var(--gold); }
+  .score-box.timer-box .value {
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .score-box.timer-box.urgent .value { color: #EF4444; animation: pulse-red 0.5s ease-in-out infinite; }
+  @keyframes pulse-red { 0%,100%{opacity:1}50%{opacity:0.6} }
+
+  /* 连击显示 */
+  .combo-display {
+    text-align: center;
+    height: 30px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .combo-display.active {
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 15px;
+    animation: combo-bounce 0.3s ease-out;
+  }
+  @keyframes combo-bounce {
+    0%{transform:scale(1)} 50%{transform:scale(1.25)} 100%{transform:scale(1)}
+  }
+
+  /* 打地鼠格子 */
+  .mole-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    max-width: 480px;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+
+  /* 单个洞穴 */
+  .hole-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    /* 不剪切，让地鼠可以弹出 */
+  }
+
+  /* 洞穴底部椭圆阴影 */
+  .hole-shadow {
+    width: 100%;
+    height: 30px;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.7) 60%, transparent 100%);
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+    margin-top: -4px;
+  }
+
+  /* 洞穴视觉（圆形暗洞） */
+  .hole {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 35% 35%, #1e0e3a, #08021a 70%);
+    border: 2px solid rgba(124,58,237,0.3);
+    box-shadow: inset 0 8px 20px rgba(0,0,0,0.8), 0 0 0 4px rgba(124,58,237,0.1);
+    position: relative;
+    overflow: hidden; /* 洞内地鼠不溢出 */
+    cursor: crosshair;
+    user-select: none;
+    /* 绿色草地圆圈 */
+  }
+  .hole::before {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: -2px; right: -2px;
+    height: 30%;
+    background: linear-gradient(to top, #1a4a1a, transparent);
+    border-radius: 0 0 50% 50%;
+    z-index: 3;
+  }
+
+  /* 地鼠容器（在洞内，overflow:hidden） */
+  .mole-container {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    width: 80%;
+    transition: transform 0.15s ease-out;
+    z-index: 2;
+    pointer-events: none;
+    /* 地鼠从洞底向上弹出 */
+  }
+  .mole-container.visible {
+    transform: translateX(-50%) translateY(10%);
+  }
+  .mole-container.hit {
+    transform: translateX(-50%) translateY(-5%) scale(1.15);
+    transition: transform 0.08s;
+  }
+
+  /* SVG地鼠 */
+  .mole-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 -4px 8px rgba(0,0,0,0.5));
+  }
+
+  /* 星光爆炸容器 */
+  .burst-layer {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 10;
+    overflow: visible;
+  }
+
+  /* 分数飘字 */
+  .score-pop {
+    position: absolute;
+    left: 50%; top: 30%;
+    transform: translateX(-50%);
+    font-size: 22px; font-weight: 900;
+    pointer-events: none;
+    animation: score-float 0.8s ease-out forwards;
+    z-index: 20;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  }
+  .score-pop.plus { color: var(--gold); }
+  .score-pop.plus3 { color: #22C55E; font-size: 26px; }
+  .score-pop.minus { color: #EF4444; }
+  @keyframes score-float {
+    0%   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    30%  { opacity: 1; transform: translateX(-50%) translateY(-20px) scale(1.2); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-50px) scale(0.8); }
+  }
+
+  /* 星光粒子 */
+  .star-particle {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: star-burst 0.5s ease-out forwards;
+  }
+  @keyframes star-burst {
+    0%   { opacity: 1; transform: scale(1) translate(0,0); }
+    100% { opacity: 0; transform: scale(0.3) var(--tx); }
+  }
+
+  /* 游戏状态遮罩 */
+  .game-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(13,7,32,0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    backdrop-filter: blur(2px);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .game-overlay.show { opacity: 1; pointer-events: all; }
+
+  /* 开始/结束按钮 */
+  .btn-start {
+    padding: 14px 40px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: white; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 24px rgba(124,58,237,0.5);
+    margin-top: 8px;
+  }
+  .btn-start:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(124,58,237,0.6); }
+
+  /* 游戏开始按钮（覆盖在格子上） */
+  .game-start-wrap {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 10px;
+    width: 100%;
+  }
+  .game-start-hint { font-size: 13px; color: var(--muted); }
+
+  /* ─── 右侧面板 ─── */
+  .stat-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--muted); }
+  .stat-val { font-weight: 700; }
+  .stat-val.hit { color: #22C55E; }
+  .stat-val.miss { color: #EF4444; }
+  .stat-val.rate { color: var(--gold); }
+
+  /* 奖品解锁 */
+  .prize-unlock-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .prize-unlock-row:last-child { border-bottom: none; }
+  .prize-unlock-icon { font-size: 22px; }
+  .prize-unlock-info { flex: 1; }
+  .prize-unlock-name { font-size: 13px; font-weight: 600; }
+  .prize-unlock-bar-wrap {
+    height: 5px; background: rgba(255,255,255,0.08);
+    border-radius: 3px; margin-top: 5px; overflow: hidden;
+  }
+  .prize-unlock-bar {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.4s ease;
+  }
+  .prize-unlock-threshold {
+    font-size: 11px; color: var(--muted); white-space: nowrap;
+  }
+  .prize-unlocked-badge {
+    font-size: 10px; font-weight: 700;
+    background: linear-gradient(135deg, var(--gold), #F97316);
+    color: #000; padding: 2px 7px; border-radius: 20px;
+  }
+
+  /* 历史分数 */
+  .history-list { display: flex; flex-direction: column; gap: 7px; }
+  .history-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 10px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .history-rank {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--muted);
+  }
+  .history-score { font-weight: 700; color: var(--gold); }
+  .history-time { font-size: 11px; color: var(--muted); }
+
+  /* 最高分 */
+  .best-score-display {
+    text-align: center; padding: 16px 0;
+  }
+  .best-score-display .num {
+    font-size: 42px; font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(245,200,66,0.4);
+    line-height: 1;
+  }
+  .best-score-display .label {
+    font-size: 12px; color: var(--muted); margin-top: 4px;
+  }
+
+  /* ─── 底部状态栏 ─── */
+  .footer {
+    padding: 10px 32px;
+    border-top: 1px solid var(--border);
+    background: rgba(13,7,32,0.9);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: var(--muted);
+    flex-shrink: 0;
+  }
+  .footer-left { display: flex; align-items: center; gap: 16px; }
+  .footer-dot { color: var(--accent); }
+  .footer-tag {
+    background: rgba(245,200,66,0.12);
+    border: 1px solid rgba(245,200,66,0.25);
+    border-radius: 4px; padding: 1px 7px;
+    font-size: 11px; color: var(--gold); font-weight: 600;
+  }
+
+  /* ─── 结算弹窗 ─── */
+  .result-modal {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(8,2,26,0.85);
+    backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .result-modal.show { opacity: 1; pointer-events: all; }
+  .result-box {
+    background: linear-gradient(145deg, #1a0a2e, #0d0720);
+    border: 1px solid rgba(124,58,237,0.4);
+    border-radius: 20px;
+    padding: 36px 40px;
+    text-align: center;
+    min-width: 320px;
+    box-shadow: 0 20px 60px rgba(124,58,237,0.3);
+    transform: scale(0.9);
+    transition: transform 0.3s;
+  }
+  .result-modal.show .result-box { transform: scale(1); }
+  .result-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .result-score-big {
+    font-size: 64px; font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 0 30px rgba(245,200,66,0.5);
+    line-height: 1; margin: 16px 0;
+  }
+  .result-stats {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px; margin: 20px 0;
+  }
+  .result-stat { background: var(--card); border-radius: 10px; padding: 12px 8px; }
+  .result-stat .rs-val { font-size: 22px; font-weight: 800; }
+  .result-stat .rs-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .result-prizes { margin: 16px 0; display: flex; flex-direction: column; gap: 6px; }
+  .result-prize-item {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(245,200,66,0.08);
+    border: 1px solid rgba(245,200,66,0.25);
+    border-radius: 8px; padding: 8px 14px;
+    font-size: 13px;
+  }
+  .result-prize-icon { font-size: 20px; }
+  .result-btns { display: flex; gap: 10px; margin-top: 20px; }
+  .result-btn {
+    flex: 1; padding: 12px; border-radius: 10px;
+    font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .result-btn.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: white;
+    box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+  }
+  .result-btn.secondary {
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .result-btn:hover { transform: translateY(-1px); }
+
+  /* 新纪录标签 */
+  .new-record-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--gold), #F97316);
+    color: #000; font-size: 12px; font-weight: 800;
+    padding: 3px 12px; border-radius: 20px;
+    margin-bottom: 4px;
+    animation: badge-glow 1s ease-in-out infinite alternate;
+  }
+  @keyframes badge-glow {
+    from { box-shadow: 0 0 8px rgba(245,200,66,0.4); }
+    to   { box-shadow: 0 0 20px rgba(245,200,66,0.8); }
+  }
+
+  /* 游戏区整体容器（有overflow:visible） */
+  .game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    flex: 1;
+  }
+
+  /* 格子外层（相对定位，用于放置全屏开始遮罩） */
+  .grid-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  /* 全局游戏遮罩（覆盖格子） */
+  .grid-overlay {
+    position: absolute;
+    inset: -20px;
+    border-radius: 24px;
+    background: rgba(8,2,26,0.75);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    backdrop-filter: blur(4px);
+    transition: opacity 0.3s;
+  }
+  .grid-overlay.hidden { opacity: 0; pointer-events: none; }
+  .overlay-emoji { font-size: 48px; margin-bottom: 12px; }
+  .overlay-title { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+  .overlay-desc { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<!-- ─── 顶部导航 ─── -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    🎮 游戏<span>中台</span>
+    <span class="nav-badge">DEMO</span>
+  </a>
+
+  <div class="nav-links-wrap">
+    <div class="nav-links">
+      <a href="index.html"         class="nav-link">首页</a>
+      <a href="wheel.html"         class="nav-link">大转盘</a>
+      <a href="nine-grid.html"     class="nav-link">九宫格</a>
+      <a href="scratch-card.html"  class="nav-link">刮刮乐</a>
+      <a href="shake-dice.html"    class="nav-link">摇骰子</a>
+      <a href="smash-egg.html"     class="nav-link">砸金蛋</a>
+      <a href="slot-machine.html"  class="nav-link">老虎机</a>
+      <a href="gift-box.html"      class="nav-link">礼盒开箱</a>
+      <a href="whack-mole.html"    class="nav-link active">打地鼠</a>
+      <a href="cup-game.html"      class="nav-link">三杯游戏</a>
+      <a href="number-bomb.html"   class="nav-link">数字炸弹</a>
+      <a href="stamp-collect.html" class="nav-link">集卡集章</a>
+      <a href="vote-pk.html"       class="nav-link">投票PK</a>
+      <a href="flying-chess.html"  class="nav-link">飞行棋</a>
+      <a href="monopoly.html"      class="nav-link">大富翁</a>
+      <a href="red-packet-rain.html" class="nav-link">红包雨</a>
+      <a href="claw-machine.html"  class="nav-link">夹娃娃机</a>
+      <a href="flip-match.html"    class="nav-link">翻牌配对</a>
+      <a href="shake.html"         class="nav-link">摇一摇</a>
+      <a href="quiz.html"          class="nav-link">问答闯关</a>
+      <a href="daily-checkin.html" class="nav-link">每日签到</a>
+    </div>
+  </div>
+
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span class="status-text">组件运行中</span>
+  </div>
+</nav>
+
+<!-- ─── 主体三列 ─── -->
+<div class="main">
+
+  <!-- ─── 左侧配置面板 ─── -->
+  <div class="panel-left">
+    <div class="panel-title">配置面板</div>
+
+    <!-- 游戏难度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>游戏难度</div>
+      <div class="difficulty-grid" id="diffGrid">
+        <div class="diff-btn active" data-diff="easy" onclick="setDifficulty('easy',this)">
+          <div class="diff-name">简单</div>
+          <div class="diff-desc">地鼠慢<br>停留长</div>
+        </div>
+        <div class="diff-btn" data-diff="normal" onclick="setDifficulty('normal',this)">
+          <div class="diff-name">普通</div>
+          <div class="diff-desc">标准速度<br>适中时间</div>
+        </div>
+        <div class="diff-btn" data-diff="hard" onclick="setDifficulty('hard',this)">
+          <div class="diff-name">困难</div>
+          <div class="diff-desc">极速出现<br>极短停留</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 游戏时长 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>游戏时长</div>
+      <div class="time-btns" id="timeGroup">
+        <div class="time-btn active" data-t="30"  onclick="setDuration(30,this)">30秒</div>
+        <div class="time-btn"       data-t="60"  onclick="setDuration(60,this)">60秒</div>
+        <div class="time-btn"       data-t="90"  onclick="setDuration(90,this)">90秒</div>
+      </div>
+    </div>
+
+    <!-- 出现概率 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>地鼠概率</div>
+      <div class="prob-row">
+        <div class="prob-label">👑 金色地鼠</div>
+        <input type="range" class="prob-slider" id="goldenSlider" min="5" max="40" value="15"
+               oninput="updateProb('golden',this.value)">
+        <div class="prob-val" id="goldenVal">15%</div>
+      </div>
+      <div class="prob-row">
+        <div class="prob-label">💣 炸弹地鼠</div>
+        <input type="range" class="prob-slider" id="bombSlider" min="5" max="35" value="10"
+               oninput="updateProb('bomb',this.value)">
+        <div class="prob-val" id="bombVal">10%</div>
+      </div>
+    </div>
+
+    <!-- 奖品配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品阈值配置</div>
+      <div class="prize-row">
+        <div class="prize-icon">🥉</div>
+        <input type="number" class="prize-input" id="prize1Input" value="10" min="1">
+        <div class="prize-label">分 解锁</div>
+      </div>
+      <div class="prize-row">
+        <div class="prize-icon">🥈</div>
+        <input type="number" class="prize-input" id="prize2Input" value="25" min="1">
+        <div class="prize-label">分 解锁</div>
+      </div>
+      <div class="prize-row">
+        <div class="prize-icon">🥇</div>
+        <input type="number" class="prize-input" id="prize3Input" value="50" min="1">
+        <div class="prize-label">分 解锁</div>
+      </div>
+    </div>
+
+    <!-- 开始按钮 -->
+    <button class="btn-primary" id="startBtn" onclick="startGame()">🔨 开始游戏</button>
+  </div>
+
+  <!-- ─── 中间游戏区 ─── -->
+  <div class="panel-center">
+    <div class="game-area">
+
+      <!-- 分数 + 倒计时 + 连击 -->
+      <div class="game-header">
+        <div class="score-box score-main">
+          <div class="label">分数</div>
+          <div class="value" id="scoreDisplay">0</div>
+        </div>
+        <div class="score-box timer-box" id="timerBox">
+          <div class="label">倒计时</div>
+          <div class="value" id="timerDisplay">30</div>
+        </div>
+        <div class="score-box">
+          <div class="label">连击</div>
+          <div class="value" id="comboDisplay" style="color:var(--accent2)">0x</div>
+        </div>
+      </div>
+
+      <!-- 连击提示文字 -->
+      <div class="combo-display" id="comboText">点击地鼠得分，躲避炸弹！</div>
+
+      <!-- 3×3 格子 -->
+      <div class="grid-wrap">
+        <div class="mole-grid" id="moleGrid">
+          <!-- 9个洞穴由JS生成 -->
+        </div>
+
+        <!-- 格子遮罩（开始前/结束后显示） -->
+        <div class="grid-overlay" id="gridOverlay">
+          <div class="overlay-emoji">🐭</div>
+          <div class="overlay-title">打地鼠</div>
+          <div class="overlay-desc">点击左侧「开始游戏」启动</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── 右侧数据面板 ─── -->
+  <div class="panel-right">
+    <div class="panel-title">本局数据</div>
+
+    <!-- 本局统计 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>命中统计</div>
+      <div class="stat-row">
+        <div class="stat-label">命中次数</div>
+        <div class="stat-val hit" id="statHit">0</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label">Miss 次数</div>
+        <div class="stat-val miss" id="statMiss">0</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label">命中率</div>
+        <div class="stat-val rate" id="statRate">-</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label">最高连击</div>
+        <div class="stat-val" style="color:var(--accent2)" id="statMaxCombo">0x</div>
+      </div>
+    </div>
+
+    <!-- 最高分 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>历史最高分</div>
+      <div class="best-score-display">
+        <div class="num" id="bestScoreDisplay">0</div>
+        <div class="label">历史最高</div>
+      </div>
+    </div>
+
+    <!-- 奖品解锁进度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品解锁进度</div>
+      <div id="prizePanelList">
+        <!-- 由JS渲染 -->
+      </div>
+    </div>
+
+    <!-- 最近5局 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>最近5局</div>
+      <div class="history-list" id="historyList">
+        <div style="font-size:12px;color:var(--muted);text-align:center;padding:12px 0">暂无记录</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── 底部状态栏 ─── -->
+<footer class="footer">
+  <div class="footer-left">
+    <span class="footer-tag">打地鼠</span>
+    <span>难度递增 · 实时加速</span>
+    <span class="footer-dot">·</span>
+    <span>点击/触控双支持</span>
+  </div>
+  <div>🎮 小游戏中台 · DEMO</div>
+</footer>
+
+<!-- ─── 结算弹窗 ─── -->
+<div class="result-modal" id="resultModal">
+  <div class="result-box">
+    <div id="newRecordBadge" style="display:none">
+      <div class="new-record-badge">🏆 新纪录！</div>
+    </div>
+    <div class="result-title">游戏结束！</div>
+    <div class="result-score-big" id="resultScore">0</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:-10px;margin-bottom:4px">分数</div>
+
+    <div class="result-stats">
+      <div class="result-stat">
+        <div class="rs-val" id="rsHit" style="color:#22C55E">0</div>
+        <div class="rs-label">命中</div>
+      </div>
+      <div class="result-stat">
+        <div class="rs-val" id="rsMiss" style="color:#EF4444">0</div>
+        <div class="rs-label">Miss</div>
+      </div>
+      <div class="result-stat">
+        <div class="rs-val" id="rsCombo" style="color:var(--accent2)">0x</div>
+        <div class="rs-label">最高连击</div>
+      </div>
+    </div>
+
+    <div class="result-prizes" id="resultPrizes"></div>
+
+    <div class="result-btns">
+      <button class="result-btn secondary" onclick="closeResult()">查看数据</button>
+      <button class="result-btn primary" onclick="restartGame()">再玩一局</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   打地鼠 - 游戏核心逻辑
+   ══════════════════════════════════════════ */
+
+// ─── 配置参数 ───
+const DIFFICULTY_PRESETS = {
+  easy:   { spawnInterval: 1400, stayTime: 1800, accelFactor: 0.94 },
+  normal: { spawnInterval: 1000, stayTime: 1200, accelFactor: 0.90 },
+  hard:   { spawnInterval: 650,  stayTime: 800,  accelFactor: 0.85 }
+};
+
+// 游戏状态
+let gameState = {
+  running: false,
+  score: 0,
+  timeLeft: 30,
+  totalTime: 30,
+  hitCount: 0,
+  missCount: 0,
+  combo: 0,
+  maxCombo: 0,
+  difficulty: 'easy',
+  goldenProb: 15,
+  bombProb: 10,
+  prizes: [
+    { icon: '🥉', name: '铜牌奖励', threshold: 10, unlocked: false },
+    { icon: '🥈', name: '银牌奖励', threshold: 25, unlocked: false },
+    { icon: '🥇', name: '金牌奖励', threshold: 50, unlocked: false }
+  ],
+  bestScore: 0,
+  history: []
+};
+
+// 洞穴状态 (9个)
+let holes = [];
+let spawnTimer = null;
+let countdownTimer = null;
+let accelTimer = null;
+let currentInterval = 1400;
+let currentStay = 1800;
+
+// ─── 初始化9个洞穴 ───
+function initHoles() {
+  const grid = document.getElementById('moleGrid');
+  grid.innerHTML = '';
+  holes = [];
+
+  for (let i = 0; i < 9; i++) {
+    const holeWrap = document.createElement('div');
+    holeWrap.className = 'hole-wrap';
+
+    const hole = document.createElement('div');
+    hole.className = 'hole';
+    hole.dataset.index = i;
+
+    // 地鼠容器
+    const moleContainer = document.createElement('div');
+    moleContainer.className = 'mole-container';
+    moleContainer.dataset.index = i;
+
+    // 分数爆炸层
+    const burstLayer = document.createElement('div');
+    burstLayer.className = 'burst-layer';
+
+    hole.appendChild(moleContainer);
+    hole.appendChild(burstLayer);
+    holeWrap.appendChild(hole);
+
+    // 草地阴影
+    const shadow = document.createElement('div');
+    shadow.className = 'hole-shadow';
+    holeWrap.appendChild(shadow);
+
+    grid.appendChild(holeWrap);
+
+    // 绑定点击事件（桌面+移动端）
+    hole.addEventListener('click', (e) => onHoleClick(e, i));
+    hole.addEventListener('touchstart', (e) => { e.preventDefault(); onHoleClick(e, i); }, { passive: false });
+
+    holes.push({
+      index: i,
+      active: false,
+      type: 'normal', // normal | golden | bomb
+      timer: null,
+      container: moleContainer,
+      burstLayer: burstLayer
+    });
+  }
+}
+
+// ─── 生成地鼠SVG ───
+function getMoleSVG(type) {
+  if (type === 'normal') {
+    // 普通棕色地鼠
+    return `<svg class="mole-svg" viewBox="0 0 80 90" xmlns="http://www.w3.org/2000/svg">
+      <!-- 耳朵 -->
+      <ellipse cx="18" cy="34" rx="12" ry="10" fill="#8B5E3C"/>
+      <ellipse cx="62" cy="34" rx="12" ry="10" fill="#8B5E3C"/>
+      <ellipse cx="18" cy="34" rx="7" ry="6" fill="#E8A080"/>
+      <ellipse cx="62" cy="34" rx="7" ry="6" fill="#E8A080"/>
+      <!-- 身体 -->
+      <ellipse cx="40" cy="60" rx="30" ry="28" fill="#A0714F"/>
+      <!-- 脸 -->
+      <ellipse cx="40" cy="46" rx="26" ry="22" fill="#C49070"/>
+      <!-- 眼睛 -->
+      <circle cx="30" cy="40" r="5" fill="white"/>
+      <circle cx="50" cy="40" r="5" fill="white"/>
+      <circle cx="31" cy="40" r="3" fill="#1a0a2e"/>
+      <circle cx="51" cy="40" r="3" fill="#1a0a2e"/>
+      <circle cx="32" cy="39" r="1" fill="white"/>
+      <circle cx="52" cy="39" r="1" fill="white"/>
+      <!-- 鼻子 -->
+      <ellipse cx="40" cy="50" rx="5" ry="3.5" fill="#D97070"/>
+      <!-- 嘴巴 -->
+      <path d="M34 55 Q40 60 46 55" stroke="#8B4040" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <!-- 胡须 -->
+      <line x1="14" y1="50" x2="32" y2="51" stroke="#888" stroke-width="1" opacity="0.7"/>
+      <line x1="14" y1="54" x2="32" y2="53" stroke="#888" stroke-width="1" opacity="0.7"/>
+      <line x1="48" y1="51" x2="66" y2="50" stroke="#888" stroke-width="1" opacity="0.7"/>
+      <line x1="48" y1="53" x2="66" y2="54" stroke="#888" stroke-width="1" opacity="0.7"/>
+    </svg>`;
+  } else if (type === 'golden') {
+    // 金色地鼠（戴王冠）
+    return `<svg class="mole-svg" viewBox="0 0 80 95" xmlns="http://www.w3.org/2000/svg">
+      <!-- 王冠 -->
+      <polygon points="20,28 28,14 40,22 52,14 60,28" fill="#F5C842" stroke="#E8A800" stroke-width="1.5"/>
+      <circle cx="28" cy="14" r="3" fill="#EC4899"/>
+      <circle cx="40" cy="22" r="3" fill="#EC4899"/>
+      <circle cx="52" cy="14" r="3" fill="#EC4899"/>
+      <!-- 耳朵 -->
+      <ellipse cx="18" cy="40" rx="12" ry="10" fill="#c8a440"/>
+      <ellipse cx="62" cy="40" rx="12" ry="10" fill="#c8a440"/>
+      <ellipse cx="18" cy="40" rx="7" ry="6" fill="#ffe499"/>
+      <ellipse cx="62" cy="40" rx="7" ry="6" fill="#ffe499"/>
+      <!-- 身体 -->
+      <ellipse cx="40" cy="66" rx="30" ry="28" fill="#d4a840"/>
+      <!-- 脸 -->
+      <ellipse cx="40" cy="52" rx="26" ry="22" fill="#f0c860"/>
+      <!-- 眼睛（闪亮） -->
+      <circle cx="30" cy="46" r="5" fill="white"/>
+      <circle cx="50" cy="46" r="5" fill="white"/>
+      <circle cx="31" cy="46" r="3" fill="#1a0a2e"/>
+      <circle cx="51" cy="46" r="3" fill="#1a0a2e"/>
+      <circle cx="32" cy="45" r="1.5" fill="white"/>
+      <circle cx="52" cy="45" r="1.5" fill="white"/>
+      <!-- 星星眼睛光芒 -->
+      <circle cx="30" cy="46" r="7" fill="rgba(245,200,66,0.2)" stroke="rgba(245,200,66,0.5)" stroke-width="1"/>
+      <circle cx="50" cy="46" r="7" fill="rgba(245,200,66,0.2)" stroke="rgba(245,200,66,0.5)" stroke-width="1"/>
+      <!-- 鼻子 -->
+      <ellipse cx="40" cy="56" rx="5" ry="3.5" fill="#D97070"/>
+      <!-- 嘴巴微笑 -->
+      <path d="M33 62 Q40 68 47 62" stroke="#8B4040" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- 腮红 -->
+      <circle cx="26" cy="58" r="5" fill="rgba(236,72,153,0.3)"/>
+      <circle cx="54" cy="58" r="5" fill="rgba(236,72,153,0.3)"/>
+    </svg>`;
+  } else {
+    // 炸弹地鼠（红色骷髅，危险！）
+    return `<svg class="mole-svg" viewBox="0 0 80 90" xmlns="http://www.w3.org/2000/svg">
+      <!-- 危险光晕 -->
+      <ellipse cx="40" cy="48" rx="32" ry="26" fill="rgba(239,68,68,0.15)"/>
+      <!-- 耳朵（红黑） -->
+      <ellipse cx="18" cy="36" rx="12" ry="10" fill="#7f1d1d"/>
+      <ellipse cx="62" cy="36" rx="12" ry="10" fill="#7f1d1d"/>
+      <ellipse cx="18" cy="36" rx="7" ry="6" fill="#dc2626"/>
+      <ellipse cx="62" cy="36" rx="7" ry="6" fill="#dc2626"/>
+      <!-- 身体 -->
+      <ellipse cx="40" cy="62" rx="30" ry="28" fill="#991b1b"/>
+      <!-- 脸（骷髅白） -->
+      <ellipse cx="40" cy="46" rx="26" ry="22" fill="#f5f5f5"/>
+      <!-- 骷髅眼眶（X） -->
+      <circle cx="30" cy="40" r="7" fill="#1a0a2e"/>
+      <circle cx="50" cy="40" r="7" fill="#1a0a2e"/>
+      <line x1="25" y1="35" x2="35" y2="45" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="35" y1="35" x2="25" y2="45" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="45" y1="35" x2="55" y2="45" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="55" y1="35" x2="45" y2="45" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- 骷髅牙齿 -->
+      <rect x="29" y="56" width="6" height="7" rx="1" fill="#1a0a2e"/>
+      <rect x="37" y="56" width="6" height="7" rx="1" fill="#1a0a2e"/>
+      <rect x="45" y="56" width="6" height="7" rx="1" fill="#1a0a2e"/>
+      <!-- 危险感叹号 -->
+      <text x="38" y="76" font-size="12" fill="#F5C842" font-weight="900" font-family="monospace">💀</text>
+    </svg>`;
+  }
+}
+
+// ─── 弹出地鼠 ───
+function spawnMole() {
+  if (!gameState.running) return;
+
+  // 找空闲的洞
+  const available = holes.filter(h => !h.active);
+  if (available.length === 0) return;
+
+  // 随机选洞
+  const hole = available[Math.floor(Math.random() * available.length)];
+
+  // 随机地鼠类型（根据概率）
+  const rand = Math.random() * 100;
+  let type = 'normal';
+  if (rand < gameState.bombProb) {
+    type = 'bomb';
+  } else if (rand < gameState.bombProb + gameState.goldenProb) {
+    type = 'golden';
+  }
+
+  hole.active = true;
+  hole.type = type;
+
+  // 设置SVG
+  hole.container.innerHTML = getMoleSVG(type);
+
+  // 弹出动画
+  requestAnimationFrame(() => {
+    hole.container.classList.add('visible');
+  });
+
+  // 自动缩回（stopTime后未点击 → Miss）
+  hole.timer = setTimeout(() => {
+    if (hole.active) {
+      hideMole(hole, true); // true = 自动缩回（Miss）
+    }
+  }, currentStay);
+}
+
+// ─── 隐藏地鼠 ───
+function hideMole(hole, isMiss) {
+  if (!hole.active) return;
+
+  if (isMiss && hole.type !== 'bomb') {
+    // 普通/金色地鼠自动缩回 → Miss
+    gameState.missCount++;
+    gameState.combo = 0; // 断连击
+    updateComboDisplay();
+    updateStats();
+  }
+
+  hole.active = false;
+  clearTimeout(hole.timer);
+  hole.container.classList.remove('visible', 'hit');
+
+  // 缩回动画结束后清空SVG
+  setTimeout(() => {
+    if (!hole.active) {
+      hole.container.innerHTML = '';
+    }
+  }, 200);
+}
+
+// ─── 点击洞穴 ───
+function onHoleClick(e, index) {
+  if (!gameState.running) return;
+
+  const hole = holes[index];
+
+  if (!hole.active) {
+    // 点空了，不计Miss（只有地鼠自动缩回才算Miss）
+    return;
+  }
+
+  clearTimeout(hole.timer);
+
+  if (hole.type === 'bomb') {
+    // 点到炸弹！扣5分
+    gameState.score = Math.max(0, gameState.score - 5);
+    gameState.combo = 0;
+    showScorePop(hole, '-5', 'minus');
+    showBurst(hole, '#EF4444');
+    updateComboDisplay();
+  } else {
+    // 命中！
+    gameState.hitCount++;
+    const pts = hole.type === 'golden' ? 3 : 1;
+    gameState.score += pts;
+    gameState.combo++;
+    if (gameState.combo > gameState.maxCombo) gameState.maxCombo = gameState.combo;
+
+    showScorePop(hole, '+' + pts, hole.type === 'golden' ? 'plus3' : 'plus');
+    showBurst(hole, hole.type === 'golden' ? '#F5C842' : '#7C3AED');
+    updateComboDisplay();
+
+    // 地鼠击中动画
+    hole.container.classList.add('hit');
+  }
+
+  // 更新显示
+  updateScoreDisplay();
+  updateStats();
+  checkPrizes();
+
+  // 标记不活跃
+  hole.active = false;
+  setTimeout(() => {
+    hole.container.classList.remove('visible', 'hit');
+    setTimeout(() => { hole.container.innerHTML = ''; }, 200);
+  }, 100);
+}
+
+// ─── 分数飘字 ───
+function showScorePop(hole, text, cls) {
+  const pop = document.createElement('div');
+  pop.className = `score-pop ${cls}`;
+  pop.textContent = text;
+  hole.burstLayer.appendChild(pop);
+  setTimeout(() => pop.remove(), 900);
+}
+
+// ─── 星光爆炸 ───
+function showBurst(hole, color) {
+  const count = 8;
+  for (let i = 0; i < count; i++) {
+    const star = document.createElement('div');
+    star.className = 'star-particle';
+    star.style.background = color;
+    star.style.left = '50%';
+    star.style.top = '40%';
+    const angle = (i / count) * 360;
+    const dist = 30 + Math.random() * 20;
+    const tx = `translate(${Math.cos(angle * Math.PI / 180) * dist}px, ${Math.sin(angle * Math.PI / 180) * dist}px)`;
+    star.style.setProperty('--tx', tx);
+    star.style.animationDelay = `${Math.random() * 0.1}s`;
+    hole.burstLayer.appendChild(star);
+    setTimeout(() => star.remove(), 600);
+  }
+}
+
+// ─── 连击显示 ───
+function updateComboDisplay() {
+  const el = document.getElementById('comboDisplay');
+  const text = document.getElementById('comboText');
+  el.textContent = gameState.combo + 'x';
+
+  if (gameState.combo >= 5) {
+    text.textContent = `🔥 ${gameState.combo} 连击！太厉害了！`;
+    text.className = 'combo-display active';
+  } else if (gameState.combo >= 3) {
+    text.textContent = `⚡ ${gameState.combo} 连击！`;
+    text.className = 'combo-display active';
+  } else if (gameState.combo >= 2) {
+    text.textContent = `连击 x${gameState.combo}！`;
+    text.className = 'combo-display active';
+  } else {
+    text.textContent = '点击地鼠得分，躲避骷髅！';
+    text.className = 'combo-display';
+  }
+}
+
+// ─── 更新分数显示 ───
+function updateScoreDisplay() {
+  document.getElementById('scoreDisplay').textContent = gameState.score;
+}
+
+// ─── 更新统计 ───
+function updateStats() {
+  document.getElementById('statHit').textContent = gameState.hitCount;
+  document.getElementById('statMiss').textContent = gameState.missCount;
+  const total = gameState.hitCount + gameState.missCount;
+  const rate = total > 0 ? Math.round(gameState.hitCount / total * 100) + '%' : '-';
+  document.getElementById('statRate').textContent = rate;
+  document.getElementById('statMaxCombo').textContent = gameState.maxCombo + 'x';
+}
+
+// ─── 检查奖品解锁 ───
+function checkPrizes() {
+  gameState.prizes.forEach(p => {
+    if (!p.unlocked && gameState.score >= p.threshold) {
+      p.unlocked = true;
+    }
+  });
+  renderPrizePanel();
+}
+
+// ─── 渲染奖品面板 ───
+function renderPrizePanel() {
+  const list = document.getElementById('prizePanelList');
+  list.innerHTML = '';
+
+  gameState.prizes.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'prize-unlock-row';
+    const progress = Math.min(gameState.score / p.threshold * 100, 100);
+    div.innerHTML = `
+      <div class="prize-unlock-icon">${p.icon}</div>
+      <div class="prize-unlock-info">
+        <div class="prize-unlock-name">${p.name}</div>
+        <div class="prize-unlock-bar-wrap">
+          <div class="prize-unlock-bar" style="width:${progress}%"></div>
+        </div>
+      </div>
+      <div>
+        ${p.unlocked
+          ? '<span class="prize-unlocked-badge">已解锁</span>'
+          : `<div class="prize-unlock-threshold">${gameState.score}/${p.threshold}</div>`
+        }
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ─── 难度递增（每5秒加速） ───
+function startAcceleration() {
+  const preset = DIFFICULTY_PRESETS[gameState.difficulty];
+  currentInterval = preset.spawnInterval;
+  currentStay = preset.stayTime;
+
+  accelTimer = setInterval(() => {
+    if (!gameState.running) return;
+    currentInterval = Math.max(300, Math.floor(currentInterval * preset.accelFactor));
+    currentStay    = Math.max(300, Math.floor(currentStay    * preset.accelFactor));
+    // 重启spawn计时器
+    clearInterval(spawnTimer);
+    spawnTimer = setInterval(spawnMole, currentInterval);
+  }, 5000);
+}
+
+// ─── 倒计时 ───
+function startCountdown() {
+  const timerDisplay = document.getElementById('timerDisplay');
+  const timerBox = document.getElementById('timerBox');
+
+  countdownTimer = setInterval(() => {
+    gameState.timeLeft--;
+    timerDisplay.textContent = gameState.timeLeft;
+
+    // 最后10秒变红闪烁
+    if (gameState.timeLeft <= 10) {
+      timerBox.classList.add('urgent');
+    }
+
+    if (gameState.timeLeft <= 0) {
+      endGame();
+    }
+  }, 1000);
+}
+
+// ─── 开始游戏 ───
+function startGame() {
+  if (gameState.running) return;
+
+  // 读取当前配置
+  const preset = DIFFICULTY_PRESETS[gameState.difficulty];
+
+  // 重置状态
+  gameState.running = true;
+  gameState.score = 0;
+  gameState.hitCount = 0;
+  gameState.missCount = 0;
+  gameState.combo = 0;
+  gameState.maxCombo = 0;
+  gameState.prizes.forEach(p => p.unlocked = false);
+  gameState.timeLeft = gameState.totalTime;
+
+  // 读取奖品阈值
+  gameState.prizes[0].threshold = parseInt(document.getElementById('prize1Input').value) || 10;
+  gameState.prizes[1].threshold = parseInt(document.getElementById('prize2Input').value) || 25;
+  gameState.prizes[2].threshold = parseInt(document.getElementById('prize3Input').value) || 50;
+
+  // 重置UI
+  updateScoreDisplay();
+  updateStats();
+  renderPrizePanel();
+  document.getElementById('timerDisplay').textContent = gameState.totalTime;
+  document.getElementById('timerBox').classList.remove('urgent');
+  document.getElementById('comboDisplay').textContent = '0x';
+  document.getElementById('comboText').textContent = '点击地鼠得分，躲避骷髅！';
+  document.getElementById('comboText').className = 'combo-display';
+
+  // 隐藏遮罩
+  document.getElementById('gridOverlay').classList.add('hidden');
+
+  // 禁用开始按钮
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('startBtn').textContent = '游戏进行中...';
+
+  // 初始化洞穴
+  initHoles();
+
+  // 启动地鼠生成
+  currentInterval = preset.spawnInterval;
+  currentStay = preset.stayTime;
+  spawnTimer = setInterval(spawnMole, currentInterval);
+
+  // 启动难度递增
+  startAcceleration();
+
+  // 启动倒计时
+  startCountdown();
+}
+
+// ─── 结束游戏 ───
+function endGame() {
+  gameState.running = false;
+
+  // 清理定时器
+  clearInterval(spawnTimer);
+  clearInterval(countdownTimer);
+  clearInterval(accelTimer);
+  spawnTimer = null;
+  countdownTimer = null;
+  accelTimer = null;
+
+  // 隐藏所有地鼠
+  holes.forEach(h => {
+    if (h.active) {
+      h.active = false;
+      clearTimeout(h.timer);
+      h.container.classList.remove('visible', 'hit');
+      h.container.innerHTML = '';
+    }
+  });
+
+  // 更新最高分
+  const isNewRecord = gameState.score > gameState.bestScore;
+  if (isNewRecord) {
+    gameState.bestScore = gameState.score;
+    document.getElementById('bestScoreDisplay').textContent = gameState.bestScore;
+  }
+
+  // 记录历史
+  gameState.history.unshift({
+    score: gameState.score,
+    time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+  });
+  if (gameState.history.length > 5) gameState.history.pop();
+  renderHistory();
+
+  // 最终检查奖品
+  checkPrizes();
+
+  // 恢复开始按钮
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('startBtn').textContent = '🔄 再玩一局';
+
+  // 显示遮罩
+  const overlay = document.getElementById('gridOverlay');
+  overlay.classList.remove('hidden');
+  overlay.querySelector('.overlay-emoji').textContent = '🎉';
+  overlay.querySelector('.overlay-title').textContent = '游戏结束';
+  overlay.querySelector('.overlay-desc').textContent = `得了 ${gameState.score} 分！`;
+
+  // 弹出结算弹窗
+  showResultModal(isNewRecord);
+}
+
+// ─── 结算弹窗 ───
+function showResultModal(isNewRecord) {
+  document.getElementById('resultScore').textContent = gameState.score;
+  document.getElementById('rsHit').textContent = gameState.hitCount;
+  document.getElementById('rsMiss').textContent = gameState.missCount;
+  document.getElementById('rsCombo').textContent = gameState.maxCombo + 'x';
+
+  // 新纪录
+  document.getElementById('newRecordBadge').style.display = isNewRecord ? 'block' : 'none';
+
+  // 解锁的奖品
+  const prizes = document.getElementById('resultPrizes');
+  prizes.innerHTML = '';
+  const unlocked = gameState.prizes.filter(p => p.unlocked);
+  if (unlocked.length > 0) {
+    unlocked.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'result-prize-item';
+      div.innerHTML = `<span class="result-prize-icon">${p.icon}</span><span>${p.name} 已解锁！</span>`;
+      prizes.appendChild(div);
+    });
+  } else {
+    prizes.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:4px">未解锁任何奖品，继续努力！</div>';
+  }
+
+  document.getElementById('resultModal').classList.add('show');
+}
+
+function closeResult() {
+  document.getElementById('resultModal').classList.remove('show');
+}
+
+function restartGame() {
+  closeResult();
+  setTimeout(startGame, 200);
+}
+
+// ─── 渲染历史 ───
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (gameState.history.length === 0) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px 0">暂无记录</div>';
+    return;
+  }
+  list.innerHTML = '';
+  gameState.history.forEach((h, i) => {
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    div.innerHTML = `
+      <div class="history-rank">${i + 1}</div>
+      <span class="history-score">${h.score}分</span>
+      <span class="history-time">${h.time}</span>
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ─── 配置切换函数 ───
+function setDifficulty(diff, el) {
+  if (gameState.running) return;
+  gameState.difficulty = diff;
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setDuration(t, el) {
+  if (gameState.running) return;
+  gameState.totalTime = t;
+  document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('timerDisplay').textContent = t;
+}
+
+function updateProb(type, val) {
+  if (type === 'golden') {
+    gameState.goldenProb = parseInt(val);
+    document.getElementById('goldenVal').textContent = val + '%';
+  } else {
+    gameState.bombProb = parseInt(val);
+    document.getElementById('bombVal').textContent = val + '%';
+  }
+}
+
+// ─── 初始化页面 ───
+(function init() {
+  initHoles();
+  renderPrizePanel();
+  renderHistory();
+  document.getElementById('bestScoreDisplay').textContent = gameState.bestScore;
+})();
+</script>
+</body>
+</html>
