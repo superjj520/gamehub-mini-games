@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 消消乐</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: inherit; white-space: nowrap;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600; white-space: nowrap;
+  }
+
+  /* 横向滚动导航 */
+  .nav-scroll-wrap {
+    flex: 1;
+    overflow-x: auto;
+    margin: 0 24px;
+    scrollbar-width: none;
+  }
+  .nav-scroll-wrap::-webkit-scrollbar { display: none; }
+  .nav-tabs { display: flex; gap: 4px; width: max-content; }
+  .nav-tab {
+    padding: 7px 14px; border-radius: 8px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center; white-space: nowrap;
+  }
+  .nav-tab:hover { background: var(--card); color: var(--text); }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+
+  .nav-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .status-text { font-size: 12px; color: var(--muted); }
+
+  /* ─── 主体三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* ─── 左侧配置面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 16px;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px; margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+
+  /* 模式选择 */
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mode-btn {
+    padding: 12px 8px; border-radius: 8px; text-align: center;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s; font-size: 13px; color: var(--muted);
+  }
+  .mode-btn:hover { border-color: rgba(124,58,237,0.5); color: var(--text); }
+  .mode-btn.active {
+    border-color: var(--accent); background: rgba(124,58,237,0.15); color: var(--gold);
+  }
+  .mode-btn .mode-icon { font-size: 20px; margin-bottom: 5px; }
+  .mode-btn .mode-name { font-weight: 700; }
+
+  /* 数值行 */
+  .config-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 13px;
+  }
+  .config-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .config-label { color: var(--muted); }
+  .config-ctrl { display: flex; align-items: center; gap: 8px; }
+  .num-btn {
+    width: 26px; height: 26px; border-radius: 6px;
+    background: rgba(255,255,255,0.08); border: 1px solid var(--border);
+    color: var(--text); font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .num-btn:hover { background: rgba(124,58,237,0.3); border-color: var(--accent); }
+  .num-val { min-width: 40px; text-align: center; font-weight: 700; font-size: 14px; }
+
+  /* 棋盘尺寸 */
+  .size-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .size-btn {
+    padding: 10px; border-radius: 8px; text-align: center;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s; font-size: 13px; color: var(--muted);
+  }
+  .size-btn:hover { border-color: rgba(124,58,237,0.4); color: var(--text); }
+  .size-btn.active {
+    border-color: var(--accent); background: rgba(124,58,237,0.15); color: var(--gold);
+  }
+  .size-btn .size-icon { font-size: 18px; margin-bottom: 4px; }
+  .size-btn .size-name { font-weight: 700; font-size: 14px; }
+  .size-btn .size-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* 奖品配置 */
+  .prize-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .prize-item:last-child { border-bottom: none; }
+  .prize-score-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 700; white-space: nowrap;
+  }
+  .prize-input {
+    flex: 1; background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 10px;
+    color: var(--text); font-size: 13px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .prize-input:focus { border-color: var(--accent); }
+
+  /* 主按钮 */
+  .btn-primary {
+    width: 100%; padding: 13px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: white; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4); margin-top: 4px;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(124,58,237,0.55); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-secondary {
+    width: 100%; padding: 10px; border-radius: 10px;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    color: var(--muted); font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; margin-top: 8px;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+
+  /* 色块预览 */
+  .gem-preview { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .gem-chip {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; border: 1px solid rgba(255,255,255,0.15);
+    transition: transform 0.15s;
+  }
+  .gem-chip:hover { transform: scale(1.1); }
+
+  /* ─── 中间游戏区 ─── */
+  .panel-center {
+    display: flex; flex-direction: column;
+    align-items: center; padding: 24px 20px;
+    overflow-y: auto; gap: 16px;
+  }
+
+  /* 顶部状态栏 */
+  .game-stats {
+    display: flex; gap: 12px; align-items: center;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 12px 20px; width: 100%;
+    max-width: 600px;
+  }
+  .stat-item {
+    flex: 1; text-align: center;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+  .stat-val {
+    font-size: 22px; font-weight: 800; color: var(--gold);
+    font-variant-numeric: tabular-nums;
+    transition: transform 0.15s;
+  }
+  .stat-val.pop { animation: statPop 0.3s ease; }
+  @keyframes statPop {
+    0%{transform:scale(1)} 50%{transform:scale(1.25)} 100%{transform:scale(1)}
+  }
+  .stat-divider { width: 1px; height: 36px; background: var(--border); }
+
+  /* 目标提示 */
+  .target-hint {
+    font-size: 12px; color: var(--muted); text-align: center;
+    background: rgba(245,200,66,0.08); border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 8px; padding: 6px 14px;
+    width: 100%; max-width: 600px;
+  }
+  .target-hint strong { color: var(--gold); }
+
+  /* 棋盘容器 */
+  .board-wrap {
+    position: relative;
+    width: 100%; max-width: 560px;
+  }
+  #gameBoard {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+    background: rgba(26,10,46,0.8);
+    box-shadow: 0 0 40px rgba(124,58,237,0.2);
+    margin: 0 auto;
+    /* 宽高通过JS动态设置 */
+  }
+  #gameBoard.shake {
+    animation: boardShake 0.4s ease;
+  }
+  @keyframes boardShake {
+    0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)}
+  }
+
+  /* 方块 */
+  .gem {
+    position: absolute;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, top 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
+    user-select: none;
+    border: 2px solid transparent;
+  }
+  .gem:hover { transform: scale(1.08); }
+  .gem.selected {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px var(--gold), 0 0 16px rgba(245,200,66,0.5);
+    transform: scale(1.1);
+    z-index: 10;
+  }
+  .gem.removing {
+    animation: gemPop 0.3s ease forwards;
+  }
+  @keyframes gemPop {
+    0%{transform:scale(1);opacity:1;filter:brightness(3)}
+    60%{transform:scale(1.3);opacity:0.6}
+    100%{transform:scale(0);opacity:0}
+  }
+  .gem.falling {
+    transition: top 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+  .gem.spawning {
+    animation: gemSpawn 0.25s ease;
+  }
+  @keyframes gemSpawn {
+    0%{transform:scale(0.3);opacity:0} 100%{transform:scale(1);opacity:1}
+  }
+
+  /* 方块颜色 */
+  .gem-0 { background: linear-gradient(135deg,#e74c3c,#c0392b); } /* 红宝石 */
+  .gem-1 { background: linear-gradient(135deg,#2980b9,#1a5276); } /* 蓝晶   */
+  .gem-2 { background: linear-gradient(135deg,#27ae60,#1e8449); } /* 翠玉   */
+  .gem-3 { background: linear-gradient(135deg,#f39c12,#d68910); } /* 金块   */
+  .gem-4 { background: linear-gradient(135deg,#8e44ad,#6c3483); } /* 紫水晶 */
+  .gem-5 { background: linear-gradient(135deg,#95a5a6,#7f8c8d); } /* 白玉   */
+
+  /* 粒子 */
+  .particle {
+    position: absolute;
+    width: 8px; height: 8px; border-radius: 50%;
+    pointer-events: none;
+    animation: particleFly 0.6s ease forwards;
+    z-index: 50;
+  }
+  @keyframes particleFly {
+    0%{transform:translate(0,0) scale(1);opacity:1}
+    100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}
+  }
+
+  /* 连消提示 */
+  .cascade-toast {
+    position: absolute; left: 50%; top: 40%;
+    transform: translateX(-50%) translateY(-50%);
+    font-size: 28px; font-weight: 900;
+    color: var(--gold); text-shadow: 0 0 20px rgba(245,200,66,0.8);
+    pointer-events: none; z-index: 60;
+    animation: cascadeFloat 1.2s ease forwards;
+    white-space: nowrap;
+  }
+  @keyframes cascadeFloat {
+    0%{opacity:0;transform:translateX(-50%) translateY(-20px) scale(0.8)}
+    20%{opacity:1;transform:translateX(-50%) translateY(-50%) scale(1.1)}
+    70%{opacity:1;transform:translateX(-50%) translateY(-60px) scale(1)}
+    100%{opacity:0;transform:translateX(-50%) translateY(-80px) scale(0.9)}
+  }
+
+  /* 游戏结束遮罩 */
+  .game-over-mask {
+    position: absolute; inset: 0;
+    background: rgba(13,7,32,0.9);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    border-radius: 12px; z-index: 80;
+    gap: 12px;
+  }
+  .game-over-title {
+    font-size: 32px; font-weight: 900; color: var(--gold);
+    text-shadow: 0 0 20px rgba(245,200,66,0.6);
+  }
+  .game-over-score { font-size: 18px; color: var(--muted); }
+  .game-over-score strong { color: var(--text); font-size: 28px; }
+  .btn-restart {
+    padding: 12px 32px; border-radius: 10px; margin-top: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: white; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+  }
+  .btn-restart:hover { transform: translateY(-1px); }
+
+  /* 等待开始状态 */
+  .idle-mask {
+    position: absolute; inset: 0;
+    background: rgba(13,7,32,0.85);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    border-radius: 12px; z-index: 80; gap: 10px;
+  }
+  .idle-icon { font-size: 56px; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  .idle-text { font-size: 18px; font-weight: 700; color: var(--muted); }
+
+  /* ─── 右侧数据面板 ─── */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+
+  /* 进度条 */
+  .progress-section { margin-bottom: 6px; }
+  .progress-header {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--muted); margin-bottom: 8px;
+  }
+  .progress-header strong { color: var(--text); }
+  .progress-bar {
+    height: 8px; border-radius: 4px; background: rgba(255,255,255,0.08);
+    overflow: hidden; margin-bottom: 14px;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.4s ease;
+  }
+
+  /* 统计数值 */
+  .data-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 13px;
+  }
+  .data-row:last-child { border-bottom: none; }
+  .data-label { color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .data-val { font-weight: 700; color: var(--text); }
+  .data-val.gold { color: var(--gold); }
+  .data-val.green { color: #22C55E; }
+
+  /* 奖品状态 */
+  .prize-status-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px; border-radius: 10px; margin-bottom: 8px;
+    border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+    transition: all 0.3s;
+  }
+  .prize-status-item.unlocked {
+    border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.06);
+  }
+  .prize-lock {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .prize-status-item.unlocked .prize-lock {
+    background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.4);
+  }
+  .prize-info { flex: 1; min-width: 0; }
+  .prize-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prize-thresh { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .prize-badge {
+    font-size: 11px; padding: 2px 7px; border-radius: 8px;
+    background: rgba(255,255,255,0.08); color: var(--muted); flex-shrink: 0;
+  }
+  .prize-status-item.unlocked .prize-badge {
+    background: rgba(34,197,94,0.2); color: #22C55E;
+  }
+
+  /* 历史记录 */
+  .history-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-rank { color: var(--muted); font-size: 12px; }
+  .history-score { font-weight: 700; color: var(--gold); }
+
+  /* ─── 底部状态栏 ─── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 12px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(13,7,32,0.8); flex-shrink: 0;
+  }
+  .footer-left { font-size: 12px; color: var(--muted); display: flex; gap: 20px; }
+  .footer-tag { display: flex; align-items: center; gap: 6px; }
+  .footer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .footer-right { font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ─── 顶部导航 ─── -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">🎮 <span>GameHub</span> 中台</a>
+  <div class="nav-scroll-wrap">
+    <div class="nav-tabs">
+      <a href="index.html"        class="nav-tab">🏠 首页</a>
+      <a href="wheel.html"        class="nav-tab">🎡 大转盘</a>
+      <a href="nine-grid.html"    class="nav-tab">🔲 九宫格</a>
+      <a href="scratch-card.html" class="nav-tab">🎴 刮刮乐</a>
+      <a href="shake-dice.html"   class="nav-tab">🎲 摇骰子</a>
+      <a href="smash-egg.html"    class="nav-tab">🥚 砸金蛋</a>
+      <a href="slot-machine.html" class="nav-tab">🎰 老虎机</a>
+      <a href="gift-box.html"     class="nav-tab">🎁 礼盒开箱</a>
+      <a href="whack-mole.html"   class="nav-tab">🦔 打地鼠</a>
+      <a href="cup-game.html"     class="nav-tab">🥤 三杯游戏</a>
+      <a href="number-bomb.html"  class="nav-tab">💣 数字炸弹</a>
+      <a href="stamp-collect.html"class="nav-tab">📮 集卡集章</a>
+      <a href="vote-pk.html"      class="nav-tab">⚡ 投票PK</a>
+      <a href="gashapon.html"     class="nav-tab">🎰 扭蛋机</a>
+      <a href="blind-box.html"    class="nav-tab">📦 盲盒抽卡</a>
+      <a href="game-2048.html"    class="nav-tab">🔢 2048</a>
+      <a href="match3.html"       class="nav-tab active">💎 消消乐</a>
+      <a href="catch-coins.html"  class="nav-tab">🪙 接金币</a>
+      <a href="grow-tree.html"    class="nav-tab">🌳 成长树</a>
+      <a href="flying-chess.html" class="nav-tab">✈️ 飞行棋</a>
+      <a href="monopoly.html"     class="nav-tab">🏦 大富翁</a>
+      <a href="red-packet-rain.html" class="nav-tab">🧧 红包雨</a>
+      <a href="claw-machine.html" class="nav-tab">🦾 夹娃娃机</a>
+      <a href="flip-match.html"   class="nav-tab">🃏 翻牌配对</a>
+      <a href="shake.html"        class="nav-tab">📱 摇一摇</a>
+      <a href="quiz.html"         class="nav-tab">❓ 问答闯关</a>
+      <a href="daily-checkin.html"class="nav-tab">📅 每日签到</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span class="status-text">运行中</span>
+    <div class="nav-badge">💎 消消乐</div>
+  </div>
+</nav>
+
+<!-- ─── 主体三列布局 ─── -->
+<div class="main">
+
+  <!-- ─── 左侧配置面板 ─── -->
+  <aside class="panel-left">
+    <div class="panel-title">游戏配置</div>
+
+    <!-- 游戏模式 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>游戏模式</div>
+      <div class="mode-grid">
+        <div class="mode-btn active" id="modeSteps" onclick="selectMode('steps')">
+          <div class="mode-icon">👣</div>
+          <div class="mode-name">限步模式</div>
+        </div>
+        <div class="mode-btn" id="modeTime" onclick="selectMode('time')">
+          <div class="mode-icon">⏱</div>
+          <div class="mode-name">限时模式</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 步数 / 时间设置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>
+        <span id="limitLabel">步数限制</span>
+      </div>
+      <div class="config-row">
+        <span class="config-label" id="limitDesc">总步数</span>
+        <div class="config-ctrl">
+          <button class="num-btn" onclick="changeLimit(-5)">−</button>
+          <span class="num-val" id="limitVal">30</span>
+          <button class="num-btn" onclick="changeLimit(5)">＋</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 棋盘大小 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>棋盘大小</div>
+      <div class="size-grid">
+        <div class="size-btn" id="size6" onclick="selectSize(6)">
+          <div class="size-icon">▦</div>
+          <div class="size-name">6 × 6</div>
+          <div class="size-desc">简单模式</div>
+        </div>
+        <div class="size-btn active" id="size8" onclick="selectSize(8)">
+          <div class="size-icon">⊞</div>
+          <div class="size-name">8 × 8</div>
+          <div class="size-desc">标准模式</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 奖品配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品配置</div>
+      <div class="prize-item">
+        <span class="prize-score-badge" id="p1Badge">300分</span>
+        <input class="prize-input" id="p1Name" type="text" placeholder="奖品名称（如：5元券）" value="5元优惠券">
+        <input class="prize-input" style="width:72px;flex:none" id="p1Score" type="number" value="300" min="1" onchange="updatePrizeBadge(1)">
+      </div>
+      <div class="prize-item">
+        <span class="prize-score-badge" id="p2Badge">600分</span>
+        <input class="prize-input" id="p2Name" type="text" placeholder="奖品名称" value="10元优惠券">
+        <input class="prize-input" style="width:72px;flex:none" id="p2Score" type="number" value="600" min="1" onchange="updatePrizeBadge(2)">
+      </div>
+      <div class="prize-item">
+        <span class="prize-score-badge" id="p3Badge">1000分</span>
+        <input class="prize-input" id="p3Name" type="text" placeholder="奖品名称" value="神秘大奖">
+        <input class="prize-input" style="width:72px;flex:none" id="p3Score" type="number" value="1000" min="1" onchange="updatePrizeBadge(3)">
+      </div>
+    </div>
+
+    <!-- 宝石预览 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>宝石类型</div>
+      <div class="gem-preview">
+        <div class="gem-chip gem-0">🔴</div>
+        <div class="gem-chip gem-1">🔵</div>
+        <div class="gem-chip gem-2">🟢</div>
+        <div class="gem-chip gem-3">🟡</div>
+        <div class="gem-chip gem-4">🟣</div>
+        <div class="gem-chip gem-5">⚪</div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="startGame()">🚀 开始游戏</button>
+    <button class="btn-secondary" onclick="resetGame()">↺ 重置配置</button>
+  </aside>
+
+  <!-- ─── 中间游戏区 ─── -->
+  <main class="panel-center">
+    <!-- 顶部状态行 -->
+    <div class="game-stats">
+      <div class="stat-item">
+        <div class="stat-label">当前得分</div>
+        <div class="stat-val" id="scoreDisplay">0</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-label" id="limitStatLabel">剩余步数</div>
+        <div class="stat-val" id="limitDisplay">30</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-label">连消</div>
+        <div class="stat-val" id="cascadeDisplay">×1</div>
+      </div>
+    </div>
+
+    <!-- 目标分提示 -->
+    <div class="target-hint" id="targetHint">
+      🎯 目标：达到 <strong id="targetScoreHint">300</strong> 分解锁奖品
+    </div>
+
+    <!-- 棋盘 -->
+    <div class="board-wrap">
+      <div id="gameBoard">
+        <!-- 等待开始遮罩 -->
+        <div class="idle-mask" id="idleMask">
+          <div class="idle-icon">💎</div>
+          <div class="idle-text">配置后点击「开始游戏」</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ─── 右侧数据面板 ─── -->
+  <aside class="panel-right">
+    <div class="panel-title">实时数据</div>
+
+    <!-- 分数进度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>目标进度</div>
+      <div class="progress-section">
+        <div class="progress-header">
+          <span>当前</span>
+          <strong id="progressScoreText">0 / 300</strong>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 本局统计 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>本局统计</div>
+      <div class="data-row">
+        <span class="data-label">💎 消除总数</span>
+        <span class="data-val" id="statTotal">0</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">🔥 最大连消</span>
+        <span class="data-val gold" id="statCascade">0</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">⚡ 有效步数</span>
+        <span class="data-val" id="statMoves">0</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">⭐ 单次最高</span>
+        <span class="data-val gold" id="statBest">0</span>
+      </div>
+    </div>
+
+    <!-- 奖品解锁 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品解锁</div>
+      <div id="prizeStatusList">
+        <!-- 由JS动态生成 -->
+      </div>
+    </div>
+
+    <!-- 历史最高 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>历史最高分</div>
+      <div id="historyList">
+        <div style="text-align:center;color:var(--muted);font-size:13px;padding:12px 0">暂无记录</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- ─── 底部状态栏 ─── -->
+<footer class="footer">
+  <div class="footer-left">
+    <span class="footer-tag">
+      <span class="footer-dot"></span>
+      <span id="footerBoardInfo">8×8棋盘</span>
+    </span>
+    <span class="footer-tag">
+      <span class="footer-dot" style="background:var(--accent2)"></span>
+      连消加成
+    </span>
+    <span class="footer-tag">
+      <span class="footer-dot" style="background:#22C55E"></span>
+      限步 / 限时双模式
+    </span>
+  </div>
+  <div class="footer-right" id="footerStatus">等待开始</div>
+</footer>
+
+<script>
+/* ================================================
+   消消乐（Match-3）核心逻辑
+   ================================================ */
+
+// ─── 游戏配置 ───
+const GEM_EMOJIS  = ['🔴','🔵','🟢','🟡','🟣','⚪'];
+const GEM_SCORES  = [10, 12, 10, 15, 12, 10]; // 各类型每颗得分
+const GEM_COLORS  = ['#e74c3c','#2980b9','#27ae60','#f39c12','#8e44ad','#95a5a6'];
+const CASCADE_BONUS = [0, 0, 20, 50, 100, 200]; // 第n次连消额外分（0-indexed）
+
+// ─── 游戏状态 ───
+let config = {
+  mode: 'steps',    // 'steps' | 'time'
+  limit: 30,        // 步数或秒数
+  boardSize: 8,     // 6 或 8
+  prizes: [
+    { score: 300,  name: '5元优惠券' },
+    { score: 600,  name: '10元优惠券' },
+    { score: 1000, name: '神秘大奖' }
+  ]
+};
+
+let state = {
+  running: false,
+  grid: [],          // grid[row][col] = 宝石类型(0-5) 或 -1(空)
+  elements: [],      // elements[row][col] = DOM元素
+  selected: null,    // { row, col } 当前选中方块
+  score: 0,
+  limitLeft: 0,      // 剩余步数或秒数
+  cascadeCount: 0,   // 当前连消次数
+  maxCascade: 0,     // 最大连消
+  totalGems: 0,      // 消除总数
+  validMoves: 0,     // 有效步数
+  bestSingle: 0,     // 单次最高分
+  animating: false,  // 是否正在动画（防止误操作）
+  timer: null,       // 定时器句柄
+  history: []        // 历史分数 [{score, date}]
+};
+
+let cellSize = 64; // 单格像素（动态计算）
+
+// ─── 初始化 ───
+window.addEventListener('load', () => {
+  renderPrizeStatus();
+  updatePrizeBadge(1);
+  updatePrizeBadge(2);
+  updatePrizeBadge(3);
+  loadHistory();
+  calcCellSize();
+  window.addEventListener('resize', () => { if(state.running) rebuildBoardDOM(); });
+});
+
+// 计算合适的单格大小
+function calcCellSize() {
+  const board = document.getElementById('gameBoard');
+  const center = board.parentElement;
+  const maxW = Math.min(center.clientWidth - 32, 560);
+  const sz = config.boardSize;
+  cellSize = Math.floor((maxW - 4) / sz); // 减去边框
+  cellSize = Math.max(48, Math.min(70, cellSize));
+}
+
+// ─── 配置交互 ───
+function selectMode(mode) {
+  config.mode = mode;
+  document.getElementById('modeSteps').classList.toggle('active', mode === 'steps');
+  document.getElementById('modeTime').classList.toggle('active', mode === 'time');
+  if (mode === 'steps') {
+    document.getElementById('limitLabel').textContent = '步数限制';
+    document.getElementById('limitDesc').textContent = '总步数';
+    document.getElementById('limitVal').textContent = '30';
+    config.limit = 30;
+    document.getElementById('limitStatLabel').textContent = '剩余步数';
+  } else {
+    document.getElementById('limitLabel').textContent = '时间限制';
+    document.getElementById('limitDesc').textContent = '总秒数';
+    document.getElementById('limitVal').textContent = '60';
+    config.limit = 60;
+    document.getElementById('limitStatLabel').textContent = '剩余时间';
+  }
+}
+
+function changeLimit(delta) {
+  const min = config.mode === 'steps' ? 10 : 30;
+  const max = config.mode === 'steps' ? 100 : 180;
+  config.limit = Math.max(min, Math.min(max, config.limit + delta));
+  document.getElementById('limitVal').textContent = config.limit;
+}
+
+function selectSize(sz) {
+  config.boardSize = sz;
+  document.getElementById('size6').classList.toggle('active', sz === 6);
+  document.getElementById('size8').classList.toggle('active', sz === 8);
+  document.getElementById('footerBoardInfo').textContent = sz + '×' + sz + '棋盘';
+}
+
+function updatePrizeBadge(idx) {
+  const score = parseInt(document.getElementById('p'+idx+'Score').value) || 0;
+  document.getElementById('p'+idx+'Badge').textContent = score + '分';
+  // 同步config
+  config.prizes[idx-1].score = score;
+  config.prizes[idx-1].name  = document.getElementById('p'+idx+'Name').value;
+  renderPrizeStatus();
+}
+
+function resetGame() {
+  if (state.running) stopGame();
+  selectMode('steps');
+  selectSize(8);
+  document.getElementById('p1Score').value = 300;
+  document.getElementById('p2Score').value = 600;
+  document.getElementById('p3Score').value = 1000;
+  document.getElementById('p1Name').value  = '5元优惠券';
+  document.getElementById('p2Name').value  = '10元优惠券';
+  document.getElementById('p3Name').value  = '神秘大奖';
+  config.prizes = [{score:300,name:'5元优惠券'},{score:600,name:'10元优惠券'},{score:1000,name:'神秘大奖'}];
+  [1,2,3].forEach(updatePrizeBadge);
+}
+
+// ─── 游戏流程 ───
+function startGame() {
+  if (state.running) stopGame();
+
+  // 读取最新奖品配置
+  config.prizes = [
+    { score: parseInt(document.getElementById('p1Score').value)||300, name: document.getElementById('p1Name').value||'奖品1' },
+    { score: parseInt(document.getElementById('p2Score').value)||600, name: document.getElementById('p2Name').value||'奖品2' },
+    { score: parseInt(document.getElementById('p3Score').value)||1000, name: document.getElementById('p3Name').value||'奖品3' }
+  ];
+
+  // 初始化状态
+  state.running   = true;
+  state.score     = 0;
+  state.limitLeft = config.limit;
+  state.cascadeCount = 0;
+  state.maxCascade   = 0;
+  state.totalGems    = 0;
+  state.validMoves   = 0;
+  state.bestSingle   = 0;
+  state.selected     = null;
+  state.animating    = false;
+
+  calcCellSize();
+  initGrid();
+  rebuildBoardDOM();
+  updateHUD();
+  renderPrizeStatus();
+
+  document.getElementById('footerStatus').textContent = state.running ? '游戏进行中' : '等待开始';
+  document.getElementById('footerBoardInfo').textContent = config.boardSize + '×' + config.boardSize + '棋盘';
+
+  // 限时模式启动倒计时
+  if (config.mode === 'time') {
+    state.timer = setInterval(() => {
+      if (!state.running) return clearInterval(state.timer);
+      state.limitLeft--;
+      updateHUD();
+      if (state.limitLeft <= 0) endGame();
+    }, 1000);
+  }
+}
+
+function stopGame() {
+  state.running = false;
+  if (state.timer) { clearInterval(state.timer); state.timer = null; }
+}
+
+function endGame() {
+  stopGame();
+  // 记录历史
+  state.history.unshift({ score: state.score, date: new Date().toLocaleDateString('zh-CN') });
+  state.history = state.history.slice(0, 5); // 只保留最近5条
+  saveHistory();
+  renderHistory();
+  // 显示结束遮罩
+  showGameOver();
+  document.getElementById('footerStatus').textContent = '游戏结束';
+}
+
+function showGameOver() {
+  const board = document.getElementById('gameBoard');
+  // 移除旧遮罩
+  const old = board.querySelector('.game-over-mask');
+  if (old) old.remove();
+
+  const mask = document.createElement('div');
+  mask.className = 'game-over-mask';
+
+  // 检查是否解锁奖品
+  const unlocked = config.prizes.filter(p => state.score >= p.score);
+  const title = unlocked.length > 0 ? '🎉 恭喜获奖！' : '⏹ 游戏结束';
+
+  mask.innerHTML = `
+    <div class="game-over-title">${title}</div>
+    <div class="game-over-score">最终得分 <strong>${state.score}</strong></div>
+    ${unlocked.length > 0 ? `<div style="color:var(--gold);font-size:14px">解锁：${unlocked.map(p=>p.name).join(' + ')}</div>` : ''}
+    <div style="color:var(--muted);font-size:13px">最大连消 ×${state.maxCascade} | 消除 ${state.totalGems} 颗</div>
+    <button class="btn-restart" onclick="startGame()">再玩一局</button>
+  `;
+  board.appendChild(mask);
+}
+
+// ─── 棋盘初始化 ───
+function initGrid() {
+  const sz = config.boardSize;
+  state.grid = [];
+  for (let r = 0; r < sz; r++) {
+    state.grid[r] = [];
+    for (let c = 0; c < sz; c++) {
+      // 生成随机类型，避免初始就有3连
+      state.grid[r][c] = randomGemNoMatch(r, c, state.grid);
+    }
+  }
+}
+
+// 生成不产生初始3连的随机宝石
+function randomGemNoMatch(row, col, grid) {
+  const types = [0,1,2,3,4,5];
+  // 随机打散
+  for (let i = types.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [types[i], types[j]] = [types[j], types[i]];
+  }
+  for (const t of types) {
+    // 检查横向2连
+    if (col >= 2 && grid[row][col-1] === t && grid[row][col-2] === t) continue;
+    // 检查纵向2连
+    if (row >= 2 && grid[row-1][col] === t && grid[row-2][col] === t) continue;
+    return t;
+  }
+  return Math.floor(Math.random() * 6);
+}
+
+// ─── 棋盘DOM渲染 ───
+function rebuildBoardDOM() {
+  const sz = config.boardSize;
+  const board = document.getElementById('gameBoard');
+  const size  = cellSize * sz;
+  board.style.width  = size + 'px';
+  board.style.height = size + 'px';
+
+  // 清空旧内容（保留遮罩类元素）
+  Array.from(board.children).forEach(el => {
+    if (!el.classList.contains('idle-mask') && !el.classList.contains('game-over-mask')) {
+      el.remove();
+    }
+  });
+  // 移除等待遮罩
+  const idle = board.querySelector('.idle-mask');
+  if (idle) idle.remove();
+
+  // 初始化元素二维数组
+  state.elements = [];
+  for (let r = 0; r < sz; r++) {
+    state.elements[r] = [];
+    for (let c = 0; c < sz; c++) {
+      state.elements[r][c] = null;
+    }
+  }
+
+  // 创建方块元素
+  for (let r = 0; r < sz; r++) {
+    for (let c = 0; c < sz; c++) {
+      createGemEl(r, c, state.grid[r][c], false);
+    }
+  }
+}
+
+// 创建单个宝石DOM
+function createGemEl(row, col, type, spawning) {
+  const board = document.getElementById('gameBoard');
+  const el = document.createElement('div');
+  el.className = `gem gem-${type}${spawning ? ' spawning' : ''}`;
+  el.textContent = GEM_EMOJIS[type];
+  el.style.width  = (cellSize - 4) + 'px';
+  el.style.height = (cellSize - 4) + 'px';
+  el.style.left   = (col * cellSize + 2) + 'px';
+  el.style.top    = (row * cellSize + 2) + 'px';
+  el.dataset.row = row;
+  el.dataset.col = col;
+  el.addEventListener('click', onGemClick);
+  board.appendChild(el);
+  state.elements[row][col] = el;
+  return el;
+}
+
+// 更新方块位置
+function moveGemEl(row, col, toRow, toCol) {
+  const el = state.elements[row][col];
+  if (!el) return;
+  el.style.top  = (toRow * cellSize + 2) + 'px';
+  el.style.left = (toCol * cellSize + 2) + 'px';
+  el.dataset.row = toRow;
+  el.dataset.col = toCol;
+  state.elements[toRow][toCol] = el;
+  state.elements[row][col] = null;
+}
+
+// ─── 点击逻辑 ───
+function onGemClick(e) {
+  if (!state.running || state.animating) return;
+  const row = parseInt(e.currentTarget.dataset.row);
+  const col = parseInt(e.currentTarget.dataset.col);
+
+  if (!state.selected) {
+    // 第一次点击：选中
+    selectGem(row, col);
+  } else {
+    const { row: sr, col: sc } = state.selected;
+    if (sr === row && sc === col) {
+      // 再次点击同一个：取消选中
+      deselectGem();
+      return;
+    }
+    if (isAdjacent(sr, sc, row, col)) {
+      // 相邻：尝试互换
+      deselectGem();
+      trySwap(sr, sc, row, col);
+    } else {
+      // 不相邻：切换选中
+      deselectGem();
+      selectGem(row, col);
+    }
+  }
+}
+
+function selectGem(row, col) {
+  state.selected = { row, col };
+  const el = state.elements[row][col];
+  if (el) el.classList.add('selected');
+}
+
+function deselectGem() {
+  if (state.selected) {
+    const { row, col } = state.selected;
+    const el = state.elements[row][col];
+    if (el) el.classList.remove('selected');
+    state.selected = null;
+  }
+}
+
+function isAdjacent(r1, c1, r2, c2) {
+  return (Math.abs(r1-r2) + Math.abs(c1-c2)) === 1;
+}
+
+// ─── 互换逻辑 ───
+function trySwap(r1, c1, r2, c2) {
+  state.animating = true;
+  // 执行互换
+  swapGrid(r1, c1, r2, c2);
+  swapDOM(r1, c1, r2, c2);
+
+  setTimeout(() => {
+    // 检测是否有消除
+    const matches = findMatches();
+    if (matches.length === 0) {
+      // 无效互换：换回
+      swapGrid(r1, c1, r2, c2);
+      swapDOM(r1, c1, r2, c2);
+      setTimeout(() => { state.animating = false; }, 280);
+    } else {
+      // 有效互换
+      if (config.mode === 'steps') {
+        state.limitLeft--;
+        updateHUD();
+        if (state.limitLeft <= 0) {
+          // 先完成消除动画再结束
+          state.cascadeCount = 0;
+          processMatches(matches, () => { endGame(); });
+          return;
+        }
+      }
+      state.validMoves++;
+      state.cascadeCount = 0;
+      processMatches(matches, () => {
+        state.animating = false;
+        updateStatsPanel();
+      });
+    }
+  }, 260);
+}
+
+// 互换grid数据
+function swapGrid(r1, c1, r2, c2) {
+  const tmp = state.grid[r1][c1];
+  state.grid[r1][c1] = state.grid[r2][c2];
+  state.grid[r2][c2] = tmp;
+}
+
+// 互换DOM位置（带过渡动画）
+function swapDOM(r1, c1, r2, c2) {
+  const el1 = state.elements[r1][c1];
+  const el2 = state.elements[r2][c2];
+  if (!el1 || !el2) return;
+
+  // 互换top/left
+  const top1 = el1.style.top, left1 = el1.style.left;
+  el1.style.top  = el2.style.top;
+  el1.style.left = el2.style.left;
+  el2.style.top  = top1;
+  el2.style.left = left1;
+
+  // 更新数据
+  el1.dataset.row = r2; el1.dataset.col = c2;
+  el2.dataset.row = r1; el2.dataset.col = c1;
+  state.elements[r1][c1] = el2;
+  state.elements[r2][c2] = el1;
+}
+
+// ─── 匹配检测 ───
+function findMatches() {
+  const sz = config.boardSize;
+  const matched = new Set(); // "row,col" 字符串集合
+
+  // 横向扫描
+  for (let r = 0; r < sz; r++) {
+    let run = 1;
+    for (let c = 1; c <= sz; c++) {
+      if (c < sz && state.grid[r][c] !== -1 && state.grid[r][c] === state.grid[r][c-1]) {
+        run++;
+      } else {
+        if (run >= 3) {
+          for (let k = c-run; k < c; k++) matched.add(r+','+k);
+        }
+        run = 1;
+      }
+    }
+  }
+
+  // 纵向扫描
+  for (let c = 0; c < sz; c++) {
+    let run = 1;
+    for (let r = 1; r <= sz; r++) {
+      if (r < sz && state.grid[r][c] !== -1 && state.grid[r][c] === state.grid[r-1][c]) {
+        run++;
+      } else {
+        if (run >= 3) {
+          for (let k = r-run; k < r; k++) matched.add(k+','+c);
+        }
+        run = 1;
+      }
+    }
+  }
+
+  // 转换成 [{row, col, type}]
+  return Array.from(matched).map(s => {
+    const [r, c] = s.split(',').map(Number);
+    return { row: r, col: c, type: state.grid[r][c] };
+  });
+}
+
+// ─── 消除流程（含连消递归）───
+function processMatches(matches, onDone) {
+  if (matches.length === 0) { onDone(); return; }
+
+  state.cascadeCount++;
+  if (state.cascadeCount > state.maxCascade) state.maxCascade = state.cascadeCount;
+
+  // 计算得分
+  let pts = 0;
+  matches.forEach(m => { pts += GEM_SCORES[m.type]; });
+  // 连消加成
+  const bonusIdx = Math.min(state.cascadeCount, CASCADE_BONUS.length - 1);
+  pts += CASCADE_BONUS[bonusIdx];
+
+  state.score    += pts;
+  state.totalGems += matches.length;
+  if (pts > state.bestSingle) state.bestSingle = pts;
+
+  updateHUD();
+  updateStatsPanel();
+
+  // 连消特效
+  if (state.cascadeCount >= 2) showCascadeToast(state.cascadeCount, pts);
+  if (state.cascadeCount >= 3) shakeBoard();
+
+  // 消除动画 + 粒子
+  matches.forEach(m => {
+    const el = state.elements[m.row][m.col];
+    if (!el) return;
+    spawnParticles(m.row, m.col, m.type);
+    el.classList.add('removing');
+  });
+
+  setTimeout(() => {
+    // 从DOM和grid中移除
+    matches.forEach(m => {
+      const el = state.elements[m.row][m.col];
+      if (el) el.remove();
+      state.elements[m.row][m.col] = null;
+      state.grid[m.row][m.col] = -1;
+    });
+
+    // 下落补充
+    applyGravity(() => {
+      fillEmpty(() => {
+        // 检测新的连消
+        const newMatches = findMatches();
+        if (newMatches.length > 0) {
+          processMatches(newMatches, onDone);
+        } else {
+          state.cascadeCount = 0;
+          onDone();
+        }
+      });
+    });
+  }, 350);
+}
+
+// ─── 重力下落 ───
+function applyGravity(onDone) {
+  const sz = config.boardSize;
+  // 逐列从下往上遍历，将空格填补
+  for (let c = 0; c < sz; c++) {
+    let writeRow = sz - 1;
+    for (let r = sz - 1; r >= 0; r--) {
+      if (state.grid[r][c] !== -1) {
+        if (r !== writeRow) {
+          // 移动数据
+          state.grid[writeRow][c] = state.grid[r][c];
+          state.grid[r][c] = -1;
+          // 移动DOM
+          const el = state.elements[r][c];
+          if (el) {
+            el.classList.add('falling');
+            el.style.top = (writeRow * cellSize + 2) + 'px';
+            el.dataset.row = writeRow;
+            state.elements[writeRow][c] = el;
+            state.elements[r][c] = null;
+          }
+        }
+        writeRow--;
+      }
+    }
+  }
+  setTimeout(onDone, 320);
+}
+
+// ─── 顶部填充新方块 ───
+function fillEmpty(onDone) {
+  const sz = config.boardSize;
+  for (let r = 0; r < sz; r++) {
+    for (let c = 0; c < sz; c++) {
+      if (state.grid[r][c] === -1) {
+        const type = Math.floor(Math.random() * 6);
+        state.grid[r][c] = type;
+        const el = createGemEl(r, c, type, true);
+        // 从棋盘顶部外面落入
+        el.style.top = (r * cellSize + 2) + 'px';
+      }
+    }
+  }
+  setTimeout(onDone, 280);
+}
+
+// ─── 粒子特效 ───
+function spawnParticles(row, col, type) {
+  const board = document.getElementById('gameBoard');
+  const cx = col * cellSize + cellSize / 2;
+  const cy = row * cellSize + cellSize / 2;
+  const color = GEM_COLORS[type];
+  const count = 6;
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.background = color;
+    p.style.left = cx + 'px';
+    p.style.top  = cy + 'px';
+    const angle = (i / count) * Math.PI * 2;
+    const dist  = 30 + Math.random() * 30;
+    p.style.setProperty('--tx', Math.cos(angle)*dist + 'px');
+    p.style.setProperty('--ty', Math.sin(angle)*dist + 'px');
+    board.appendChild(p);
+    setTimeout(() => p.remove(), 700);
+  }
+}
+
+// ─── 连消提示 ───
+function showCascadeToast(n, bonus) {
+  const board = document.getElementById('gameBoard');
+  const toast = document.createElement('div');
+  toast.className = 'cascade-toast';
+  const labels = ['', '', 'DOUBLE!', 'TRIPLE!', 'COMBO×4!', 'MEGA!'];
+  const label = labels[Math.min(n, labels.length-1)] || `COMBO×${n}!`;
+  toast.textContent = `${label}  +${bonus}`;
+  board.appendChild(toast);
+  setTimeout(() => toast.remove(), 1300);
+}
+
+// ─── 棋盘震动 ───
+function shakeBoard() {
+  const board = document.getElementById('gameBoard');
+  board.classList.remove('shake');
+  void board.offsetWidth; // 强制重绘
+  board.classList.add('shake');
+  setTimeout(() => board.classList.remove('shake'), 500);
+}
+
+// ─── HUD更新 ───
+function updateHUD() {
+  // 得分
+  const scoreEl = document.getElementById('scoreDisplay');
+  scoreEl.textContent = state.score;
+  scoreEl.classList.remove('pop');
+  void scoreEl.offsetWidth;
+  scoreEl.classList.add('pop');
+
+  // 步数/时间
+  document.getElementById('limitDisplay').textContent =
+    config.mode === 'steps' ? state.limitLeft : fmtTime(state.limitLeft);
+
+  // 连消
+  document.getElementById('cascadeDisplay').textContent = '×' + (state.cascadeCount || 1);
+
+  // 进度条
+  const target = config.prizes[0].score;
+  const pct = Math.min(100, Math.round(state.score / target * 100));
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressScoreText').textContent = state.score + ' / ' + target;
+
+  // 目标提示（显示下一个未解锁的奖品分数）
+  const nextPrize = config.prizes.find(p => state.score < p.score);
+  if (nextPrize) {
+    document.getElementById('targetScoreHint').textContent = nextPrize.score;
+  } else {
+    document.getElementById('targetHint').innerHTML = '🎉 已解锁所有奖品！';
+  }
+
+  // 奖品解锁状态
+  renderPrizeStatus();
+}
+
+function fmtTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return m + ':' + String(s).padStart(2, '0');
+}
+
+// ─── 数据面板 ───
+function updateStatsPanel() {
+  document.getElementById('statTotal').textContent   = state.totalGems;
+  document.getElementById('statCascade').textContent = state.maxCascade;
+  document.getElementById('statMoves').textContent   = state.validMoves;
+  document.getElementById('statBest').textContent    = state.bestSingle;
+}
+
+function renderPrizeStatus() {
+  const list = document.getElementById('prizeStatusList');
+  list.innerHTML = '';
+  config.prizes.forEach((p, i) => {
+    const unlocked = state.score >= p.score;
+    const item = document.createElement('div');
+    item.className = 'prize-status-item' + (unlocked ? ' unlocked' : '');
+    item.innerHTML = `
+      <div class="prize-lock">${unlocked ? '🎁' : '🔒'}</div>
+      <div class="prize-info">
+        <div class="prize-name">${p.name || '奖品'+(i+1)}</div>
+        <div class="prize-thresh">${p.score} 分解锁</div>
+      </div>
+      <div class="prize-badge">${unlocked ? '已解锁' : '未达到'}</div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+// ─── 历史记录（localStorage）───
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem('match3_history');
+    if (raw) state.history = JSON.parse(raw);
+  } catch(e) {}
+  renderHistory();
+}
+
+function saveHistory() {
+  try {
+    localStorage.setItem('match3_history', JSON.stringify(state.history));
+  } catch(e) {}
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (!state.history.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:12px 0">暂无记录</div>';
+    return;
+  }
+  list.innerHTML = '';
+  state.history.forEach((h, i) => {
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    item.innerHTML = `
+      <span class="history-rank">#${i+1} &nbsp;${h.date}</span>
+      <span class="history-score">${h.score} 分</span>
+    `;
+    list.appendChild(item);
+  });
+}
+</script>
+</body>
+</html>
