@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 华容道</title>
+<style>
+  /* ============================
+     全局重置 & CSS变量
+  ============================ */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ============================
+     导航栏
+  ============================ */
+  .nav {
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    height: 56px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.96);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 17px; font-weight: 700;
+    text-decoration: none; color: var(--text);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 8px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  /* 横向滚动导航链接区 */
+  .nav-scroll {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    flex: 1;
+    scrollbar-width: none;
+  }
+  .nav-scroll::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 6px 13px; border-radius: 7px;
+    font-size: 13px; cursor: pointer; white-space: nowrap;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    flex-shrink: 0;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  /* ============================
+     三列主布局
+  ============================ */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    flex: 1;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+  }
+
+  /* ============================
+     左侧配置面板
+  ============================ */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .panel-section-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.2px; margin-bottom: 4px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold); flex-shrink: 0;
+  }
+
+  /* 单选按钮组 */
+  .btn-group {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .btn-opt {
+    flex: 1; padding: 8px 4px; border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent; color: var(--muted);
+    font-size: 13px; cursor: pointer;
+    transition: all 0.2s; text-align: center;
+    min-width: 60px;
+  }
+  .btn-opt.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-color: transparent; color: #fff; font-weight: 600;
+  }
+  .btn-opt:hover:not(.active) { border-color: var(--accent); color: var(--text); }
+
+  /* 奖品配置行 */
+  .prize-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px;
+  }
+  .prize-row:last-child { margin-bottom: 0; }
+  .prize-num-input {
+    width: 72px; padding: 7px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+    color: var(--gold); font-size: 14px; font-weight: 700;
+    text-align: center;
+  }
+  .prize-name-input {
+    flex: 1; padding: 7px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+    color: var(--text); font-size: 13px;
+  }
+  .prize-num-input:focus, .prize-name-input:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .prize-badge {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; flex-shrink: 0;
+  }
+  .prize-badge.b1 { background: rgba(124,58,237,0.3); }
+  .prize-badge.b2 { background: rgba(245,200,66,0.3); }
+  .prize-badge.b3 { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+
+  /* 主按钮 */
+  .btn-primary {
+    width: 100%; padding: 11px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 10px;
+    color: #fff; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-secondary {
+    flex: 1; padding: 9px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--gold); }
+
+  /* ============================
+     中间游戏区
+  ============================ */
+  .panel-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
+    gap: 16px;
+  }
+
+  /* 状态栏 */
+  .status-bar {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; max-width: 480px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .stat-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 8px 16px;
+    text-align: center; min-width: 90px;
+  }
+  .stat-label {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .stat-val {
+    font-size: 22px; font-weight: 800; color: var(--gold);
+    line-height: 1.2;
+  }
+
+  /* 棋盘包装 */
+  .board-wrap {
+    position: relative;
+    background: var(--deep);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 12px;
+    /* 尺寸由JS动态设置 */
+  }
+
+  /* 底层格子槽 */
+  .board-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .cell-slot {
+    width: 88px; height: 88px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px dashed rgba(255,255,255,0.06);
+  }
+
+  /* 拼图方块（绝对定位） */
+  .board-tiles {
+    position: absolute;
+    top: 12px; left: 12px;
+    /* 与棋盘内边距对齐 */
+  }
+  .tile {
+    position: absolute;
+    width: 88px; height: 88px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: transform 0.12s ease;
+    user-select: none;
+    font-weight: 800;
+    font-size: 28px;
+    /* transform 由JS设置 */
+    border: 1px solid rgba(255,255,255,0.12);
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .tile:hover { filter: brightness(1.15); }
+  .tile:active { filter: brightness(0.95); }
+
+  /* 数字模式渐变色（按数字1-15） */
+  .tile[data-n="1"]  { background: linear-gradient(135deg, #7C3AED, #6D28D9); }
+  .tile[data-n="2"]  { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+  .tile[data-n="3"]  { background: linear-gradient(135deg, #A78BFA, #8B5CF6); }
+  .tile[data-n="4"]  { background: linear-gradient(135deg, #EC4899, #DB2777); }
+  .tile[data-n="5"]  { background: linear-gradient(135deg, #F472B6, #EC4899); }
+  .tile[data-n="6"]  { background: linear-gradient(135deg, #F5C842, #D97706); }
+  .tile[data-n="7"]  { background: linear-gradient(135deg, #FCD34D, #F5C842); }
+  .tile[data-n="8"]  { background: linear-gradient(135deg, #F59E0B, #D97706); }
+  .tile[data-n="9"]  { background: linear-gradient(135deg, #10B981, #059669); }
+  .tile[data-n="10"] { background: linear-gradient(135deg, #34D399, #10B981); }
+  .tile[data-n="11"] { background: linear-gradient(135deg, #06B6D4, #0891B2); }
+  .tile[data-n="12"] { background: linear-gradient(135deg, #22D3EE, #06B6D4); }
+  .tile[data-n="13"] { background: linear-gradient(135deg, #F97316, #EA580C); }
+  .tile[data-n="14"] { background: linear-gradient(135deg, #FB923C, #F97316); }
+  .tile[data-n="15"] { background: linear-gradient(135deg, #EF4444, #DC2626); }
+
+  /* 图片模式 - canvas渲染 */
+  .tile canvas {
+    width: 88px; height: 88px;
+    border-radius: 8px;
+    pointer-events: none;
+  }
+
+  /* 操作按钮行 */
+  .btn-row {
+    display: flex; gap: 10px;
+    width: 100%; max-width: 480px;
+  }
+
+  /* 提示区域 */
+  .hint-bar {
+    width: 100%; max-width: 480px;
+    background: rgba(245,200,66,0.08);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--gold);
+    text-align: center;
+    min-height: 40px;
+  }
+
+  /* 奖品解锁提示条 */
+  .prize-hint {
+    width: 100%; max-width: 480px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .prize-tag {
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px;
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.3);
+    color: var(--muted);
+    transition: all 0.3s;
+  }
+  .prize-tag.unlocked {
+    background: linear-gradient(135deg, rgba(124,58,237,0.4), rgba(236,72,153,0.4));
+    border-color: var(--accent2);
+    color: #fff;
+  }
+
+  /* ============================
+     右侧数据面板
+  ============================ */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.01);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* 数据列表 */
+  .data-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-row:last-child { border-bottom: none; }
+  .data-key { font-size: 12px; color: var(--muted); }
+  .data-val { font-size: 14px; font-weight: 700; color: var(--text); }
+  .data-val.highlight { color: var(--gold); }
+
+  /* 历史记录 */
+  .history-item {
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+  .history-item:last-child { margin-bottom: 0; }
+  .history-head {
+    display: flex; justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .history-medal { font-size: 14px; }
+  .history-steps { color: var(--gold); font-weight: 700; }
+  .history-sub { color: var(--muted); font-size: 11px; }
+
+  /* 奖品解锁记录 */
+  .unlock-item {
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(236,72,153,0.1));
+    border: 1px solid rgba(124,58,237,0.3);
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+  .unlock-name { color: var(--gold); font-weight: 600; }
+  .unlock-sub { color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+  /* ============================
+     完成弹窗
+  ============================ */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-overlay.show {
+    opacity: 1; pointer-events: all;
+  }
+  .modal {
+    background: linear-gradient(135deg, var(--deep), var(--bg));
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 36px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    transform: scale(0.8);
+    transition: transform 0.3s;
+  }
+  .modal-overlay.show .modal { transform: scale(1); }
+  .modal-icon { font-size: 56px; margin-bottom: 12px; }
+  .modal-title {
+    font-size: 24px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .modal-sub { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+  .modal-stats {
+    display: flex; gap: 16px; justify-content: center;
+    margin-bottom: 20px;
+  }
+  .modal-stat {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 18px;
+    text-align: center;
+  }
+  .modal-stat-val { font-size: 24px; font-weight: 800; color: var(--gold); }
+  .modal-stat-label { font-size: 11px; color: var(--muted); }
+  .modal-prize {
+    background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(236,72,153,0.2));
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 15px;
+    color: var(--gold);
+    font-weight: 600;
+  }
+  .modal-prize.hidden { display: none; }
+  .modal-btns { display: flex; gap: 10px; }
+
+  /* ============================
+     烟花画布（全屏）
+  ============================ */
+  #fireworks-canvas {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 199;
+  }
+
+  /* ============================
+     底部 footer
+  ============================ */
+  .footer {
+    height: 40px; display: flex; align-items: center;
+    justify-content: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--muted);
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================
+     导航栏
+============================ -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">🎮 <span>Mini</span>Game <span class="nav-badge">中台</span></a>
+  <div class="nav-scroll">
+    <a class="nav-tab" href="index.html">首页</a>
+    <a class="nav-tab" href="wheel.html">大转盘</a>
+    <a class="nav-tab" href="nine-grid.html">九宫格</a>
+    <a class="nav-tab" href="scratch-card.html">刮刮乐</a>
+    <a class="nav-tab" href="shake-dice.html">摇骰子</a>
+    <a class="nav-tab" href="smash-egg.html">砸金蛋</a>
+    <a class="nav-tab" href="slot-machine.html">老虎机</a>
+    <a class="nav-tab" href="gift-box.html">礼盒开箱</a>
+    <a class="nav-tab" href="whack-mole.html">打地鼠</a>
+    <a class="nav-tab" href="cup-game.html">三杯游戏</a>
+    <a class="nav-tab" href="number-bomb.html">数字炸弹</a>
+    <a class="nav-tab" href="stamp-collect.html">集卡集章</a>
+    <a class="nav-tab" href="vote-pk.html">投票PK</a>
+    <a class="nav-tab" href="gashapon.html">扭蛋机</a>
+    <a class="nav-tab" href="blind-box.html">盲盒抽卡</a>
+    <a class="nav-tab" href="game-2048.html">2048</a>
+    <a class="nav-tab" href="match3.html">消消乐</a>
+    <a class="nav-tab" href="catch-coins.html">接金币</a>
+    <a class="nav-tab" href="grow-tree.html">成长树</a>
+    <a class="nav-tab" href="flying-chess.html">飞行棋</a>
+    <a class="nav-tab" href="monopoly.html">大富翁</a>
+    <a class="nav-tab" href="red-packet-rain.html">红包雨</a>
+    <a class="nav-tab" href="claw-machine.html">夹娃娃机</a>
+    <a class="nav-tab" href="flip-match.html">翻牌配对</a>
+    <a class="nav-tab" href="shake.html">摇一摇</a>
+    <a class="nav-tab" href="quiz.html">问答闯关</a>
+    <a class="nav-tab" href="daily-checkin.html">每日签到</a>
+    <a class="nav-tab active" href="sliding-puzzle.html">华容道</a>
+  </div>
+</nav>
+
+<!-- ============================
+     三列主布局
+============================ -->
+<div class="main">
+
+  <!-- ======== 左侧配置面板 ======== -->
+  <aside class="panel-left">
+
+    <div class="panel-section-title">游戏配置</div>
+
+    <!-- 游戏模式 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>游戏模式</div>
+      <div class="btn-group">
+        <button class="btn-opt active" id="modeNum" onclick="setMode('number', this)">🔢 数字华容道</button>
+        <button class="btn-opt" id="modeImg" onclick="setMode('image', this)">🖼️ 图片华容道</button>
+      </div>
+    </div>
+
+    <!-- 难度选择 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>难度选择</div>
+      <div class="btn-group">
+        <button class="btn-opt active" id="diffEasy" onclick="setDiff('easy', this)">🌱 简单</button>
+        <button class="btn-opt" id="diffNormal" onclick="setDiff('normal', this)">🔥 普通</button>
+        <button class="btn-opt" id="diffHard" onclick="setDiff('hard', this)">💀 困难</button>
+      </div>
+      <div style="margin-top:10px; padding:8px 10px; border-radius:8px; background:rgba(255,255,255,0.03); font-size:12px; color:var(--muted);">
+        <span id="diffDesc">打乱 20 步，新手友好</span>
+      </div>
+    </div>
+
+    <!-- 图片样式（仅图片模式显示） -->
+    <div class="card" id="imgStyleCard" style="display:none;">
+      <div class="card-title"><span class="dot"></span>图案样式</div>
+      <div class="btn-group">
+        <button class="btn-opt active" id="imgS0" onclick="setImgStyle(0,this)">🌈 渐变几何</button>
+        <button class="btn-opt" id="imgS1" onclick="setImgStyle(1,this)">🌸 花卉</button>
+        <button class="btn-opt" id="imgS2" onclick="setImgStyle(2,this)">🌌 星空</button>
+      </div>
+    </div>
+
+    <!-- 营销奖品配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>营销奖品配置</div>
+      <div style="font-size:11px; color:var(--muted); margin-bottom:10px;">设置步数阈值，在X步内完成可解锁对应奖品</div>
+
+      <div class="prize-row">
+        <span class="prize-badge b3">🥇</span>
+        <input class="prize-num-input" id="p1Steps" type="number" value="30" min="1" max="999">
+        <input class="prize-name-input" id="p1Name" type="text" value="一等奖·限定皮肤" placeholder="奖品名称">
+      </div>
+      <div class="prize-row">
+        <span class="prize-badge b2">🥈</span>
+        <input class="prize-num-input" id="p2Steps" type="number" value="50" min="1" max="999">
+        <input class="prize-name-input" id="p2Name" type="text" value="二等奖·100积分" placeholder="奖品名称">
+      </div>
+      <div class="prize-row">
+        <span class="prize-badge b1">🥉</span>
+        <input class="prize-num-input" id="p3Steps" type="number" value="80" min="1" max="999">
+        <input class="prize-name-input" id="p3Name" type="text" value="三等奖·优惠券" placeholder="奖品名称">
+      </div>
+    </div>
+
+    <!-- 游戏说明 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>玩法说明</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.8;">
+        • 4×4 共 16 格，数字 1-15 + 1 空格<br>
+        • 点击空格相邻的方块，方块滑向空格<br>
+        • 目标：将数字从左到右、从上到下排列为 1→15<br>
+        • 步数越少，可解锁越高级奖品<br>
+        • 右下角为空格时完成
+      </div>
+    </div>
+
+    <!-- 开始按钮 -->
+    <button class="btn-primary" onclick="startGame()">🚀 开始游戏</button>
+
+  </aside>
+
+  <!-- ======== 中间游戏区 ======== -->
+  <section class="panel-center">
+
+    <!-- 状态栏 -->
+    <div class="status-bar">
+      <div class="stat-box">
+        <div class="stat-label">步数</div>
+        <div class="stat-val" id="stepCount">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">用时</div>
+        <div class="stat-val" id="timerVal">0:00</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">难度</div>
+        <div class="stat-val" style="font-size:16px;" id="diffLabel">简单</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">模式</div>
+        <div class="stat-val" style="font-size:16px;" id="modeLabel">数字</div>
+      </div>
+    </div>
+
+    <!-- 棋盘（JS 动态渲染） -->
+    <div class="board-wrap" id="boardWrap">
+      <div class="board-grid" id="boardGrid"></div>
+      <div class="board-tiles" id="boardTiles"></div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="shuffleBoard()">🔀 重新打乱</button>
+      <button class="btn-secondary" onclick="showHint()">💡 提示</button>
+      <button class="btn-secondary" onclick="solveStep()">🤖 自动一步</button>
+    </div>
+
+    <!-- 奖品解锁提示 -->
+    <div class="prize-hint" id="prizeHint">
+      <!-- 动态生成 -->
+    </div>
+
+    <!-- 提示文字 -->
+    <div class="hint-bar" id="hintBar">点击「开始游戏」初始化棋盘，或直接点击方块开始滑动</div>
+
+  </section>
+
+  <!-- ======== 右侧数据面板 ======== -->
+  <aside class="panel-right">
+
+    <div class="panel-section-title">实时数据</div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>当前局数据</div>
+      <div class="data-row">
+        <span class="data-key">当前步数</span>
+        <span class="data-val highlight" id="r_steps">0</span>
+      </div>
+      <div class="data-row">
+        <span class="data-key">已用时间</span>
+        <span class="data-val" id="r_time">—</span>
+      </div>
+      <div class="data-row">
+        <span class="data-key">当前难度</span>
+        <span class="data-val" id="r_diff">简单</span>
+      </div>
+      <div class="data-row">
+        <span class="data-key">当前模式</span>
+        <span class="data-val" id="r_mode">数字</span>
+      </div>
+      <div class="data-row">
+        <span class="data-key">最近提示</span>
+        <span class="data-val" id="r_hint">—</span>
+      </div>
+    </div>
+
+    <div class="panel-section-title">历史最佳</div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>最佳记录</div>
+      <div class="data-row">
+        <span class="data-key">最少步数</span>
+        <span class="data-val highlight" id="best_steps">—</span>
+      </div>
+      <div class="data-row">
+        <span class="data-key">最短用时</span>
+        <span class="data-val" id="best_time">—</span>
+      </div>
+      <div class="data-row">
+        <span class="data-key">总游戏局数</span>
+        <span class="data-val" id="total_games">0</span>
+      </div>
+      <div class="data-row">
+        <span class="data-key">总完成局数</span>
+        <span class="data-val" id="total_wins">0</span>
+      </div>
+    </div>
+
+    <div class="panel-section-title">奖品解锁记录</div>
+
+    <div id="unlockList">
+      <div style="font-size:12px; color:var(--muted); text-align:center; padding:12px 0;">
+        暂无解锁记录
+      </div>
+    </div>
+
+    <div class="panel-section-title">最近5局历史</div>
+
+    <div id="historyList">
+      <div style="font-size:12px; color:var(--muted); text-align:center; padding:12px 0;">
+        暂无历史记录
+      </div>
+    </div>
+
+  </aside>
+
+</div>
+
+<!-- 底部 -->
+<footer class="footer">小游戏中台 · 华容道 (Sliding Puzzle) · 纯原生 HTML</footer>
+
+<!-- ============================
+     完成弹窗
+============================ -->
+<div class="modal-overlay" id="winModal">
+  <div class="modal">
+    <div class="modal-icon" id="winIcon">🎉</div>
+    <div class="modal-title">华容道完成！</div>
+    <div class="modal-sub" id="winSub">太棒了，成功还原！</div>
+    <div class="modal-stats">
+      <div class="modal-stat">
+        <div class="modal-stat-val" id="winSteps">—</div>
+        <div class="modal-stat-label">总步数</div>
+      </div>
+      <div class="modal-stat">
+        <div class="modal-stat-val" id="winTime">—</div>
+        <div class="modal-stat-label">用时</div>
+      </div>
+    </div>
+    <div class="modal-prize hidden" id="winPrize"></div>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closeModal()">继续浏览</button>
+      <button class="btn-primary" onclick="startGame()">再来一局</button>
+    </div>
+  </div>
+</div>
+
+<!-- 烟花画布 -->
+<canvas id="fireworks-canvas"></canvas>
+
+<!-- ============================
+     JavaScript 核心逻辑
+============================ -->
+<script>
+/* ==============================
+   游戏状态
+============================== */
+const TILE_SIZE = 88;   // 方块尺寸 px
+const GAP       = 8;    // 间距 px
+const GRID      = 4;    // 4×4
+
+let state = {
+  mode: 'number',           // 'number' | 'image'
+  diff: 'easy',             // 'easy' | 'normal' | 'hard'
+  imgStyle: 0,              // 图案样式 0/1/2
+  tiles: [],                // 长度16的数组，0=空格，1-15=方块
+  steps: 0,
+  timerStart: null,
+  timerInterval: null,
+  running: false,
+  // 历史统计
+  bestSteps: null,
+  bestTime: null,
+  totalGames: 0,
+  totalWins: 0,
+  history: [],
+  unlocks: [],
+};
+
+/* 难度对应打乱步数 */
+const DIFF_SHUFFLE = { easy: 20, normal: 50, hard: 100 };
+const DIFF_LABELS  = { easy: '简单', normal: '普通', hard: '困难' };
+const DIFF_DESC    = {
+  easy:   '打乱 20 步，新手友好',
+  normal: '打乱 50 步，需要思考',
+  hard:   '打乱 100 步，高手挑战',
+};
+
+/* ==============================
+   配置面板控制函数
+============================== */
+
+/* 切换游戏模式 */
+function setMode(mode, btn) {
+  state.mode = mode;
+  document.querySelectorAll('#modeNum, #modeImg').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('imgStyleCard').style.display = mode === 'image' ? 'block' : 'none';
+  document.getElementById('modeLabel').textContent  = mode === 'number' ? '数字' : '图片';
+  document.getElementById('r_mode').textContent     = mode === 'number' ? '数字' : '图片';
+}
+
+/* 切换难度 */
+function setDiff(diff, btn) {
+  state.diff = diff;
+  document.querySelectorAll('#diffEasy, #diffNormal, #diffHard').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('diffDesc').textContent   = DIFF_DESC[diff];
+  document.getElementById('diffLabel').textContent  = DIFF_LABELS[diff];
+  document.getElementById('r_diff').textContent     = DIFF_LABELS[diff];
+}
+
+/* 切换图片样式 */
+function setImgStyle(s, btn) {
+  state.imgStyle = s;
+  document.querySelectorAll('#imgS0, #imgS1, #imgS2').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ==============================
+   目标状态 & 可解性验证
+============================== */
+
+/* 目标排列：1,2,3,...,15,0（0=空格在最后） */
+function getGoalState() {
+  return [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0];
+}
+
+/* 检查是否已完成 */
+function isSolved() {
+  const goal = getGoalState();
+  return state.tiles.every((v, i) => v === goal[i]);
+}
+
+/* 计算逆序数 + 空格所在行（从下往上），判断是否可解 */
+function isSolvable(arr) {
+  let inv = 0;
+  const a = arr.filter(x => x !== 0);
+  for (let i = 0; i < a.length; i++) {
+    for (let j = i + 1; j < a.length; j++) {
+      if (a[i] > a[j]) inv++;
+    }
+  }
+  // 空格所在行（从底部数，1开始）
+  const blankIdx = arr.indexOf(0);
+  const blankRowFromBottom = GRID - Math.floor(blankIdx / GRID);
+  if (inv % 2 === 0 && blankRowFromBottom % 2 === 1) return true;
+  if (inv % 2 === 1 && blankRowFromBottom % 2 === 0) return true;
+  return false;
+}
+
+/* ==============================
+   初始化棋盘
+============================== */
+
+/* 生成有序棋盘 */
+function initTiles() {
+  state.tiles = getGoalState();
+}
+
+/* 随机打乱（通过合法移动，保证可解） */
+function shuffleTiles(steps) {
+  initTiles();
+  let prevBlank = -1;  // 避免来回反复
+  for (let i = 0; i < steps; i++) {
+    const blank = state.tiles.indexOf(0);
+    const neighbors = getNeighbors(blank).filter(n => n !== prevBlank);
+    const pick = neighbors[Math.floor(Math.random() * neighbors.length)];
+    // 交换
+    state.tiles[blank] = state.tiles[pick];
+    state.tiles[pick] = 0;
+    prevBlank = blank;
+  }
+}
+
+/* 获取指定格子的相邻格子索引（上下左右） */
+function getNeighbors(idx) {
+  const row = Math.floor(idx / GRID);
+  const col = idx % GRID;
+  const result = [];
+  if (row > 0)        result.push(idx - GRID);  // 上
+  if (row < GRID - 1) result.push(idx + GRID);  // 下
+  if (col > 0)        result.push(idx - 1);     // 左
+  if (col < GRID - 1) result.push(idx + 1);     // 右
+  return result;
+}
+
+/* ==============================
+   渲染棋盘
+============================== */
+
+/* 计算某个格子位置的像素坐标 */
+function getPos(idx) {
+  const col = idx % GRID;
+  const row = Math.floor(idx / GRID);
+  return {
+    x: col * (TILE_SIZE + GAP),
+    y: row * (TILE_SIZE + GAP),
+  };
+}
+
+/* 生成数字模式方块 HTML */
+function renderTiles() {
+  const container = document.getElementById('boardTiles');
+  container.innerHTML = '';
+
+  state.tiles.forEach((num, idx) => {
+    if (num === 0) return;  // 空格不渲染方块
+    const pos = getPos(idx);
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.dataset.n = num;
+    tile.dataset.idx = idx;
+    tile.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+
+    if (state.mode === 'number') {
+      /* 数字模式：显示数字 */
+      tile.textContent = num;
+    } else {
+      /* 图片模式：Canvas 绘制对应碎片 */
+      const canvas = document.createElement('canvas');
+      canvas.width  = TILE_SIZE;
+      canvas.height = TILE_SIZE;
+      drawImagePiece(canvas, num, state.imgStyle);
+      tile.appendChild(canvas);
+    }
+
+    tile.addEventListener('click', () => onTileClick(idx));
+    container.appendChild(tile);
+  });
+}
+
+/* ==============================
+   图片碎片绘制（Canvas）
+   将一张虚拟图案分成 4×4 块，按 num 决定取第几块
+============================== */
+function drawImagePiece(canvas, num, style) {
+  const ctx  = canvas.getContext('2d');
+  const SIZE = TILE_SIZE;
+  // 完整图案总尺寸
+  const TOTAL = SIZE * GRID + GAP * (GRID - 1);  // ~400px
+
+  // 当前方块在目标中的位置（num 1-15，第16格为空格）
+  const goalIdx = num - 1;
+  const goalCol = goalIdx % GRID;
+  const goalRow = Math.floor(goalIdx / GRID);
+
+  // 在完整图中的坐标（含 GAP）
+  const srcX = goalCol * (SIZE + GAP);
+  const srcY = goalRow * (SIZE + GAP);
+
+  // 画完整图的对应区域
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(0, 0, SIZE, SIZE, 8);
+  ctx.clip();
+
+  // 通过 drawPattern 绘制，用 translate 定位到当前碎片位置
+  ctx.translate(-srcX, -srcY);
+  drawPattern(ctx, TOTAL, style);
+  ctx.restore();
+
+  // 图片模式也叠加小数字（辅助参考）
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.font = 'bold 14px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(num, SIZE - 6, SIZE - 4);
+}
+
+/* 绘制整幅背景图案（尺寸 size × size） */
+function drawPattern(ctx, size, style) {
+  if (style === 0) {
+    /* 渐变几何 */
+    const grad = ctx.createLinearGradient(0, 0, size, size);
+    grad.addColorStop(0,   '#7C3AED');
+    grad.addColorStop(0.35,'#EC4899');
+    grad.addColorStop(0.65,'#F5C842');
+    grad.addColorStop(1,   '#10B981');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, size, size);
+    // 几何三角纹路
+    const colors = ['rgba(255,255,255,0.06)','rgba(0,0,0,0.08)'];
+    for (let i = 0; i < 20; i++) {
+      ctx.beginPath();
+      const x  = (i % 5) * (size / 5);
+      const y  = Math.floor(i / 5) * (size / 4);
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + size / 5, y);
+      ctx.lineTo(x + size / 10, y + size / 4);
+      ctx.closePath();
+      ctx.fillStyle = colors[i % 2];
+      ctx.fill();
+    }
+    // 圆形装饰
+    for (let i = 0; i < 6; i++) {
+      ctx.beginPath();
+      ctx.arc(
+        size * (0.1 + 0.18 * i),
+        size * (0.3 + 0.1 * (i % 3)),
+        size * 0.08,
+        0, Math.PI * 2
+      );
+      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      ctx.fill();
+    }
+
+  } else if (style === 1) {
+    /* 花卉 */
+    const bg = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size);
+    bg.addColorStop(0, '#EC4899');
+    bg.addColorStop(0.5, '#8B5CF6');
+    bg.addColorStop(1, '#1A0A2E');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, size, size);
+    // 花瓣
+    const petals = 6;
+    const petalW = size * 0.06;
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 4; col++) {
+        const cx = (col + 0.5) * (size / 4);
+        const cy = (row + 0.5) * (size / 4);
+        for (let p = 0; p < petals; p++) {
+          const angle = (p / petals) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.ellipse(
+            cx + Math.cos(angle) * petalW * 1.5,
+            cy + Math.sin(angle) * petalW * 1.5,
+            petalW, petalW * 0.5,
+            angle, 0, Math.PI * 2
+          );
+          ctx.fillStyle = 'rgba(255,255,255,0.15)';
+          ctx.fill();
+        }
+        ctx.beginPath();
+        ctx.arc(cx, cy, petalW * 0.6, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(245,200,66,0.6)';
+        ctx.fill();
+      }
+    }
+
+  } else {
+    /* 星空 */
+    ctx.fillStyle = '#0D0720';
+    ctx.fillRect(0, 0, size, size);
+    // 星星
+    const seed = 42;
+    function pseudoRand(n) { return ((n * 1664525 + 1013904223) & 0xffffffff) / 0xffffffff; }
+    for (let i = 0; i < 120; i++) {
+      const sx = pseudoRand(i * 2 + seed) * size;
+      const sy = pseudoRand(i * 3 + seed) * size;
+      const sr = pseudoRand(i * 7 + seed) * 2 + 0.5;
+      ctx.beginPath();
+      ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${0.4 + pseudoRand(i * 5) * 0.6})`;
+      ctx.fill();
+    }
+    // 星云
+    const nebula = ctx.createRadialGradient(size*0.3, size*0.4, 0, size*0.3, size*0.4, size*0.4);
+    nebula.addColorStop(0, 'rgba(124,58,237,0.3)');
+    nebula.addColorStop(1, 'rgba(124,58,237,0)');
+    ctx.fillStyle = nebula;
+    ctx.fillRect(0, 0, size, size);
+    const nebula2 = ctx.createRadialGradient(size*0.7, size*0.6, 0, size*0.7, size*0.6, size*0.35);
+    nebula2.addColorStop(0, 'rgba(236,72,153,0.25)');
+    nebula2.addColorStop(1, 'rgba(236,72,153,0)');
+    ctx.fillStyle = nebula2;
+    ctx.fillRect(0, 0, size, size);
+  }
+}
+
+/* ==============================
+   点击方块移动逻辑
+============================== */
+function onTileClick(idx) {
+  if (!state.running) {
+    // 允许直接点击开始
+    startGame(true);
+    return;
+  }
+  const blankIdx = state.tiles.indexOf(0);
+  const neighbors = getNeighbors(blankIdx);
+
+  if (!neighbors.includes(idx)) {
+    // 不相邻，闪烁提示
+    flashTile(idx);
+    return;
+  }
+
+  // 合法移动：交换方块和空格
+  state.tiles[blankIdx] = state.tiles[idx];
+  state.tiles[idx] = 0;
+  state.steps++;
+
+  // 更新步数显示
+  document.getElementById('stepCount').textContent = state.steps;
+  document.getElementById('r_steps').textContent   = state.steps;
+
+  // 更新奖品进度标签
+  updatePrizeTags();
+
+  // 动画：只移动该方块
+  animateTileMove(blankIdx, idx);
+
+  // 检查是否完成
+  if (isSolved()) {
+    setTimeout(onWin, 200);
+  }
+}
+
+/* 仅动画移动单个方块（不全量重渲染，保证流畅） */
+function animateTileMove(toIdx, fromIdx) {
+  // 找到当前 DOM 中对应方块
+  const container = document.getElementById('boardTiles');
+  const tileEl = container.querySelector(`[data-idx="${fromIdx}"]`);
+  if (!tileEl) {
+    renderTiles();
+    return;
+  }
+
+  // 更新 data-idx
+  tileEl.dataset.idx = toIdx;
+
+  // 更新点击事件（移除旧的，添加新的）
+  const newTile = tileEl.cloneNode(true);
+  newTile.dataset.idx = toIdx;
+  newTile.addEventListener('click', () => onTileClick(toIdx));
+
+  // 设置新位置（CSS transition 自动动画）
+  const pos = getPos(toIdx);
+  newTile.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+
+  tileEl.parentNode.replaceChild(newTile, tileEl);
+}
+
+/* 闪烁效果（非法点击） */
+function flashTile(idx) {
+  const container = document.getElementById('boardTiles');
+  const tileEl = container.querySelector(`[data-idx="${idx}"]`);
+  if (!tileEl) return;
+  tileEl.style.filter = 'brightness(1.6) saturate(2)';
+  setTimeout(() => { tileEl.style.filter = ''; }, 200);
+}
+
+/* ==============================
+   游戏控制
+============================== */
+
+/* 开始 / 重新开始游戏 */
+function startGame(silent) {
+  stopTimer();
+
+  const shuffleSteps = DIFF_SHUFFLE[state.diff];
+  shuffleTiles(shuffleSteps);
+
+  state.steps   = 0;
+  state.running = true;
+  state.timerStart = Date.now();
+
+  // 重置计时器
+  document.getElementById('stepCount').textContent = '0';
+  document.getElementById('timerVal').textContent  = '0:00';
+  document.getElementById('r_steps').textContent   = '0';
+  document.getElementById('r_time').textContent    = '0:00';
+  document.getElementById('r_hint').textContent    = '—';
+
+  // 更新统计
+  state.totalGames++;
+  document.getElementById('total_games').textContent = state.totalGames;
+
+  renderTiles();
+  startTimer();
+  updatePrizeTags();
+
+  if (!silent) {
+    setHint('棋盘已打乱，点击空格相邻方块进行移动！');
+  }
+}
+
+/* 仅打乱不重置步数 */
+function shuffleBoard() {
+  const shuffleSteps = DIFF_SHUFFLE[state.diff];
+  shuffleTiles(shuffleSteps);
+  state.steps = 0;
+  state.running = true;
+  if (!state.timerStart) {
+    state.timerStart = Date.now();
+    startTimer();
+  }
+  document.getElementById('stepCount').textContent = '0';
+  document.getElementById('r_steps').textContent   = '0';
+  renderTiles();
+  updatePrizeTags();
+  setHint('已重新打乱，加油！');
+}
+
+/* ==============================
+   计时器
+============================== */
+function startTimer() {
+  state.timerInterval = setInterval(() => {
+    if (!state.timerStart) return;
+    const elapsed = Math.floor((Date.now() - state.timerStart) / 1000);
+    const m = Math.floor(elapsed / 60);
+    const s = elapsed % 60;
+    const str = `${m}:${s.toString().padStart(2,'0')}`;
+    document.getElementById('timerVal').textContent = str;
+    document.getElementById('r_time').textContent   = str;
+  }, 500);
+}
+
+function stopTimer() {
+  if (state.timerInterval) {
+    clearInterval(state.timerInterval);
+    state.timerInterval = null;
+  }
+}
+
+function getElapsed() {
+  if (!state.timerStart) return 0;
+  return Math.floor((Date.now() - state.timerStart) / 1000);
+}
+
+function formatTime(secs) {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+/* ==============================
+   完成游戏
+============================== */
+function onWin() {
+  stopTimer();
+  state.running = false;
+
+  const elapsed = getElapsed();
+  const steps   = state.steps;
+
+  // 更新历史最佳
+  state.totalWins++;
+  document.getElementById('total_wins').textContent = state.totalWins;
+
+  if (state.bestSteps === null || steps < state.bestSteps) {
+    state.bestSteps = steps;
+    document.getElementById('best_steps').textContent = steps + ' 步';
+  }
+  if (state.bestTime === null || elapsed < state.bestTime) {
+    state.bestTime = elapsed;
+    document.getElementById('best_time').textContent = formatTime(elapsed);
+  }
+
+  // 记录历史
+  state.history.unshift({ steps, time: elapsed, diff: state.diff, mode: state.mode });
+  if (state.history.length > 5) state.history.pop();
+  renderHistory();
+
+  // 检查奖品解锁
+  const prize = checkPrize(steps);
+  if (prize) {
+    state.unlocks.unshift({ name: prize.name, steps, time: elapsed });
+    renderUnlocks();
+  }
+
+  // 弹窗内容
+  document.getElementById('winSteps').textContent = steps + ' 步';
+  document.getElementById('winTime').textContent  = formatTime(elapsed);
+
+  const prizeEl = document.getElementById('winPrize');
+  if (prize) {
+    prizeEl.innerHTML = `🎁 解锁奖品：<strong>${prize.name}</strong>`;
+    prizeEl.classList.remove('hidden');
+  } else {
+    prizeEl.classList.add('hidden');
+  }
+
+  // 根据步数选图标
+  document.getElementById('winIcon').textContent = steps <= 30 ? '🏆' : steps <= 60 ? '🎉' : '✅';
+  document.getElementById('winSub').textContent  = steps <= 30 ? '惊人成绩！' : steps <= 60 ? '干得漂亮！' : '成功完成！';
+
+  document.getElementById('winModal').classList.add('show');
+
+  // 烟花
+  startFireworks();
+  setTimeout(stopFireworks, 3000);
+}
+
+function closeModal() {
+  document.getElementById('winModal').classList.remove('show');
+}
+
+/* ==============================
+   奖品逻辑
+============================== */
+
+/* 读取当前配置的奖品 */
+function getPrizes() {
+  return [
+    { steps: parseInt(document.getElementById('p1Steps').value) || 30, name: document.getElementById('p1Name').value || '一等奖' },
+    { steps: parseInt(document.getElementById('p2Steps').value) || 50, name: document.getElementById('p2Name').value || '二等奖' },
+    { steps: parseInt(document.getElementById('p3Steps').value) || 80, name: document.getElementById('p3Name').value || '三等奖' },
+  ].sort((a, b) => a.steps - b.steps);  // 按步数升序
+}
+
+/* 根据步数检查解锁了哪个奖品（最高级） */
+function checkPrize(steps) {
+  const prizes = getPrizes();
+  let unlocked = null;
+  for (const p of prizes) {
+    if (steps <= p.steps) {
+      unlocked = p;
+      break;  // 已按步数升序排列，取最严格的
+    }
+  }
+  return unlocked;
+}
+
+/* 更新奖品进度标签 */
+function updatePrizeTags() {
+  const prizes = getPrizes();
+  const steps  = state.steps;
+  const container = document.getElementById('prizeHint');
+  container.innerHTML = '';
+  prizes.forEach(p => {
+    const tag = document.createElement('div');
+    tag.className = 'prize-tag' + (steps <= p.steps && state.steps > 0 ? ' unlocked' : '');
+    // 还未完成时，只提示目标步数
+    tag.textContent = `≤${p.steps}步 · ${p.name}`;
+    container.appendChild(tag);
+  });
+}
+
+/* ==============================
+   提示功能（贪心：移动与目标位置最近的方块）
+============================== */
+function showHint() {
+  if (!state.running) { setHint('请先开始游戏'); return; }
+
+  // 找距离目标位置最偏离且可移动的方块
+  const blankIdx = state.tiles.indexOf(0);
+  const neighbors = getNeighbors(blankIdx);
+  const goal = getGoalState();
+
+  let bestNeighbor = -1;
+  let bestScore = -Infinity;
+
+  neighbors.forEach(n => {
+    const num = state.tiles[n];
+    const targetIdx = goal.indexOf(num);
+    // 移动前该数字的曼哈顿距离
+    const beforeDist = manhattan(n, targetIdx);
+    // 移动后（该数字到达 blankIdx 位置）的距离
+    const afterDist  = manhattan(blankIdx, targetIdx);
+    const improvement = beforeDist - afterDist;
+    if (improvement > bestScore) {
+      bestScore = improvement;
+      bestNeighbor = n;
+    }
+  });
+
+  if (bestNeighbor >= 0) {
+    const num = state.tiles[bestNeighbor];
+    const row = Math.floor(bestNeighbor / GRID) + 1;
+    const col = bestNeighbor % GRID + 1;
+    setHint(`建议移动第${row}行第${col}列的方块【${num}】（向空格方向滑动）`);
+    document.getElementById('r_hint').textContent = `方块 ${num}`;
+    // 高亮
+    highlightTile(bestNeighbor);
+  } else {
+    setHint('暂时找不到好的提示，试试其他方向');
+  }
+}
+
+/* 曼哈顿距离 */
+function manhattan(idx1, idx2) {
+  return Math.abs(Math.floor(idx1/GRID) - Math.floor(idx2/GRID))
+       + Math.abs(idx1 % GRID - idx2 % GRID);
+}
+
+/* 高亮提示方块 */
+function highlightTile(idx) {
+  const container = document.getElementById('boardTiles');
+  const tileEl = container.querySelector(`[data-idx="${idx}"]`);
+  if (!tileEl) return;
+  tileEl.style.filter = 'brightness(1.5) drop-shadow(0 0 8px #F5C842)';
+  setTimeout(() => { tileEl.style.filter = ''; }, 800);
+}
+
+/* ==============================
+   自动走一步（A* 简化版：BFS寻找最优一步）
+   直接模拟"找到使状态更接近目标的移动"
+============================== */
+function solveStep() {
+  if (!state.running) { setHint('请先开始游戏'); return; }
+  if (isSolved()) { setHint('已经完成了！'); return; }
+
+  const blankIdx = state.tiles.indexOf(0);
+  const neighbors = getNeighbors(blankIdx);
+  const goal = getGoalState();
+
+  // 选择移动后整体曼哈顿距离最小的移动
+  let bestNeighbor = -1;
+  let bestDist = Infinity;
+
+  neighbors.forEach(n => {
+    // 模拟移动
+    const tempTiles = [...state.tiles];
+    tempTiles[blankIdx] = tempTiles[n];
+    tempTiles[n] = 0;
+    // 计算总曼哈顿距离
+    let totalDist = 0;
+    tempTiles.forEach((val, idx) => {
+      if (val === 0) return;
+      const targetIdx = goal.indexOf(val);
+      totalDist += manhattan(idx, targetIdx);
+    });
+    if (totalDist < bestDist) {
+      bestDist     = totalDist;
+      bestNeighbor = n;
+    }
+  });
+
+  if (bestNeighbor >= 0) {
+    onTileClick(bestNeighbor);
+    setHint(`自动移动了方块【${state.tiles[blankIdx] || state.tiles[bestNeighbor]}】`);
+  }
+}
+
+/* 设置提示文字 */
+function setHint(text) {
+  document.getElementById('hintBar').textContent = text;
+}
+
+/* ==============================
+   历史 & 解锁记录渲染
+============================== */
+function renderHistory() {
+  const container = document.getElementById('historyList');
+  if (state.history.length === 0) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px 0;">暂无历史记录</div>';
+    return;
+  }
+  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+  container.innerHTML = state.history.map((h, i) => `
+    <div class="history-item">
+      <div class="history-head">
+        <span class="history-medal">${medals[i] || '▫️'}</span>
+        <span class="history-steps">${h.steps} 步</span>
+      </div>
+      <div class="history-sub">${formatTime(h.time)} · ${DIFF_LABELS[h.diff]} · ${h.mode === 'number' ? '数字' : '图片'}模式</div>
+    </div>
+  `).join('');
+}
+
+function renderUnlocks() {
+  const container = document.getElementById('unlockList');
+  if (state.unlocks.length === 0) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px 0;">暂无解锁记录</div>';
+    return;
+  }
+  container.innerHTML = state.unlocks.slice(0, 5).map(u => `
+    <div class="unlock-item">
+      <div class="unlock-name">🎁 ${u.name}</div>
+      <div class="unlock-sub">${u.steps} 步 · ${formatTime(u.time)} 完成</div>
+    </div>
+  `).join('');
+}
+
+/* ==============================
+   烟花效果（Canvas）
+============================== */
+const fwCanvas = document.getElementById('fireworks-canvas');
+const fwCtx    = fwCanvas.getContext('2d');
+let fwParticles = [];
+let fwAnimId    = null;
+
+function resizeFireworks() {
+  fwCanvas.width  = window.innerWidth;
+  fwCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeFireworks);
+resizeFireworks();
+
+function createFirework(x, y) {
+  const colors = ['#F5C842','#7C3AED','#EC4899','#10B981','#06B6D4','#fff'];
+  for (let i = 0; i < 40; i++) {
+    const angle    = (Math.PI * 2 / 40) * i;
+    const speed    = 3 + Math.random() * 5;
+    fwParticles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      alpha: 1,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      size: 3 + Math.random() * 3,
+    });
+  }
+}
+
+function updateFireworks() {
+  fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+  fwParticles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.12;   // 重力
+    p.alpha -= 0.018;
+    fwCtx.globalAlpha = Math.max(0, p.alpha);
+    fwCtx.fillStyle = p.color;
+    fwCtx.beginPath();
+    fwCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    fwCtx.fill();
+  });
+  fwCtx.globalAlpha = 1;
+  fwParticles = fwParticles.filter(p => p.alpha > 0);
+  fwAnimId = requestAnimationFrame(updateFireworks);
+}
+
+function startFireworks() {
+  fwParticles = [];
+  // 发射3发
+  const positions = [
+    { x: window.innerWidth * 0.3, y: window.innerHeight * 0.3 },
+    { x: window.innerWidth * 0.7, y: window.innerHeight * 0.25 },
+    { x: window.innerWidth * 0.5, y: window.innerHeight * 0.2 },
+  ];
+  positions.forEach((p, i) => {
+    setTimeout(() => createFirework(p.x, p.y), i * 300);
+  });
+  if (!fwAnimId) updateFireworks();
+}
+
+function stopFireworks() {
+  if (fwAnimId) {
+    cancelAnimationFrame(fwAnimId);
+    fwAnimId = null;
+  }
+  fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+  fwParticles = [];
+}
+
+/* ==============================
+   键盘支持（方向键移动空格周围方块）
+============================== */
+document.addEventListener('keydown', e => {
+  if (!state.running) return;
+  const blankIdx = state.tiles.indexOf(0);
+  const row = Math.floor(blankIdx / GRID);
+  const col = blankIdx % GRID;
+  let targetIdx = -1;
+
+  // 方向键：空格往该方向移动 = 对面方块滑入
+  switch (e.key) {
+    case 'ArrowUp':    if (row < GRID - 1) targetIdx = blankIdx + GRID; break;
+    case 'ArrowDown':  if (row > 0)         targetIdx = blankIdx - GRID; break;
+    case 'ArrowLeft':  if (col < GRID - 1) targetIdx = blankIdx + 1;    break;
+    case 'ArrowRight': if (col > 0)         targetIdx = blankIdx - 1;    break;
+  }
+  if (targetIdx >= 0) {
+    e.preventDefault();
+    onTileClick(targetIdx);
+  }
+});
+
+/* ==============================
+   初始化页面
+============================== */
+(function init() {
+  // 设置棋盘尺寸
+  const boardSize = GRID * TILE_SIZE + (GRID - 1) * GAP;
+  const grid = document.getElementById('boardGrid');
+  grid.style.width  = boardSize + 'px';
+  grid.style.height = boardSize + 'px';
+
+  // 生成底层格子槽
+  for (let i = 0; i < GRID * GRID; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'cell-slot';
+    grid.appendChild(slot);
+  }
+
+  // 渲染初始有序棋盘（不计时）
+  initTiles();
+  renderTiles();
+  updatePrizeTags();
+
+  // 导航：自动滚动到 active 标签
+  const activeTab = document.querySelector('.nav-tab.active');
+  if (activeTab) activeTab.scrollIntoView({ inline: 'center', behavior: 'smooth' });
+})();
+</script>
+</body>
+</html>
