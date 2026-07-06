@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameHub 平台框架 & 操作地图</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --gold:#F5C842; --bg:#0D0720; --accent:#7C3AED; --accent2:#EC4899;
+  --deep:#1A0A2E; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1);
+  --text:#F0EAF8; --muted:rgba(240,234,248,0.55); --green:#22C55E;
+}
+body { font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+/* ─── 顶栏 ─── */
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:0 32px; height:56px; border-bottom:1px solid var(--border); background:rgba(13,7,32,0.97); backdrop-filter:blur(12px); position:sticky; top:0; z-index:100; }
+.topbar-logo { font-size:17px; font-weight:800; }
+.topbar-logo span { color:var(--gold); }
+.topbar-nav { display:flex; gap:6px; }
+.topbar-nav a { padding:5px 13px; border-radius:20px; font-size:13px; color:var(--muted); text-decoration:none; border:1px solid transparent; transition:all 0.2s; }
+.topbar-nav a:hover { color:var(--text); border-color:var(--border); }
+.topbar-nav a.active { color:var(--gold); background:rgba(245,200,66,0.08); border-color:rgba(245,200,66,0.2); }
+
+/* ─── 内容 ─── */
+.page { max-width:980px; margin:0 auto; padding:40px 32px 80px; }
+
+/* ─── 章节 ─── */
+.section { margin-bottom:52px; scroll-margin-top:72px; }
+.section-title { font-size:22px; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:10px; }
+.section-title .badge { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; background:rgba(124,58,237,0.2); border:1px solid rgba(124,58,237,0.35); color:var(--accent); vertical-align:middle; }
+.section-sub { font-size:14px; color:var(--muted); margin-bottom:20px; }
+
+/* ─── 卡片 ─── */
+.card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px 22px; margin-bottom:14px; }
+.card-title { font-size:15px; font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+.card p { font-size:13px; color:var(--muted); line-height:1.8; }
+
+/* ─── 网格布局 ─── */
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+@media(max-width:700px) { .grid2,.grid3 { grid-template-columns:1fr; } }
+
+/* ─── 表格 ─── */
+.table-wrap { overflow-x:auto; border-radius:12px; border:1px solid var(--border); }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { background:rgba(255,255,255,0.06); padding:10px 14px; text-align:left; font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border); }
+td { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.04); }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:rgba(255,255,255,0.02); }
+
+/* ─── 标签 ─── */
+.tag { display:inline-block; padding:2px 8px; border-radius:5px; font-size:11px; font-weight:600; margin:2px 2px 2px 0; }
+.tag-green  { background:rgba(34,197,94,0.15);  color:var(--green); border:1px solid rgba(34,197,94,0.25); }
+.tag-purple { background:rgba(124,58,237,0.15); color:#a78bfa;     border:1px solid rgba(124,58,237,0.25); }
+.tag-gold   { background:rgba(245,200,66,0.12); color:var(--gold); border:1px solid rgba(245,200,66,0.25); }
+.tag-pink   { background:rgba(236,72,153,0.12); color:#f472b6;     border:1px solid rgba(236,72,153,0.25); }
+.tag-blue   { background:rgba(59,130,246,0.12); color:#93c5fd;     border:1px solid rgba(59,130,246,0.2); }
+.tag-gray   { background:rgba(255,255,255,0.06); color:var(--muted); border:1px solid var(--border); }
+
+/* ─── 流程图 ─── */
+.flow { display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin:14px 0; }
+.flow-step { padding:8px 16px; border-radius:10px; font-size:13px; font-weight:600; background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.3); }
+.flow-step.gold { background:rgba(245,200,66,0.12); border-color:rgba(245,200,66,0.3); color:var(--gold); }
+.flow-step.green { background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.3); color:var(--green); }
+.flow-step.pink { background:rgba(236,72,153,0.12); border-color:rgba(236,72,153,0.3); color:#f472b6; }
+.flow-arrow { color:var(--muted); font-size:16px; font-weight:700; }
+
+/* ─── 代码块 ─── */
+.code-block { background:rgba(0,0,0,0.4); border:1px solid var(--border); border-radius:10px; padding:14px 16px; font-family:'SF Mono','Menlo',monospace; font-size:12px; color:#a78bfa; line-height:1.8; overflow-x:auto; margin:10px 0; }
+.code-block .cmt { color:var(--muted); }
+.code-block .str { color:var(--gold); }
+.code-block .kw  { color:#f472b6; }
+
+/* ─── 锚点导航 ─── */
+.toc { background:rgba(124,58,237,0.06); border:1px solid rgba(124,58,237,0.2); border-radius:14px; padding:20px 22px; margin-bottom:40px; }
+.toc-title { font-size:13px; font-weight:700; color:var(--accent); margin-bottom:12px; }
+.toc-list { display:flex; flex-direction:column; gap:6px; }
+.toc-list a { font-size:13px; color:var(--muted); text-decoration:none; display:flex; align-items:center; gap:8px; transition:color 0.2s; }
+.toc-list a:hover { color:var(--text); }
+.toc-list a .toc-num { width:20px; height:20px; border-radius:50%; background:rgba(124,58,237,0.2); font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--accent); }
+
+/* ─── 高亮框 ─── */
+.highlight-box { border-radius:12px; padding:16px 18px; margin:14px 0; font-size:13px; line-height:1.8; }
+.hl-purple { background:rgba(124,58,237,0.08); border:1px solid rgba(124,58,237,0.2); }
+.hl-gold   { background:rgba(245,200,66,0.06); border:1px solid rgba(245,200,66,0.2); color:rgba(245,200,66,0.9); }
+.hl-green  { background:rgba(34,197,94,0.06);  border:1px solid rgba(34,197,94,0.2);  color:rgba(34,197,94,0.9); }
+
+/* ─── 行内标注 ─── */
+.pill { display:inline-block; padding:1px 8px; border-radius:20px; font-size:11px; font-weight:700; background:rgba(124,58,237,0.2); color:#a78bfa; }
+
+/* ─── 游戏列表 ─── */
+.game-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:8px; }
+.game-item { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px 12px; font-size:12px; display:flex; align-items:center; gap:8px; }
+.game-item .gi-icon { font-size:18px; flex-shrink:0; }
+.game-item .gi-name { font-weight:600; }
+.game-item .gi-tag  { font-size:10px; color:var(--muted); }
+
+/* ─── 分隔线 ─── */
+hr { border:none; border-top:1px solid var(--border); margin:32px 0; }
+
+/* ─── Step数字 ─── */
+.step-num { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--accent); color:white; font-size:11px; font-weight:800; flex-shrink:0; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">🎮 <span>GameHub</span> 平台文档</div>
+  <nav class="topbar-nav">
+    <a href="index.html">← 首页</a>
+    <a href="builder.html">🚀 生成器</a>
+    <a href="shop.html">🪙 商城</a>
+    <a class="active" href="#">📖 框架文档</a>
+  </nav>
+</div>
+
+<div class="page">
+
+  <div style="margin-bottom:32px">
+    <div style="font-size:28px;font-weight:800;margin-bottom:8px">GameHub 平台框架 & 操作手册</div>
+    <div style="font-size:14px;color:var(--muted)">51个游戏 · 全配置化 · 纯前端无后端 · 2026年7月</div>
+  </div>
+
+  <!-- 目录 -->
+  <div class="toc">
+    <div class="toc-title">📋 目录</div>
+    <div class="toc-list">
+      <a href="#overview"><div class="toc-num">1</div>平台整体架构</a>
+      <a href="#modules"><div class="toc-num">2</div>公共模块说明（6个JS）</a>
+      <a href="#userflow"><div class="toc-num">3</div>用户旅程地图</a>
+      <a href="#gamelist"><div class="toc-num">4</div>51个游戏完整清单</a>
+      <a href="#config"><div class="toc-num">5</div>游戏配置化操作指南（?c= 参数）</a>
+      <a href="#builder"><div class="toc-num">6</div>游戏生成器使用流程</a>
+      <a href="#economy"><div class="toc-num">7</div>经济系统：金币 / 经验 / 等级</a>
+      <a href="#deploy"><div class="toc-num">8</div>部署 & 更新流程</a>
+    </div>
+  </div>
+
+  <!-- ═══════════ 1. 平台架构 ═══════════ -->
+  <div class="section" id="overview">
+    <div class="section-title">1. 平台整体架构 <span class="badge">概览</span></div>
+    <div class="section-sub">纯前端静态站点，无服务器，数据存本地浏览器</div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">🏗️ 技术栈</div>
+        <p>
+          · 原生 HTML + CSS + JavaScript，无框架依赖<br>
+          · Canvas 2D 绘制游戏画面<br>
+          · Web Audio API 音效<br>
+          · localStorage 数据持久化<br>
+          · CSS 变量实现皮肤切换<br>
+          · Base64 编码传递游戏配置
+        </p>
+      </div>
+      <div class="card">
+        <div class="card-title">📁 文件结构</div>
+        <p>
+          · <strong style="color:var(--gold)">51个游戏HTML</strong> — 每个游戏独立一个文件<br>
+          · <strong style="color:var(--gold)">7个功能页</strong> — 首页/商城/排行/我的/生成器/后台/文档<br>
+          · <strong style="color:var(--gold)">6个公共模块JS</strong> — user/achievement/leaderboard/themes/sound/share<br>
+          · <strong style="color:var(--gold)">1个公共CSS</strong> — mobile.css 移动端适配
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:0">
+      <div class="card-title">🔗 页面关系图</div>
+      <div class="flow">
+        <div class="flow-step gold">index.html<br><small>首页入口</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">51个游戏.html<br><small>各自独立</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step green">金币 / 经验 / 成就<br><small>自动记录</small></div>
+      </div>
+      <div class="flow" style="margin-top:4px">
+        <div class="flow-step gold">builder.html<br><small>生成器</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step pink">?c=BASE64<br><small>配置链接</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">游戏.html<br><small>读取配置渲染</small></div>
+      </div>
+      <div class="flow" style="margin-top:4px">
+        <div class="flow-step gold">shop.html<br><small>商城</small></div>
+        <div class="flow-arrow">↔</div>
+        <div class="flow-step">leaderboard.html<br><small>排行榜</small></div>
+        <div class="flow-arrow">↔</div>
+        <div class="flow-step">profile.html<br><small>我的账号</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ 2. 公共模块 ═══════════ -->
+  <div class="section" id="modules">
+    <div class="section-title">2. 公共模块说明 <span class="badge">6个JS文件</span></div>
+    <div class="section-sub">每个游戏页面在 &lt;/body&gt; 前引入，自动初始化</div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>文件</th><th>作用</th><th>主要API</th><th>存储Key</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="pill">user.js</span></td>
+            <td>用户系统：昵称/等级/金币/经验</td>
+            <td>
+              <code>GameUser.addExp(n)</code><br>
+              <code>GameUser.addCoins(n, 来源)</code><br>
+              <code>GameUser.spendCoins(n, 说明)</code><br>
+              <code>GameUser.getCoins()</code>
+            </td>
+            <td><code>gh_user</code></td>
+          </tr>
+          <tr>
+            <td><span class="pill">achievement.js</span></td>
+            <td>成就系统：50个成就，解锁自动弹Toast+发金币</td>
+            <td>
+              <code>GameAchievement.trigger(事件, 值)</code><br>
+              <code>GameAchievement.incCounter(key, n)</code><br>
+              <code>GameAchievement.isUnlocked(id)</code>
+            </td>
+            <td><code>gh_achievements</code><br><code>gh_ach_counters</code></td>
+          </tr>
+          <tr>
+            <td><span class="pill">leaderboard.js</span></td>
+            <td>跨游戏排行榜：记录每局得分，展示Top10</td>
+            <td>
+              <code>GameLeaderboard.submitAndNotify({game, score, result})</code><br>
+              <code>GameLeaderboard.getTop(game, 10)</code><br>
+              <code>GameLeaderboard.getPersonalBest(game)</code>
+            </td>
+            <td><code>gh_leaderboard</code></td>
+          </tr>
+          <tr>
+            <td><span class="pill">themes.js</span></td>
+            <td>皮肤系统：4套主题色，CSS变量覆盖</td>
+            <td>
+              <code>GameThemes.apply(skinName)</code><br>
+              皮肤：default / festive / ocean / gold
+            </td>
+            <td><code>gh_theme</code></td>
+          </tr>
+          <tr>
+            <td><span class="pill">sound.js</span></td>
+            <td>音效系统：Web Audio API合成音效</td>
+            <td>
+              <code>GameSound.play('win')</code><br>
+              <code>GameSound.play('click')</code><br>
+              <code>GameSound.toggle()</code>
+            </td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><span class="pill">share.js</span></td>
+            <td>分享：生成分享图/链接</td>
+            <td><code>GameShare.share(title, score)</code></td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight-box hl-purple" style="margin-top:14px">
+      💡 <strong>引入方式</strong>：每个游戏HTML在 &lt;/body&gt; 前加这几行即可自动生效：<br>
+      <div class="code-block" style="margin-top:8px">
+&lt;<span class="kw">script</span> src=<span class="str">"user.js"</span>&gt;&lt;/<span class="kw">script</span>&gt;<br>
+&lt;<span class="kw">script</span> src=<span class="str">"achievement.js"</span>&gt;&lt;/<span class="kw">script</span>&gt;<br>
+&lt;<span class="kw">script</span> src=<span class="str">"leaderboard.js"</span>&gt;&lt;/<span class="kw">script</span>&gt;<br>
+&lt;<span class="kw">script</span> src=<span class="str">"themes.js"</span>&gt;&lt;/<span class="kw">script</span>&gt;
+      </div>
+      引入后在游戏结束处调用：<code>GameLeaderboard.submitAndNotify({game:'大转盘', score:100})</code>
+    </div>
+  </div>
+
+  <!-- ═══════════ 3. 用户旅程 ═══════════ -->
+  <div class="section" id="userflow">
+    <div class="section-title">3. 用户旅程地图 <span class="badge">5条路径</span></div>
+    <div class="section-sub">用户从进入平台到深度使用的完整路径</div>
+
+    <!-- 路径1 -->
+    <div class="card">
+      <div class="card-title">🎯 路径A：随机游玩（最常见）</div>
+      <div class="flow">
+        <div class="flow-step gold">打开 games.jydigtal.com</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">首页浏览游戏列表</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">点击任意游戏</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step green">游戏结束自动获得金币+经验</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step pink">成就弹窗（首次触发）</div>
+      </div>
+      <p style="margin-top:10px">· 自动分配随机昵称+头像，无需注册登录<br>· 等级升级时顶部导航栏实时刷新显示 Lv.N · 🪙金币数</p>
+    </div>
+
+    <!-- 路径2 -->
+    <div class="card">
+      <div class="card-title">🪙 路径B：经济循环（核心留存）</div>
+      <div class="flow">
+        <div class="flow-step">玩游戏 / 每日签到</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step gold">赚取金币 + 经验</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">等级提升</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step pink">去 shop.html 兑换奖励</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step green">解锁头像框/特效/称号</div>
+      </div>
+      <p style="margin-top:10px">
+        · 每日签到连续7天奖励递增：20→30→40→50→60→80→100金币<br>
+        · 游戏结束每局奖励5~50金币（难度越高越多）<br>
+        · 50个成就各自有金币奖励（20~500金币）
+      </p>
+    </div>
+
+    <!-- 路径3 -->
+    <div class="card">
+      <div class="card-title">🏆 路径C：竞技排行（竞争留存）</div>
+      <div class="flow">
+        <div class="flow-step">刷分游戏（2048/消消乐/贪吃蛇…）</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step gold">自动上传排行榜</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">leaderboard.html 查看排名</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step green">超越个人最佳弹Toast</div>
+      </div>
+      <p style="margin-top:10px">
+        · 每个游戏独立排行，记录历史最高分<br>
+        · 支持查看所有游戏的跨游戏综合排名
+      </p>
+    </div>
+
+    <!-- 路径4 -->
+    <div class="card">
+      <div class="card-title">🚀 路径D：运营配置（平台方视角）</div>
+      <div class="flow">
+        <div class="flow-step">打开 builder.html</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step gold">选游戏类型 + 填写奖品</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">点「生成链接」</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step pink">复制链接/扫二维码</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step green">发给用户直接玩</div>
+      </div>
+      <p style="margin-top:10px">
+        · 目前支持配置化的6个游戏：大转盘 / 刮刮乐 / 老虎机 / 九宫格 / 砸金蛋 / 盲盒<br>
+        · 配置通过 URL 的 <code>?c=</code> 参数传递，链接即配置，无需后台<br>
+        · 4套快速模板：电商促销 / 品牌活动 / 游戏积分 / 餐饮外卖
+      </p>
+    </div>
+
+    <!-- 路径5 -->
+    <div class="card">
+      <div class="card-title">🔧 路径E：后台管理（admin.html）</div>
+      <div class="flow">
+        <div class="flow-step gold">打开 admin.html</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">查看平台数据概况</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">管理用户/排行/成就</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step green">清数据 / 导出统计</div>
+      </div>
+      <p style="margin-top:10px">· 当前为本地管理，数据来源于 localStorage<br>· 适合单机演示、内测阶段</p>
+    </div>
+  </div>
+
+  <!-- ═══════════ 4. 游戏清单 ═══════════ -->
+  <div class="section" id="gamelist">
+    <div class="section-title">4. 51个游戏完整清单 <span class="badge">全部上线</span></div>
+    <div class="section-sub">按玩法分类，所有游戏均已接入金币/经验/成就/排行榜</div>
+
+    <div style="margin-bottom:16px">
+      <span class="tag tag-gold">🎰 抽奖类 8个</span>
+      <span class="tag tag-purple">🧩 益智类 15个</span>
+      <span class="tag tag-blue">🕹️ 操作类 12个</span>
+      <span class="tag tag-pink">💬 社交类 7个</span>
+      <span class="tag tag-green">🎲 棋盘类 5个</span>
+      <span class="tag tag-gray">✨ 工具类 4个</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>#</th><th>游戏名</th><th>文件</th><th>分类</th><th>支持配置化</th><th>特色</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>大转盘</td><td>wheel.html</td><td><span class="tag tag-gold">抽奖</span></td><td><span class="tag tag-green">✓ 已支持</span></td><td>4套皮肤、每日限次、概率配置</td></tr>
+          <tr><td>2</td><td>九宫格</td><td>nine-grid.html</td><td><span class="tag tag-gold">抽奖</span></td><td><span class="tag tag-green">✓ 已支持</span></td><td>8格流水灯动画</td></tr>
+          <tr><td>3</td><td>刮刮乐</td><td>scratch-card.html</td><td><span class="tag tag-gold">抽奖</span></td><td><span class="tag tag-green">✓ 已支持</span></td><td>Canvas涂层、自动揭示阈值</td></tr>
+          <tr><td>4</td><td>砸金蛋</td><td>smash-egg.html</td><td><span class="tag tag-gold">抽奖</span></td><td><span class="tag tag-green">✓ 已支持</span></td><td>破壳动画、每日N次</td></tr>
+          <tr><td>5</td><td>老虎机</td><td>slot-machine.html</td><td><span class="tag tag-gold">抽奖</span></td><td><span class="tag tag-green">✓ 已支持</span></td><td>3轮滚动、赔率系统</td></tr>
+          <tr><td>6</td><td>盲盒抽卡</td><td>blind-box.html</td><td><span class="tag tag-gold">抽奖</span></td><td><span class="tag tag-green">✓ 已支持</span></td><td>稀有度系统 N/R/SR/SSR/SP</td></tr>
+          <tr><td>7</td><td>扭蛋机</td><td>gashapon.html</td><td><span class="tag tag-gold">抽奖</span></td><td><span class="tag tag-gray">待接入</span></td><td>3D扭蛋动画</td></tr>
+          <tr><td>8</td><td>礼盒开箱</td><td>gift-box.html</td><td><span class="tag tag-gold">抽奖</span></td><td><span class="tag tag-gray">待接入</span></td><td>3D翻盖、粒子特效、4套皮肤</td></tr>
+          <tr><td>9</td><td>摇骰子</td><td>shake-dice.html</td><td><span class="tag tag-gold">抽奖</span></td><td><span class="tag tag-gray">待接入</span></td><td>多骰子组合</td></tr>
+          <tr><td>10</td><td>号码球抽奖</td><td>lottery-ball.html</td><td><span class="tag tag-gold">抽奖</span></td><td><span class="tag tag-gray">待接入</span></td><td>双色球玩法</td></tr>
+          <tr><td>11</td><td>幸运数字</td><td>lucky-number.html</td><td><span class="tag tag-gold">抽奖</span></td><td><span class="tag tag-gray">待接入</span></td><td>数字竞猜</td></tr>
+          <tr><td>12</td><td>三杯游戏</td><td>cup-game.html</td><td><span class="tag tag-gold">抽奖</span></td><td><span class="tag tag-gray">待接入</span></td><td>找球速度挑战</td></tr>
+          <tr><td>13</td><td>数字炸弹</td><td>number-bomb.html</td><td><span class="tag tag-pink">社交</span></td><td><span class="tag tag-gray">待接入</span></td><td>多人聚会、范围缩小</td></tr>
+          <tr><td>14</td><td>2048</td><td>game-2048.html</td><td><span class="tag tag-purple">益智</span></td><td><span class="tag tag-gray">—</span></td><td>经典合并、最高分排行</td></tr>
+          <tr><td>15</td><td>消消乐</td><td>match3.html</td><td><span class="tag tag-purple">益智</span></td><td><span class="tag tag-gray">—</span></td><td>三消、连消加成</td></tr>
+          <tr><td>16</td><td>连连看</td><td>link-match.html</td><td><span class="tag tag-purple">益智</span></td><td><span class="tag tag-gray">—</span></td><td>图案匹配</td></tr>
+          <tr><td>17</td><td>翻牌配对</td><td>flip-match.html</td><td><span class="tag tag-purple">益智</span></td><td><span class="tag tag-gray">—</span></td><td>3D翻转、限时、三档难度</td></tr>
+          <tr><td>18</td><td>华容道</td><td>sliding-puzzle.html</td><td><span class="tag tag-purple">益智</span></td><td><span class="tag tag-gray">—</span></td><td>滑块移动</td></tr>
+          <tr><td>19</td><td>拼图</td><td>puzzle.html</td><td><span class="tag tag-purple">益智</span></td><td><span class="tag tag-gray">—</span></td><td>分割拖拽</td></tr>
+          <tr><td>20</td><td>扫雷</td><td>minesweeper.html</td><td><span class="tag tag-purple">益智</span></td><td><span class="tag tag-gray">—</span></td><td>经典扫雷</td></tr>
+          <tr><td>21</td><td>数独</td><td>sudoku.html</td><td><span class="tag tag-purple">益智</span></td><td><span class="tag tag-gray">—</span></td><td>难度分级</td></tr>
+          <tr><td>22</td><td>推箱子</td><td>sokoban.html</td><td><span class="tag tag-purple">益智</span></td><td><span class="tag tag-gray">—</span></td><td>多关卡</td></tr>
+          <tr><td>23</td><td>迷宫寻宝</td><td>maze.html</td><td><span class="tag tag-purple">益智</span></td><td><span class="tag tag-gray">—</span></td><td>随机生成地图</td></tr>
+          <tr><td>24</td><td>俄罗斯方块</td><td>tetris.html</td><td><span class="tag tag-purple">益智</span></td><td><span class="tag tag-gray">—</span></td><td>经典玩法</td></tr>
+          <tr><td>25</td><td>问答闯关</td><td>quiz.html</td><td><span class="tag tag-purple">益智</span></td><td><span class="tag tag-gray">待接入</span></td><td>题库可配、连对加成</td></tr>
+          <tr><td>26</td><td>摇一摇</td><td>shake.html</td><td><span class="tag tag-blue">操作</span></td><td><span class="tag tag-gray">—</span></td><td>重力感应</td></tr>
+          <tr><td>27</td><td>打地鼠</td><td>whack-mole.html</td><td><span class="tag tag-blue">操作</span></td><td><span class="tag tag-gray">—</span></td><td>三类地鼠、难度递增</td></tr>
+          <tr><td>28</td><td>夹娃娃机</td><td>claw-machine.html</td><td><span class="tag tag-blue">操作</span></td><td><span class="tag tag-gray">—</span></td><td>实时操控、爪子动画</td></tr>
+          <tr><td>29</td><td>切水果</td><td>fruit-cut.html</td><td><span class="tag tag-blue">操作</span></td><td><span class="tag tag-gray">—</span></td><td>滑动切割</td></tr>
+          <tr><td>30</td><td>弹弓射击</td><td>slingshot.html</td><td><span class="tag tag-blue">操作</span></td><td><span class="tag tag-gray">—</span></td><td>弹道物理</td></tr>
+          <tr><td>31</td><td>射箭</td><td>archery.html</td><td><span class="tag tag-blue">操作</span></td><td><span class="tag tag-gray">—</span></td><td>瞄准角度</td></tr>
+          <tr><td>32</td><td>套圈圈</td><td>ring-toss.html</td><td><span class="tag tag-blue">操作</span></td><td><span class="tag tag-gray">—</span></td><td>投掷模拟</td></tr>
+          <tr><td>33</td><td>接金币</td><td>catch-coins.html</td><td><span class="tag tag-blue">操作</span></td><td><span class="tag tag-gray">—</span></td><td>下落接物</td></tr>
+          <tr><td>34</td><td>弹珠机</td><td>pinball.html</td><td><span class="tag tag-blue">操作</span></td><td><span class="tag tag-gray">—</span></td><td>物理弹射</td></tr>
+          <tr><td>35</td><td>贪吃蛇闯关</td><td>snake.html</td><td><span class="tag tag-blue">操作</span></td><td><span class="tag tag-gray">—</span></td><td>关卡设计</td></tr>
+          <tr><td>36</td><td>跳一跳</td><td>jump-game.html</td><td><span class="tag tag-blue">操作</span></td><td><span class="tag tag-gray">—</span></td><td>平台跳跃</td></tr>
+          <tr><td>37</td><td>钓鱼</td><td>fishing.html</td><td><span class="tag tag-blue">操作</span></td><td><span class="tag tag-gray">—</span></td><td>节奏感应</td></tr>
+          <tr><td>38</td><td>红包雨</td><td>red-packet-rain.html</td><td><span class="tag tag-blue">操作</span></td><td><span class="tag tag-gray">—</span></td><td>限时点击、稀有红包</td></tr>
+          <tr><td>39</td><td>飞行棋</td><td>flying-chess.html</td><td><span class="tag tag-green">棋盘</span></td><td><span class="tag tag-gray">—</span></td><td>格子事件、任务闯关</td></tr>
+          <tr><td>40</td><td>大富翁</td><td>monopoly.html</td><td><span class="tag tag-green">棋盘</span></td><td><span class="tag tag-gray">—</span></td><td>地图引擎、双人对战</td></tr>
+          <tr><td>41</td><td>成长树养成</td><td>grow-tree.html</td><td><span class="tag tag-green">养成</span></td><td><span class="tag tag-gray">—</span></td><td>每日培育成长</td></tr>
+          <tr><td>42</td><td>能量收集</td><td>energy-collect.html</td><td><span class="tag tag-green">养成</span></td><td><span class="tag tag-gray">—</span></td><td>任务驱动</td></tr>
+          <tr><td>43</td><td>进度解锁</td><td>progress-unlock.html</td><td><span class="tag tag-green">养成</span></td><td><span class="tag tag-gray">—</span></td><td>里程碑奖励</td></tr>
+          <tr><td>44</td><td>投票PK</td><td>vote-pk.html</td><td><span class="tag tag-pink">社交</span></td><td><span class="tag tag-gray">—</span></td><td>多选项对比</td></tr>
+          <tr><td>45</td><td>组队挑战</td><td>team-challenge.html</td><td><span class="tag tag-pink">社交</span></td><td><span class="tag tag-gray">—</span></td><td>队伍积分</td></tr>
+          <tr><td>46</td><td>集卡集章</td><td>stamp-collect.html</td><td><span class="tag tag-pink">社交</span></td><td><span class="tag tag-gray">—</span></td><td>收集任务</td></tr>
+          <tr><td>47</td><td>每日签到</td><td>daily-checkin.html</td><td><span class="tag tag-pink">社交</span></td><td><span class="tag tag-gray">—</span></td><td>连签递增奖励</td></tr>
+          <tr><td>48</td><td>表情包生成</td><td>emoji-maker.html</td><td><span class="tag tag-gray">工具</span></td><td><span class="tag tag-gray">—</span></td><td>自定义生成</td></tr>
+          <tr><td>49</td><td>性格测试</td><td>personality-test.html</td><td><span class="tag tag-gray">工具</span></td><td><span class="tag tag-gray">—</span></td><td>题目配置化</td></tr>
+          <tr><td>50</td><td>名字生成器</td><td>name-generator.html</td><td><span class="tag tag-gray">工具</span></td><td><span class="tag tag-gray">—</span></td><td>多风格生成</td></tr>
+          <tr><td>51</td><td>好友排行榜</td><td>leaderboard.html</td><td><span class="tag tag-pink">社交</span></td><td><span class="tag tag-gray">—</span></td><td>跨游戏排名</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════ 5. 配置化指南 ═══════════ -->
+  <div class="section" id="config">
+    <div class="section-title">5. 游戏配置化操作指南 <span class="badge">?c= 参数</span></div>
+    <div class="section-sub">6个抽奖游戏支持通过链接传入自定义配置，实现一个游戏无限玩法</div>
+
+    <div class="card">
+      <div class="card-title">📐 原理：链接即配置</div>
+      <p>
+        配置是一个 JSON 对象，经过 Base64 编码后附加到游戏 URL 的 <code>?c=</code> 参数。<br>
+        玩家打开链接时，游戏自动读取配置并渲染，不同的链接就是不同的活动。
+      </p>
+      <div class="code-block" style="margin-top:12px">
+<span class="cmt">// 配置对象结构</span><br>
+{<br>
+&nbsp;&nbsp;<span class="str">"title"</span>:      <span class="str">"双11大转盘"</span>,      <span class="cmt">// 游戏标题</span><br>
+&nbsp;&nbsp;<span class="str">"subtitle"</span>:   <span class="str">"每天3次免费抽"</span>,   <span class="cmt">// 副标题</span><br>
+&nbsp;&nbsp;<span class="str">"dailyLimit"</span>: 3,                 <span class="cmt">// 每日限次</span><br>
+&nbsp;&nbsp;<span class="str">"skin"</span>:       <span class="str">"festive"</span>,        <span class="cmt">// 皮肤（仅大转盘）</span><br>
+&nbsp;&nbsp;<span class="str">"embed"</span>:      <span class="kw">false</span>,            <span class="cmt">// true=隐藏左侧配置面板</span><br>
+&nbsp;&nbsp;<span class="str">"prizes"</span>: [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="str">"name"</span>:<span class="str">"100元券"</span>, <span class="str">"emoji"</span>:<span class="str">"🎫"</span>, <span class="str">"prob"</span>:5, <span class="str">"color"</span>:<span class="str">"#F5C842"</span>, <span class="str">"type"</span>:<span class="str">"win"</span> },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="str">"name"</span>:<span class="str">"谢谢参与"</span>, <span class="str">"emoji"</span>:<span class="str">"😊"</span>, <span class="str">"prob"</span>:50, <span class="str">"color"</span>:<span class="str">"#6B7280"</span>, <span class="str">"type"</span>:<span class="str">"miss"</span> }<br>
+&nbsp;&nbsp;]<br>
+}
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:14px">
+      <div class="card">
+        <div class="card-title">🎰 各游戏 prizes 格式差异</div>
+        <div class="table-wrap" style="margin-top:8px">
+          <table>
+            <thead><tr><th>游戏</th><th>prob含义</th><th>其他字段</th></tr></thead>
+            <tbody>
+              <tr><td>大转盘</td><td>整数% (0-100)</td><td>stock库存</td></tr>
+              <tr><td>刮刮乐</td><td>整数%，自动归一化</td><td>score得分值</td></tr>
+              <tr><td>老虎机</td><td>整数%→权重/2</td><td>score=倍率</td></tr>
+              <tr><td>九宫格</td><td>整数%，必须8个</td><td>—</td></tr>
+              <tr><td>砸金蛋</td><td>整数%</td><td>desc描述</td></tr>
+              <tr><td>盲盒</td><td>整数%</td><td>按顺序→稀有度</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🛠️ 手动生成链接（不用生成器）</div>
+        <div class="code-block" style="margin-top:8px;font-size:11px">
+<span class="cmt">// 在浏览器控制台执行</span><br>
+<span class="kw">const</span> cfg = {<br>
+&nbsp;&nbsp;title: <span class="str">"我的活动"</span>,<br>
+&nbsp;&nbsp;dailyLimit: 5,<br>
+&nbsp;&nbsp;prizes: [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{name:<span class="str">"大奖"</span>,emoji:<span class="str">"🏆"</span>,prob:5,type:<span class="str">"win"</span>},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{name:<span class="str">"谢谢"</span>,emoji:<span class="str">"😊"</span>,prob:95,type:<span class="str">"miss"</span>}<br>
+&nbsp;&nbsp;]<br>
+};<br>
+<span class="kw">const</span> url = <span class="str">"https://games.jydigtal.com/wheel.html?c="</span><br>
+&nbsp;&nbsp;+ btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));<br>
+console.log(url);
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ 6. 生成器使用 ═══════════ -->
+  <div class="section" id="builder">
+    <div class="section-title">6. 游戏生成器使用流程 <span class="badge">builder.html</span></div>
+    <div class="section-sub">零代码操作，3分钟生成一个活动链接</div>
+
+    <div class="card">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div class="step-num">1</div>
+          <div>
+            <div style="font-weight:700;margin-bottom:4px">选择游戏类型</div>
+            <p>点击 6 种游戏类型卡片之一（大转盘/刮刮乐/老虎机/九宫格/砸金蛋/盲盒）。底部自动出现该游戏的使用提示。</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div class="step-num">2</div>
+          <div>
+            <div style="font-weight:700;margin-bottom:4px">填写基础配置</div>
+            <p>活动标题 / 副标题 / 每日次数。大转盘还可以选皮肤（紫/红/蓝/金）。</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div class="step-num">3</div>
+          <div>
+            <div style="font-weight:700;margin-bottom:4px">配置奖品</div>
+            <p>点 emoji 换图标，填写奖品名称、概率%、类型（中奖/未中）。右上角快速模板可一键套用电商/品牌/游戏/餐饮4套预设。概率条实时显示总计是否达到100%。</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div class="step-num">4</div>
+          <div>
+            <div style="font-weight:700;margin-bottom:4px">生成链接</div>
+            <p>点「🚀 生成游戏链接」，右侧显示完整 URL。可一键复制链接、新窗口预览、生成二维码。右侧 iframe 也在实时预览效果。</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div class="step-num">5</div>
+          <div>
+            <div style="font-weight:700;margin-bottom:4px">发给用户</div>
+            <p>把链接或二维码发给用户，他们直接打开浏览器就能玩，无需安装任何东西。每个链接的配置独立，可以针对不同活动生成不同链接。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box hl-gold" style="margin-top:14px">
+      ⚠️ <strong>注意事项</strong>：配置存在 URL 里，链接一旦发出配置就固定了。如果要修改奖品，需要重新在 builder 生成新链接再发给用户。
+    </div>
+  </div>
+
+  <!-- ═══════════ 7. 经济系统 ═══════════ -->
+  <div class="section" id="economy">
+    <div class="section-title">7. 经济系统 <span class="badge">金币·经验·等级</span></div>
+    <div class="section-sub">驱动用户留存的核心机制</div>
+
+    <div class="grid3">
+      <div class="card">
+        <div class="card-title">🪙 金币来源</div>
+        <p>
+          · 游戏结束奖励：5~50/局<br>
+          · 成就解锁：20~500/个<br>
+          · 每日签到：20~100/天<br>
+          · 商城购买（消耗）
+        </p>
+      </div>
+      <div class="card">
+        <div class="card-title">⚡ 经验来源</div>
+        <p>
+          · 每局游戏：10~50经验<br>
+          · 等级公式：Lv.N 需要 N×100 经验<br>
+          · 当前最高等级：无上限
+        </p>
+      </div>
+      <div class="card">
+        <div class="card-title">🎖️ 50个成就</div>
+        <p>
+          · 抽奖类：首次中奖、连续中奖等<br>
+          · 游戏类：2048达到指定分、贪吃蛇闯关等<br>
+          · 社交类：玩过10种游戏<br>
+          · 解锁时自动弹 Toast + 发金币
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="card-title">🏪 商城可兑换内容（shop.html）</div>
+      <p>
+        头像框（100~500金币）· 特效（200~800金币）· 优惠券道具（50~200金币）· 游戏称号（300~1000金币）<br>
+        共20件商品，购买后存入本地 <code>gh_shop</code>，兑换记录可查账单。
+      </p>
+    </div>
+  </div>
+
+  <!-- ═══════════ 8. 部署更新 ═══════════ -->
+  <div class="section" id="deploy">
+    <div class="section-title">8. 部署 & 更新流程 <span class="badge">Cloudflare Pages</span></div>
+    <div class="section-sub">GitHub push → 自动构建 → 1分钟全球生效</div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">🚀 部署信息</div>
+        <p>
+          · 线上地址：<strong style="color:var(--gold)">games.jydigtal.com</strong><br>
+          · 部署平台：Cloudflare Pages（免费）<br>
+          · 代码仓库：github.com/superjj520/gamehub-mini-games<br>
+          · 本地目录：~/minigame-platform
+        </p>
+      </div>
+      <div class="card">
+        <div class="card-title">🔄 更新一个游戏</div>
+        <div class="code-block" style="margin-top:8px">
+<span class="cmt"># 1. 修改文件</span><br>
+编辑 ~/minigame-platform/xxx.html<br><br>
+<span class="cmt"># 2. 提交并推送</span><br>
+git add xxx.html<br>
+git commit -m <span class="str">"fix: 描述改动"</span><br>
+git push origin main<br><br>
+<span class="cmt"># 3. 等约1分钟自动生效</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:0">
+      <div class="card-title">📂 本地文件目录结构</div>
+      <div class="code-block">
+~/minigame-platform/<br>
+├── <span class="str">index.html</span>         <span class="cmt">首页</span><br>
+├── <span class="str">builder.html</span>       <span class="cmt">游戏生成器</span><br>
+├── <span class="str">shop.html</span>          <span class="cmt">积分商城</span><br>
+├── <span class="str">leaderboard.html</span>   <span class="cmt">排行榜</span><br>
+├── <span class="str">profile.html</span>       <span class="cmt">我的账号</span><br>
+├── <span class="str">admin.html</span>         <span class="cmt">后台管理</span><br>
+├── <span class="str">user.js</span>            <span class="cmt">用户系统</span><br>
+├── <span class="str">achievement.js</span>     <span class="cmt">成就系统（50个成就）</span><br>
+├── <span class="str">leaderboard.js</span>     <span class="cmt">排行榜引擎</span><br>
+├── <span class="str">themes.js</span>          <span class="cmt">皮肤系统</span><br>
+├── <span class="str">sound.js</span>           <span class="cmt">音效</span><br>
+├── <span class="str">share.js</span>           <span class="cmt">分享</span><br>
+├── <span class="str">mobile.css</span>         <span class="cmt">移动端样式</span><br>
+└── <span class="str">wheel.html</span> ... (51个游戏)
+      </div>
+    </div>
+
+    <div class="highlight-box hl-green" style="margin-top:14px">
+      ✅ <strong>目前已完成</strong>：51个游戏全上线 · 6个JS公共模块 · 经济系统 · 6个游戏支持URL配置化 · Cloudflare全球CDN
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
