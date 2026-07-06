@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 性格测试</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold:    #F5C842;
+    --bg:      #0D0720;
+    --accent:  #7C3AED;
+    --accent2: #EC4899;
+    --deep:    #1A0A2E;
+    --card:    rgba(255,255,255,0.05);
+    --border:  rgba(255,255,255,0.1);
+    --text:    #F0EAF8;
+    --muted:   rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 导航栏 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 58px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.96);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 200;
+    flex-shrink: 0;
+    gap: 16px;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 17px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: var(--text); white-space: nowrap;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  /* 横向滚动导航标签 */
+  .nav-scroll {
+    flex: 1; overflow-x: auto; overflow-y: hidden;
+    scrollbar-width: none;
+  }
+  .nav-scroll::-webkit-scrollbar { display: none; }
+  .nav-tabs { display: flex; gap: 2px; padding: 4px 0; white-space: nowrap; }
+  .nav-tab {
+    padding: 6px 14px; border-radius: 7px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center; white-space: nowrap;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+  .nav-right {
+    display: flex; align-items: center; gap: 8px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .status-badge {
+    background: rgba(34,197,94,0.15);
+    border: 1px solid rgba(34,197,94,0.3);
+    border-radius: 6px; padding: 3px 9px;
+    font-size: 11px; color: #22C55E; font-weight: 600;
+  }
+
+  /* ─── 三列主体 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    flex: 1;
+    min-height: 0;
+    height: calc(100vh - 58px);
+  }
+
+  /* ─── 左侧配置面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.015);
+  }
+  .panel-left::-webkit-scrollbar { width: 4px; }
+  .panel-left::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  .panel-title {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.2px; margin-bottom: 12px; margin-top: 20px;
+  }
+  .panel-title:first-child { margin-top: 0; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+
+  /* 测试主题选择 */
+  .theme-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 11px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.18s;
+    margin-bottom: 7px;
+  }
+  .theme-item:last-child { margin-bottom: 0; }
+  .theme-item:hover { border-color: rgba(124,58,237,0.4); }
+  .theme-item.active { border-color: var(--accent); background: rgba(124,58,237,0.1); }
+  .theme-icon { font-size: 18px; flex-shrink: 0; }
+  .theme-info { flex: 1; }
+  .theme-name { font-size: 12px; font-weight: 600; }
+  .theme-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .theme-check {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; transition: all 0.18s;
+  }
+  .theme-item.active .theme-check {
+    background: var(--accent); border-color: var(--accent);
+  }
+
+  /* 题目数量 */
+  .seg-group { display: flex; gap: 4px; }
+  .seg-btn {
+    flex: 1; padding: 6px 0; border-radius: 7px;
+    font-size: 12px; font-weight: 600;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted); cursor: pointer; transition: all 0.18s; text-align: center;
+  }
+  .seg-btn.active {
+    background: rgba(124,58,237,0.25);
+    border-color: var(--accent); color: var(--text);
+  }
+  .seg-btn:hover:not(.active) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+  /* 奖品配置 */
+  .prize-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .prize-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .prize-type-badge {
+    font-size: 10px; font-weight: 700; padding: 2px 7px;
+    border-radius: 4px; flex-shrink: 0; min-width: 54px; text-align: center;
+  }
+  .prize-input {
+    flex: 1; background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 8px;
+    color: var(--text); font-size: 12px; outline: none;
+  }
+  .prize-input:focus { border-color: var(--accent); }
+
+  /* 结果主题色 */
+  .color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+  .swatch {
+    width: 28px; height: 28px; border-radius: 50%;
+    cursor: pointer; border: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .swatch.active { border-color: white; transform: scale(1.2); }
+
+  /* ─── 游戏中心区域 ─── */
+  .game-center {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 32px 48px; position: relative;
+    overflow-y: auto; overflow-x: hidden;
+  }
+  .game-center::-webkit-scrollbar { width: 4px; }
+  .game-center::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+  .game-center::before {
+    content: ''; position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%);
+    top: 40%; left: 50%; transform: translate(-50%,-50%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* 开始屏 */
+  .start-screen {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 100%; text-align: center;
+    position: relative; z-index: 2; padding: 40px 0;
+  }
+  .start-emoji { font-size: 80px; margin-bottom: 20px; animation: floatY 3s ease-in-out infinite; }
+  @keyframes floatY {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+  .start-title {
+    font-size: 34px; font-weight: 900; letter-spacing: -1px;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+  .start-sub {
+    font-size: 15px; color: var(--muted);
+    margin-bottom: 14px; line-height: 1.8; max-width: 400px;
+  }
+  .start-tags { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 32px; }
+  .start-tag {
+    padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.4);
+    color: rgba(240,234,248,0.8);
+  }
+  .start-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 16px; padding: 15px 52px;
+    color: white; font-size: 17px; font-weight: 800; cursor: pointer;
+    box-shadow: 0 8px 32px rgba(124,58,237,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124,58,237,0.5); }
+  .start-btn:active { transform: translateY(0); }
+
+  /* 答题区 */
+  .quiz-screen {
+    display: none; flex-direction: column;
+    width: 100%; max-width: 560px; position: relative; z-index: 2;
+    padding: 20px 0;
+  }
+  .quiz-screen.active { display: flex; }
+
+  /* 进度条 */
+  .progress-wrap { margin-bottom: 28px; }
+  .progress-info {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .progress-label { font-size: 13px; color: var(--muted); }
+  .progress-num {
+    font-size: 13px; font-weight: 700;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .progress-bar {
+    height: 6px; background: rgba(255,255,255,0.08);
+    border-radius: 99px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 0 8px rgba(124,58,237,0.5);
+  }
+
+  /* 题目卡片 */
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px; padding: 28px 28px 24px;
+    margin-bottom: 20px; position: relative; overflow: hidden;
+  }
+  .question-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .question-number {
+    font-size: 11px; font-weight: 700;
+    color: var(--accent2); letter-spacing: 1px; margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .question-text {
+    font-size: 20px; font-weight: 700; line-height: 1.5;
+    color: var(--text); letter-spacing: -0.3px;
+  }
+
+  /* 选项按钮 */
+  .options-grid { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px; border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid var(--border);
+    cursor: pointer; transition: all 0.18s;
+    text-align: left; color: var(--text);
+    font-size: 15px; font-family: inherit;
+  }
+  .option-btn:hover {
+    background: rgba(124,58,237,0.12);
+    border-color: rgba(124,58,237,0.5);
+    transform: translateX(4px);
+  }
+  .option-btn.selected {
+    background: rgba(124,58,237,0.25);
+    border-color: var(--accent);
+  }
+  .option-btn.correct { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.5); }
+  .option-letter {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+    transition: all 0.18s;
+  }
+  .option-btn:hover .option-letter { background: var(--accent); border-color: var(--accent); }
+  .option-btn.selected .option-letter { background: var(--accent); border-color: var(--accent); }
+
+  /* 动画：题目切换 */
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .anim-in { animation: slideIn 0.3s ease forwards; }
+
+  /* ─── 结果遮罩 ─── */
+  .result-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(13,7,32,0.85);
+    backdrop-filter: blur(8px);
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .result-overlay.active { display: flex; }
+
+  /* 结果卡片 */
+  .result-card {
+    background: var(--deep);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 24px; padding: 36px 40px;
+    max-width: 520px; width: 100%;
+    position: relative; overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    animation: popIn 0.45s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  /* 结果卡顶部渐变光晕（由JS动态控制颜色） */
+  .result-card::before {
+    content: ''; position: absolute;
+    top: -60px; left: 50%; transform: translateX(-50%);
+    width: 320px; height: 320px; border-radius: 50%;
+    pointer-events: none;
+    transition: background 0.4s;
+  }
+  .result-card-inner { position: relative; z-index: 1; }
+  .result-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--muted); text-transform: uppercase; text-align: center;
+    margin-bottom: 8px;
+  }
+  .result-type-name {
+    font-size: 30px; font-weight: 900; text-align: center;
+    letter-spacing: -0.5px; margin-bottom: 4px;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .result-type-en {
+    font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 20px;
+  }
+
+  /* 雷达图容器 */
+  .radar-wrap {
+    display: flex; justify-content: center; margin-bottom: 18px;
+  }
+
+  /* 特质标签 */
+  .trait-tags {
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 20px;
+  }
+  .trait-tag {
+    padding: 5px 13px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3);
+    color: rgba(240,234,248,0.85);
+  }
+
+  /* 性格描述 */
+  .result-desc {
+    font-size: 14px; color: var(--muted); line-height: 1.7;
+    text-align: center; margin-bottom: 20px;
+    padding: 14px 16px; background: rgba(255,255,255,0.04);
+    border-radius: 10px; border: 1px solid var(--border);
+  }
+
+  /* 奖品展示 */
+  .prize-block {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; border-radius: 12px;
+    background: rgba(245,200,66,0.08);
+    border: 1px solid rgba(245,200,66,0.25);
+    margin-bottom: 20px;
+  }
+  .prize-emoji { font-size: 32px; flex-shrink: 0; }
+  .prize-info { flex: 1; }
+  .prize-info-title { font-size: 11px; color: var(--gold); font-weight: 700; letter-spacing: 0.8px; margin-bottom: 3px; }
+  .prize-info-name { font-size: 15px; font-weight: 700; }
+
+  /* 结果按钮组 */
+  .result-btns { display: flex; gap: 10px; }
+  .btn-share {
+    flex: 1; padding: 13px 0; border-radius: 12px; border: none; cursor: pointer;
+    font-size: 14px; font-weight: 700; font-family: inherit;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white; transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+  }
+  .btn-share:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,0.5); }
+  .btn-retry {
+    flex: 1; padding: 13px 0; border-radius: 12px; cursor: pointer;
+    font-size: 14px; font-weight: 700; font-family: inherit;
+    background: rgba(255,255,255,0.06);
+    border: 1.5px solid var(--border); color: var(--text);
+    transition: all 0.15s;
+  }
+  .btn-retry:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+
+  /* 分享弹窗小提示 */
+  .share-toast {
+    position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: rgba(34,197,94,0.9); color: white;
+    padding: 10px 24px; border-radius: 30px;
+    font-size: 14px; font-weight: 600;
+    opacity: 0; transition: all 0.3s; z-index: 1000;
+    pointer-events: none; white-space: nowrap;
+  }
+  .share-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ─── 右侧数据面板 ─── */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.015);
+  }
+  .panel-right::-webkit-scrollbar { width: 4px; }
+  .panel-right::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  /* 数据统计卡 */
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 12px;
+  }
+  .stat-card-title {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .stat-big {
+    font-size: 32px; font-weight: 900;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* 分布柱状图 */
+  .dist-item { margin-bottom: 10px; }
+  .dist-item:last-child { margin-bottom: 0; }
+  .dist-header {
+    display: flex; justify-content: space-between;
+    font-size: 12px; margin-bottom: 4px;
+  }
+  .dist-name { color: var(--text); font-weight: 600; }
+  .dist-pct { color: var(--muted); }
+  .dist-bar {
+    height: 6px; background: rgba(255,255,255,0.07);
+    border-radius: 99px; overflow: hidden;
+  }
+  .dist-fill {
+    height: 100%; border-radius: 99px;
+    transition: width 0.8s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* 奖品统计 */
+  .prize-stat-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .prize-stat-item:last-child { border-bottom: none; }
+  .prize-stat-emoji { font-size: 20px; flex-shrink: 0; }
+  .prize-stat-info { flex: 1; min-width: 0; }
+  .prize-stat-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prize-stat-count { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .prize-stat-num {
+    font-size: 16px; font-weight: 800;
+    color: var(--gold); flex-shrink: 0;
+  }
+
+  /* 实时动态 */
+  .live-feed {
+    display: flex; flex-direction: column; gap: 7px;
+  }
+  .live-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--muted); line-height: 1.4;
+  }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #22C55E; flex-shrink: 0;
+    box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── 导航栏 ─── -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span>Game</span>Hub <div class="nav-badge">中台</div>
+  </a>
+  <div class="nav-scroll">
+    <div class="nav-tabs">
+      <a href="wheel.html"          class="nav-tab">大转盘</a>
+      <a href="nine-grid.html"      class="nav-tab">九宫格</a>
+      <a href="scratch-card.html"   class="nav-tab">刮刮乐</a>
+      <a href="shake-dice.html"     class="nav-tab">摇骰子</a>
+      <a href="smash-egg.html"      class="nav-tab">砸金蛋</a>
+      <a href="red-packet-rain.html" class="nav-tab">红包雨</a>
+      <a href="quiz.html"           class="nav-tab">问答闯关</a>
+      <a href="slot-machine.html"   class="nav-tab">老虎机</a>
+      <a href="flip-match.html"     class="nav-tab">翻牌配对</a>
+      <a href="blind-box.html"      class="nav-tab">盲盒抽奖</a>
+      <a href="gashapon.html"       class="nav-tab">扭蛋机</a>
+      <a href="claw-machine.html"   class="nav-tab">抓娃娃</a>
+      <a href="whack-mole.html"     class="nav-tab">打地鼠</a>
+      <a href="catch-coins.html"    class="nav-tab">接金币</a>
+      <a href="fruit-cut.html"      class="nav-tab">切水果</a>
+      <a href="snake.html"          class="nav-tab">贪吃蛇</a>
+      <a href="tetris.html"         class="nav-tab">俄罗斯方块</a>
+      <a href="2048.html"           class="nav-tab">2048</a>
+      <a href="minesweeper.html"    class="nav-tab">扫雷</a>
+      <a href="sudoku.html"         class="nav-tab">数独</a>
+      <a href="puzzle.html"         class="nav-tab">拼图</a>
+      <a href="sliding-puzzle.html" class="nav-tab">华容道</a>
+      <a href="number-bomb.html"    class="nav-tab">数字炸弹</a>
+      <a href="flying-chess.html"   class="nav-tab">飞行棋</a>
+      <a href="monopoly.html"       class="nav-tab">大富翁</a>
+      <a href="cup-game.html"       class="nav-tab">猜杯游戏</a>
+      <a href="ring-toss.html"      class="nav-tab">套圈圈</a>
+      <a href="slingshot.html"      class="nav-tab">弹弓射击</a>
+      <a href="pinball.html"        class="nav-tab">弹球台</a>
+      <a href="match3.html"         class="nav-tab">消消乐</a>
+      <a href="grow-tree.html"      class="nav-tab">种树养成</a>
+      <a href="stamp-collect.html"  class="nav-tab">集章打卡</a>
+      <a href="energy-collect.html" class="nav-tab">能量收集</a>
+      <a href="progress-unlock.html" class="nav-tab">进度解锁</a>
+      <a href="daily-checkin.html"  class="nav-tab">签到日历</a>
+      <a href="vote-pk.html"        class="nav-tab">投票PK</a>
+      <a href="shake.html"          class="nav-tab">摇一摇</a>
+      <a href="gift-box.html"       class="nav-tab">礼盒拆箱</a>
+      <a href="personality-test.html" class="nav-tab active">性格测试</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span style="font-size:12px;color:var(--muted)">夏日大促 2026</span>
+    <div class="status-badge">进行中</div>
+  </div>
+</nav>
+
+<!-- ─── 主体三列 ─── -->
+<div class="main">
+
+  <!-- ══════════════════════════════
+       左侧：配置面板
+  ══════════════════════════════════ -->
+  <div class="panel-left">
+
+    <div class="panel-title">测试主题</div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>选择测试类型</div>
+      <div id="themeList">
+        <div class="theme-item active" data-theme="workplace" onclick="selectTheme(this,'workplace')">
+          <span class="theme-icon">💼</span>
+          <div class="theme-info">
+            <div class="theme-name">职场性格</div>
+            <div class="theme-meta">Explorer / Achiever / Connector / Thinker</div>
+          </div>
+          <div class="theme-check">✓</div>
+        </div>
+        <div class="theme-item" data-theme="consume" onclick="selectTheme(this,'consume')">
+          <span class="theme-icon">🛍️</span>
+          <div class="theme-info">
+            <div class="theme-name">消费风格</div>
+            <div class="theme-meta">理性派 / 享乐型 / 实惠派 / 品质控</div>
+          </div>
+          <div class="theme-check"></div>
+        </div>
+        <div class="theme-item" data-theme="zodiac" onclick="selectTheme(this,'zodiac')">
+          <span class="theme-icon">✨</span>
+          <div class="theme-info">
+            <div class="theme-name">星座运势</div>
+            <div class="theme-meta">火象 / 水象 / 土象 / 风象</div>
+          </div>
+          <div class="theme-check"></div>
+        </div>
+        <div class="theme-item" data-theme="food" onclick="selectTheme(this,'food')">
+          <span class="theme-icon">🍜</span>
+          <div class="theme-info">
+            <div class="theme-name">美食性格</div>
+            <div class="theme-meta">美食家 / 实用派 / 探险家 / 家常控</div>
+          </div>
+          <div class="theme-check"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-title">题目数量</div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>每次作答题数</div>
+      <div class="seg-group" id="countGroup">
+        <button class="seg-btn" onclick="selectCount(this,5)">5题</button>
+        <button class="seg-btn" onclick="selectCount(this,8)">8题</button>
+        <button class="seg-btn active" onclick="selectCount(this,10)">10题</button>
+      </div>
+    </div>
+
+    <div class="panel-title">奖品配置</div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>各类型专属奖品</div>
+      <div id="prizeConfig">
+        <!-- 由 JS 动态渲染 -->
+      </div>
+    </div>
+
+    <div class="panel-title">结果卡主题色</div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>结果页光晕颜色</div>
+      <div class="color-swatches" id="colorSwatches">
+        <div class="swatch active" data-color="purple" style="background:linear-gradient(135deg,#7C3AED,#EC4899)" onclick="selectColor(this,'purple')"></div>
+        <div class="swatch" data-color="gold"   style="background:linear-gradient(135deg,#F5C842,#FF9500)" onclick="selectColor(this,'gold')"></div>
+        <div class="swatch" data-color="blue"   style="background:linear-gradient(135deg,#3B82F6,#06B6D4)" onclick="selectColor(this,'blue')"></div>
+        <div class="swatch" data-color="green"  style="background:linear-gradient(135deg,#22C55E,#10B981)" onclick="selectColor(this,'green')"></div>
+        <div class="swatch" data-color="pink"   style="background:linear-gradient(135deg,#EC4899,#F43F5E)" onclick="selectColor(this,'pink')"></div>
+        <div class="swatch" data-color="orange" style="background:linear-gradient(135deg,#F97316,#EF4444)" onclick="selectColor(this,'orange')"></div>
+      </div>
+    </div>
+
+  </div><!-- /panel-left -->
+
+  <!-- ══════════════════════════════
+       中间：游戏区域
+  ══════════════════════════════════ -->
+  <div class="game-center">
+
+    <!-- 开始屏 -->
+    <div class="start-screen" id="startScreen">
+      <div class="start-emoji" id="startEmoji">🧠</div>
+      <div class="start-title" id="startTitle">探索你的性格密码</div>
+      <div class="start-sub" id="startSub">
+        10道题，揭示你的职场性格类型<br>发现专属奖励，分享给朋友
+      </div>
+      <div class="start-tags">
+        <span class="start-tag">🔍 深度分析</span>
+        <span class="start-tag">🎁 专属奖品</span>
+        <span class="start-tag">📤 裂变分享</span>
+        <span class="start-tag">⚡ 90秒完成</span>
+      </div>
+      <button class="start-btn" onclick="startQuiz()">开始测试</button>
+    </div>
+
+    <!-- 答题屏 -->
+    <div class="quiz-screen" id="quizScreen">
+      <!-- 进度条 -->
+      <div class="progress-wrap">
+        <div class="progress-info">
+          <span class="progress-label" id="progressLabel">第 1 题 / 共 10 题</span>
+          <span class="progress-num" id="progressPct">10%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width:10%"></div>
+        </div>
+      </div>
+      <!-- 题目卡片 -->
+      <div class="question-card anim-in" id="questionCard">
+        <div class="question-number" id="questionNumber">QUESTION 01</div>
+        <div class="question-text" id="questionText">题目加载中…</div>
+      </div>
+      <!-- 选项 -->
+      <div class="options-grid" id="optionsGrid"></div>
+    </div>
+
+  </div><!-- /game-center -->
+
+  <!-- ══════════════════════════════
+       右侧：数据面板
+  ══════════════════════════════════ -->
+  <div class="panel-right">
+
+    <div class="panel-title">参与数据</div>
+
+    <!-- 总人数 -->
+    <div class="stat-card">
+      <div class="stat-card-title">累计完成测试</div>
+      <div class="stat-big" id="totalCount">3,847</div>
+      <div class="stat-sub">↑ 今日 +128 人</div>
+    </div>
+
+    <!-- 各类型分布 -->
+    <div class="stat-card">
+      <div class="stat-card-title">性格类型分布</div>
+      <div id="distChart">
+        <!-- 由JS渲染 -->
+      </div>
+    </div>
+
+    <!-- 奖品领取 -->
+    <div class="stat-card">
+      <div class="stat-card-title">奖品领取统计</div>
+      <div id="prizeStats">
+        <!-- 由JS渲染 -->
+      </div>
+    </div>
+
+    <!-- 实时动态 -->
+    <div class="stat-card">
+      <div class="stat-card-title">实时动态</div>
+      <div class="live-feed" id="liveFeed">
+        <!-- 由JS动态插入 -->
+      </div>
+    </div>
+
+  </div><!-- /panel-right -->
+
+</div><!-- /main -->
+
+<!-- ─── 结果遮罩 ─── -->
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-card" id="resultCard">
+    <div class="result-card-inner">
+      <div class="result-label">你的性格类型</div>
+      <div class="result-type-name" id="resultTypeName">探索者型</div>
+      <div class="result-type-en"  id="resultTypeEn">The Explorer</div>
+      <!-- SVG 雷达图 -->
+      <div class="radar-wrap">
+        <svg id="radarSvg" width="220" height="220" viewBox="0 0 220 220"></svg>
+      </div>
+      <!-- 特质标签 -->
+      <div class="trait-tags" id="traitTags"></div>
+      <!-- 性格描述 -->
+      <div class="result-desc" id="resultDesc"></div>
+      <!-- 奖品 -->
+      <div class="prize-block" id="resultPrize">
+        <div class="prize-emoji" id="prizeEmoji">🎁</div>
+        <div class="prize-info">
+          <div class="prize-info-title">🏆 专属奖励</div>
+          <div class="prize-info-name" id="prizeName">加载中…</div>
+        </div>
+      </div>
+      <!-- 操作按钮 -->
+      <div class="result-btns">
+        <button class="btn-share" onclick="sharResult()">📤 分享结果 · 邀请好友</button>
+        <button class="btn-retry" onclick="retryQuiz()">🔄 重新测试</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 分享成功提示 -->
+<div class="share-toast" id="shareToast">🎉 分享链接已复制！邀请好友一起测试</div>
+
+<!-- ════════════════════════════════════════════
+     JavaScript 核心逻辑
+════════════════════════════════════════════════ -->
+<script>
+/* ─────────────────────────────────────────────
+   题库数据：每个主题10道题，每题选项含分值映射
+   分值键对应四种性格类型：A/B/C/D
+─────────────────────────────────────────────── */
+const QUESTION_BANKS = {
+  // 职场性格：Explorer(A) / Achiever(B) / Connector(C) / Thinker(D)
+  workplace: {
+    emoji: '💼',
+    title: '探索你的职场密码',
+    sub: '10道题，揭示你的职场性格类型\n发现专属奖励，分享给朋友',
+    types: {
+      A: { name:'探索者型', en:'The Explorer',
+           desc:'你充满好奇心与创造力，喜欢挑战未知、拓展边界。天生的冒险家，总能在混乱中发现机会，带给团队无限可能与新鲜视角。',
+           traits:['🔍 好奇驱动','✨ 创意无限','🚀 敢于冒险','🌈 思维开阔','⚡ 行动力强'],
+           radar:[85,70,60,75,90], color:'#7C3AED' },
+      B: { name:'成就者型', en:'The Achiever',
+           desc:'你以结果为导向，执行力超强。设定目标、拆解路径、全力冲刺——这是你的工作模式。你是团队里最值得信赖的那块基石。',
+           traits:['🎯 目标聚焦','⚙️ 执行力强','🏆 追求卓越','💪 意志坚定','📊 数据思维'],
+           radar:[90,65,55,85,70], color:'#F59E0B' },
+      C: { name:'连接者型', en:'The Connector',
+           desc:'人际关系是你最大的资产。你天生善于倾听、建立信任，能让不同背景的人走到一起。你是团队的润滑剂和情感纽带。',
+           traits:['🤝 人际共情','💬 沟通达人','🌟 团队凝聚','❤️ 情绪感知','🎭 影响力强'],
+           radar:[65,90,75,60,80], color:'#EC4899' },
+      D: { name:'思考者型', en:'The Thinker',
+           desc:'你是深度思考的践行者。在做决策前，你会系统梳理信息、评估风险、推演结果。你的分析让团队少走弯路、避免盲目。',
+           traits:['🧠 深度分析','📐 逻辑严谨','🔬 注重细节','⚖️ 审慎决策','📚 知识广博'],
+           radar:[70,75,90,65,75], color:'#3B82F6' },
+    },
+    questions: [
+      { q:'工作中遇到棘手难题，你第一反应是？',
+        opts:['A 独自研究，探索新解法','B 快速评估，制定执行计划','C 找人讨论，集思广益','D 收集数据，系统分析'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你最享受哪种工作状态？',
+        opts:['A 探索没做过的新项目','B 高效完成一串待办清单','C 和团队一起头脑风暴','D 深入钻研一个复杂问题'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'会议上，你通常是哪种角色？',
+        opts:['A 提出大胆新方向的人','B 推进议程、确保落实的人','C 调和分歧、凝聚共识的人','D 提供数据和分析支撑的人'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'面对截止日期临近，你会？',
+        opts:['A 找到更聪明的捷径绕过难点','B 全力冲刺，绝不拖延','C 协调组员分工，一起扛','D 重新检查优先级，稳步推进'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你认为好领导最重要的品质是？',
+        opts:['A 能激发团队创意与潜能','B 目标清晰、雷厉风行','C 善于倾听、凝聚人心','D 判断准确、决策理性'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'同事犯了错，你会怎么处理？',
+        opts:['A 和他一起想创造性的弥补方案','B 直接指出问题，推动纠正','C 先安抚情绪，再理性复盘','D 梳理根因，避免下次复现'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'下班后，你更倾向于？',
+        opts:['A 尝试新的兴趣爱好','B 完成今天还没做完的事','C 和朋友/同事一起聚聚','D 看书或深度思考'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你最大的职业动力是？',
+        opts:['A 不断突破自我的边界','B 达成一个又一个里程碑','C 与优秀的人共同成长','D 把一件事做到极致精深'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'遇到观点分歧，你的态度是？',
+        opts:['A 拥抱不同，可能会碰撞出新思路','B 看谁的方案更有利于目标达成','C 理解对方立场，寻找共同点','D 用逻辑和证据来评判哪个更合理'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'理想的工作环境是？',
+        opts:['A 灵活自由，允许试错探索','B 目标明确，进度可量化','C 氛围融洽，团队紧密协作','D 安静专注，深度工作优先'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+    ]
+  },
+
+  // 消费风格：理性决策者(A) / 冲动享乐型(B) / 实惠派(C) / 品质追求者(D)
+  consume: {
+    emoji: '🛍️',
+    title: '揭秘你的消费性格',
+    sub: '10道题，看清你的购物基因\n专属优惠等你来领取',
+    types: {
+      A: { name:'理性决策者', en:'The Rational Buyer',
+           desc:'你购物前会做大量功课，对比参数、阅读评测，绝不冲动消费。每一笔支出都有明确理由，性价比是你最重要的标准。',
+           traits:['🧮 精打细算','📊 对比分析','🕵️ 深度调研','⚖️ 理性权衡','💡 明智消费'],
+           radar:[90,60,70,85,75], color:'#3B82F6' },
+      B: { name:'冲动享乐型', en:'The Impulsive Enjoyer',
+           desc:'你活在当下，购物是一种情绪出口。看到喜欢的就想拥有，享受开箱的快乐远超深思熟虑。生活因你而更有活力。',
+           traits:['💫 活在当下','🎉 及时行乐','🛒 果断购买','🎊 享受开箱','🌟 品味独到'],
+           radar:[65,92,80,60,75], color:'#EC4899' },
+      C: { name:'实惠派', en:'The Value Hunter',
+           desc:'你是优惠券、折扣和团购的忠实追随者。在你眼中，最聪明的消费是用最少的钱买到最大的价值。等到打折再出手！',
+           traits:['🏷️ 精准比价','⏳ 等待折扣','🎁 羊毛达人','💰 省钱高手','🔖 收藏党员'],
+           radar:[75,55,85,90,70], color:'#22C55E' },
+      D: { name:'品质追求者', en:'The Quality Seeker',
+           desc:'你宁愿少买，也要买好。材质、工艺、品牌故事——这些都是你的考量维度。你认为好东西值得溢价，质量就是最好的省钱。',
+           traits:['✨ 品质至上','🏅 信赖品牌','🎨 颜值敏感','💎 精选主义','🌿 可持续消费'],
+           radar:[80,70,60,75,92], color:'#F59E0B' },
+    },
+    questions: [
+      { q:'双11购物节，你通常怎么做？',
+        opts:['A 提前列清单，只买计划内的','B 看到喜欢的就加购，狂欢！','C 只等满减叠优惠时下单','D 只买几件心仪已久的好货'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'买了一件衣服回来，你最常有的感受是？',
+        opts:['A 满意，买之前做了功课','B 开心，冲动买的超喜欢','C 值，等到打折才下手','D 安心，这个牌子质量没问题'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你一般如何决定买哪款手机？',
+        opts:['A 看参数对比测评视频','B 朋友用的同款，好看就行','C 哪个搭配套餐便宜买哪个','D 只考虑一两个信赖的品牌'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'购物车里的东西，你多久会清空一次？',
+        opts:['A 考虑清楚再付款，可能很久','B 冲动来了马上结算','C 等凑够优惠门槛再付','D 收藏很久，真需要才买'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你对购物分期/花呗的态度？',
+        opts:['A 尽量不用，少花钱','B 偶尔用，买当下想要的','C 用，可以买更多省更多','D 不太在意，品质更重要'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'好友推荐一款新出的零食，你会？',
+        opts:['A 先搜评价再决定买不买','B 马上下单，尝鲜第一！','C 等有活动再说','D 先看看配料表和品牌'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你更愿意为什么类型的东西多花钱？',
+        opts:['A 功能强大的工具','B 当下喜欢的潮流单品','C 实用耐用的家居用品','D 经典款、传世品'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'发现一家新开的网红餐厅，你会？',
+        opts:['A 先查价格和评分再决定','B 立刻种草，周末就去！','C 等团购券出来再去','D 先看看食材和厨师来源'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你的衣柜里大多是？',
+        opts:['A 实用款，穿过很多次的','B 新买的，时髦当季款','C 打折淘来的宝贝','D 经典好料子、少而精'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你认为"聪明消费"是？',
+        opts:['A 买最符合需求的','B 买让自己开心的','C 买最省钱的','D 买最经得起时间的'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+    ]
+  },
+
+  // 星座运势：火象(A) / 水象(B) / 土象(C) / 风象(D)
+  zodiac: {
+    emoji: '✨',
+    title: '探测你的元素能量',
+    sub: '10道题，发现你内在的星座元素\n火·水·土·风，你属于哪一脉？',
+    types: {
+      A: { name:'火象星座能量', en:'Fire Element · 白羊/狮子/射手',
+           desc:'你充满激情与活力，天生的领袖气质让你走到哪里都是焦点。你勇于开创、热情洋溢，面对挑战从不退缩，有燃烧周围人的能量。',
+           traits:['🔥 激情满满','👑 天生领袖','⚡ 行动力爆表','🦁 勇气十足','🌟 感染力强'],
+           radar:[95,75,60,80,70], color:'#EF4444' },
+      B: { name:'水象星座能量', en:'Water Element · 巨蟹/天蝎/双鱼',
+           desc:'你拥有细腻的情感感知能力，能深入理解他人的内心。直觉敏锐、富有同理心，你在人际关系中有着无可替代的温柔力量。',
+           traits:['🌊 情感深邃','🌙 直觉灵敏','💙 共情专家','🔮 神秘气质','🌸 温柔治愈'],
+           radar:[70,92,75,65,80], color:'#06B6D4' },
+      C: { name:'土象星座能量', en:'Earth Element · 金牛/处女/摩羯',
+           desc:'你踏实可靠、脚踏实地，是朋友圈里最值得信赖的存在。你注重实际、持之以恒，任何事到你手里都会被做得扎实而完美。',
+           traits:['🌱 脚踏实地','🏔️ 稳定可靠','⚙️ 精益求精','💪 持之以恒','🍀 务实智慧'],
+           radar:[75,65,92,80,70], color:'#22C55E' },
+      D: { name:'风象星座能量', en:'Air Element · 双子/天秤/水瓶',
+           desc:'你思维灵活、智识广博，对世界充满好奇心。你善于沟通、眼界开阔，总能用独特的视角看待问题，是观念的传播者与连接者。',
+           traits:['💨 思维飞速','🗣️ 表达大师','🌐 眼界开阔','🎭 社交达人','💡 创意源泉'],
+           radar:[80,70,65,92,75], color:'#8B5CF6' },
+    },
+    questions: [
+      { q:'好友临时取消约定，你的第一感受是？',
+        opts:['A 有点生气，但立刻另寻安排','B 有些失落，希望了解原因','C 没关系，调整计划就好','D 好啊，刚好可以做别的事'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你在一段新的关系中更倾向于？',
+        opts:['A 大胆主动，快速建立联系','B 细心观察，慢慢敞开心扉','C 真诚投入，稳步发展','D 先做朋友，保持轻松氛围'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'旅行中，你最享受的是？',
+        opts:['A 挑战极限或体验刺激项目','B 感受当地人文与情感氛围','C 按计划游览，深入体验','D 随机漫步，发现意外惊喜'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你做决定时更依赖？',
+        opts:['A 直觉和当下的冲劲','B 内心的感受和情感直觉','C 过去经验和实际考量','D 理性分析和多方信息'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你最常被身边人夸赞的是？',
+        opts:['A 勇敢、有冲劲','B 贴心、善解人意','C 靠谱、有责任感','D 聪明、想法多'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你遇到不公平的事，通常？',
+        opts:['A 直接说出来，捍卫自己','B 内心很在意，但先消化情绪','C 冷静处理，寻求合理结果','D 分析事件本质，寻找平衡点'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'空闲时间你最喜欢？',
+        opts:['A 运动、冒险或外出探索','B 写日记、听音乐或独处沉思','C 整理家居、规划近期目标','D 看书、聊天或学新东西'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你更害怕哪种情形？',
+        opts:['A 被束缚、失去自由','B 被误解、情感受伤','C 不稳定、失去掌控','D 思维停滞、失去成长'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'处理矛盾时，你的方式？',
+        opts:['A 直接摊牌，快速解决','B 深入沟通，修复情感','C 稳重处理，找出症结','D 理性对话，找到共识'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你觉得什么最能代表你？',
+        opts:['A 燃烧的火焰，炽热而有力','B 流动的海洋，深邃而包容','C 大地与山峰，稳固而厚重','D 流动的风，自由而充满变化'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+    ]
+  },
+
+  // 美食性格：美食家(A) / 实用派(B) / 探险家(C) / 家常控(D)
+  food: {
+    emoji: '🍜',
+    title: '测测你的美食基因',
+    sub: '10道题，发现你的独特饮食性格\n找到专属你的美食奖励',
+    types: {
+      A: { name:'美食鉴赏家', en:'The Gourmet',
+           desc:'你对食物充满热情与敬意，能感知食材的微妙差异，追求极致的风味体验。米其林餐厅或街边小馆，只要够好，你都乐于探索。',
+           traits:['🌟 极致品味','🍷 风味敏感','📸 食物美学','🗺️ 觅食达人','👨‍🍳 热爱厨艺'],
+           radar:[95,80,70,75,85], color:'#F59E0B' },
+      B: { name:'实用主义派', en:'The Practical Eater',
+           desc:'对你来说，吃饭就是补充能量、让身体运转。你不追求仪式感，快捷方便是第一位，能吃饱、营养均衡就够了。效率第一！',
+           traits:['⚡ 效率优先','🥗 注重营养','🕐 省时用餐','💰 性价比高','🔄 规律饮食'],
+           radar:[70,65,80,92,60], color:'#22C55E' },
+      C: { name:'饮食探险家', en:'The Food Explorer',
+           desc:'你把吃饭当冒险，越稀奇越感兴趣。异国料理、奇特食材、网红新品——你永远愿意第一个尝试，口感新鲜感就是最大满足。',
+           traits:['🌍 异国风味','🧪 勇于尝鲜','📱 网红打卡','🎲 随机选餐','🔥 重口味控'],
+           radar:[85,90,65,70,75], color:'#EC4899' },
+      D: { name:'家常味道控', en:'The Home Cook Lover',
+           desc:'家常菜就是你的最爱，妈妈的味道才是终极美味。外出就餐你偏爱烟火气十足的小馆子，亲切、熟悉、有温度的食物让你最安心。',
+           traits:['🏠 家的味道','🫕 烟火气质','❤️ 情感饮食','🥘 熟悉口味','👪 共餐文化'],
+           radar:[70,75,92,65,88], color:'#F97316' },
+    },
+    questions: [
+      { q:'去一家新餐厅，你最先看什么？',
+        opts:['A 菜品食材来源和厨师介绍','B 价格套餐和营养搭配','C 有没有从没见过的特色菜','D 有没有熟悉的家常菜'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'午饭时间有限，你会？',
+        opts:['A 找一家好吃的，就算排队也值','B 随便快餐，赶紧吃完干活','C 去试试最近的新开网红店','D 找家口碑老店，必有家常菜'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你对食物的核心要求是？',
+        opts:['A 食材新鲜，工艺精湛','B 营养均衡，热量合理','C 从未吃过，口感新奇','D 熟悉的味道，有温度感'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'如果可以随意选择晚餐，你会选？',
+        opts:['A 精致的主厨发布菜单','B 快手健康便当','C 泰国、越南或秘鲁菜','D 妈妈做的红烧肉和米饭'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'朋友圈看到一道新食谱，你会？',
+        opts:['A 研究技法，尝试复刻','B 看看热量再说','C 马上收藏，下周挑战','D 看看有没有自己喜欢的家常版本'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'旅行时，你最期待的是？',
+        opts:['A 当地最有名的高端餐厅','B 有健康选择的连锁店','C 当地人爱去的奇特小馆','D 最正宗的地道家常料理'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你觉得一顿饭最重要的是？',
+        opts:['A 食材与烹调的极致细节','B 吃完精神饱满，没有负担','C 每一口都有意外惊喜','D 有人陪、有笑声、有温度'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'点外卖，你通常怎么选？',
+        opts:['A 看评分最高的精品店','B 热量低、快速到达','C 新开的、没点过的','D 熟悉的老店，就是那个味'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你对吃辣的态度？',
+        opts:['A 看菜系，辣要辣得有层次','B 微辣即可，不影响消化','C 越辣越好，挑战极限','D 家里做的酸辣才是我爱的'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+      { q:'你觉得什么样的用餐体验最完美？',
+        opts:['A 食材讲究、服务精致、氛围雅致','B 快速上桌、不浪费、刚好吃饱','C 菜单从没见过、吃完有说不完的话题','D 家人围坐、熟悉的菜、热闹温馨'],
+        scores:{A:'A',B:'B',C:'C',D:'D'} },
+    ]
+  }
+};
+
+/* ─────────────────────────────────────────────
+   游戏状态
+─────────────────────────────────────────────── */
+let currentTheme = 'workplace';
+let totalQuestions = 10;
+let currentIndex = 0;
+let answers = [];   // 存每题选的类型key
+let activeQuestions = [];
+let selectedColor = 'purple';
+
+// 奖品配置（默认值）
+let prizeMap = {
+  workplace: { A:'探险者专属优惠券×1', B:'成就者VIP体验资格', C:'连接者好友邀请礼包', D:'思考者知识礼盒' },
+  consume:   { A:'理性派精选购物礼金', B:'享乐型限量潮品', C:'实惠派超值折扣码', D:'品质派轻奢体验券' },
+  zodiac:    { A:'火象能量激活礼盒', B:'水象灵感盲盒', C:'土象稳稳幸福礼包', D:'风象自由探索券' },
+  food:      { A:'美食家私厨体验名额', B:'营养师定制食谱', C:'探险家异国料理礼包', D:'家常控烹饪礼品套装' },
+};
+
+// 颜色主题映射
+const COLOR_THEMES = {
+  purple: { glow:'rgba(124,58,237,0.35)', gradient:'linear-gradient(135deg,#7C3AED,#EC4899)' },
+  gold:   { glow:'rgba(245,200,66,0.35)',  gradient:'linear-gradient(135deg,#F5C842,#FF9500)' },
+  blue:   { glow:'rgba(59,130,246,0.35)',  gradient:'linear-gradient(135deg,#3B82F6,#06B6D4)' },
+  green:  { glow:'rgba(34,197,94,0.35)',   gradient:'linear-gradient(135deg,#22C55E,#10B981)' },
+  pink:   { glow:'rgba(236,72,153,0.35)',  gradient:'linear-gradient(135deg,#EC4899,#F43F5E)' },
+  orange: { glow:'rgba(249,115,22,0.35)',  gradient:'linear-gradient(135deg,#F97316,#EF4444)' },
+};
+
+/* ─────────────────────────────────────────────
+   初始化
+─────────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  renderPrizeConfig();
+  renderDistChart();
+  renderPrizeStats();
+  renderLiveFeed();
+  // 每5秒刷新实时动态
+  setInterval(pushLiveItem, 5000);
+});
+
+/* ─────────────────────────────────────────────
+   左侧面板：切换测试主题
+─────────────────────────────────────────────── */
+function selectTheme(el, themeKey) {
+  document.querySelectorAll('.theme-item').forEach(i => {
+    i.classList.remove('active');
+    i.querySelector('.theme-check').textContent = '';
+  });
+  el.classList.add('active');
+  el.querySelector('.theme-check').textContent = '✓';
+  currentTheme = themeKey;
+
+  const bank = QUESTION_BANKS[themeKey];
+  // 更新开始屏文案
+  document.getElementById('startEmoji').textContent = bank.emoji;
+  document.getElementById('startTitle').textContent = bank.title;
+  document.getElementById('startSub').innerHTML = bank.sub.replace('\n','<br>');
+
+  // 重新渲染奖品配置
+  renderPrizeConfig();
+  renderDistChart();
+  renderPrizeStats();
+}
+
+/* ─────────────────────────────────────────────
+   左侧面板：题目数量
+─────────────────────────────────────────────── */
+function selectCount(el, n) {
+  document.querySelectorAll('#countGroup .seg-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  totalQuestions = n;
+}
+
+/* ─────────────────────────────────────────────
+   左侧面板：奖品配置渲染
+─────────────────────────────────────────────── */
+function renderPrizeConfig() {
+  const bank = QUESTION_BANKS[currentTheme];
+  const prizes = prizeMap[currentTheme];
+  const typeColors = { A:'#7C3AED', B:'#F59E0B', C:'#EC4899', D:'#22C55E' };
+  let html = '';
+  Object.keys(bank.types).forEach(key => {
+    const t = bank.types[key];
+    html += `
+      <div class="prize-row">
+        <span class="prize-type-badge" style="background:${typeColors[key]}22;color:${typeColors[key]};border:1px solid ${typeColors[key]}55">
+          ${t.name.slice(0,4)}
+        </span>
+        <input class="prize-input" id="prize-${key}" value="${prizes[key]}"
+          onchange="updatePrize('${key}', this.value)"
+          placeholder="请输入奖品名称…">
+      </div>`;
+  });
+  document.getElementById('prizeConfig').innerHTML = html;
+}
+
+function updatePrize(key, val) {
+  prizeMap[currentTheme][key] = val;
+}
+
+/* ─────────────────────────────────────────────
+   左侧面板：主题色
+─────────────────────────────────────────────── */
+function selectColor(el, colorKey) {
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  selectedColor = colorKey;
+}
+
+/* ─────────────────────────────────────────────
+   游戏开始
+─────────────────────────────────────────────── */
+function startQuiz() {
+  const bank = QUESTION_BANKS[currentTheme];
+  // 从完整题库中随机取 totalQuestions 道
+  const shuffled = [...bank.questions].sort(() => Math.random() - 0.5);
+  activeQuestions = shuffled.slice(0, totalQuestions);
+  answers = [];
+  currentIndex = 0;
+
+  document.getElementById('startScreen').style.display = 'none';
+  const qs = document.getElementById('quizScreen');
+  qs.classList.add('active');
+  renderQuestion();
+}
+
+/* ─────────────────────────────────────────────
+   渲染当前题目
+─────────────────────────────────────────────── */
+function renderQuestion() {
+  const q = activeQuestions[currentIndex];
+  const total = activeQuestions.length;
+  const pct = Math.round(((currentIndex + 1) / total) * 100);
+
+  // 进度更新
+  document.getElementById('progressLabel').textContent = `第 ${currentIndex + 1} 题 / 共 ${total} 题`;
+  document.getElementById('progressPct').textContent = `${pct}%`;
+  document.getElementById('progressFill').style.width = `${pct}%`;
+
+  // 题目内容
+  const card = document.getElementById('questionCard');
+  card.classList.remove('anim-in');
+  void card.offsetWidth; // 触发重排以重置动画
+  card.classList.add('anim-in');
+
+  document.getElementById('questionNumber').textContent =
+    `QUESTION ${String(currentIndex + 1).padStart(2,'0')}`;
+  document.getElementById('questionText').textContent = q.q;
+
+  // 选项
+  const letters = ['A','B','C','D'];
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+  q.opts.forEach((opt, idx) => {
+    const letter = letters[idx];
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `
+      <span class="option-letter">${letter}</span>
+      <span>${opt.slice(2)}</span>`;
+    btn.onclick = () => selectOption(letter, q.scores[letter]);
+    grid.appendChild(btn);
+  });
+}
+
+/* ─────────────────────────────────────────────
+   选择答案并跳转
+─────────────────────────────────────────────── */
+function selectOption(letter, typeKey) {
+  // 标记选中
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.classList.remove('selected'));
+  const letters = ['A','B','C','D'];
+  const idx = letters.indexOf(letter);
+  if (btns[idx]) btns[idx].classList.add('selected');
+
+  answers.push(typeKey);
+
+  // 延迟300ms跳下一题，让用户看到选中效果
+  setTimeout(() => {
+    currentIndex++;
+    if (currentIndex >= activeQuestions.length) {
+      showResult();
+    } else {
+      renderQuestion();
+    }
+  }, 300);
+}
+
+/* ─────────────────────────────────────────────
+   计算结果
+─────────────────────────────────────────────── */
+function calcResult() {
+  const count = { A:0, B:0, C:0, D:0 };
+  answers.forEach(k => { if (count[k] !== undefined) count[k]++; });
+  // 取分值最高的
+  const winner = Object.keys(count).reduce((a, b) => count[a] >= count[b] ? a : b);
+  return { winner, count };
+}
+
+/* ─────────────────────────────────────────────
+   展示结果
+─────────────────────────────────────────────── */
+function showResult() {
+  const { winner, count } = calcResult();
+  const bank = QUESTION_BANKS[currentTheme];
+  const type = bank.types[winner];
+  const theme = COLOR_THEMES[selectedColor];
+  const prize = prizeMap[currentTheme][winner];
+
+  // 设置结果内容
+  document.getElementById('resultTypeName').textContent = `「${type.name}」`;
+  document.getElementById('resultTypeEn').textContent = type.en;
+  document.getElementById('resultDesc').textContent = type.desc;
+  document.getElementById('prizeName').textContent = prize;
+
+  // 光晕颜色
+  const card = document.getElementById('resultCard');
+  card.querySelector('::before'); // 无法直接修改伪元素，用内联覆盖
+  card.style.setProperty('--glow-color', theme.glow);
+  // 用绝对定位元素模拟光晕
+  let glow = card.querySelector('.glow-orb');
+  if (!glow) {
+    glow = document.createElement('div');
+    glow.className = 'glow-orb';
+    glow.style.cssText = `position:absolute;top:-80px;left:50%;transform:translateX(-50%);
+      width:360px;height:360px;border-radius:50%;pointer-events:none;z-index:0;`;
+    card.insertBefore(glow, card.firstChild);
+  }
+  glow.style.background = `radial-gradient(circle, ${theme.glow} 0%, transparent 70%)`;
+
+  // 特质标签
+  document.getElementById('traitTags').innerHTML =
+    type.traits.map(t => `<span class="trait-tag">${t}</span>`).join('');
+
+  // 奖品emoji（根据奖品关键词智能匹配）
+  const prizeEmojis = ['🎁','🏆','💎','🌟','🎀','🎉','🥇','✨','🎊','💰'];
+  document.getElementById('prizeEmoji').textContent =
+    prizeEmojis[winner.charCodeAt(0) % prizeEmojis.length];
+
+  // SVG雷达图
+  drawRadar(type.radar, type.color);
+
+  // 展示遮罩
+  document.getElementById('resultOverlay').classList.add('active');
+
+  // 更新右侧数据（模拟新增一条记录）
+  updateStats(winner);
+}
+
+/* ─────────────────────────────────────────────
+   SVG 雷达图绘制
+─────────────────────────────────────────────── */
+function drawRadar(values, color) {
+  const svg = document.getElementById('radarSvg');
+  const W = 220, CX = 110, CY = 110, R = 80;
+  const labels = ['创造力','执行力','社交力','分析力','感知力'];
+  const n = 5;
+  const step = (Math.PI * 2) / n;
+  const startAngle = -Math.PI / 2; // 从顶部开始
+
+  // 多边形顶点计算
+  const getPoint = (i, r) => ({
+    x: CX + r * Math.cos(startAngle + i * step),
+    y: CY + r * Math.sin(startAngle + i * step)
+  });
+
+  let svgHTML = '';
+
+  // 背景网格（5层）
+  [0.2, 0.4, 0.6, 0.8, 1.0].forEach(ratio => {
+    const pts = Array.from({length:n}, (_,i) => {
+      const p = getPoint(i, R * ratio);
+      return `${p.x},${p.y}`;
+    }).join(' ');
+    svgHTML += `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
+  });
+
+  // 轴线
+  for (let i = 0; i < n; i++) {
+    const p = getPoint(i, R);
+    svgHTML += `<line x1="${CX}" y1="${CY}" x2="${p.x}" y2="${p.y}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;
+  }
+
+  // 数据多边形
+  const dataPoints = values.map((v, i) => {
+    const r = R * (v / 100);
+    return getPoint(i, r);
+  });
+  const polyStr = dataPoints.map(p => `${p.x},${p.y}`).join(' ');
+  svgHTML += `<polygon points="${polyStr}" fill="${color}33" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>`;
+
+  // 数据点圆圈
+  dataPoints.forEach(p => {
+    svgHTML += `<circle cx="${p.x}" cy="${p.y}" r="4" fill="${color}" stroke="white" stroke-width="1.5"/>`;
+  });
+
+  // 标签
+  labels.forEach((label, i) => {
+    const p = getPoint(i, R + 18);
+    let anchor = 'middle';
+    if (p.x < CX - 10) anchor = 'end';
+    else if (p.x > CX + 10) anchor = 'start';
+    svgHTML += `<text x="${p.x}" y="${p.y + 4}" text-anchor="${anchor}"
+      font-size="11" fill="rgba(240,234,248,0.6)" font-family="-apple-system,'PingFang SC',sans-serif">${label}</text>`;
+  });
+
+  // 分值标注
+  values.forEach((v, i) => {
+    const p = getPoint(i, R * (v / 100));
+    svgHTML += `<text x="${p.x}" y="${p.y - 8}" text-anchor="middle"
+      font-size="10" font-weight="700" fill="${color}" font-family="-apple-system,sans-serif">${v}</text>`;
+  });
+
+  svg.innerHTML = svgHTML;
+}
+
+/* ─────────────────────────────────────────────
+   分享结果
+─────────────────────────────────────────────── */
+function sharResult() {
+  const bank = QUESTION_BANKS[currentTheme];
+  const { winner } = calcResult();
+  const type = bank.types[winner];
+  const text = `我测出来是「${type.name}」！${type.en} | ${type.traits.slice(0,3).join(' ')}`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(`${text}\n来测测你是什么性格？`);
+  }
+  const toast = document.getElementById('shareToast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+/* ─────────────────────────────────────────────
+   重新测试
+─────────────────────────────────────────────── */
+function retryQuiz() {
+  document.getElementById('resultOverlay').classList.remove('active');
+  document.getElementById('quizScreen').classList.remove('active');
+  document.getElementById('startScreen').style.display = '';
+  answers = [];
+  currentIndex = 0;
+}
+
+/* ─────────────────────────────────────────────
+   右侧数据面板
+─────────────────────────────────────────────── */
+// 模拟各类型分布数据
+let distData = {
+  workplace: { A:31, B:28, C:22, D:19 },
+  consume:   { A:25, B:30, C:27, D:18 },
+  zodiac:    { A:26, B:24, C:28, D:22 },
+  food:      { A:20, B:32, C:25, D:23 },
+};
+
+function renderDistChart() {
+  const bank = QUESTION_BANKS[currentTheme];
+  const dist = distData[currentTheme];
+  const total = Object.values(dist).reduce((a,b) => a+b, 0);
+  const barColors = { A:'#7C3AED', B:'#F59E0B', C:'#EC4899', D:'#22C55E' };
+  let html = '';
+  Object.keys(bank.types).forEach(key => {
+    const pct = Math.round((dist[key] / total) * 100);
+    html += `
+      <div class="dist-item">
+        <div class="dist-header">
+          <span class="dist-name">${bank.types[key].name}</span>
+          <span class="dist-pct">${pct}%</span>
+        </div>
+        <div class="dist-bar">
+          <div class="dist-fill" id="dist-${key}" style="width:0%;background:${barColors[key]}"></div>
+        </div>
+      </div>`;
+  });
+  document.getElementById('distChart').innerHTML = html;
+  // 延迟触发动画
+  requestAnimationFrame(() => {
+    Object.keys(bank.types).forEach(key => {
+      const pct = Math.round((dist[key] / total) * 100);
+      const el = document.getElementById(`dist-${key}`);
+      if (el) el.style.width = `${pct}%`;
+    });
+  });
+}
+
+function renderPrizeStats() {
+  const bank = QUESTION_BANKS[currentTheme];
+  const dist = distData[currentTheme];
+  const prizeEmojis = { A:'🏆', B:'🎯', C:'🎁', D:'📚' };
+  const prizes = prizeMap[currentTheme];
+  let html = '';
+  Object.keys(bank.types).forEach(key => {
+    const count = Math.round(dist[key] * 12.3); // 模拟数量
+    html += `
+      <div class="prize-stat-item">
+        <span class="prize-stat-emoji">${prizeEmojis[key]}</span>
+        <div class="prize-stat-info">
+          <div class="prize-stat-name">${prizes[key]}</div>
+          <div class="prize-stat-count">${bank.types[key].name}</div>
+        </div>
+        <span class="prize-stat-num">${count}</span>
+      </div>`;
+  });
+  document.getElementById('prizeStats').innerHTML = html;
+}
+
+// 实时动态假数据
+const LIVE_NAMES  = ['小明','芸芸','Jason','小鱼儿','阿杰','Grace','悠悠','Tony','欣欣','老王'];
+const LIVE_CITIES = ['上海','北京','广州','深圳','成都','杭州','武汉','西安','南京','重庆'];
+
+function renderLiveFeed() {
+  const feed = document.getElementById('liveFeed');
+  feed.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    feed.appendChild(createLiveItem());
+  }
+}
+
+function createLiveItem() {
+  const bank = QUESTION_BANKS[currentTheme];
+  const typeKeys = Object.keys(bank.types);
+  const typeKey  = typeKeys[Math.floor(Math.random() * typeKeys.length)];
+  const typeName = bank.types[typeKey].name;
+  const name  = LIVE_NAMES[Math.floor(Math.random() * LIVE_NAMES.length)];
+  const city  = LIVE_CITIES[Math.floor(Math.random() * LIVE_CITIES.length)];
+  const mins  = Math.floor(Math.random() * 10) + 1;
+  const div = document.createElement('div');
+  div.className = 'live-item';
+  div.innerHTML = `<span class="live-dot"></span>${city}的${name} ${mins}分钟前测出「${typeName}」`;
+  return div;
+}
+
+function pushLiveItem() {
+  const feed = document.getElementById('liveFeed');
+  if (!feed) return;
+  const item = createLiveItem();
+  item.style.opacity = '0';
+  item.style.transform = 'translateY(-6px)';
+  item.style.transition = 'all 0.4s';
+  feed.insertBefore(item, feed.firstChild);
+  requestAnimationFrame(() => {
+    item.style.opacity = '1';
+    item.style.transform = 'translateY(0)';
+  });
+  // 保持最多7条
+  while (feed.children.length > 7) {
+    feed.removeChild(feed.lastChild);
+  }
+}
+
+// 更新统计（每完成一次测试后调用）
+function updateStats(winnerKey) {
+  distData[currentTheme][winnerKey]++;
+  const totalEl = document.getElementById('totalCount');
+  const cur = parseInt(totalEl.textContent.replace(/,/g,'')) + 1;
+  totalEl.textContent = cur.toLocaleString();
+  renderDistChart();
+  renderPrizeStats();
+  pushLiveItem();
+}
+</script>
+</body>
+</html>
