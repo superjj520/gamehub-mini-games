@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 弹弓射击</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.97);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: inherit;
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .nav-links-wrap {
+    flex: 1;
+    overflow-x: auto;
+    margin: 0 20px;
+    scrollbar-width: none;
+  }
+  .nav-links-wrap::-webkit-scrollbar { display: none; }
+  .nav-links {
+    display: flex;
+    gap: 2px;
+    white-space: nowrap;
+  }
+  .nav-link {
+    padding: 6px 13px; border-radius: 7px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-link:hover { background: var(--card); color: var(--text); }
+  .nav-link.active { background: var(--card); color: var(--gold); }
+  .nav-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.4} }
+  .status-text { font-size: 12px; color: var(--muted); }
+
+  /* ─── 主体三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: calc(100vh - 57px - 42px);
+  }
+
+  /* ─── 通用面板样式 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--deep);
+    position: relative;
+    overflow: hidden;
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* ─── 选项按钮组 ─── */
+  .opt-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .opt-btn {
+    flex: 1; min-width: 60px; padding: 9px 6px; border-radius: 8px;
+    text-align: center; font-size: 13px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s;
+    color: var(--muted); font-weight: 600;
+  }
+  .opt-btn:hover { border-color: rgba(124,58,237,0.5); color: var(--text); }
+  .opt-btn.active {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.15);
+    color: var(--gold);
+  }
+
+  /* ─── 目标类型开关 ─── */
+  .target-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .target-toggle {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px; border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .target-toggle:hover { border-color: rgba(124,58,237,0.4); }
+  .target-toggle.on { border-color: var(--accent); background: rgba(124,58,237,0.12); }
+  .target-icon { font-size: 20px; }
+  .target-info { flex: 1; }
+  .target-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .target-score { font-size: 11px; color: var(--muted); }
+  .toggle-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(255,255,255,0.15); flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .target-toggle.on .toggle-dot { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+
+  /* ─── 奖品配置 ─── */
+  .prize-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+  }
+  .prize-row:last-child { margin-bottom: 0; }
+  .prize-icon { font-size: 18px; }
+  .prize-input {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .prize-input:focus { border-color: var(--accent); }
+  .prize-label { font-size: 12px; color: var(--muted); width: 55px; text-align: right; flex-shrink: 0; }
+
+  /* ─── 中间区域HUD ─── */
+  .game-hud {
+    display: flex; align-items: center; gap: 16px;
+    width: 100%; margin-bottom: 12px;
+    padding: 10px 16px; border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .hud-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .hud-label { font-size: 10px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+  .hud-val { font-size: 20px; font-weight: 700; color: var(--gold); line-height: 1; }
+  .hud-sep { width: 1px; height: 30px; background: var(--border); }
+  .hud-center { flex: 1; text-align: center; }
+  .hud-level { font-size: 15px; font-weight: 700; color: var(--text); }
+  .hud-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* 石子剩余指示 */
+  .stone-bar {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+  .stone-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #c8a86c, #7a5c2a);
+    border: 1px solid rgba(245,200,66,0.4);
+    transition: opacity 0.3s;
+  }
+  .stone-dot.used { opacity: 0.2; }
+
+  /* Canvas 容器 */
+  .canvas-wrap {
+    flex: 1; width: 100%;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: crosshair;
+    min-height: 0;
+  }
+  #gameCanvas {
+    display: block;
+    width: 100%; height: 100%;
+  }
+
+  /* 游戏遮罩（开始/过关/结束） */
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(13,7,32,0.88);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+    z-index: 10;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-title { font-size: 32px; font-weight: 800; color: var(--gold); text-shadow: 0 0 20px rgba(245,200,66,0.5); }
+  .overlay-sub { font-size: 15px; color: var(--muted); text-align: center; line-height: 1.6; }
+  .overlay-score { font-size: 22px; font-weight: 700; color: var(--text); }
+  .overlay-btns { display: flex; gap: 12px; margin-top: 8px; }
+  .btn-start {
+    padding: 12px 32px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: #fff; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-start:hover { opacity: 0.85; }
+  .btn-outline {
+    padding: 12px 28px; border-radius: 10px;
+    background: transparent;
+    border: 1px solid var(--border); color: var(--muted); font-size: 15px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--text); }
+
+  /* 操作按钮区 */
+  .action-bar {
+    display: flex; gap: 10px; margin-top: 10px;
+    flex-shrink: 0;
+  }
+  .btn-action {
+    flex: 1; padding: 10px 20px; border-radius: 9px; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none; transition: all 0.2s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .btn-secondary:hover { color: var(--text); border-color: var(--accent); }
+
+  /* ─── 右侧数据面板 ─── */
+  .stat-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--muted); }
+  .stat-val { font-weight: 700; color: var(--text); }
+  .stat-val.gold { color: var(--gold); }
+  .stat-val.green { color: #22C55E; }
+
+  /* 关卡进度条 */
+  .level-progress {
+    margin-bottom: 6px;
+  }
+  .level-progress-bar {
+    height: 6px; border-radius: 3px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden; margin-top: 6px;
+  }
+  .level-progress-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.4s ease;
+  }
+  .level-steps {
+    display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap;
+  }
+  .level-step {
+    width: 24px; height: 24px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--muted); transition: all 0.3s;
+  }
+  .level-step.done { background: rgba(34,197,94,0.15); border-color: #22C55E; color: #22C55E; }
+  .level-step.current { background: rgba(124,58,237,0.2); border-color: var(--accent); color: var(--gold); }
+
+  /* 目标击中统计 */
+  .hit-stat {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .hit-stat:last-child { border-bottom: none; }
+  .hit-icon { font-size: 16px; width: 24px; text-align: center; }
+  .hit-name { flex: 1; font-size: 12px; color: var(--muted); }
+  .hit-count { font-size: 14px; font-weight: 700; color: var(--text); }
+  .hit-bar {
+    height: 3px; border-radius: 2px;
+    background: rgba(255,255,255,0.08);
+    margin-top: 4px; overflow: hidden;
+  }
+  .hit-bar-fill {
+    height: 100%; border-radius: 2px;
+    background: var(--accent2);
+    transition: width 0.4s ease;
+  }
+
+  /* 奖品解锁状态 */
+  .prize-unlock {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    margin-bottom: 8px;
+    transition: all 0.3s;
+  }
+  .prize-unlock.unlocked { border-color: var(--gold); background: rgba(245,200,66,0.08); }
+  .prize-unlock-icon { font-size: 20px; }
+  .prize-unlock-info { flex: 1; }
+  .prize-unlock-name { font-size: 12px; font-weight: 600; }
+  .prize-unlock-cond { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .prize-lock-icon { font-size: 14px; }
+  .prize-unlock.unlocked .prize-lock-icon { color: var(--gold); }
+
+  /* ─── 底部说明栏 ─── */
+  .footer {
+    padding: 10px 28px;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--muted);
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(13,7,32,0.95);
+    flex-shrink: 0;
+  }
+  .footer-tags { display: flex; gap: 12px; }
+  .footer-tag {
+    padding: 3px 10px; border-radius: 20px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    font-size: 11px;
+  }
+
+  /* ─── 滚动条美化 ─── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ─── 顶部导航栏 ─── -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">
+    🎮 <span>Mini</span>Hub
+    <span class="nav-badge">PRO</span>
+  </a>
+  <div class="nav-links-wrap">
+    <div class="nav-links">
+      <a class="nav-link" href="index.html">首页</a>
+      <a class="nav-link" href="wheel.html">大转盘</a>
+      <a class="nav-link" href="nine-grid.html">九宫格</a>
+      <a class="nav-link" href="scratch-card.html">刮刮乐</a>
+      <a class="nav-link" href="shake-dice.html">摇骰子</a>
+      <a class="nav-link" href="smash-egg.html">砸金蛋</a>
+      <a class="nav-link" href="slot-machine.html">老虎机</a>
+      <a class="nav-link" href="gift-box.html">礼盒开箱</a>
+      <a class="nav-link" href="whack-mole.html">打地鼠</a>
+      <a class="nav-link" href="cup-game.html">三杯游戏</a>
+      <a class="nav-link" href="number-bomb.html">数字炸弹</a>
+      <a class="nav-link" href="stamp-collect.html">集卡集章</a>
+      <a class="nav-link" href="vote-pk.html">投票PK</a>
+      <a class="nav-link" href="gashapon.html">扭蛋机</a>
+      <a class="nav-link" href="blind-box.html">盲盒抽卡</a>
+      <a class="nav-link" href="game-2048.html">2048</a>
+      <a class="nav-link" href="match3.html">消消乐</a>
+      <a class="nav-link" href="catch-coins.html">接金币</a>
+      <a class="nav-link" href="grow-tree.html">成长树</a>
+      <a class="nav-link" href="pinball.html">弹珠机</a>
+      <a class="nav-link" href="snake.html">贪吃蛇</a>
+      <a class="nav-link active" href="slingshot.html">弹弓射击</a>
+      <a class="nav-link" href="fruit-cut.html">切水果</a>
+      <a class="nav-link" href="progress-unlock.html">进度解锁</a>
+      <a class="nav-link" href="energy-collect.html">能量收集</a>
+      <a class="nav-link" href="flying-chess.html">飞行棋</a>
+      <a class="nav-link" href="monopoly.html">大富翁</a>
+      <a class="nav-link" href="red-packet-rain.html">红包雨</a>
+      <a class="nav-link" href="claw-machine.html">夹娃娃机</a>
+      <a class="nav-link" href="flip-match.html">翻牌配对</a>
+      <a class="nav-link" href="shake.html">摇一摇</a>
+      <a class="nav-link" href="quiz.html">问答闯关</a>
+      <a class="nav-link" href="daily-checkin.html">每日签到</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span class="status-text">组件运行中</span>
+  </div>
+</nav>
+
+<!-- ─── 主体三列 ─── -->
+<div class="main">
+
+  <!-- ══════════════════════════════
+       左侧：配置面板
+  ══════════════════════════════ -->
+  <div class="panel-left">
+    <div class="panel-title">⚙️ 游戏配置</div>
+
+    <!-- 关卡数设置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>关卡总数</div>
+      <div class="opt-btns" id="levelCountBtns">
+        <div class="opt-btn" data-val="3">3 关</div>
+        <div class="opt-btn active" data-val="5">5 关</div>
+        <div class="opt-btn" data-val="10">10 关</div>
+      </div>
+    </div>
+
+    <!-- 每关石子数 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>每关石子数</div>
+      <div class="opt-btns" id="stoneBtns">
+        <div class="opt-btn" data-val="3">3 颗</div>
+        <div class="opt-btn active" data-val="5">5 颗</div>
+        <div class="opt-btn" data-val="8">8 颗</div>
+      </div>
+    </div>
+
+    <!-- 目标类型 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>目标类型（可多选）</div>
+      <div class="target-grid" id="targetToggles">
+        <div class="target-toggle on" data-type="box">
+          <span class="target-icon">📦</span>
+          <div class="target-info">
+            <div class="target-name">普通箱</div>
+            <div class="target-score">100 分 · 1 击</div>
+          </div>
+          <div class="toggle-dot"></div>
+        </div>
+        <div class="target-toggle on" data-type="iron">
+          <span class="target-icon">🔩</span>
+          <div class="target-info">
+            <div class="target-name">铁箱</div>
+            <div class="target-score">200 分 · 2 击</div>
+          </div>
+          <div class="toggle-dot"></div>
+        </div>
+        <div class="target-toggle on" data-type="balloon">
+          <span class="target-icon">🎈</span>
+          <div class="target-info">
+            <div class="target-name">气球</div>
+            <div class="target-score">150 分 · 飘移</div>
+          </div>
+          <div class="toggle-dot"></div>
+        </div>
+        <div class="target-toggle on" data-type="gold">
+          <span class="target-icon">🎯</span>
+          <div class="target-info">
+            <div class="target-name">黄金靶</div>
+            <div class="target-score">500 分 · 稀有</div>
+          </div>
+          <div class="toggle-dot"></div>
+        </div>
+        <div class="target-toggle" data-type="bomb">
+          <span class="target-icon">💣</span>
+          <div class="target-info">
+            <div class="target-name">炸弹桶</div>
+            <div class="target-score">300 分 · 爆炸</div>
+          </div>
+          <div class="toggle-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 奖品配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品解锁配置</div>
+      <div class="prize-row">
+        <span class="prize-icon">🥉</span>
+        <input class="prize-input" id="prize1Input" type="text" value="小奖品（5折券）" placeholder="奖品名称">
+        <span class="prize-label" id="prize1Cond">过1关</span>
+      </div>
+      <div class="prize-row">
+        <span class="prize-icon">🥈</span>
+        <input class="prize-input" id="prize2Input" type="text" value="中奖品（8折券）" placeholder="奖品名称">
+        <span class="prize-label" id="prize2Cond">过3关</span>
+      </div>
+      <div class="prize-row">
+        <span class="prize-icon">🏆</span>
+        <input class="prize-input" id="prize3Input" type="text" value="大奖（免费兑换）" placeholder="奖品名称">
+        <span class="prize-label" id="prize3Cond">全通关</span>
+      </div>
+    </div>
+
+    <!-- 弹力系数 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>弹力系数</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:12px;color:var(--muted);width:60px;">拉伸力度</span>
+        <div style="flex:1;">
+          <input type="range" id="powerSlider" min="3" max="12" value="7" step="1">
+        </div>
+        <span style="font-size:13px;color:var(--gold);font-weight:700;width:28px;text-align:right;" id="powerVal">7</span>
+      </div>
+    </div>
+
+  </div><!-- /panel-left -->
+
+  <!-- ══════════════════════════════
+       中间：游戏区
+  ══════════════════════════════ -->
+  <div class="panel-center" id="centerPanel">
+
+    <!-- HUD信息栏 -->
+    <div class="game-hud">
+      <div class="hud-item">
+        <span class="hud-label">得分</span>
+        <span class="hud-val" id="hudScore">0</span>
+      </div>
+      <div class="hud-sep"></div>
+      <div class="hud-item hud-center">
+        <div class="hud-level" id="hudLevel">第 1 关 / 共 5 关</div>
+        <div class="hud-hint" id="hudHint">拖拽弹弓石子，松手发射！</div>
+      </div>
+      <div class="hud-sep"></div>
+      <div class="hud-item">
+        <span class="hud-label">石子</span>
+        <span class="hud-val" id="hudStones">5</span>
+      </div>
+    </div>
+
+    <!-- 石子剩余可视化 -->
+    <div class="stone-bar" id="stoneBar"></div>
+
+    <!-- Canvas游戏主体 -->
+    <div class="canvas-wrap" id="canvasWrap">
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- 开始/结算遮罩 -->
+      <div class="overlay" id="overlay">
+        <div class="overlay-title" id="overlayTitle">🏹 弹弓射击</div>
+        <div class="overlay-sub" id="overlaySub">拖拽石子拉弓，松手发射<br>击中目标得分，过关解锁奖品！</div>
+        <div class="overlay-score" id="overlayScore" style="display:none;"></div>
+        <div class="overlay-btns">
+          <button class="btn-start" id="btnStart">开始游戏</button>
+        </div>
+      </div>
+    </div><!-- /canvas-wrap -->
+
+    <!-- 底部操作 -->
+    <div class="action-bar">
+      <button class="btn-action btn-secondary" id="btnReplay">🔄 重新开始</button>
+      <button class="btn-action btn-primary" id="btnNextLevel" style="display:none;">下一关 ▶</button>
+    </div>
+
+  </div><!-- /panel-center -->
+
+  <!-- ══════════════════════════════
+       右侧：数据面板
+  ══════════════════════════════ -->
+  <div class="panel-right">
+    <div class="panel-title">📊 实时数据</div>
+
+    <!-- 关卡进度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>关卡进度</div>
+      <div class="level-progress">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);">
+          <span>已通关</span>
+          <span id="progressText">0 / 5</span>
+        </div>
+        <div class="level-progress-bar">
+          <div class="level-progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="level-steps" id="levelSteps"></div>
+    </div>
+
+    <!-- 分数统计 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>分数统计</div>
+      <div class="stat-row">
+        <span class="stat-label">本局得分</span>
+        <span class="stat-val gold" id="statScore">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">历史最高</span>
+        <span class="stat-val gold" id="statBest">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">已发射石子</span>
+        <span class="stat-val" id="statFired">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">命中率</span>
+        <span class="stat-val green" id="statAccuracy">—</span>
+      </div>
+    </div>
+
+    <!-- 目标击中统计 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>目标击中统计</div>
+      <div id="hitStats">
+        <!-- JS动态渲染 -->
+      </div>
+    </div>
+
+    <!-- 奖品解锁状态 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品解锁状态</div>
+      <div id="prizeStatus">
+        <!-- JS动态渲染 -->
+      </div>
+    </div>
+
+  </div><!-- /panel-right -->
+
+</div><!-- /main -->
+
+<!-- ─── 底部说明栏 ─── -->
+<footer class="footer">
+  <span>Canvas物理 · 抛物线飞行 | 5种目标</span>
+  <div class="footer-tags">
+    <span class="footer-tag">⚡ 实时物理</span>
+    <span class="footer-tag">🎯 5种目标</span>
+    <span class="footer-tag">🏆 关卡系统</span>
+    <span class="footer-tag">🎁 奖品解锁</span>
+  </div>
+</footer>
+
+<script>
+/* ════════════════════════════════════════════════
+   弹弓射击游戏 —— 核心引擎
+   Angry Birds 风格，Canvas 2D 物理模拟
+════════════════════════════════════════════════ */
+
+// ── 全局配置（与左侧面板同步） ──
+const CONFIG = {
+  totalLevels: 5,     // 关卡总数
+  stonesPerLevel: 5,  // 每关石子数
+  power: 7,           // 弹力系数
+  enabledTypes: new Set(['box','iron','balloon','gold']), // 启用的目标类型
+  gravity: 0.35,      // 重力加速度
+  prizes: [
+    { icon:'🥉', name:'小奖品（5折券）', cond: 1 },
+    { icon:'🥈', name:'中奖品（8折券）', cond: 3 },
+    { icon:'🏆', name:'大奖（免费兑换）', cond: 0 }, // cond=0表示全通关
+  ]
+};
+
+// ── 游戏状态 ──
+let GAME = {
+  running: false,
+  currentLevel: 1,
+  clearedLevels: 0,
+  score: 0,
+  bestScore: 0,
+  stonesLeft: 5,
+  stonesFired: 0,
+  stoneHits: 0,    // 发射后命中目标的颗数
+  phase: 'idle',   // idle | aiming | flying | clearing
+  hitStats: { box:0, iron:0, balloon:0, gold:0, bomb:0 },
+  levelTargets: [], // 当前关卡目标列表
+};
+
+// Canvas相关
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// ── 弹弓参数（相对于Canvas坐标） ──
+const SLING = {
+  baseX: 130,   // 弹弓根部X（Canvas坐标，在resize后会重新计算）
+  baseY: 0,     // 弹弓根部Y（resize后计算）
+  forkH: 60,    // 叉形高度
+  forkW: 26,    // 两叉间距
+  get leftX() { return this.baseX - this.forkW / 2; },
+  get rightX() { return this.baseX + this.forkW / 2; },
+  get leftY()  { return this.baseY - this.forkH; },
+  get rightY() { return this.baseY - this.forkH; },
+};
+
+// ── 当前石子（待发射/飞行中） ──
+let stone = null;
+
+// 拖拽状态
+let isDragging = false;
+let dragX = 0, dragY = 0;
+
+// 拖尾轨迹（最近12帧位置）
+let trail = [];
+
+// 碎片效果列表
+let fragments = [];
+
+// 气球漂移计时
+let balloonDriftTimer = 0;
+
+// 动画帧ID
+let rafId = null;
+
+// ── Canvas 尺寸自适应 ──
+function resizeCanvas() {
+  const wrap = document.getElementById('canvasWrap');
+  canvas.width = wrap.clientWidth;
+  canvas.height = wrap.clientHeight;
+  // 重算弹弓位置
+  SLING.baseX = 120;
+  SLING.baseY = canvas.height - 60;
+}
+
+// ── 星空背景绘制 ──
+let stars = [];
+function initStars() {
+  stars = [];
+  for (let i = 0; i < 120; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height * 0.7,
+      r: Math.random() * 1.5 + 0.3,
+      alpha: Math.random() * 0.7 + 0.3,
+    });
+  }
+}
+
+function drawBackground() {
+  // 天空渐变
+  const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  grad.addColorStop(0, '#05010f');
+  grad.addColorStop(0.6, '#0D0720');
+  grad.addColorStop(1, '#1a0030');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // 星星
+  stars.forEach(s => {
+    ctx.save();
+    ctx.globalAlpha = s.alpha * (0.7 + 0.3 * Math.sin(Date.now() / 1200 + s.x));
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+
+  // 地面
+  const groundGrad = ctx.createLinearGradient(0, canvas.height - 55, 0, canvas.height);
+  groundGrad.addColorStop(0, '#2a1040');
+  groundGrad.addColorStop(1, '#1a0030');
+  ctx.fillStyle = groundGrad;
+  ctx.fillRect(0, canvas.height - 55, canvas.width, 55);
+
+  // 地面草皮装饰线
+  ctx.strokeStyle = 'rgba(124,58,237,0.3)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, canvas.height - 55);
+  ctx.lineTo(canvas.width, canvas.height - 55);
+  ctx.stroke();
+}
+
+// ── 绘制弹弓 ──
+function drawSlingshot() {
+  const bx = SLING.baseX, by = SLING.baseY;
+  const lx = SLING.leftX, ly = SLING.leftY;
+  const rx = SLING.rightX, ry = SLING.rightY;
+
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  // 主干（棕色）
+  ctx.strokeStyle = '#8B5E3C';
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.moveTo(bx, by);
+  ctx.lineTo(bx, by - SLING.forkH - 18);
+  ctx.stroke();
+
+  // 左叉
+  ctx.lineWidth = 7;
+  ctx.beginPath();
+  ctx.moveTo(bx, by - SLING.forkH);
+  ctx.lineTo(lx, ly);
+  ctx.stroke();
+
+  // 右叉
+  ctx.beginPath();
+  ctx.moveTo(bx, by - SLING.forkH);
+  ctx.lineTo(rx, ry);
+  ctx.stroke();
+
+  // 木叉高光
+  ctx.strokeStyle = 'rgba(200,160,80,0.35)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(bx - 2, by);
+  ctx.lineTo(bx - 2, by - SLING.forkH - 18);
+  ctx.stroke();
+
+  // 橡皮筋
+  const px = isDragging ? dragX : (stone ? stone.x : bx);
+  const py = isDragging ? dragY : (stone ? stone.y : by - SLING.forkH - 2);
+
+  // 橡皮筋颜色：拉伸时变红
+  const stretchDist = Math.hypot(px - bx, py - (by - SLING.forkH));
+  const maxStretch = 90;
+  const t = Math.min(stretchDist / maxStretch, 1);
+  const rbColor = `rgba(${Math.round(80 + t * 160)},${Math.round(200 - t * 140)},${Math.round(60 - t * 50)},0.85)`;
+
+  ctx.strokeStyle = rbColor;
+  ctx.lineWidth = 3;
+
+  // 左侧橡皮筋
+  ctx.beginPath();
+  ctx.moveTo(lx, ly);
+  ctx.lineTo(px, py);
+  ctx.stroke();
+
+  // 右侧橡皮筋
+  ctx.beginPath();
+  ctx.moveTo(rx, ry);
+  ctx.lineTo(px, py);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+// ── 绘制石子（待发射状态） ──
+function drawReadyStone() {
+  // 未拖拽时，石子静止在弹弓凹槽中心
+  const sx = isDragging ? dragX : SLING.baseX;
+  const sy = isDragging ? dragY : (SLING.baseY - SLING.forkH - 2);
+  drawStone(sx, sy, 14, 1.0);
+}
+
+// ── 通用石子绘制（带渐变+光泽） ──
+function drawStone(x, y, r, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  const grad = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.1, x, y, r);
+  grad.addColorStop(0, '#e8d08a');
+  grad.addColorStop(0.5, '#b88a40');
+  grad.addColorStop(1, '#6b4010');
+  ctx.fillStyle = grad;
+
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 光泽高光
+  ctx.fillStyle = 'rgba(255,255,200,0.5)';
+  ctx.beginPath();
+  ctx.arc(x - r * 0.28, y - r * 0.28, r * 0.32, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+// ── 绘制飞行石子拖尾 ──
+function drawTrail() {
+  if (!trail.length) return;
+  for (let i = 0; i < trail.length; i++) {
+    const t = trail[i];
+    const progress = i / trail.length;
+    const r = 14 * progress * 0.7;
+    const alpha = progress * 0.5;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    const grad = ctx.createRadialGradient(t.x, t.y, 0, t.x, t.y, Math.max(r, 1));
+    grad.addColorStop(0, '#F5C842');
+    grad.addColorStop(1, 'rgba(245,200,66,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, Math.max(r, 1), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+// ── 目标定义 ──
+const TARGET_DEF = {
+  box:     { color:'#4A90E2', darkColor:'#2060b0', label:'📦', hp:1, score:100, w:44, h:44 },
+  iron:    { color:'#7A8A9A', darkColor:'#4a5a6a', label:'🔩', hp:2, score:200, w:48, h:48 },
+  balloon: { color:'#EC4899', darkColor:'#a0204a', label:'🎈', hp:1, score:150, w:38, h:50, drift:true },
+  gold:    { color:'#F5C842', darkColor:'#b08010', label:'🎯', hp:1, score:500, w:42, h:42 },
+  bomb:    { color:'#444444', darkColor:'#222222', label:'💣', hp:1, score:300, w:44, h:44, explode:true },
+};
+
+// ── 生成当前关卡目标 ──
+function generateTargets(level) {
+  const targets = [];
+  const types = Array.from(CONFIG.enabledTypes);
+  if (!types.length) return targets;
+
+  // 目标数量随关卡递增
+  const count = 3 + Math.min(level - 1, 5);
+  const canvasW = canvas.width;
+  const groundY = canvas.height - 55;
+
+  // 目标区域：从1/3处到右侧留边80px
+  const startX = Math.round(canvasW * 0.35);
+  const endX = canvasW - 80;
+  const rangeX = endX - startX;
+
+  for (let i = 0; i < count; i++) {
+    // 随机类型（高关卡提升铁箱/黄金靶比例）
+    let type;
+    const r = Math.random();
+    if (level >= 3 && r < 0.15 && types.includes('gold')) {
+      type = 'gold';
+    } else if (level >= 2 && r < 0.3 && types.includes('iron')) {
+      type = 'iron';
+    } else if (r < 0.55 && types.includes('balloon')) {
+      type = 'balloon';
+    } else {
+      // 从启用类型里随机
+      type = types[Math.floor(Math.random() * types.length)];
+    }
+
+    const def = TARGET_DEF[type];
+    // 堆叠排列：每行最多4个
+    const col = i % 4;
+    const row = Math.floor(i / 4);
+    const spacing = Math.min(rangeX / 4, 90);
+    const x = startX + col * spacing + Math.random() * 20 - 10;
+    const y = groundY - def.h / 2 - row * (def.h + 10) - 5;
+
+    targets.push({
+      id: i,
+      type,
+      x, y,
+      w: def.w, h: def.h,
+      hp: def.hp,
+      maxHp: def.hp,
+      score: def.score,
+      drift: def.drift || false,
+      driftVY: def.drift ? -0.3 : 0,  // 气球初始上浮速度
+      driftVX: def.drift ? (Math.random() * 0.6 - 0.3) : 0,
+      explode: def.explode || false,
+      alive: true,
+      // 震动效果
+      shakeX: 0, shakeY: 0, shakeTimer: 0,
+      // 碎裂动画进度（>0时表示正在碎裂）
+      breaking: false,
+    });
+  }
+  return targets;
+}
+
+// ── 绘制单个目标 ──
+function drawTarget(t) {
+  if (!t.alive) return;
+  const def = TARGET_DEF[t.type];
+  const ox = t.x + t.shakeX;
+  const oy = t.y + t.shakeY;
+
+  ctx.save();
+
+  // 受击闪白效果
+  if (t.shakeTimer > 0 && t.hp < t.maxHp) {
+    ctx.globalAlpha = 0.7 + 0.3 * Math.sin(t.shakeTimer * 3);
+  }
+
+  // 主体
+  const hw = t.w / 2, hh = t.h / 2;
+  const radius = t.type === 'balloon' ? t.w / 2 : 8;
+
+  if (t.type === 'balloon') {
+    // 气球：椭圆
+    ctx.fillStyle = def.color;
+    ctx.shadowColor = def.color;
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.ellipse(ox, oy, hw, hh, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 高光
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.ellipse(ox - hw * 0.25, oy - hh * 0.28, hw * 0.3, hh * 0.22, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 细绳
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(ox, oy + hh);
+    ctx.quadraticCurveTo(ox + 8, oy + hh + 15, ox + 3, oy + hh + 28);
+    ctx.stroke();
+  } else {
+    // 矩形目标
+    ctx.fillStyle = def.color;
+    ctx.shadowColor = def.color;
+    ctx.shadowBlur = 8;
+    roundRect(ctx, ox - hw, oy - hh, t.w, t.h, radius);
+    ctx.fill();
+
+    // 暗色上层
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = def.darkColor;
+    ctx.globalAlpha = (ctx.globalAlpha || 1) * 0.25;
+    roundRect(ctx, ox - hw + 3, oy - hh + 3, t.w - 6, t.h - 6, radius - 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // 血量条（铁箱显示）
+    if (t.type === 'iron' && t.hp < t.maxHp) {
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      roundRect(ctx, ox - hw, oy + hh + 3, t.w, 5, 2);
+      ctx.fill();
+      ctx.fillStyle = '#EF4444';
+      roundRect(ctx, ox - hw, oy + hh + 3, t.w * (t.hp / t.maxHp), 5, 2);
+      ctx.fill();
+    }
+  }
+
+  // 中心图标文字
+  ctx.globalAlpha = 1;
+  ctx.font = `${Math.round(t.w * 0.45)}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowBlur = 0;
+  ctx.fillText(def.label, ox, oy);
+
+  ctx.restore();
+}
+
+// ── 辅助：圆角矩形路径 ──
+function roundRect(c, x, y, w, h, r) {
+  c.beginPath();
+  c.moveTo(x + r, y);
+  c.lineTo(x + w - r, y);
+  c.arcTo(x + w, y, x + w, y + r, r);
+  c.lineTo(x + w, y + h - r);
+  c.arcTo(x + w, y + h, x + w - r, y + h, r);
+  c.lineTo(x + r, y + h);
+  c.arcTo(x, y + h, x, y + h - r, r);
+  c.lineTo(x, y + r);
+  c.arcTo(x, y, x + r, y, r);
+  c.closePath();
+}
+
+// ── 绘制碎片 ──
+function drawFragments() {
+  fragments.forEach(f => {
+    ctx.save();
+    ctx.globalAlpha = f.alpha;
+    ctx.translate(f.x, f.y);
+    ctx.rotate(f.angle);
+    ctx.fillStyle = f.color;
+    ctx.shadowColor = f.color;
+    ctx.shadowBlur = 6;
+    if (f.type === 'balloon') {
+      ctx.beginPath();
+      ctx.ellipse(0, 0, f.w / 2, f.h / 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      roundRect(ctx, -f.w / 2, -f.h / 2, f.w, f.h, 3);
+      ctx.fill();
+    }
+    ctx.restore();
+  });
+}
+
+// ── 生成碎片（目标被击毁时） ──
+function spawnFragments(t) {
+  const def = TARGET_DEF[t.type];
+  const count = t.type === 'bomb' ? 8 : 4;
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
+    const speed = 3 + Math.random() * 5;
+    fragments.push({
+      x: t.x, y: t.y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 3,
+      w: t.w * 0.45, h: t.h * 0.45,
+      color: def.color,
+      type: t.type,
+      angle: Math.random() * Math.PI * 2,
+      angleV: (Math.random() - 0.5) * 0.2,
+      alpha: 1,
+    });
+  }
+
+  // 炸弹爆炸：额外光圈
+  if (t.type === 'bomb') {
+    spawnExplosion(t.x, t.y);
+  }
+}
+
+// 爆炸光圈效果（作为特殊碎片处理）
+function spawnExplosion(x, y) {
+  for (let i = 0; i < 3; i++) {
+    fragments.push({
+      x, y,
+      vx: 0, vy: 0,
+      w: 20 + i * 30, h: 20 + i * 30,
+      color: '#FF6B00',
+      type: 'explosion',
+      angle: 0, angleV: 0,
+      alpha: 0.8 - i * 0.15,
+      isExplosion: true,
+      radius: 10 + i * 20,
+      radiusV: 5 + i * 3,
+    });
+  }
+}
+
+// ── 碰撞检测：飞行石子 vs 目标 ──
+function checkCollisions() {
+  if (!stone || stone.phase !== 'flying') return;
+
+  GAME.levelTargets.forEach(t => {
+    if (!t.alive) return;
+    const def = TARGET_DEF[t.type];
+    const hw = t.w / 2, hh = t.h / 2;
+
+    // AABB + 圆心距检测
+    const inX = stone.x >= t.x - hw - 14 && stone.x <= t.x + hw + 14;
+    const inY = stone.y >= t.y - hh - 14 && stone.y <= t.y + hh + 14;
+
+    if (inX && inY) {
+      t.hp--;
+      t.shakeTimer = 12;
+      t.shakeX = (Math.random() - 0.5) * 8;
+      t.shakeY = (Math.random() - 0.5) * 8;
+
+      if (t.hp <= 0) {
+        t.alive = false;
+        GAME.score += t.score;
+        GAME.hitStats[t.type]++;
+        GAME.stoneHits++;
+        spawnFragments(t);
+
+        // 炸弹额外伤害周围目标
+        if (t.type === 'bomb') {
+          GAME.levelTargets.forEach(other => {
+            if (!other.alive || other.id === t.id) return;
+            const dist = Math.hypot(other.x - t.x, other.y - t.y);
+            if (dist < 100) {
+              other.hp = 0;
+              other.alive = false;
+              GAME.score += other.score;
+              GAME.hitStats[other.type]++;
+              GAME.stoneHits++;
+              spawnFragments(other);
+            }
+          });
+        }
+      }
+
+      // 石子碰撞后减速（穿透弱化）
+      stone.vx *= 0.4;
+      stone.vy *= 0.4;
+
+      updateHUD();
+    }
+  });
+}
+
+// ── 物理更新主循环 ──
+function physicsUpdate() {
+  if (!stone) return;
+
+  if (stone.phase === 'flying') {
+    // 拖尾
+    trail.push({ x: stone.x, y: stone.y });
+    if (trail.length > 14) trail.shift();
+
+    // 运动方程
+    stone.x += stone.vx;
+    stone.y += stone.vy;
+    stone.vy += CONFIG.gravity;
+
+    // 碰撞检测
+    checkCollisions();
+
+    // 出界或落地则结束该石子
+    if (stone.y > canvas.height + 20 || stone.x > canvas.width + 50 || stone.x < -50) {
+      stone = null;
+      trail = [];
+      onStoneEnd();
+    }
+  }
+}
+
+// ── 气球漂移更新 ──
+function updateBalloons() {
+  balloonDriftTimer++;
+  GAME.levelTargets.forEach(t => {
+    if (!t.alive || t.type !== 'balloon') return;
+    t.driftVX += (Math.random() - 0.5) * 0.05;
+    t.driftVX = Math.max(-0.8, Math.min(0.8, t.driftVX));
+    t.driftVY += -0.015; // 持续上浮
+    t.driftVY = Math.max(-1.2, t.driftVY);
+    t.x += t.driftVX;
+    t.y += t.driftVY;
+
+    // 气球飞出上方则消失
+    if (t.y < -60) {
+      t.alive = false; // 飞走不得分
+    }
+  });
+}
+
+// ── 震动定时器更新 ──
+function updateShake() {
+  GAME.levelTargets.forEach(t => {
+    if (t.shakeTimer > 0) {
+      t.shakeTimer--;
+      t.shakeX = (Math.random() - 0.5) * 6 * (t.shakeTimer / 12);
+      t.shakeY = (Math.random() - 0.5) * 6 * (t.shakeTimer / 12);
+      if (t.shakeTimer === 0) { t.shakeX = 0; t.shakeY = 0; }
+    }
+  });
+}
+
+// ── 碎片物理更新 ──
+function updateFragments() {
+  fragments = fragments.filter(f => f.alpha > 0.02);
+  fragments.forEach(f => {
+    if (f.isExplosion) {
+      f.radius += f.radiusV;
+      f.alpha -= 0.04;
+      f.w = f.radius * 2;
+      f.h = f.radius * 2;
+    } else {
+      f.x += f.vx;
+      f.y += f.vy;
+      f.vy += 0.25; // 碎片受重力
+      f.angle += f.angleV;
+      f.alpha -= 0.025;
+    }
+  });
+}
+
+// 爆炸圈单独绘制
+function drawExplosions() {
+  fragments.filter(f => f.isExplosion).forEach(f => {
+    ctx.save();
+    ctx.globalAlpha = f.alpha;
+    ctx.strokeStyle = f.color;
+    ctx.lineWidth = 3;
+    ctx.shadowColor = f.color;
+    ctx.shadowBlur = 15;
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  });
+}
+
+// ── 石子用完后的处理 ──
+function onStoneEnd() {
+  const aliveCount = GAME.levelTargets.filter(t => t.alive).length;
+  const totalCount = GAME.levelTargets.length;
+  const cleared = aliveCount === 0 || (totalCount - aliveCount) >= Math.ceil(totalCount * 0.5);
+
+  if (GAME.stonesLeft <= 0) {
+    // 石子用完
+    setTimeout(() => {
+      if (cleared) {
+        showLevelClear();
+      } else {
+        showGameOver();
+      }
+    }, 600);
+  } else if (GAME.levelTargets.filter(t => t.alive).length === 0) {
+    // 全清
+    setTimeout(() => showLevelClear(), 400);
+  } else {
+    // 准备下一颗石子
+    prepareNextStone();
+  }
+}
+
+// ── 准备下一颗石子 ──
+function prepareNextStone() {
+  stone = { phase: 'ready', x: SLING.baseX, y: SLING.baseY - SLING.forkH - 2, vx: 0, vy: 0 };
+  updateStoneBar();
+}
+
+// ── 主绘制函数 ──
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  drawBackground();
+  drawExplosions();
+  drawFragments();
+
+  // 绘制目标（先绘制，让弹弓在上层）
+  GAME.levelTargets.forEach(t => drawTarget(t));
+
+  drawSlingshot();
+  drawTrail();
+
+  // 绘制飞行石子
+  if (stone && stone.phase === 'flying') {
+    drawStone(stone.x, stone.y, 14, 1.0);
+  }
+
+  // 绘制待发射石子
+  if (stone && stone.phase === 'ready') {
+    drawReadyStone();
+  }
+
+  // 瞄准预测轨迹（拖拽中显示）
+  if (isDragging && GAME.phase === 'aiming') {
+    drawAimTrajectory();
+  }
+}
+
+// ── 绘制抛物线预测轨迹 ──
+function drawAimTrajectory() {
+  const power = CONFIG.power / 10;
+  const cx = SLING.baseX, cy = SLING.baseY - SLING.forkH;
+  const vx0 = (cx - dragX) * power;
+  const vy0 = (cy - dragY) * power;
+
+  ctx.save();
+  ctx.setLineDash([6, 8]);
+  ctx.lineWidth = 1.5;
+
+  let px = SLING.baseX, py = SLING.baseY - SLING.forkH - 2;
+  let pvx = vx0, pvy = vy0;
+
+  for (let i = 0; i < 30; i++) {
+    const nx = px + pvx;
+    const ny = py + pvy;
+    pvy += CONFIG.gravity;
+
+    const alpha = 0.5 - i * 0.015;
+    if (alpha <= 0) break;
+    ctx.strokeStyle = `rgba(245,200,66,${alpha})`;
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(nx, ny);
+    ctx.stroke();
+
+    px = nx; py = ny;
+    if (py > canvas.height) break;
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+// ── 主循环 ──
+function loop() {
+  if (!GAME.running) return;
+
+  physicsUpdate();
+  updateBalloons();
+  updateShake();
+  updateFragments();
+  render();
+
+  rafId = requestAnimationFrame(loop);
+}
+
+// ── 鼠标/触摸事件 ──
+function getCanvasPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    x: (clientX - rect.left) * scaleX,
+    y: (clientY - rect.top) * scaleY,
+  };
+}
+
+// 判断是否在弹弓拖拽区域内
+function isNearStone(pos) {
+  if (!stone || stone.phase !== 'ready') return false;
+  const sx = SLING.baseX, sy = SLING.baseY - SLING.forkH - 2;
+  return Math.hypot(pos.x - sx, pos.y - sy) < 30;
+}
+
+canvas.addEventListener('mousedown', onPointerDown);
+canvas.addEventListener('mousemove', onPointerMove);
+canvas.addEventListener('mouseup', onPointerUp);
+canvas.addEventListener('touchstart', onPointerDown, { passive: false });
+canvas.addEventListener('touchmove', onPointerMove, { passive: false });
+canvas.addEventListener('touchend', onPointerUp);
+
+function onPointerDown(e) {
+  e.preventDefault();
+  if (!GAME.running) return;
+  const pos = getCanvasPos(e);
+  if (isNearStone(pos)) {
+    isDragging = true;
+    GAME.phase = 'aiming';
+    dragX = pos.x;
+    dragY = pos.y;
+  }
+}
+
+function onPointerMove(e) {
+  e.preventDefault();
+  if (!isDragging) return;
+  const pos = getCanvasPos(e);
+
+  // 限制拉伸距离
+  const cx = SLING.baseX, cy = SLING.baseY - SLING.forkH;
+  const dx = pos.x - cx, dy = pos.y - cy;
+  const dist = Math.hypot(dx, dy);
+  const maxDist = 90;
+
+  if (dist > maxDist) {
+    dragX = cx + dx / dist * maxDist;
+    dragY = cy + dy / dist * maxDist;
+  } else {
+    dragX = pos.x;
+    dragY = pos.y;
+  }
+}
+
+function onPointerUp(e) {
+  if (!isDragging) return;
+  isDragging = false;
+  GAME.phase = 'flying';
+
+  // 发射
+  const power = CONFIG.power / 10;
+  const cx = SLING.baseX, cy = SLING.baseY - SLING.forkH;
+  const vx = (cx - dragX) * power;
+  const vy = (cy - dragY) * power;
+
+  // 检查是否有足够拉力
+  if (Math.hypot(vx, vy) < 0.5) {
+    GAME.phase = 'aiming';
+    return;
+  }
+
+  stone = { phase: 'flying', x: dragX, y: dragY, vx, vy };
+  trail = [];
+
+  GAME.stonesLeft--;
+  GAME.stonesFired++;
+  updateHUD();
+  updateStoneBar();
+  updateRightPanel();
+}
+
+// ── 开始游戏 ──
+function startGame() {
+  GAME.running = true;
+  GAME.currentLevel = 1;
+  GAME.clearedLevels = 0;
+  GAME.score = 0;
+  GAME.stonesFired = 0;
+  GAME.stoneHits = 0;
+  GAME.hitStats = { box:0, iron:0, balloon:0, gold:0, bomb:0 };
+
+  document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('btnNextLevel').style.display = 'none';
+
+  startLevel(1);
+  if (rafId) cancelAnimationFrame(rafId);
+  loop();
+}
+
+// ── 开始某一关 ──
+function startLevel(level) {
+  GAME.currentLevel = level;
+  GAME.stonesLeft = CONFIG.stonesPerLevel;
+  GAME.levelTargets = generateTargets(level);
+  fragments = [];
+  trail = [];
+  stone = null;
+
+  prepareNextStone();
+  updateHUD();
+  updateStoneBar();
+  updateRightPanel();
+}
+
+// ── 过关处理 ──
+function showLevelClear() {
+  GAME.clearedLevels = Math.max(GAME.clearedLevels, GAME.currentLevel);
+  GAME.running = false;
+
+  const isLast = GAME.currentLevel >= CONFIG.totalLevels;
+
+  const overlay = document.getElementById('overlay');
+  overlay.classList.remove('hidden');
+
+  document.getElementById('overlayTitle').textContent = isLast ? '🎉 全部通关！' : `✅ 第 ${GAME.currentLevel} 关通过！`;
+  document.getElementById('overlaySub').textContent = isLast
+    ? `恭喜完成全部 ${CONFIG.totalLevels} 关！\n当前得分：${GAME.score}`
+    : `干得漂亮！本关得分：${GAME.score}\n点击继续挑战下一关`;
+
+  document.getElementById('overlayScore').style.display = 'block';
+  document.getElementById('overlayScore').textContent = `总得分：${GAME.score}`;
+
+  const btns = document.querySelector('.overlay-btns');
+  btns.innerHTML = '';
+  if (!isLast) {
+    const btnNext = document.createElement('button');
+    btnNext.className = 'btn-start';
+    btnNext.textContent = '下一关 ▶';
+    btnNext.onclick = () => {
+      overlay.classList.add('hidden');
+      GAME.running = true;
+      startLevel(GAME.currentLevel + 1);
+      loop();
+    };
+    btns.appendChild(btnNext);
+  }
+  const btnRe = document.createElement('button');
+  btnRe.className = 'btn-outline';
+  btnRe.textContent = '重新开始';
+  btnRe.onclick = () => { overlay.classList.add('hidden'); startGame(); };
+  btns.appendChild(btnRe);
+
+  updateBestScore();
+  updateRightPanel();
+}
+
+// ── 游戏结束（石子耗尽未全清） ──
+function showGameOver() {
+  GAME.running = false;
+
+  const overlay = document.getElementById('overlay');
+  overlay.classList.remove('hidden');
+  document.getElementById('overlayTitle').textContent = '💔 关卡失败';
+  document.getElementById('overlaySub').textContent = `石子用完了，目标还剩 ${GAME.levelTargets.filter(t=>t.alive).length} 个\n再来一次吧！`;
+  document.getElementById('overlayScore').style.display = 'block';
+  document.getElementById('overlayScore').textContent = `本局得分：${GAME.score}`;
+
+  const btns = document.querySelector('.overlay-btns');
+  btns.innerHTML = '';
+  const btnRe = document.createElement('button');
+  btnRe.className = 'btn-start';
+  btnRe.textContent = '🔄 再来一次';
+  btnRe.onclick = () => { overlay.classList.add('hidden'); startGame(); };
+  btns.appendChild(btnRe);
+
+  const btnCont = document.createElement('button');
+  btnCont.className = 'btn-outline';
+  btnCont.textContent = '从本关重试';
+  btnCont.onclick = () => {
+    overlay.classList.add('hidden');
+    GAME.running = true;
+    startLevel(GAME.currentLevel);
+    loop();
+  };
+  btns.appendChild(btnCont);
+
+  updateBestScore();
+}
+
+// ── 更新历史最高分 ──
+function updateBestScore() {
+  if (GAME.score > GAME.bestScore) {
+    GAME.bestScore = GAME.score;
+    document.getElementById('statBest').textContent = GAME.bestScore;
+  }
+}
+
+// ── 更新HUD ──
+function updateHUD() {
+  document.getElementById('hudScore').textContent = GAME.score;
+  document.getElementById('hudStones').textContent = GAME.stonesLeft;
+  document.getElementById('hudLevel').textContent = `第 ${GAME.currentLevel} 关 / 共 ${CONFIG.totalLevels} 关`;
+  const aliveCount = GAME.levelTargets.filter(t => t.alive).length;
+  document.getElementById('hudHint').textContent = aliveCount > 0
+    ? `剩余 ${aliveCount} 个目标`
+    : '🎉 全部清除！';
+  document.getElementById('statScore').textContent = GAME.score;
+}
+
+// ── 更新石子剩余可视化 ──
+function updateStoneBar() {
+  const bar = document.getElementById('stoneBar');
+  bar.innerHTML = '';
+  for (let i = 0; i < CONFIG.stonesPerLevel; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'stone-dot' + (i >= GAME.stonesLeft ? ' used' : '');
+    bar.appendChild(dot);
+  }
+}
+
+// ── 更新右侧面板 ──
+function updateRightPanel() {
+  // 关卡进度
+  const total = CONFIG.totalLevels;
+  const cleared = GAME.clearedLevels;
+  document.getElementById('progressText').textContent = `${cleared} / ${total}`;
+  document.getElementById('progressFill').style.width = `${(cleared / total) * 100}%`;
+
+  const stepsEl = document.getElementById('levelSteps');
+  stepsEl.innerHTML = '';
+  for (let i = 1; i <= total; i++) {
+    const el = document.createElement('div');
+    el.className = 'level-step' + (i <= cleared ? ' done' : (i === GAME.currentLevel ? ' current' : ''));
+    el.textContent = i <= cleared ? '✓' : i;
+    stepsEl.appendChild(el);
+  }
+
+  // 分数
+  document.getElementById('statScore').textContent = GAME.score;
+  document.getElementById('statBest').textContent = GAME.bestScore;
+  document.getElementById('statFired').textContent = GAME.stonesFired;
+  const acc = GAME.stonesFired > 0
+    ? Math.round(GAME.stoneHits / GAME.stonesFired * 100) + '%'
+    : '—';
+  document.getElementById('statAccuracy').textContent = acc;
+
+  // 目标击中统计
+  const hitEl = document.getElementById('hitStats');
+  hitEl.innerHTML = '';
+  const typeList = [
+    { type: 'box', icon: '📦', name: '普通箱' },
+    { type: 'iron', icon: '🔩', name: '铁箱' },
+    { type: 'balloon', icon: '🎈', name: '气球' },
+    { type: 'gold', icon: '🎯', name: '黄金靶' },
+    { type: 'bomb', icon: '💣', name: '炸弹桶' },
+  ];
+  const maxHit = Math.max(1, ...Object.values(GAME.hitStats));
+  typeList.forEach(({ type, icon, name }) => {
+    const cnt = GAME.hitStats[type] || 0;
+    hitEl.innerHTML += `
+      <div class="hit-stat">
+        <span class="hit-icon">${icon}</span>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;">
+            <span class="hit-name">${name}</span>
+            <span class="hit-count">${cnt}</span>
+          </div>
+          <div class="hit-bar">
+            <div class="hit-bar-fill" style="width:${(cnt/maxHit)*100}%"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  // 奖品解锁
+  const prizeEl = document.getElementById('prizeStatus');
+  prizeEl.innerHTML = '';
+  CONFIG.prizes.forEach((p, i) => {
+    const cond = p.cond === 0 ? CONFIG.totalLevels : p.cond;
+    const unlocked = GAME.clearedLevels >= cond;
+    const condText = p.cond === 0 ? `全 ${CONFIG.totalLevels} 关通过` : `通过 ${cond} 关`;
+    prizeEl.innerHTML += `
+      <div class="prize-unlock ${unlocked ? 'unlocked' : ''}">
+        <span class="prize-unlock-icon">${p.icon}</span>
+        <div class="prize-unlock-info">
+          <div class="prize-unlock-name">${p.name}</div>
+          <div class="prize-unlock-cond">${condText}</div>
+        </div>
+        <span class="prize-lock-icon">${unlocked ? '🔓' : '🔒'}</span>
+      </div>
+    `;
+  });
+}
+
+// ── 初始化各按钮组事件 ──
+function initControls() {
+  // 关卡数
+  document.querySelectorAll('#levelCountBtns .opt-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#levelCountBtns .opt-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      CONFIG.totalLevels = parseInt(btn.dataset.val);
+      syncPrizeConds();
+      updateRightPanel();
+    });
+  });
+
+  // 石子数
+  document.querySelectorAll('#stoneBtns .opt-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#stoneBtns .opt-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      CONFIG.stonesPerLevel = parseInt(btn.dataset.val);
+    });
+  });
+
+  // 目标类型开关
+  document.querySelectorAll('#targetToggles .target-toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const type = toggle.dataset.type;
+      if (CONFIG.enabledTypes.has(type)) {
+        // 至少保留1种
+        if (CONFIG.enabledTypes.size > 1) {
+          CONFIG.enabledTypes.delete(type);
+          toggle.classList.remove('on');
+        }
+      } else {
+        CONFIG.enabledTypes.add(type);
+        toggle.classList.add('on');
+      }
+    });
+  });
+
+  // 弹力系数
+  const powerSlider = document.getElementById('powerSlider');
+  powerSlider.addEventListener('input', () => {
+    CONFIG.power = parseInt(powerSlider.value);
+    document.getElementById('powerVal').textContent = CONFIG.power;
+  });
+
+  // 奖品名称输入
+  document.getElementById('prize1Input').addEventListener('input', e => { CONFIG.prizes[0].name = e.target.value; updateRightPanel(); });
+  document.getElementById('prize2Input').addEventListener('input', e => { CONFIG.prizes[1].name = e.target.value; updateRightPanel(); });
+  document.getElementById('prize3Input').addEventListener('input', e => { CONFIG.prizes[2].name = e.target.value; updateRightPanel(); });
+
+  // 开始
+  document.getElementById('btnStart').addEventListener('click', startGame);
+
+  // 重玩
+  document.getElementById('btnReplay').addEventListener('click', () => {
+    if (rafId) cancelAnimationFrame(rafId);
+    GAME.running = false;
+    stone = null;
+    isDragging = false;
+    fragments = [];
+    trail = [];
+
+    const overlay = document.getElementById('overlay');
+    overlay.classList.remove('hidden');
+    document.getElementById('overlayTitle').textContent = '🏹 弹弓射击';
+    document.getElementById('overlaySub').textContent = '拖拽石子拉弓，松手发射\n击中目标得分，过关解锁奖品！';
+    document.getElementById('overlayScore').style.display = 'none';
+    const btns = document.querySelector('.overlay-btns');
+    btns.innerHTML = '<button class="btn-start" id="btnStart">开始游戏</button>';
+    document.getElementById('btnStart').addEventListener('click', startGame);
+  });
+}
+
+// 同步奖品条件文字
+function syncPrizeConds() {
+  document.getElementById('prize2Cond').textContent = `过${Math.ceil(CONFIG.totalLevels / 2)}关`;
+  document.getElementById('prize3Cond').textContent = '全通关';
+  CONFIG.prizes[1].cond = Math.ceil(CONFIG.totalLevels / 2);
+  CONFIG.prizes[2].cond = 0;
+}
+
+// ── 窗口尺寸变化时自适应 ──
+window.addEventListener('resize', () => {
+  resizeCanvas();
+  initStars();
+  if (!GAME.running) render(); // 重新渲染一帧背景
+});
+
+// ── 入口 ──
+(function init() {
+  resizeCanvas();
+  initStars();
+  initControls();
+  updateRightPanel();
+  updateStoneBar();
+
+  // 静态预渲染一帧（显示背景+弹弓，等待用户点击开始）
+  render();
+})();
+</script>
+</body>
+</html>
