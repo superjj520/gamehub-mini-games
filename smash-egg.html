@@ -589,7 +589,7 @@
   <!-- 中间：游戏区 -->
   <div class="game-center">
     <div class="game-title-area">
-      <div class="game-name">✨ 砸金蛋 ✨</div>
+      <div class="game-name" id="gameTitle">✨ 砸金蛋 ✨</div>
       <div class="game-subtitle">点击金蛋，砸出好运与惊喜</div>
     </div>
 
@@ -679,6 +679,43 @@ const PRIZES = [
   { id: 'p5', name: '积分 × 100', emoji: '✨', prob: 30, color: '#06B6D4', desc: '积分已自动入账',       win: true },
   { id: 'p6', name: '谢谢参与',    emoji: '🥚', prob: 30, color: '#6B7280', desc: '感谢您的参与，下次再来', win: false },
 ];
+
+// ─── URL 参数配置 (?c=BASE64_JSON) ───
+(function loadURLConfig() {
+  try {
+    const raw = new URLSearchParams(location.search).get('c');
+    if (!raw) return;
+    const cfg = JSON.parse(atob(decodeURIComponent(raw)));
+    if (cfg.title) document.addEventListener('DOMContentLoaded', () => {
+      const el = document.getElementById('gameTitle');
+      if (el) el.textContent = cfg.title;
+    });
+    if (cfg.dailyLimit != null) {
+      setTimeout(() => {
+        dailyLimit = Number(cfg.dailyLimit);
+        chancesLeft = dailyLimit;
+      }, 0);
+    }
+    if (Array.isArray(cfg.prizes) && cfg.prizes.length >= 2) {
+      PRIZES.length = 0;
+      cfg.prizes.forEach((p, i) => {
+        PRIZES.push({
+          id: 'p' + (i + 1),
+          name: p.name || ('奖品' + (i + 1)),
+          emoji: p.emoji || '🎁',
+          prob: Number(p.prob) || 10,
+          color: p.color || '#6B7280',
+          desc: p.desc || '',
+          win: p.type !== 'miss',
+        });
+      });
+    }
+    if (cfg.embed) document.addEventListener('DOMContentLoaded', () => {
+      const left = document.querySelector('.panel-left');
+      if (left) left.style.display = 'none';
+    });
+  } catch(e) {}
+})();
 
 /* 游戏状态 */
 let dailyLimit   = 3;

@@ -613,7 +613,7 @@
   <!-- 中间：游戏 -->
   <div class="game-center">
     <div class="game-title-area">
-      <div class="game-name">九宫格转盘</div>
+      <div class="game-name" id="gameTitle">九宫格转盘</div>
       <div class="game-subtitle">一圈好运，八方财气</div>
     </div>
 
@@ -712,6 +712,42 @@ const PRIZES = [
 // 外围顺时针顺序：0,1,2,5,8,7,6,3
 const OUTER_ORDER = [0, 1, 2, 5, 8, 7, 6, 3]; // 对应奖品索引0~7
 const CENTER_POS = 4; // 中心格位置
+
+// ─── URL 参数配置 (?c=BASE64_JSON) ───
+(function loadURLConfig() {
+  try {
+    const raw = new URLSearchParams(location.search).get('c');
+    if (!raw) return;
+    const cfg = JSON.parse(atob(decodeURIComponent(raw)));
+    if (cfg.title) document.addEventListener('DOMContentLoaded', () => {
+      const el = document.getElementById('gameTitle');
+      if (el) el.textContent = cfg.title;
+    });
+    if (cfg.dailyLimit != null) {
+      // dailyRemain在下方定义，用setTimeout延迟覆盖
+      setTimeout(() => { dailyRemain = Number(cfg.dailyLimit); }, 0);
+    }
+    if (Array.isArray(cfg.prizes) && cfg.prizes.length >= 2) {
+      PRIZES.length = 0;
+      const items = cfg.prizes.slice(0, 8);
+      while (items.length < 8) items.push({ name:'谢谢参与', emoji:'😊', prob:5, color:'#6B7280', type:'miss' });
+      items.forEach(p => {
+        PRIZES.push({
+          name: p.name || '奖品',
+          emoji: p.emoji || '🎁',
+          prob: Number(p.prob) || 10,
+          color: p.color || '#6B7280',
+          won: 0,
+          type: p.type === 'miss' ? 'miss' : 'win',
+        });
+      });
+    }
+    if (cfg.embed) document.addEventListener('DOMContentLoaded', () => {
+      const left = document.querySelector('.panel-left');
+      if (left) left.style.display = 'none';
+    });
+  } catch(e) {}
+})();
 
 let totalSpins = 0, winSpins = 0;
 let dailyRemain = 3;

@@ -198,30 +198,30 @@ body { font-family: -apple-system,'PingFang SC','Microsoft YaHei',sans-serif; ba
           <div class="game-type-name">大转盘</div>
           <div class="game-type-badge">✓ 已支持</div>
         </div>
-        <div class="game-type-card disabled" data-type="scratch">
+        <div class="game-type-card" data-type="scratch" onclick="selectGameType('scratch',this)">
           <div class="game-type-icon">🎟</div>
           <div class="game-type-name">刮刮乐</div>
-          <div class="game-type-badge" style="color:var(--muted)">即将支持</div>
+          <div class="game-type-badge">✓ 已支持</div>
         </div>
-        <div class="game-type-card disabled" data-type="slot">
+        <div class="game-type-card" data-type="slot" onclick="selectGameType('slot',this)">
           <div class="game-type-icon">🎰</div>
           <div class="game-type-name">老虎机</div>
-          <div class="game-type-badge" style="color:var(--muted)">即将支持</div>
+          <div class="game-type-badge">✓ 已支持</div>
         </div>
-        <div class="game-type-card disabled" data-type="nine">
+        <div class="game-type-card" data-type="nine" onclick="selectGameType('nine',this)">
           <div class="game-type-icon">🔲</div>
           <div class="game-type-name">九宫格</div>
-          <div class="game-type-badge" style="color:var(--muted)">即将支持</div>
+          <div class="game-type-badge">✓ 已支持</div>
         </div>
-        <div class="game-type-card disabled" data-type="smash">
+        <div class="game-type-card" data-type="smash" onclick="selectGameType('smash',this)">
           <div class="game-type-icon">🥚</div>
           <div class="game-type-name">砸金蛋</div>
-          <div class="game-type-badge" style="color:var(--muted)">即将支持</div>
+          <div class="game-type-badge">✓ 已支持</div>
         </div>
-        <div class="game-type-card disabled" data-type="blind">
+        <div class="game-type-card" data-type="blind" onclick="selectGameType('blind',this)">
           <div class="game-type-icon">📦</div>
           <div class="game-type-name">盲盒</div>
-          <div class="game-type-badge" style="color:var(--muted)">即将支持</div>
+          <div class="game-type-badge">✓ 已支持</div>
         </div>
       </div>
     </div>
@@ -242,7 +242,7 @@ body { font-family: -apple-system,'PingFang SC','Microsoft YaHei',sans-serif; ba
           <label>每日抽奖次数</label>
           <input type="number" id="cfgDailyLimit" value="3" min="1" max="99" oninput="refreshPreview()">
         </div>
-        <div class="field">
+        <div class="field" id="skinField">
           <label>转盘皮肤</label>
           <select id="cfgSkin" onchange="refreshPreview()">
             <option value="default">默认紫色</option>
@@ -375,7 +375,24 @@ body { font-family: -apple-system,'PingFang SC','Microsoft YaHei',sans-serif; ba
 /* ═══════════════════════════════════════════════════════
    数据
 ═══════════════════════════════════════════════════════ */
-const GAME_MAP = { wheel: 'wheel.html' };
+const GAME_MAP = {
+  wheel:   'wheel.html',
+  scratch: 'scratch-card.html',
+  slot:    'slot-machine.html',
+  nine:    'nine-grid.html',
+  smash:   'smash-egg.html',
+  blind:   'blind-box.html',
+};
+
+// 各游戏类型说明
+const GAME_INFO = {
+  wheel:   { name:'大转盘', hint:'奖品配置8个以内，概率为整数%，合计建议100%' },
+  scratch: { name:'刮刮乐', hint:'概率填整数（如5=5%），玩家刮开涂层揭晓奖品' },
+  slot:    { name:'老虎机', hint:'概率越高出现越频繁，score字段作为倍率显示' },
+  nine:    { name:'九宫格', hint:'恰好8个奖品对应外围8格，请填写8个' },
+  smash:   { name:'砸金蛋', hint:'玩家每天N次机会砸金蛋，概率合计建议100%' },
+  blind:   { name:'盲盒',   hint:'奖品将按顺序映射到稀有度：SP/SSR/SR/R/N' },
+};
 
 const TEMPLATES = {
   marketing: [
@@ -430,7 +447,10 @@ let generatedUrl = '';
 function init() {
   buildEmojiGrid();
   applyTemplate('marketing');
-  refreshPreview();
+  // 触发初始游戏类型逻辑（显示提示等）
+  const activeCard = document.querySelector('.game-type-card.active');
+  if (activeCard) selectGameType('wheel', activeCard);
+  else refreshPreview();
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -441,6 +461,33 @@ function selectGameType(type, el) {
   currentGameType = type;
   document.querySelectorAll('.game-type-card').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
+
+  // 皮肤选项仅大转盘支持
+  const skinField = document.getElementById('skinField');
+  if (skinField) skinField.style.display = (type === 'wheel') ? '' : 'none';
+
+  // 九宫格提示：限制8个奖品
+  const addBtn = document.querySelector('.add-prize-btn');
+  if (addBtn) addBtn.style.display = (type === 'nine') ? 'none' : '';
+
+  // 显示游戏提示
+  const info = GAME_INFO[type] || {};
+  let hintEl = document.getElementById('gameTypeHint');
+  if (!hintEl) {
+    hintEl = document.createElement('div');
+    hintEl.id = 'gameTypeHint';
+    hintEl.style.cssText = 'font-size:11px;color:var(--muted);background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:8px;padding:8px 12px;margin-top:10px;line-height:1.6;';
+    document.querySelector('.game-types').after(hintEl);
+  }
+  hintEl.textContent = '💡 ' + (info.hint || '');
+
+  // 九宫格自动补到8个奖品
+  if (type === 'nine' && prizes.length !== 8) {
+    while (prizes.length < 8) prizes.push({ name:'谢谢参与', emoji:'😊', prob:10, color:COLORS[prizes.length%COLORS.length], stock:999, type:'miss' });
+    if (prizes.length > 8) prizes.splice(8);
+    renderPrizes();
+  }
+
   refreshPreview();
 }
 
@@ -659,7 +706,8 @@ function drawQR(text, canvas) {
 }
 
 function resetAll() {
-  document.getElementById('cfgTitle').value = '夏日大转盘';
+  const info = GAME_INFO[currentGameType] || { name:'大转盘' };
+  document.getElementById('cfgTitle').value = '夏日' + info.name;
   document.getElementById('cfgSubtitle').value = '转动命运，赢取大奖';
   document.getElementById('cfgDailyLimit').value = '3';
   document.getElementById('cfgSkin').value = 'default';

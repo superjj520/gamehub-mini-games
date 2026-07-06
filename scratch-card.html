@@ -533,7 +533,7 @@
   <!-- 中间：游戏区 -->
   <div class="game-center">
     <div class="game-title-area">
-      <div class="game-name">幸运刮刮乐</div>
+      <div class="game-name" id="gameTitle">幸运刮刮乐</div>
       <div class="game-subtitle">刮开涂层，好运来袭 · 刮超过 <span id="threshDisplay">35</span>% 自动揭示</div>
     </div>
 
@@ -658,6 +658,42 @@ let state = {
   isRevealed: false,
   isScratching: false,
 };
+
+// ─── URL 参数配置 (?c=BASE64_JSON) ───
+(function loadURLConfig() {
+  try {
+    const raw = new URLSearchParams(location.search).get('c');
+    if (!raw) return;
+    const cfg = JSON.parse(atob(decodeURIComponent(raw)));
+    if (cfg.title) document.addEventListener('DOMContentLoaded', () => {
+      const el = document.getElementById('gameTitle');
+      if (el) el.textContent = cfg.title;
+    });
+    if (cfg.dailyLimit != null) state.todayUsed = 0; // 重置已用次数，让limit生效
+    if (Array.isArray(cfg.prizes) && cfg.prizes.length >= 2) {
+      PRIZES.length = 0;
+      let total = cfg.prizes.reduce((s, p) => s + (Number(p.prob) || 0), 0);
+      cfg.prizes.forEach((p, i) => {
+        PRIZES.push({
+          id: i,
+          emoji: p.emoji || '🎁',
+          name: p.name || ('奖品' + (i + 1)),
+          desc: p.desc || '',
+          prob: total > 0 ? (Number(p.prob) || 0) / total : 1 / cfg.prizes.length,
+          win: p.type !== 'miss',
+          score: Number(p.score) || 0,
+          color: p.color || '#6B7280',
+          barColor: p.color || '#6B7280',
+        });
+      });
+      state.dist = PRIZES.map(() => 0);
+    }
+    if (cfg.embed) document.addEventListener('DOMContentLoaded', () => {
+      const left = document.querySelector('.panel-left');
+      if (left) left.style.display = 'none';
+    });
+  } catch(e) {}
+})();
 
 // ─── 配置 ───
 let brushRadius = 30;

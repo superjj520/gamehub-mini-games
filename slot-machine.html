@@ -597,6 +597,34 @@ const SYMBOLS = [
   { sym: '👑', name: '皇冠', weight: 1,  multi: 500 },
 ];
 
+// ─── URL 参数配置 (?c=BASE64_JSON) ───
+(function loadURLConfig() {
+  try {
+    const raw = new URLSearchParams(location.search).get('c');
+    if (!raw) return;
+    const cfg = JSON.parse(atob(decodeURIComponent(raw)));
+    if (cfg.title) document.addEventListener('DOMContentLoaded', () => {
+      const el = document.querySelector('.slot-title-label');
+      if (el) el.textContent = cfg.title;
+    });
+    if (Array.isArray(cfg.prizes) && cfg.prizes.length >= 2) {
+      SYMBOLS.length = 0;
+      cfg.prizes.forEach(p => {
+        SYMBOLS.push({
+          sym: p.emoji || '🎰',
+          name: p.name || '奖品',
+          weight: Math.max(1, Math.round((Number(p.prob) || 10) / 2)),
+          multi: Number(p.score) || 1,
+        });
+      });
+    }
+    if (cfg.embed) document.addEventListener('DOMContentLoaded', () => {
+      const left = document.querySelector('.panel-left');
+      if (left) left.style.display = 'none';
+    });
+  } catch(e) {}
+})();
+
 // 加权符号池
 const POOL = [];
 SYMBOLS.forEach(s => { for (let i = 0; i < s.weight; i++) POOL.push(s); });
