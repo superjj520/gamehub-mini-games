@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 钓鱼</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.97);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: inherit;
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .nav-links-wrap {
+    flex: 1;
+    overflow-x: auto;
+    margin: 0 20px;
+    scrollbar-width: none;
+  }
+  .nav-links-wrap::-webkit-scrollbar { display: none; }
+  .nav-links {
+    display: flex;
+    gap: 2px;
+    white-space: nowrap;
+  }
+  .nav-link {
+    padding: 6px 13px; border-radius: 7px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-link:hover { background: var(--card); color: var(--text); }
+  .nav-link.active { background: var(--card); color: var(--gold); }
+  .nav-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.4} }
+  .status-text { font-size: 12px; color: var(--muted); }
+
+  /* ─── 主体三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: calc(100vh - 57px - 42px);
+  }
+
+  /* ─── 通用面板样式 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: var(--deep);
+    position: relative;
+    overflow: hidden;
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* ─── 时长选择 ─── */
+  .time-btns { display: flex; gap: 6px; }
+  .time-btn {
+    flex: 1; padding: 9px 6px; border-radius: 8px;
+    text-align: center; font-size: 13px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s;
+    color: var(--muted); font-weight: 600;
+  }
+  .time-btn:hover { border-color: rgba(124,58,237,0.5); color: var(--text); }
+  .time-btn.active {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.15);
+    color: var(--gold);
+  }
+
+  /* ─── 滑块通用 ─── */
+  .slider-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+  }
+  .slider-row:last-child { margin-bottom: 0; }
+  .slider-label { font-size: 12px; color: var(--muted); width: 90px; flex-shrink: 0; }
+  .slider-wrap { flex: 1; }
+  .slider-val { font-size: 12px; color: var(--gold); font-weight: 700; width: 40px; text-align: right; flex-shrink: 0; }
+  input[type=range] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,0.1);
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(124,58,237,0.6);
+  }
+
+  /* ─── 鱼种概率列表 ─── */
+  .fish-prob-list { display: flex; flex-direction: column; gap: 8px; }
+  .fish-prob-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .fish-icon-cell { font-size: 20px; width: 28px; flex-shrink: 0; }
+  .fish-name { font-size: 12px; color: var(--text); width: 60px; flex-shrink: 0; }
+  .fish-bar-wrap { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+  .fish-bar { height: 100%; border-radius: 3px; transition: width 0.3s; }
+  .fish-pct { font-size: 11px; color: var(--gold); width: 34px; text-align: right; flex-shrink: 0; }
+  .fish-pts { font-size: 11px; color: var(--muted); width: 40px; text-align: right; flex-shrink: 0; }
+
+  /* ─── 奖品配置 ─── */
+  .prize-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+  }
+  .prize-row:last-child { margin-bottom: 0; }
+  .prize-icon { font-size: 18px; }
+  .prize-input {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .prize-input:focus { border-color: var(--accent); }
+  .prize-label { font-size: 12px; color: var(--muted); width: 44px; text-align: right; flex-shrink: 0; }
+
+  /* ─── 游戏控制按钮 ─── */
+  .btn-start {
+    padding: 10px 32px;
+    border-radius: 10px;
+    font-size: 15px; font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: #fff;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+    letter-spacing: 0.5px;
+  }
+  .btn-start:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,58,237,0.5); }
+  .btn-start:active { transform: translateY(0); }
+  .btn-start:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ─── Canvas 容器 ─── */
+  #gameCanvas {
+    display: block;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    cursor: crosshair;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    flex-shrink: 0;
+  }
+
+  /* ─── 计时/分数条 ─── */
+  .game-hud {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; margin-top: 12px;
+  }
+  .hud-item {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .hud-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
+  .hud-val { font-size: 22px; font-weight: 800; color: var(--gold); line-height: 1; }
+  .hud-val.red { color: #F87171; }
+  .hud-val.green { color: #4ADE80; }
+
+  /* ─── 操作提示 ─── */
+  .hint-bar {
+    margin-top: 10px;
+    font-size: 12px; color: var(--muted);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    width: 100%;
+    text-align: center;
+    min-height: 34px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ─── 功率条弹窗覆盖 ─── */
+  #powerOverlay {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 50;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+  }
+  #powerOverlay.show {
+    display: flex;
+    pointer-events: auto;
+  }
+  .power-title {
+    font-size: 16px; font-weight: 700;
+    color: var(--gold);
+    text-shadow: 0 0 12px rgba(245,200,66,0.7);
+    animation: pulse-txt 0.6s ease-in-out infinite alternate;
+  }
+  @keyframes pulse-txt { from{opacity:0.7} to{opacity:1} }
+
+  /* ─── 弧形功率仪（SVG） ─── */
+  #powerGauge {
+    width: 200px; height: 120px;
+  }
+
+  /* ─── 点击收竿按钮 ─── */
+  .btn-reel {
+    padding: 12px 40px;
+    border-radius: 50px;
+    font-size: 15px; font-weight: 700;
+    background: linear-gradient(135deg, #22C55E, #16A34A);
+    border: none; color: #fff;
+    cursor: pointer; transition: all 0.15s;
+    box-shadow: 0 4px 16px rgba(34,197,94,0.5);
+    animation: pulse-btn 0.5s ease-in-out infinite alternate;
+  }
+  @keyframes pulse-btn { from{transform:scale(1)} to{transform:scale(1.05)} }
+  .btn-reel:active { transform: scale(0.96); }
+
+  /* ─── 右侧数据面板 ─── */
+  .stat-big {
+    text-align: center;
+    padding: 16px 0 12px;
+  }
+  .stat-big .num {
+    font-size: 42px; font-weight: 800;
+    color: var(--gold);
+    line-height: 1;
+    text-shadow: 0 0 16px rgba(245,200,66,0.4);
+  }
+  .stat-big .lbl { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .fish-stat-list { display: flex; flex-direction: column; gap: 6px; }
+  .fish-stat-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .fish-stat-row:hover { border-color: var(--border); }
+  .fsr-icon { font-size: 18px; width: 24px; }
+  .fsr-name { font-size: 12px; color: var(--text); flex: 1; }
+  .fsr-count { font-size: 13px; font-weight: 700; color: var(--gold); }
+  .fsr-pts { font-size: 11px; color: var(--muted); }
+
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+  .history-list { display: flex; flex-direction: column; gap: 6px; }
+  .history-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px; border-radius: 7px;
+    background: rgba(255,255,255,0.03);
+    font-size: 12px;
+  }
+  .history-item .rank-1 { color: var(--gold); font-weight: 700; }
+  .history-item .rank-2 { color: #C0C0C0; font-weight: 700; }
+  .history-item .rank-3 { color: #CD7F32; font-weight: 700; }
+  .history-score { color: var(--gold); font-weight: 700; }
+
+  /* ─── 结算弹窗 ─── */
+  #resultModal {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  #resultModal.show { display: flex; }
+  .result-box {
+    background: var(--deep);
+    border: 1px solid rgba(124,58,237,0.4);
+    border-radius: 20px;
+    padding: 32px 40px;
+    text-align: center;
+    min-width: 320px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 60px rgba(124,58,237,0.2);
+    animation: pop-in 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes pop-in {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+  .result-title { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+  .result-score {
+    font-size: 56px; font-weight: 900; color: var(--gold);
+    line-height: 1; margin: 10px 0;
+    text-shadow: 0 0 24px rgba(245,200,66,0.6);
+  }
+  .result-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .result-fish-summary {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+    margin-bottom: 24px;
+  }
+  .result-fish-chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 13px;
+  }
+  .result-btns { display: flex; gap: 10px; justify-content: center; }
+  .btn-again {
+    padding: 10px 28px; border-radius: 10px;
+    font-size: 14px; font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: #fff; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-again:hover { transform: translateY(-1px); }
+  .btn-close-modal {
+    padding: 10px 28px; border-radius: 10px;
+    font-size: 14px; font-weight: 600;
+    background: var(--card);
+    border: 1px solid var(--border); color: var(--muted); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-close-modal:hover { border-color: var(--accent); color: var(--text); }
+
+  /* ─── 起竿飞鱼动画（CSS） ─── */
+  .fly-fish {
+    position: absolute;
+    font-size: 28px;
+    pointer-events: none;
+    animation: fly-up 1.2s cubic-bezier(0.22,1,0.36,1) forwards;
+    z-index: 60;
+  }
+  @keyframes fly-up {
+    0%   { transform: translate(0, 0) scale(0.8); opacity: 1; }
+    60%  { transform: translate(var(--tx), var(--ty)) scale(1.3); opacity: 1; }
+    100% { transform: translate(var(--tx2), var(--ty2)) scale(0.5); opacity: 0; }
+  }
+
+  /* ─── 底部栏 ─── */
+  .footer {
+    text-align: center;
+    padding: 10px;
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ 导航栏 ═══════════════════════════════════ -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    🎮 <span>Mini</span>Games
+    <span class="nav-badge">中台</span>
+  </a>
+  <div class="nav-links-wrap">
+    <div class="nav-links">
+      <a class="nav-link" href="index.html">首页</a>
+      <a class="nav-link" href="wheel.html">大转盘</a>
+      <a class="nav-link" href="nine-grid.html">九宫格</a>
+      <a class="nav-link" href="scratch-card.html">刮刮乐</a>
+      <a class="nav-link" href="shake-dice.html">摇骰子</a>
+      <a class="nav-link" href="smash-egg.html">砸金蛋</a>
+      <a class="nav-link" href="slot-machine.html">老虎机</a>
+      <a class="nav-link" href="gift-box.html">礼盒开箱</a>
+      <a class="nav-link" href="whack-mole.html">打地鼠</a>
+      <a class="nav-link" href="cup-game.html">三杯游戏</a>
+      <a class="nav-link" href="number-bomb.html">数字炸弹</a>
+      <a class="nav-link" href="stamp-collect.html">集卡集章</a>
+      <a class="nav-link" href="vote-pk.html">投票PK</a>
+      <a class="nav-link" href="gashapon.html">扭蛋机</a>
+      <a class="nav-link" href="blind-box.html">盲盒抽卡</a>
+      <a class="nav-link" href="game-2048.html">2048</a>
+      <a class="nav-link" href="match3.html">消消乐</a>
+      <a class="nav-link" href="catch-coins.html">接金币</a>
+      <a class="nav-link" href="grow-tree.html">成长树</a>
+      <a class="nav-link" href="pinball.html">弹珠机</a>
+      <a class="nav-link" href="snake.html">贪吃蛇</a>
+      <a class="nav-link" href="slingshot.html">弹弓射击</a>
+      <a class="nav-link" href="fruit-cut.html">切水果</a>
+      <a class="nav-link" href="progress-unlock.html">进度解锁</a>
+      <a class="nav-link" href="energy-collect.html">能量收集</a>
+      <a class="nav-link active" href="fishing.html">钓鱼</a>
+      <a class="nav-link" href="flying-chess.html">飞行棋</a>
+      <a class="nav-link" href="monopoly.html">大富翁</a>
+      <a class="nav-link" href="red-packet-rain.html">红包雨</a>
+      <a class="nav-link" href="claw-machine.html">夹娃娃机</a>
+      <a class="nav-link" href="flip-match.html">翻牌配对</a>
+      <a class="nav-link" href="shake.html">摇一摇</a>
+      <a class="nav-link" href="quiz.html">问答闯关</a>
+      <a class="nav-link" href="daily-checkin.html">每日签到</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span class="status-text">运行中</span>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════ 主体布局 ═══════════════════════════════════ -->
+<div class="main">
+
+  <!-- ──────────── 左侧：配置面板 ──────────── -->
+  <aside class="panel-left">
+    <div class="panel-title">⚙️ 游戏配置</div>
+
+    <!-- 游戏时长 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>游戏时长</div>
+      <div class="time-btns">
+        <div class="time-btn" data-dur="30"  onclick="setDuration(30)">30秒</div>
+        <div class="time-btn active" data-dur="60" onclick="setDuration(60)">60秒</div>
+        <div class="time-btn" data-dur="120" onclick="setDuration(120)">120秒</div>
+        <div class="time-btn" data-dur="180" onclick="setDuration(180)">3分钟</div>
+      </div>
+    </div>
+
+    <!-- 鱼种概率配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>鱼种概率</div>
+      <div class="fish-prob-list" id="fishProbList">
+        <!-- 动态生成 -->
+      </div>
+    </div>
+
+    <!-- 水中鱼数量 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>场景设置</div>
+      <div class="slider-row">
+        <span class="slider-label">水中鱼数量</span>
+        <div class="slider-wrap">
+          <input type="range" min="3" max="12" value="7" id="fishCountSlider"
+            oninput="document.getElementById('fishCountVal').textContent=this.value; updateFishCount(+this.value)">
+        </div>
+        <span class="slider-val" id="fishCountVal">7</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">鱼游速倍数</span>
+        <div class="slider-wrap">
+          <input type="range" min="50" max="200" value="100" id="speedSlider"
+            oninput="document.getElementById('speedVal').textContent=this.value+'%'; cfg.speedMult=+this.value/100">
+        </div>
+        <span class="slider-val" id="speedVal">100%</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">金鱼出现间隔</span>
+        <div class="slider-wrap">
+          <input type="range" min="5" max="30" value="15" id="goldfishSlider"
+            oninput="document.getElementById('goldfishVal').textContent=this.value+'s'; cfg.goldfishInterval=+this.value">
+        </div>
+        <span class="slider-val" id="goldfishVal">15s</span>
+      </div>
+    </div>
+
+    <!-- 奖品阈值配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品配置</div>
+      <div class="prize-row">
+        <span class="prize-icon">🏆</span>
+        <input type="text" class="prize-input" placeholder="奖品名称（如：一等奖）" id="prize1Name" value="一等奖">
+        <span class="prize-label">≥</span>
+        <input type="number" class="prize-input" style="width:60px;flex:none" id="prize1Score" value="60">
+        <span class="prize-label" style="width:auto">分</span>
+      </div>
+      <div class="prize-row">
+        <span class="prize-icon">🥈</span>
+        <input type="text" class="prize-input" placeholder="奖品名称" id="prize2Name" value="二等奖">
+        <span class="prize-label">≥</span>
+        <input type="number" class="prize-input" style="width:60px;flex:none" id="prize2Score" value="30">
+        <span class="prize-label" style="width:auto">分</span>
+      </div>
+      <div class="prize-row">
+        <span class="prize-icon">🥉</span>
+        <input type="text" class="prize-input" placeholder="奖品名称" id="prize3Name" value="参与奖">
+        <span class="prize-label">≥</span>
+        <input type="number" class="prize-input" style="width:60px;flex:none" id="prize3Score" value="1">
+        <span class="prize-label" style="width:auto">分</span>
+      </div>
+    </div>
+
+    <!-- 开始/重置按钮 -->
+    <div style="display:flex; gap:10px;">
+      <button class="btn-start" style="flex:1" id="btnStart" onclick="startGame()">🎣 开始钓鱼</button>
+      <button class="btn-start" style="flex:none; padding:10px 18px; background:var(--card); border:1px solid var(--border); color:var(--muted); box-shadow:none;"
+        onclick="resetGame()">重置</button>
+    </div>
+  </aside>
+
+  <!-- ──────────── 中间：游戏区 ──────────── -->
+  <section class="panel-center" id="panelCenter">
+
+    <!-- Canvas 主游戏区 -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- 功率条弹窗（叠加在 Canvas 上） -->
+    <div id="powerOverlay">
+      <div class="power-title" id="powerTitle">🎣 稳住！点击收竿</div>
+      <svg id="powerGauge" viewBox="0 0 200 120">
+        <!-- 背景弧 -->
+        <path d="M 20 110 A 90 90 0 0 1 180 110" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="14" stroke-linecap="round"/>
+        <!-- 危险区（红色） -->
+        <path id="dangerArc1" d="M 20 110 A 90 90 0 0 1 20 110" fill="none" stroke="#EF4444" stroke-width="14" stroke-linecap="round"/>
+        <path id="dangerArc2" d="M 20 110 A 90 90 0 0 1 20 110" fill="none" stroke="#EF4444" stroke-width="14" stroke-linecap="round"/>
+        <!-- 最佳区（绿色） -->
+        <path id="bestArc" d="M 20 110 A 90 90 0 0 1 20 110" fill="none" stroke="#22C55E" stroke-width="14" stroke-linecap="round"/>
+        <!-- 指针 -->
+        <line id="needle" x1="100" y1="110" x2="100" y2="28" stroke="var(--gold)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="100" cy="110" r="6" fill="var(--gold)"/>
+        <!-- 分数标注 -->
+        <text x="16"  y="128" fill="rgba(240,234,248,0.5)" font-size="10" text-anchor="middle">0%</text>
+        <text x="100" y="20"  fill="rgba(240,234,248,0.5)" font-size="10" text-anchor="middle">100%</text>
+        <text x="184" y="128" fill="rgba(240,234,248,0.5)" font-size="10" text-anchor="middle">0%</text>
+      </svg>
+      <!-- 咬钩的鱼展示 -->
+      <div style="font-size:36px; line-height:1; text-align:center;" id="biteDisplay">🐟</div>
+      <button class="btn-reel" onclick="tryReel()">立即收竿！</button>
+    </div>
+
+    <!-- HUD 信息条 -->
+    <div class="game-hud" style="max-width:620px; width:100%;">
+      <div class="hud-item">
+        <div class="hud-label">剩余时间</div>
+        <div class="hud-val" id="hudTimer">--</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">当前得分</div>
+        <div class="hud-val green" id="hudScore">0</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">已钓数量</div>
+        <div class="hud-val" id="hudCount">0</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-label">连续成功</div>
+        <div class="hud-val" id="hudCombo">0</div>
+      </div>
+    </div>
+
+    <!-- 操作提示 -->
+    <div class="hint-bar" id="hintBar">👆 点击「开始钓鱼」，鼠标控制鱼竿左右，点击 Canvas 抛竿</div>
+
+  </section>
+
+  <!-- ──────────── 右侧：数据面板 ──────────── -->
+  <aside class="panel-right">
+    <div class="panel-title">📊 数据统计</div>
+
+    <!-- 当局得分 -->
+    <div class="card" style="padding-bottom:4px">
+      <div class="stat-big">
+        <div class="num" id="statScore">0</div>
+        <div class="lbl">本局得分</div>
+      </div>
+    </div>
+
+    <!-- 各鱼统计 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>鱼获统计</div>
+      <div class="fish-stat-list" id="fishStatList">
+        <!-- 动态生成 -->
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 历史最高 -->
+    <div class="panel-title">🏆 历史排名</div>
+    <div class="card">
+      <div class="history-list" id="historyList">
+        <div style="font-size:12px; color:var(--muted); text-align:center; padding:8px 0;">暂无历史记录</div>
+      </div>
+    </div>
+
+    <!-- 当局奖品 -->
+    <div class="card" id="prizeCard" style="display:none">
+      <div class="card-title"><span class="dot" style="background:var(--accent2)"></span>获得奖品</div>
+      <div style="text-align:center; padding:10px 0;">
+        <div style="font-size:36px; margin-bottom:6px;" id="prizeIcon">🏆</div>
+        <div style="font-size:16px; font-weight:700; color:var(--gold);" id="prizeName">--</div>
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="prizeDesc">--</div>
+      </div>
+    </div>
+  </aside>
+
+</div><!-- .main -->
+
+<!-- ═══════════════════════════════════ 结算弹窗 ═══════════════════════════════════ -->
+<div id="resultModal">
+  <div class="result-box">
+    <div class="result-title">🎣 本局结束！</div>
+    <div class="result-score" id="modalScore">0</div>
+    <div class="result-subtitle" id="modalSubtitle">继续努力，成为最强钓手！</div>
+    <div class="result-fish-summary" id="modalFishSummary"></div>
+    <div id="modalPrizeLine" style="font-size:18px; font-weight:700; color:var(--accent2); margin-bottom:16px; display:none;"></div>
+    <div class="result-btns">
+      <button class="btn-again" onclick="startGame()">🔄 再玩一局</button>
+      <button class="btn-close-modal" onclick="closeModal()">✕ 关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 底部栏 -->
+<div class="footer">小游戏中台 · 钓鱼组件 · Canvas 2D</div>
+
+<!-- ═══════════════════════════════════ JS 游戏逻辑 ═══════════════════════════════════ -->
+<script>
+/* ══════════════════════════════════════════════════════
+   全局配置与常量
+   ══════════════════════════════════════════════════════ */
+
+/* 鱼种定义 */
+const FISH_TYPES = [
+  { id: 'small',    emoji: '🐟', name: '小鱼',   pts: 1,   rarity: 'common',    speed: 1.0,  wobble: 0.8,  color: '#60A5FA', baseProb: 40 },
+  { id: 'puffer',   emoji: '🐡', name: '河豚',   pts: 3,   rarity: 'uncommon',  speed: 0.7,  wobble: 1.0,  color: '#FB923C', baseProb: 25 },
+  { id: 'tropical', emoji: '🐠', name: '热带鱼', pts: 5,   rarity: 'rare',      speed: 1.6,  wobble: 1.2,  color: '#F472B6', baseProb: 18 },
+  { id: 'gold',     emoji: '💰', name: '金鱼',   pts: 10,  rarity: 'limited',   speed: 1.3,  wobble: 1.4,  color: '#FBBF24', baseProb: 0  }, // 特殊限时
+  { id: 'shark',    emoji: '🦈', name: '鲨鱼',   pts: 20,  rarity: 'epic',      speed: 2.2,  wobble: 2.5,  color: '#818CF8', baseProb: 5  },
+  { id: 'trash',    emoji: '🪣', name: '垃圾桶', pts: -3,  rarity: 'trash',     speed: 0.4,  wobble: 0.5,  color: '#6B7280', baseProb: 12 },
+];
+
+/* 全局游戏配置（可被左侧面板修改） */
+const cfg = {
+  duration: 60,          // 游戏时长（秒）
+  fishCount: 7,          // 水中同时存在的鱼数量
+  speedMult: 1.0,        // 鱼速倍数
+  goldfishInterval: 15,  // 金鱼出现间隔（秒）
+  // 各鱼种概率（可被滑块覆盖）
+  probs: { small: 40, puffer: 25, tropical: 18, shark: 5, trash: 12 },
+};
+
+/* 游戏状态 */
+let state = {
+  phase: 'idle',       // idle | playing | biting | reeling | ended
+  score: 0,
+  count: 0,
+  combo: 0,
+  timeLeft: 60,
+  timerID: null,
+  rodX: 0,             // 鱼竿 X（相对 canvas）
+  hookX: 0,            // 鱼钩 X
+  hookY: 0,            // 鱼钩 Y
+  hookVY: 0,           // 鱼钩竖向速度
+  hookState: 'above',  // above | sinking | waiting | bitten
+  biteTimer: null,     // 咬钩超时计时器
+  lastGoldfish: 0,     // 上次金鱼出现时间戳
+  goldfishActive: false,
+  biteFish: null,      // 当前咬钩的鱼对象
+  // 功率条
+  needleAngle: -Math.PI/2,   // 弧度，0 = 左端，π = 右端（相对于弧形圆心）
+  needleDir: 1,
+  needleSpeed: 2.5,           // deg/frame
+  bestStart: 0,
+  bestEnd: 0,
+  // 统计
+  fishCaught: {},   // { fishId: count }
+  history: [],      // [{ score, date }]
+  rafID: null,
+};
+
+/* Canvas 相关 */
+let canvas, ctx;
+let W, H;
+const WATER_Y_RATIO = 0.42;  // 水面位于 Canvas 高度的这个比例处
+let waterY;
+
+/* 水中鱼数组 */
+let fishes = [];
+
+/* 波浪动画相关 */
+let waveOffset = 0;
+
+/* ══════════════════════════════════════════════════════
+   初始化
+   ══════════════════════════════════════════════════════ */
+function init() {
+  canvas = document.getElementById('gameCanvas');
+  ctx = canvas.getContext('2d');
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  // 鼠标控制鱼竿
+  canvas.addEventListener('mousemove', onMouseMove);
+  canvas.addEventListener('click', onCanvasClick);
+  // 键盘左右
+  document.addEventListener('keydown', onKeyDown);
+
+  buildFishProbUI();
+  buildFishStatUI();
+  initFishes();
+  draw();  // 初始渲染一帧（展示静态场景）
+}
+
+function resizeCanvas() {
+  const center = document.getElementById('panelCenter');
+  const rect = center.getBoundingClientRect();
+  // Canvas 高度充满面板，最小 480px
+  const maxW = Math.max(rect.width - 40, 400);
+  const maxH = Math.max(window.innerHeight - 57 - 150, 480);
+  W = Math.min(maxW, 620);
+  H = Math.min(maxH, 520);
+  canvas.width  = W;
+  canvas.height = H;
+  waterY = Math.floor(H * WATER_Y_RATIO);
+  // 鱼竿初始位置
+  state.rodX  = W / 2;
+  state.hookX = W / 2;
+  state.hookY = waterY - 20;
+  repositionFishes();
+}
+
+/* ══════════════════════════════════════════════════════
+   水中鱼管理
+   ══════════════════════════════════════════════════════ */
+function pickFishType() {
+  /* 按概率随机选一种（不含金鱼，金鱼限时） */
+  const pool = FISH_TYPES.filter(f => f.id !== 'gold');
+  const total = pool.reduce((s, f) => s + (cfg.probs[f.id] ?? f.baseProb), 0);
+  let r = Math.random() * total;
+  for (const f of pool) {
+    r -= (cfg.probs[f.id] ?? f.baseProb);
+    if (r <= 0) return f;
+  }
+  return pool[0];
+}
+
+function createFish(forced) {
+  const type = forced ?? pickFishType();
+  const margin = 60;
+  const y = waterY + margin + Math.random() * (H - waterY - margin - 40);
+  const dir = Math.random() < 0.5 ? 1 : -1;
+  const x = dir === 1 ? -40 : W + 40;
+  return {
+    type,
+    x, y,
+    dir,                              // 游向（1=右，-1=左）
+    speed: type.speed * cfg.speedMult * (0.8 + Math.random() * 0.4),
+    wobbleAmp: 8 + Math.random() * 12,
+    wobbleFreq: 0.02 + Math.random() * 0.02,
+    wobbleOff: Math.random() * Math.PI * 2,
+    frame: 0,
+    alpha: 1,
+    hooked: false,        // 是否正在被钓
+    limitedTimer: 0,      // 金鱼限时倒计时（帧）
+    id: Math.random().toString(36).slice(2),
+  };
+}
+
+function initFishes() {
+  fishes = [];
+  for (let i = 0; i < cfg.fishCount; i++) {
+    const f = createFish();
+    // 分散初始 X 位置
+    f.x = Math.random() * W;
+    fishes.push(f);
+  }
+}
+
+function repositionFishes() {
+  for (const f of fishes) {
+    if (f.y < waterY + 30) f.y = waterY + 50 + Math.random() * 80;
+    if (f.y > H - 20)      f.y = H - 40;
+  }
+}
+
+function updateFishes(dt) {
+  // 检查是否要刷新金鱼
+  if (state.phase === 'playing') {
+    const now = Date.now();
+    if (!state.goldfishActive && (now - state.lastGoldfish) / 1000 >= cfg.goldfishInterval) {
+      spawnGoldfish();
+    }
+    // 金鱼限时倒计时
+    for (const f of fishes) {
+      if (f.type.id === 'gold' && f.limitedTimer > 0) {
+        f.limitedTimer -= dt;
+        if (f.limitedTimer <= 0) {
+          fishes.splice(fishes.indexOf(f), 1);
+          state.goldfishActive = false;
+          break;
+        }
+      }
+    }
+  }
+
+  for (let i = fishes.length - 1; i >= 0; i--) {
+    const f = fishes[i];
+    if (f.hooked) continue;
+
+    f.frame++;
+    // 水平移动
+    f.x += f.dir * f.speed * dt;
+    // 上下摆动
+    f.y += Math.sin(f.frame * f.wobbleFreq + f.wobbleOff) * f.type.wobble * cfg.speedMult * 0.5;
+    // 保持在水中范围
+    if (f.y < waterY + 20)  f.y = waterY + 20;
+    if (f.y > H - 20)       f.y = H - 20;
+
+    // 游出屏幕后重新生成
+    if (f.x < -60 || f.x > W + 60) {
+      fishes.splice(i, 1);
+      if (fishes.length < cfg.fishCount) {
+        fishes.push(createFish());
+      }
+    }
+  }
+  // 保持数量
+  while (state.phase === 'playing' && fishes.length < cfg.fishCount) {
+    fishes.push(createFish());
+  }
+}
+
+function spawnGoldfish() {
+  const goldType = FISH_TYPES.find(f => f.id === 'gold');
+  const gf = createFish(goldType);
+  gf.limitedTimer = 8 * 60; // 8秒 × 60帧
+  fishes.push(gf);
+  state.lastGoldfish = Date.now();
+  state.goldfishActive = true;
+  showHint('💰 金鱼限时出现！快钓！');
+}
+
+/* ══════════════════════════════════════════════════════
+   鱼钩物理
+   ══════════════════════════════════════════════════════ */
+const HOOK_GRAVITY = 0.18;
+const HOOK_RISE    = -6;
+
+function updateHook(dt) {
+  if (state.hookState === 'above') {
+    // 鱼钩在水面上方，跟随鱼竿
+    state.hookX += (state.rodX - state.hookX) * 0.15;
+    state.hookY  = waterY - 18;
+  } else if (state.hookState === 'sinking') {
+    // 鱼钩沉入水中
+    state.hookVY += HOOK_GRAVITY;
+    state.hookY  += state.hookVY * dt;
+    if (state.hookY >= H - 40) {
+      // 触底，等待咬钩
+      state.hookY = H - 40;
+      state.hookVY = 0;
+      state.hookState = 'waiting';
+      showHint('🎣 等待鱼儿咬钩…');
+      // 超时自动起竿
+      clearTimeout(state.biteTimer);
+      state.biteTimer = setTimeout(autoRetract, 4000);
+    }
+    // 检测是否有鱼碰到钩
+    if (state.hookState === 'sinking') checkBite();
+  } else if (state.hookState === 'waiting') {
+    // 在水底漂动等待
+    state.hookX += (state.rodX - state.hookX) * 0.04;
+    checkBite();
+  } else if (state.hookState === 'bitten') {
+    // 咬钩后固定位置
+  }
+}
+
+function checkBite() {
+  if (state.phase !== 'playing') return;
+  const hx = state.hookX, hy = state.hookY;
+  for (const f of fishes) {
+    if (f.hooked) continue;
+    if (f.type.id === 'gold' && f.limitedTimer <= 0) continue;
+    const dx = f.x - hx, dy = f.y - hy;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 36) {
+      // 咬钩！
+      triggerBite(f);
+      return;
+    }
+  }
+}
+
+function autoRetract() {
+  if (state.hookState === 'waiting' || state.hookState === 'sinking') {
+    state.hookState = 'above';
+    state.hookVY = 0;
+    showHint('🎣 没钓到，再试试吧~ 点击 Canvas 重新抛竿');
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   咬钩 & 功率条
+   ══════════════════════════════════════════════════════ */
+function triggerBite(fish) {
+  clearTimeout(state.biteTimer);
+  state.hookState  = 'bitten';
+  state.hookX      = fish.x;
+  state.hookY      = fish.y;
+  state.biteFish   = fish;
+  fish.hooked      = true;
+  state.phase      = 'biting';
+
+  // 难度决定功率条最佳区宽度和速度
+  const difficulty = { common: 1, uncommon: 1.3, rare: 1.7, limited: 1.5, epic: 2.5, trash: 0.8 };
+  const d = difficulty[fish.type.rarity] ?? 1;
+  state.needleSpeed = 1.8 * d;              // 指针速度（度/帧）
+  const bestWidth   = Math.max(20, 50 / d); // 最佳区宽度（度）
+  // 最佳区随机位置（在 10°~170° 范围内）
+  state.bestStart = 10 + Math.random() * (160 - bestWidth);
+  state.bestEnd   = state.bestStart + bestWidth;
+
+  // 指针从左端开始
+  state.needleAngle = 0;
+  state.needleDir   = 1;
+
+  // 显示功率条
+  document.getElementById('biteDisplay').textContent = fish.type.emoji;
+  document.getElementById('powerTitle').textContent  =
+    fish.type.pts > 0 ? `🎣 咬钩啦！点击收竿！` : `🪣 是垃圾… 要收吗？`;
+  updateGaugeArcs();
+  document.getElementById('powerOverlay').classList.add('show');
+
+  showHint(`${fish.type.emoji} ${fish.type.name}（${fish.type.pts>0?'+':''}${fish.type.pts}分）咬钩！最佳区收竿可得满分！`);
+}
+
+/* 更新弧形表盘 */
+function updateGaugeArcs() {
+  /* 弧形：0° 对应左端，180° 对应右端，圆心在 (100, 110)，半径 90 */
+  const cx = 100, cy = 110, r = 90;
+
+  function arcPath(startDeg, endDeg) {
+    const s = degToRad(180 + startDeg); // 旋转使 0° 在左
+    const e = degToRad(180 + endDeg);
+    const x1 = cx + r * Math.cos(s), y1 = cy + r * Math.sin(s);
+    const x2 = cx + r * Math.cos(e), y2 = cy + r * Math.sin(e);
+    const large = (endDeg - startDeg) > 180 ? 1 : 0;
+    return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`;
+  }
+
+  // 最佳区（绿色）
+  document.getElementById('bestArc').setAttribute('d', arcPath(state.bestStart, state.bestEnd));
+
+  // 危险区（两端红色，各 10°）
+  document.getElementById('dangerArc1').setAttribute('d', arcPath(0, 10));
+  document.getElementById('dangerArc2').setAttribute('d', arcPath(170, 180));
+
+  // 指针
+  updateNeedle();
+}
+
+function updateNeedle() {
+  const cx = 100, cy = 110, r = 82;
+  const angle = degToRad(180 + state.needleAngle);
+  const nx = cx + r * Math.cos(angle);
+  const ny = cy + r * Math.sin(angle);
+  document.getElementById('needle').setAttribute('x2', nx.toFixed(1));
+  document.getElementById('needle').setAttribute('y2', ny.toFixed(1));
+}
+
+function degToRad(d) { return d * Math.PI / 180; }
+
+/* 功率条动画每帧推进 */
+function stepNeedle() {
+  if (state.phase !== 'biting') return;
+  state.needleAngle += state.needleDir * state.needleSpeed;
+  if (state.needleAngle >= 180) { state.needleAngle = 180; state.needleDir = -1; }
+  if (state.needleAngle <= 0)   { state.needleAngle = 0;   state.needleDir =  1; }
+  updateNeedle();
+}
+
+/* 玩家点击收竿 */
+function tryReel() {
+  if (state.phase !== 'biting') return;
+  const angle = state.needleAngle;
+  let mult = 0;
+  if (angle >= state.bestStart && angle <= state.bestEnd) {
+    // 在最佳区
+    const center    = (state.bestStart + state.bestEnd) / 2;
+    const halfWidth = (state.bestEnd - state.bestStart) / 2;
+    const dist      = Math.abs(angle - center);
+    mult = 1 - (dist / halfWidth) * 0.3;  // 0.7 ~ 1.0
+    mult = Math.max(0.7, mult);
+  } else if (angle < 10 || angle > 170) {
+    // 危险区，失败
+    mult = -1;
+  } else {
+    // 普通区
+    const distToCenter = Math.abs(angle - 90);
+    mult = Math.max(0.2, 0.6 - distToCenter / 180);
+  }
+
+  const fish = state.biteFish;
+  let pts = 0;
+  if (mult === -1) {
+    // 失败，鱼跑了
+    showHint(`❌ ${fish.type.emoji} 跑了！没收住…`);
+    state.combo = 0;
+  } else {
+    pts = Math.round(fish.type.pts * mult);
+    state.score += pts;
+    state.count++;
+    state.combo = fish.type.pts > 0 ? state.combo + 1 : 0;
+    state.fishCaught[fish.type.id] = (state.fishCaught[fish.type.id] ?? 0) + 1;
+    const pctStr = (mult * 100).toFixed(0) + '%';
+    showHint(`${fish.type.emoji} 钓上来啦！${pts>0?'+':''}${pts}分（精度${pctStr}）`);
+    // 飞鱼动画
+    spawnFlyFish(fish.type.emoji, fish.x, fish.y);
+  }
+
+  // 收竿
+  closeOverlay();
+  fish.hooked = false;
+  fishes.splice(fishes.indexOf(fish), 1);
+  if (fish.type.id === 'gold') state.goldfishActive = false;
+
+  state.hookState = 'above';
+  state.hookVY = 0;
+  state.biteFish = null;
+  state.phase = 'playing';
+
+  updateHUD();
+  updateStatPanel();
+}
+
+function closeOverlay() {
+  document.getElementById('powerOverlay').classList.remove('show');
+}
+
+/* ══════════════════════════════════════════════════════
+   飞鱼动画
+   ══════════════════════════════════════════════════════ */
+function spawnFlyFish(emoji, startX, startY) {
+  const center = document.getElementById('panelCenter');
+  const canvasRect = canvas.getBoundingClientRect();
+  const panelRect  = center.getBoundingClientRect();
+  // 将 Canvas 坐标转换为面板坐标
+  const x = canvasRect.left - panelRect.left + startX;
+  const y = canvasRect.top  - panelRect.top  + startY;
+
+  const el = document.createElement('div');
+  el.className = 'fly-fish';
+  el.textContent = emoji;
+  el.style.left = x + 'px';
+  el.style.top  = y + 'px';
+  // 随机飞向右上角
+  el.style.setProperty('--tx',  (40 + Math.random()*60)  + 'px');
+  el.style.setProperty('--ty',  (-80 - Math.random()*80) + 'px');
+  el.style.setProperty('--tx2', (100 + Math.random()*100) + 'px');
+  el.style.setProperty('--ty2', (-200 - Math.random()*100) + 'px');
+  center.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+
+/* ══════════════════════════════════════════════════════
+   Canvas 绘制
+   ══════════════════════════════════════════════════════ */
+let animFrame = 0;
+
+function draw() {
+  state.rafID = requestAnimationFrame(draw);
+  animFrame++;
+
+  const dt = 1; // 固定步长，60fps
+  waveOffset += 0.8;
+
+  if (state.phase === 'playing' || state.phase === 'biting') {
+    updateHook(dt);
+    updateFishes(dt);
+    if (state.phase === 'biting') stepNeedle();
+  }
+
+  ctx.clearRect(0, 0, W, H);
+
+  drawSky();
+  drawWater();
+  drawRod();
+  drawFishLine();
+  drawHook();
+  drawFishes();
+  drawWaterSurface();
+  if (state.phase === 'idle' || state.phase === 'ended') {
+    drawStartScreen();
+  }
+}
+
+/* 天空与岸边背景 */
+function drawSky() {
+  // 渐变天空
+  const grad = ctx.createLinearGradient(0, 0, 0, waterY);
+  grad.addColorStop(0, '#0a1628');
+  grad.addColorStop(0.5, '#0f2a4a');
+  grad.addColorStop(1, '#1e4a6e');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, waterY);
+
+  // 星星
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  const stars = [
+    [30,15],[80,8],[140,22],[200,6],[260,18],[320,10],[390,25],[450,12],[510,7],[570,20],
+    [50,35],[120,42],[180,30],[280,38],[360,44],[430,32],[500,39],
+  ];
+  for (const [sx, sy] of stars) {
+    const twinkle = 0.4 + 0.6 * Math.abs(Math.sin(animFrame * 0.02 + sx));
+    ctx.globalAlpha = twinkle;
+    ctx.beginPath();
+    ctx.arc(sx, sy, 0.8, 0, Math.PI*2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // 月亮
+  ctx.fillStyle = '#FEF9C3';
+  ctx.beginPath();
+  ctx.arc(W - 60, 30, 16, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#1e4a6e'; // 月牙遮罩
+  ctx.beginPath();
+  ctx.arc(W - 54, 26, 13, 0, Math.PI*2);
+  ctx.fill();
+
+  // 岸边草地
+  const bankGrad = ctx.createLinearGradient(0, waterY - 28, 0, waterY);
+  bankGrad.addColorStop(0, '#1a3a18');
+  bankGrad.addColorStop(1, '#2d5a2b');
+  ctx.fillStyle = bankGrad;
+  ctx.beginPath();
+  ctx.moveTo(0, waterY);
+  ctx.lineTo(W, waterY);
+  ctx.lineTo(W, waterY - 12);
+  // 凹凸岸边
+  for (let x = W; x >= 0; x -= 8) {
+    ctx.lineTo(x, waterY - 12 - Math.sin(x * 0.08) * 6);
+  }
+  ctx.closePath();
+  ctx.fill();
+
+  // 岸边石头
+  const rocks = [[80, waterY-8, 18, 10], [200, waterY-6, 12, 8], [W-100, waterY-10, 20, 12]];
+  for (const [rx, ry, rw, rh] of rocks) {
+    ctx.fillStyle = '#4B5563';
+    ctx.beginPath();
+    ctx.ellipse(rx, ry, rw, rh, 0, 0, Math.PI*2);
+    ctx.fill();
+  }
+}
+
+/* 水体 */
+function drawWater() {
+  const grad = ctx.createLinearGradient(0, waterY, 0, H);
+  grad.addColorStop(0, 'rgba(13,50,100,0.95)');
+  grad.addColorStop(0.4, 'rgba(8,35,75,0.98)');
+  grad.addColorStop(1, 'rgba(4,18,45,1)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, waterY, W, H - waterY);
+
+  // 水中光线（斜向光柱）
+  ctx.save();
+  for (let i = 0; i < 3; i++) {
+    const lx = 60 + i * 180 + Math.sin(animFrame * 0.005 + i) * 20;
+    const lightGrad = ctx.createLinearGradient(lx, waterY, lx + 40, H);
+    lightGrad.addColorStop(0, 'rgba(100,180,255,0.07)');
+    lightGrad.addColorStop(1, 'rgba(100,180,255,0)');
+    ctx.fillStyle = lightGrad;
+    ctx.beginPath();
+    ctx.moveTo(lx, waterY);
+    ctx.lineTo(lx + 50, H);
+    ctx.lineTo(lx + 80, H);
+    ctx.lineTo(lx + 30, waterY);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+/* 水面波纹 */
+function drawWaterSurface() {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(0, waterY);
+  for (let x = 0; x <= W; x += 4) {
+    const y = waterY + Math.sin((x + waveOffset) * 0.04) * 3
+                     + Math.sin((x - waveOffset * 0.7) * 0.07) * 2;
+    ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = 'rgba(100,200,255,0.4)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // 水面高光
+  ctx.beginPath();
+  ctx.moveTo(0, waterY + 4);
+  for (let x = 0; x <= W; x += 4) {
+    const y = waterY + 4 + Math.sin((x + waveOffset * 1.2) * 0.05) * 2;
+    ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = 'rgba(200,240,255,0.15)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* 鱼竿 */
+function drawRod() {
+  const rodBase = { x: state.rodX, y: waterY - 14 }; // 竿根（岸边）
+  const rodTip  = { x: state.rodX + 10, y: waterY - 55 }; // 竿尖
+
+  ctx.save();
+  // 竿杆
+  ctx.strokeStyle = '#92400E';
+  ctx.lineWidth = 5;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(rodBase.x - 14, waterY + 2);
+  ctx.lineTo(rodBase.x,      waterY - 14);
+  ctx.lineTo(rodTip.x,       rodTip.y);
+  ctx.stroke();
+  // 竿尖高光
+  ctx.strokeStyle = '#D97706';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(rodBase.x,  waterY - 14);
+  ctx.lineTo(rodTip.x,   rodTip.y);
+  ctx.stroke();
+  ctx.restore();
+
+  // 将竿尖保存供鱼线使用
+  state._rodTip = rodTip;
+}
+
+/* 鱼线 */
+function drawFishLine() {
+  const tip = state._rodTip;
+  if (!tip) return;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(220,220,220,0.7)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  ctx.moveTo(tip.x, tip.y);
+  // 弯曲鱼线
+  const mid = { x: (tip.x + state.hookX) / 2 + 10, y: (tip.y + state.hookY) / 2 - 10 };
+  ctx.quadraticCurveTo(mid.x, mid.y, state.hookX, state.hookY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+/* 鱼钩 */
+function drawHook() {
+  const hx = state.hookX, hy = state.hookY;
+  ctx.save();
+  ctx.strokeStyle = '#E2E8F0';
+  ctx.lineWidth = 1.5;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(hx, hy - 8);
+  ctx.lineTo(hx, hy + 4);
+  ctx.arc(hx + 3, hy + 4, 3, Math.PI, 0, false);
+  ctx.lineTo(hx + 6, hy + 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* 水中鱼群 */
+function drawFishes() {
+  for (const f of fishes) {
+    ctx.save();
+    ctx.globalAlpha = f.alpha;
+    ctx.font = `${f.type.id === 'shark' ? 28 : 22}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // 翻转方向
+    if (f.dir === -1) {
+      ctx.translate(f.x, f.y);
+      ctx.scale(-1, 1);
+      ctx.fillText(f.type.emoji, 0, 0);
+    } else {
+      ctx.fillText(f.type.emoji, f.x, f.y);
+    }
+
+    // 金鱼发光效果
+    if (f.type.id === 'gold') {
+      const glow = ctx.createRadialGradient(f.x, f.y, 2, f.x, f.y, 24);
+      glow.addColorStop(0, 'rgba(251,191,36,0.4)');
+      glow.addColorStop(1, 'rgba(251,191,36,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, 24, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+
+/* 空闲/结束时的提示文字 */
+function drawStartScreen() {
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.45)';
+  ctx.fillRect(0, 0, W, H);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 28px PingFang SC, Microsoft YaHei, sans-serif';
+  ctx.fillStyle = '#F5C842';
+  ctx.fillText(state.phase === 'ended' ? '游戏结束' : '🎣 钓鱼', W/2, H/2 - 20);
+  ctx.font = '16px PingFang SC, Microsoft YaHei, sans-serif';
+  ctx.fillStyle = 'rgba(240,234,248,0.7)';
+  ctx.fillText(state.phase === 'ended' ? '点击「再玩一局」重新开始' : '点击「开始钓鱼」进入游戏', W/2, H/2 + 20);
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════════════════
+   游戏控制
+   ══════════════════════════════════════════════════════ */
+function startGame() {
+  closeModal();
+  if (state.rafID) cancelAnimationFrame(state.rafID);
+  clearInterval(state.timerID);
+  clearTimeout(state.biteTimer);
+  closeOverlay();
+
+  state.score       = 0;
+  state.count       = 0;
+  state.combo       = 0;
+  state.timeLeft    = cfg.duration;
+  state.phase       = 'playing';
+  state.hookState   = 'above';
+  state.hookY       = waterY - 18;
+  state.biteFish    = null;
+  state.fishCaught  = {};
+  state.lastGoldfish = Date.now();
+  state.goldfishActive = false;
+
+  initFishes();
+  updateHUD();
+  updateStatPanel();
+  document.getElementById('prizeCard').style.display = 'none';
+
+  state.timerID = setInterval(tickTimer, 1000);
+
+  showHint('🖱️ 鼠标移动控制竿位，点击 Canvas 抛竿！');
+  document.getElementById('btnStart').textContent = '🎣 游戏中…';
+  document.getElementById('btnStart').disabled = true;
+
+  draw();
+}
+
+function tickTimer() {
+  state.timeLeft--;
+  updateHUD();
+  if (state.timeLeft <= 0) {
+    endGame();
+  } else if (state.timeLeft <= 10) {
+    showHint(`⏰ 还剩 ${state.timeLeft} 秒！`);
+  }
+}
+
+function endGame() {
+  clearInterval(state.timerID);
+  clearTimeout(state.biteTimer);
+  closeOverlay();
+  state.phase = 'ended';
+
+  // 记录历史
+  state.history.unshift({ score: state.score, date: new Date().toLocaleTimeString() });
+  if (state.history.length > 5) state.history.length = 5;
+
+  document.getElementById('btnStart').textContent = '🎣 开始钓鱼';
+  document.getElementById('btnStart').disabled = false;
+
+  updateStatPanel();
+  updateHistory();
+  checkPrize();
+  showResultModal();
+}
+
+function resetGame() {
+  clearInterval(state.timerID);
+  clearTimeout(state.biteTimer);
+  cancelAnimationFrame(state.rafID);
+  closeOverlay();
+  state.phase    = 'idle';
+  state.score    = 0;
+  state.count    = 0;
+  state.combo    = 0;
+  state.timeLeft = cfg.duration;
+  state.hookState = 'above';
+  state.biteFish  = null;
+  state.fishCaught = {};
+  document.getElementById('btnStart').textContent = '🎣 开始钓鱼';
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('prizeCard').style.display = 'none';
+  initFishes();
+  updateHUD();
+  updateStatPanel();
+  showHint('👆 点击「开始钓鱼」，鼠标控制鱼竿左右，点击 Canvas 抛竿');
+  draw();
+}
+
+/* ══════════════════════════════════════════════════════
+   输入事件
+   ══════════════════════════════════════════════════════ */
+function onMouseMove(e) {
+  if (state.phase !== 'playing') return;
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  state.rodX = Math.max(30, Math.min(W - 30, x));
+  if (state.hookState === 'above') {
+    state.hookX = state.rodX;
+  }
+}
+
+function onCanvasClick(e) {
+  if (state.phase !== 'playing') return;
+  if (state.hookState === 'above') {
+    // 抛竿
+    state.hookState = 'sinking';
+    state.hookVY    = 2;
+    showHint('🎣 鱼钩入水！等待咬钩…');
+  }
+}
+
+function onKeyDown(e) {
+  if (state.phase !== 'playing') return;
+  const step = 15;
+  if (e.key === 'ArrowLeft') {
+    state.rodX = Math.max(30, state.rodX - step);
+    if (state.hookState === 'above') state.hookX = state.rodX;
+  } else if (e.key === 'ArrowRight') {
+    state.rodX = Math.min(W - 30, state.rodX + step);
+    if (state.hookState === 'above') state.hookX = state.rodX;
+  } else if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    if (state.hookState === 'above') {
+      // 抛竿
+      state.hookState = 'sinking';
+      state.hookVY    = 2;
+      showHint('🎣 鱼钩入水！等待咬钩…');
+    } else if (state.phase === 'biting') {
+      tryReel();
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   HUD & 面板更新
+   ══════════════════════════════════════════════════════ */
+function updateHUD() {
+  document.getElementById('hudTimer').textContent = state.timeLeft >= 0 ? state.timeLeft + 's' : '--';
+  document.getElementById('hudTimer').className   = 'hud-val' + (state.timeLeft <= 10 ? ' red' : '');
+  document.getElementById('hudScore').textContent = state.score;
+  document.getElementById('hudCount').textContent = state.count;
+  document.getElementById('hudCombo').textContent = state.combo;
+  document.getElementById('statScore').textContent = state.score;
+}
+
+function updateStatPanel() {
+  const list = document.getElementById('fishStatList');
+  list.innerHTML = '';
+  for (const ft of FISH_TYPES) {
+    const cnt  = state.fishCaught[ft.id] ?? 0;
+    const pts  = cnt * ft.pts;
+    const row  = document.createElement('div');
+    row.className = 'fish-stat-row';
+    row.innerHTML = `
+      <div class="fsr-icon">${ft.emoji}</div>
+      <div class="fsr-name">${ft.name}</div>
+      <div class="fsr-count">${cnt}</div>
+      <div class="fsr-pts">${pts>0?'+':''}${pts}分</div>
+    `;
+    list.appendChild(row);
+  }
+}
+
+function updateHistory() {
+  const list = document.getElementById('historyList');
+  if (!state.history.length) {
+    list.innerHTML = '<div style="font-size:12px; color:var(--muted); text-align:center; padding:8px 0;">暂无历史记录</div>';
+    return;
+  }
+  list.innerHTML = '';
+  const medals = ['🥇', '🥈', '🥉'];
+  state.history.forEach((h, i) => {
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    item.innerHTML = `
+      <span>${medals[i] ?? (i+1)}</span>
+      <span style="flex:1; margin:0 8px; color:var(--muted); font-size:11px;">${h.date}</span>
+      <span class="history-score">${h.score}分</span>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function checkPrize() {
+  const prizes = [
+    { icon: '🏆', name: document.getElementById('prize1Name').value, score: +document.getElementById('prize1Score').value },
+    { icon: '🥈', name: document.getElementById('prize2Name').value, score: +document.getElementById('prize2Score').value },
+    { icon: '🥉', name: document.getElementById('prize3Name').value, score: +document.getElementById('prize3Score').value },
+  ];
+  const won = prizes.find(p => state.score >= p.score);
+  const prizeCard = document.getElementById('prizeCard');
+  if (won) {
+    document.getElementById('prizeIcon').textContent = won.icon;
+    document.getElementById('prizeName').textContent = won.name;
+    document.getElementById('prizeDesc').textContent = `得分 ${state.score}，达到 ${won.score} 分门槛`;
+    prizeCard.style.display = 'block';
+    return won;
+  }
+  prizeCard.style.display = 'none';
+  return null;
+}
+
+/* ══════════════════════════════════════════════════════
+   结算弹窗
+   ══════════════════════════════════════════════════════ */
+function showResultModal() {
+  const modal = document.getElementById('resultModal');
+  document.getElementById('modalScore').textContent = state.score;
+
+  // 总结语
+  const best = state.history.length > 1 ? Math.max(...state.history.map(h=>h.score)) : 0;
+  let sub = '';
+  if (state.score >= 60) sub = '🏆 太强了！钓鱼大师！';
+  else if (state.score >= 30) sub = '🎣 不错！继续加油！';
+  else if (state.score >= 10) sub = '🐟 还可以，再练练！';
+  else sub = '😅 继续努力，成为最强钓手！';
+  document.getElementById('modalSubtitle').textContent = sub;
+
+  // 鱼获摘要
+  const summary = document.getElementById('modalFishSummary');
+  summary.innerHTML = '';
+  for (const ft of FISH_TYPES) {
+    const cnt = state.fishCaught[ft.id] ?? 0;
+    if (!cnt) continue;
+    const chip = document.createElement('div');
+    chip.className = 'result-fish-chip';
+    chip.textContent = `${ft.emoji} ×${cnt}`;
+    summary.appendChild(chip);
+  }
+  if (!summary.children.length) {
+    summary.innerHTML = '<div style="color:var(--muted); font-size:13px;">没有钓到任何鱼</div>';
+  }
+
+  // 奖品行
+  const won = checkPrize();
+  const prizeLine = document.getElementById('modalPrizeLine');
+  if (won) {
+    prizeLine.style.display = 'block';
+    prizeLine.textContent = `🎁 恭喜获得：${won.icon} ${won.name}`;
+  } else {
+    prizeLine.style.display = 'none';
+  }
+
+  modal.classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('resultModal').classList.remove('show');
+}
+
+/* ══════════════════════════════════════════════════════
+   左侧面板 UI 构建
+   ══════════════════════════════════════════════════════ */
+function buildFishProbUI() {
+  const pool = FISH_TYPES.filter(f => f.id !== 'gold'); // 金鱼不参与普通概率
+  const barColors = ['#60A5FA','#FB923C','#F472B6','#818CF8','#6B7280'];
+  const container = document.getElementById('fishProbList');
+  container.innerHTML = '';
+  pool.forEach((ft, i) => {
+    const pct = cfg.probs[ft.id] ?? ft.baseProb;
+    const row = document.createElement('div');
+    row.className = 'fish-prob-row';
+    row.innerHTML = `
+      <div class="fish-icon-cell">${ft.emoji}</div>
+      <div class="fish-name">${ft.name}</div>
+      <div class="fish-bar-wrap">
+        <div class="fish-bar" id="fishBar_${ft.id}" style="width:${pct}%; background:${barColors[i % barColors.length]}"></div>
+      </div>
+      <div class="fish-pct" id="fishPct_${ft.id}">${pct}%</div>
+      <div class="fish-pts">${ft.pts>0?'+':''}${ft.pts}分</div>
+    `;
+    // 点击调整概率（循环：5/10/15/20/30/40）
+    row.style.cursor = 'pointer';
+    row.title = '点击调整概率';
+    row.addEventListener('click', () => cycleProb(ft.id, barColors[i % barColors.length]));
+    container.appendChild(row);
+  });
+}
+
+const PROB_STEPS = [5, 10, 15, 20, 30, 40];
+function cycleProb(fishId, color) {
+  const cur = cfg.probs[fishId] ?? 10;
+  const idx = PROB_STEPS.indexOf(cur);
+  const next = PROB_STEPS[(idx + 1) % PROB_STEPS.length];
+  cfg.probs[fishId] = next;
+  document.getElementById(`fishBar_${fishId}`).style.width = next + '%';
+  document.getElementById(`fishPct_${fishId}`).textContent = next + '%';
+}
+
+function buildFishStatUI() {
+  updateStatPanel();
+}
+
+/* ══════════════════════════════════════════════════════
+   配置更新回调
+   ══════════════════════════════════════════════════════ */
+function setDuration(sec) {
+  cfg.duration = sec;
+  state.timeLeft = sec;
+  document.querySelectorAll('.time-btn').forEach(b => {
+    b.classList.toggle('active', +b.dataset.dur === sec);
+  });
+  if (state.phase === 'idle' || state.phase === 'ended') {
+    document.getElementById('hudTimer').textContent = sec + 's';
+  }
+}
+
+function updateFishCount(n) {
+  cfg.fishCount = n;
+  if (state.phase === 'playing') {
+    while (fishes.length > n) fishes.pop();
+    while (fishes.length < n) fishes.push(createFish());
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   提示栏
+   ══════════════════════════════════════════════════════ */
+function showHint(text) {
+  document.getElementById('hintBar').textContent = text;
+}
+
+/* ══════════════════════════════════════════════════════
+   启动
+   ══════════════════════════════════════════════════════ */
+window.addEventListener('load', init);
+</script>
+</body>
+</html>
