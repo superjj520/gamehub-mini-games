@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 名字生成器</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold:    #F5C842;
+    --bg:      #0D0720;
+    --accent:  #7C3AED;
+    --accent2: #EC4899;
+    --deep:    #1A0A2E;
+    --card:    rgba(255,255,255,0.05);
+    --border:  rgba(255,255,255,0.1);
+    --text:    #F0EAF8;
+    --muted:   rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 导航栏 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 58px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.96);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 200;
+    flex-shrink: 0;
+    gap: 16px;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 17px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: var(--text); white-space: nowrap;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  /* 横向滚动导航标签 */
+  .nav-scroll {
+    flex: 1; overflow-x: auto; overflow-y: hidden;
+    scrollbar-width: none;
+  }
+  .nav-scroll::-webkit-scrollbar { display: none; }
+  .nav-tabs { display: flex; gap: 2px; padding: 4px 0; white-space: nowrap; }
+  .nav-tab {
+    padding: 6px 14px; border-radius: 7px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center; white-space: nowrap;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+  .nav-right {
+    display: flex; align-items: center; gap: 8px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .status-badge {
+    background: rgba(34,197,94,0.15);
+    border: 1px solid rgba(34,197,94,0.3);
+    border-radius: 6px; padding: 3px 9px;
+    font-size: 11px; color: #22C55E; font-weight: 600;
+  }
+
+  /* ─── 三列主体 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    flex: 1;
+    min-height: 0;
+    height: calc(100vh - 58px);
+  }
+
+  /* ─── 左侧配置面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.015);
+  }
+  .panel-left::-webkit-scrollbar { width: 4px; }
+  .panel-left::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  .panel-title {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.2px; margin-bottom: 12px; margin-top: 20px;
+  }
+  .panel-title:first-child { margin-top: 0; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+
+  /* 主题选择 */
+  .theme-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 11px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.18s;
+    margin-bottom: 7px;
+  }
+  .theme-item:last-child { margin-bottom: 0; }
+  .theme-item:hover { border-color: rgba(124,58,237,0.4); }
+  .theme-item.active { border-color: var(--accent); background: rgba(124,58,237,0.1); }
+  .theme-icon { font-size: 18px; flex-shrink: 0; }
+  .theme-info { flex: 1; }
+  .theme-name { font-size: 12px; font-weight: 600; }
+  .theme-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .theme-check {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; transition: all 0.18s;
+  }
+  .theme-item.active .theme-check {
+    background: var(--accent); border-color: var(--accent);
+    color: white;
+  }
+  .theme-item.active .theme-check::after { content: '✓'; }
+
+  /* 输入框 */
+  .config-input {
+    width: 100%; background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px 12px;
+    color: var(--text); font-size: 13px; outline: none;
+    transition: border-color 0.18s;
+  }
+  .config-input:focus { border-color: var(--accent); }
+  .config-input::placeholder { color: var(--muted); }
+
+  /* 风格选择分组按钮 */
+  .seg-group { display: flex; gap: 4px; flex-wrap: wrap; }
+  .seg-btn {
+    flex: 1; padding: 6px 8px; border-radius: 7px;
+    font-size: 12px; font-weight: 600; min-width: 0;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted); cursor: pointer; transition: all 0.18s; text-align: center;
+  }
+  .seg-btn.active {
+    background: rgba(124,58,237,0.25);
+    border-color: var(--accent); color: var(--text);
+  }
+  .seg-btn:hover:not(.active) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+  /* 次数上限滑块 */
+  .slider-wrap { padding: 4px 0; }
+  .slider-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .slider-label { font-size: 12px; color: var(--muted); }
+  .slider-val { font-size: 13px; font-weight: 700; color: var(--gold); }
+  input[type=range] {
+    width: 100%; accent-color: var(--accent); height: 4px;
+    cursor: pointer;
+  }
+
+  /* ─── 游戏中心区 ─── */
+  .game-center {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 32px 48px; position: relative;
+    overflow-y: auto; overflow-x: hidden;
+  }
+  .game-center::-webkit-scrollbar { width: 4px; }
+  .game-center::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+  .game-center::before {
+    content: ''; position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%);
+    top: 40%; left: 50%; transform: translate(-50%,-50%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* 游戏区标题区域 */
+  .game-header {
+    text-align: center; position: relative; z-index: 2;
+    margin-bottom: 28px; width: 100%; max-width: 560px;
+  }
+  .game-title-emoji { font-size: 56px; margin-bottom: 12px; display: block; animation: floatY 3s ease-in-out infinite; }
+  @keyframes floatY { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  .game-title {
+    font-size: 30px; font-weight: 900; letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .game-subtitle { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+  /* 输入区 */
+  .input-zone {
+    width: 100%; max-width: 460px; position: relative; z-index: 2; margin-bottom: 20px;
+  }
+  .name-input-wrap { position: relative; }
+  .name-input {
+    width: 100%; padding: 18px 24px;
+    background: rgba(255,255,255,0.06);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    color: var(--text); font-size: 22px; font-weight: 700;
+    outline: none; transition: all 0.2s;
+    text-align: center; letter-spacing: 2px;
+  }
+  .name-input::placeholder { color: rgba(240,234,248,0.25); font-size: 16px; font-weight: 400; letter-spacing: 0; }
+  .name-input:focus { border-color: var(--accent); background: rgba(124,58,237,0.08); box-shadow: 0 0 0 4px rgba(124,58,237,0.12); }
+
+  /* 生成按钮 */
+  .gen-btn {
+    width: 100%; max-width: 460px;
+    padding: 16px 0; border: none; border-radius: 14px;
+    font-size: 17px; font-weight: 800; cursor: pointer;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white; letter-spacing: 0.5px;
+    box-shadow: 0 8px 28px rgba(124,58,237,0.4);
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    position: relative; z-index: 2; margin-bottom: 16px;
+  }
+  .gen-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(124,58,237,0.5); }
+  .gen-btn:active { transform: translateY(0); }
+  .gen-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* 结果卡片区 */
+  .result-zone {
+    width: 100%; max-width: 460px; position: relative; z-index: 2;
+    display: none; flex-direction: column; align-items: center; gap: 16px;
+  }
+  .result-zone.show { display: flex; animation: fadeInUp 0.4s ease; }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 结果卡片 */
+  .result-card {
+    width: 100%; border-radius: 20px; padding: 36px 28px 28px;
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    min-height: 260px; justify-content: center;
+  }
+  /* 卡片粒子动画背景 */
+  .result-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: inherit; opacity: 0.12; filter: blur(40px); z-index: 0;
+  }
+  .result-card-inner { position: relative; z-index: 1; width: 100%; text-align: center; }
+
+  /* 主题徽标 */
+  .result-theme-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 14px; border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    background: rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 16px; letter-spacing: 0.3px;
+  }
+
+  /* 生成的大名字 */
+  .result-name {
+    font-size: 38px; font-weight: 900;
+    color: #fff; letter-spacing: 2px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    margin-bottom: 16px; line-height: 1.2;
+  }
+  /* 描述文字 */
+  .result-desc {
+    font-size: 13px; color: rgba(255,255,255,0.82);
+    line-height: 1.9; max-width: 320px; margin: 0 auto;
+  }
+  .result-desc p { margin: 0; }
+
+  /* 品牌水印 */
+  .result-watermark {
+    position: absolute; bottom: 14px; right: 18px;
+    font-size: 11px; color: rgba(255,255,255,0.35);
+    font-weight: 600; letter-spacing: 0.5px; z-index: 2;
+  }
+
+  /* 操作按钮组 */
+  .action-row {
+    display: flex; gap: 10px; width: 100%;
+  }
+  .action-btn {
+    flex: 1; padding: 11px 0; border-radius: 10px;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    border: 1px solid var(--border); transition: all 0.18s;
+    color: var(--text);
+  }
+  .action-btn.secondary { background: rgba(255,255,255,0.06); }
+  .action-btn.secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+  .action-btn.accent {
+    background: rgba(124,58,237,0.2); border-color: var(--accent); color: var(--text);
+  }
+  .action-btn.accent:hover { background: rgba(124,58,237,0.35); }
+  .action-btn.gold-btn {
+    background: rgba(245,200,66,0.15); border-color: var(--gold); color: var(--gold);
+  }
+  .action-btn.gold-btn:hover { background: rgba(245,200,66,0.25); }
+
+  /* 使用上限提示 */
+  .limit-tip {
+    font-size: 12px; color: var(--muted);
+    text-align: center; display: none;
+  }
+  .limit-tip.show { display: block; }
+  .limit-warn { color: #F87171; }
+
+  /* ─── 右侧数据面板 ─── */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.015);
+  }
+  .panel-right::-webkit-scrollbar { width: 4px; }
+  .panel-right::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  /* 数据卡片 */
+  .stat-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px; margin-bottom: 12px;
+  }
+  .stat-box-title {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+  }
+  .big-num {
+    font-size: 36px; font-weight: 900;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1; margin-bottom: 4px;
+  }
+  .big-num-sub { font-size: 12px; color: var(--muted); }
+
+  /* 热度排行 */
+  .rank-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-num {
+    width: 20px; text-align: center; font-size: 12px;
+    font-weight: 800; color: var(--muted); flex-shrink: 0;
+  }
+  .rank-num.top1 { color: var(--gold); }
+  .rank-num.top2 { color: #C0C0C0; }
+  .rank-num.top3 { color: #CD7F32; }
+  .rank-icon { font-size: 15px; flex-shrink: 0; }
+  .rank-info { flex: 1; }
+  .rank-name { font-size: 12px; font-weight: 600; }
+  .rank-bar-wrap { background: rgba(255,255,255,0.07); border-radius: 3px; height: 4px; margin-top: 3px; }
+  .rank-bar { height: 4px; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .rank-pct { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+
+  /* 最近生成记录 */
+  .record-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .record-item:last-child { border-bottom: none; }
+  .record-avatar {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .record-info { flex: 1; }
+  .record-user { font-size: 12px; font-weight: 600; }
+  .record-gen  { font-size: 11px; color: var(--gold); margin-top: 1px; }
+  .record-theme { font-size: 11px; color: var(--muted); }
+
+  /* 分享数据 */
+  .share-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0;
+  }
+  .share-label { font-size: 12px; color: var(--muted); }
+  .share-val   { font-size: 14px; font-weight: 700; color: var(--text); }
+
+  /* Toast 提示 */
+  .toast {
+    position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: rgba(30,20,60,0.95); border: 1px solid var(--border);
+    padding: 10px 22px; border-radius: 10px; font-size: 13px;
+    color: var(--text); z-index: 999; opacity: 0; pointer-events: none;
+    transition: all 0.3s; backdrop-filter: blur(12px); white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* 隐藏的 canvas（用于生成分享图） */
+  #shareCanvas { display: none; }
+</style>
+</head>
+<body>
+
+<!-- ─── 导航栏 ─── -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span>🎮</span> 小游戏<span>中台</span>
+    <span class="nav-badge">PRO</span>
+  </a>
+  <div class="nav-scroll">
+    <div class="nav-tabs">
+      <a href="wheel.html"           class="nav-tab">大转盘</a>
+      <a href="nine-grid.html"       class="nav-tab">九宫格</a>
+      <a href="scratch-card.html"    class="nav-tab">刮刮乐</a>
+      <a href="shake-dice.html"      class="nav-tab">摇骰子</a>
+      <a href="smash-egg.html"       class="nav-tab">砸金蛋</a>
+      <a href="red-packet-rain.html" class="nav-tab">红包雨</a>
+      <a href="quiz.html"            class="nav-tab">问答闯关</a>
+      <a href="slot-machine.html"    class="nav-tab">老虎机</a>
+      <a href="flip-match.html"      class="nav-tab">翻牌配对</a>
+      <a href="blind-box.html"       class="nav-tab">盲盒抽奖</a>
+      <a href="gashapon.html"        class="nav-tab">扭蛋机</a>
+      <a href="claw-machine.html"    class="nav-tab">抓娃娃</a>
+      <a href="whack-mole.html"      class="nav-tab">打地鼠</a>
+      <a href="catch-coins.html"     class="nav-tab">接金币</a>
+      <a href="fruit-cut.html"       class="nav-tab">切水果</a>
+      <a href="snake.html"           class="nav-tab">贪吃蛇</a>
+      <a href="tetris.html"          class="nav-tab">俄罗斯方块</a>
+      <a href="game-2048.html"       class="nav-tab">2048</a>
+      <a href="minesweeper.html"     class="nav-tab">扫雷</a>
+      <a href="sudoku.html"          class="nav-tab">数独</a>
+      <a href="puzzle.html"          class="nav-tab">拼图</a>
+      <a href="sliding-puzzle.html"  class="nav-tab">华容道</a>
+      <a href="number-bomb.html"     class="nav-tab">数字炸弹</a>
+      <a href="flying-chess.html"    class="nav-tab">飞行棋</a>
+      <a href="monopoly.html"        class="nav-tab">大富翁</a>
+      <a href="cup-game.html"        class="nav-tab">猜杯游戏</a>
+      <a href="ring-toss.html"       class="nav-tab">套圈圈</a>
+      <a href="slingshot.html"       class="nav-tab">弹弓射击</a>
+      <a href="pinball.html"         class="nav-tab">弹球台</a>
+      <a href="match3.html"          class="nav-tab">消消乐</a>
+      <a href="grow-tree.html"       class="nav-tab">种树养成</a>
+      <a href="stamp-collect.html"   class="nav-tab">集章打卡</a>
+      <a href="energy-collect.html"  class="nav-tab">能量收集</a>
+      <a href="progress-unlock.html" class="nav-tab">进度解锁</a>
+      <a href="daily-checkin.html"   class="nav-tab">签到日历</a>
+      <a href="vote-pk.html"         class="nav-tab">投票PK</a>
+      <a href="shake.html"           class="nav-tab">摇一摇</a>
+      <a href="gift-box.html"        class="nav-tab">礼盒拆箱</a>
+      <a href="personality-test.html" class="nav-tab">性格测试</a>
+      <a href="name-generator.html"  class="nav-tab active">名字生成器</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span style="font-size:12px;color:var(--muted)">夏日大促 2026</span>
+    <div class="status-badge">进行中</div>
+  </div>
+</nav>
+
+<!-- ─── 主体三列 ─── -->
+<div class="main">
+
+  <!-- ══════════════════════════════
+       左侧：配置面板
+  ══════════════════════════════════ -->
+  <div class="panel-left">
+
+    <div class="panel-title">生成主题</div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>选择名字风格</div>
+      <div id="themeList">
+        <div class="theme-item active" data-theme="wuxia" onclick="selectTheme(this,'wuxia')">
+          <span class="theme-icon">⚔️</span>
+          <div class="theme-info">
+            <div class="theme-name">武侠江湖</div>
+            <div class="theme-meta">独孤剑魔 · 天山雪狐 · 九阳神掌</div>
+          </div>
+          <div class="theme-check"></div>
+        </div>
+        <div class="theme-item" data-theme="magic" onclick="selectTheme(this,'magic')">
+          <span class="theme-icon">🔮</span>
+          <div class="theme-info">
+            <div class="theme-name">魔法世界</div>
+            <div class="theme-meta">星光织梦师 · 暗影术士 · 虚空法师</div>
+          </div>
+          <div class="theme-check"></div>
+        </div>
+        <div class="theme-item" data-theme="alien" onclick="selectTheme(this,'alien')">
+          <span class="theme-icon">👽</span>
+          <div class="theme-info">
+            <div class="theme-name">外星文明</div>
+            <div class="theme-meta">Zyx·格瑞达 · 欧米迦-7</div>
+          </div>
+          <div class="theme-check"></div>
+        </div>
+        <div class="theme-item" data-theme="wealth" onclick="selectTheme(this,'wealth')">
+          <span class="theme-icon">💰</span>
+          <div class="theme-info">
+            <div class="theme-name">财富预言</div>
+            <div class="theme-meta">年入百万的XX · 即将逆袭的XX</div>
+          </div>
+          <div class="theme-check"></div>
+        </div>
+        <div class="theme-item" data-theme="hero" onclick="selectTheme(this,'hero')">
+          <span class="theme-icon">🦸</span>
+          <div class="theme-info">
+            <div class="theme-name">超级英雄</div>
+            <div class="theme-meta">钢铁守护者 · 暗影骑士 · 光速闪侠</div>
+          </div>
+          <div class="theme-check"></div>
+        </div>
+        <div class="theme-item" data-theme="pokemon" onclick="selectTheme(this,'pokemon')">
+          <span class="theme-icon">⚡</span>
+          <div class="theme-info">
+            <div class="theme-name">宝可梦系</div>
+            <div class="theme-meta">雷光皮卡 · 烈焰喷火 · 水晶冰伊</div>
+          </div>
+          <div class="theme-check"></div>
+        </div>
+        <div class="theme-item" data-theme="zodiac" onclick="selectTheme(this,'zodiac')">
+          <span class="theme-icon">🌟</span>
+          <div class="theme-info">
+            <div class="theme-name">星座传说</div>
+            <div class="theme-meta">天秤座守护神 · 双鱼星使者</div>
+          </div>
+          <div class="theme-check"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-title">词库风格</div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>整体气质偏向</div>
+      <div class="seg-group" id="styleGroup">
+        <button class="seg-btn active" data-style="powerful" onclick="selectStyle(this,'powerful')">霸气</button>
+        <button class="seg-btn" data-style="cute"    onclick="selectStyle(this,'cute')">可爱</button>
+        <button class="seg-btn" data-style="funny"   onclick="selectStyle(this,'funny')">搞笑</button>
+        <button class="seg-btn" data-style="mystery" onclick="selectStyle(this,'mystery')">神秘</button>
+      </div>
+    </div>
+
+    <div class="panel-title">水印设置</div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>品牌水印文字</div>
+      <input class="config-input" id="brandInput" value="小游戏中台 · GameHub" placeholder="输入品牌水印文字" maxlength="20">
+    </div>
+
+    <div class="panel-title">次数限制</div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>每用户生成上限</div>
+      <div class="slider-wrap">
+        <div class="slider-row">
+          <span class="slider-label">最多可生成次数</span>
+          <span class="slider-val" id="limitVal">5 次</span>
+        </div>
+        <input type="range" id="limitRange" min="1" max="20" value="5"
+               oninput="document.getElementById('limitVal').textContent=this.value+' 次'">
+      </div>
+    </div>
+
+  </div><!-- /panel-left -->
+
+
+  <!-- ══════════════════════════════
+       中间：游戏主区域
+  ══════════════════════════════════ -->
+  <div class="game-center" id="gameCenter">
+
+    <!-- 顶部标题 -->
+    <div class="game-header">
+      <span class="game-title-emoji">✨</span>
+      <div class="game-title">专属名字生成器</div>
+      <div class="game-subtitle">
+        输入你的名字，获得一个独一无二的专属称号<br>
+        每次生成都不同，快来测试你的天赋异禀吧！
+      </div>
+    </div>
+
+    <!-- 输入区 -->
+    <div class="input-zone">
+      <div class="name-input-wrap">
+        <input class="name-input" id="nameInput" placeholder="输入你的名字" maxlength="10"
+               oninput="onNameInput()" onkeydown="if(event.key==='Enter')doGenerate()">
+      </div>
+    </div>
+
+    <!-- 生成按钮 -->
+    <button class="gen-btn" id="genBtn" onclick="doGenerate()" disabled>
+      ✨ 生成专属名字
+    </button>
+
+    <!-- 次数提示 -->
+    <div class="limit-tip" id="limitTip"></div>
+
+    <!-- 结果展示区 -->
+    <div class="result-zone" id="resultZone">
+
+      <!-- 精美结果卡片 -->
+      <div class="result-card" id="resultCard">
+        <div class="result-card-inner">
+          <div class="result-theme-badge" id="resultBadge">⚔️ 武侠江湖</div>
+          <div class="result-name"  id="resultName">天剑无极</div>
+          <div class="result-desc"  id="resultDesc">
+            <p>你是一位行走于江湖的绝世剑客，</p>
+            <p>一剑破万法，无人能挡。</p>
+            <p>命中注定威震天下，留名千古。</p>
+          </div>
+        </div>
+        <div class="result-watermark" id="resultWatermark">小游戏中台 · GameHub</div>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="action-row">
+        <button class="action-btn secondary" onclick="doGenerate()">🔄 再生成一个</button>
+        <button class="action-btn accent"    onclick="copyResult()">📋 复制名字</button>
+        <button class="action-btn gold-btn"  onclick="downloadCard()">⬇️ 下载卡片</button>
+      </div>
+
+    </div><!-- /result-zone -->
+
+  </div><!-- /game-center -->
+
+
+  <!-- ══════════════════════════════
+       右侧：数据面板
+  ══════════════════════════════════ -->
+  <div class="panel-right">
+
+    <!-- 已生成次数 -->
+    <div class="stat-box">
+      <div class="stat-box-title">实时数据</div>
+      <div class="big-num" id="totalCount">12,847</div>
+      <div class="big-num-sub">累计生成名字</div>
+    </div>
+
+    <!-- 分享次数 -->
+    <div class="stat-box">
+      <div class="stat-box-title">分享数据</div>
+      <div class="share-row">
+        <span class="share-label">📤 分享次数</span>
+        <span class="share-val" id="shareCount">3,291</span>
+      </div>
+      <div class="share-row">
+        <span class="share-label">⬇️ 下载卡片</span>
+        <span class="share-val" id="downloadCount">1,856</span>
+      </div>
+      <div class="share-row">
+        <span class="share-label">📋 复制次数</span>
+        <span class="share-val" id="copyCount">5,723</span>
+      </div>
+    </div>
+
+    <!-- 各主题热度排行 -->
+    <div class="stat-box">
+      <div class="stat-box-title">主题热度排行</div>
+      <div id="rankList">
+        <div class="rank-row">
+          <div class="rank-num top1">1</div>
+          <div class="rank-icon">💰</div>
+          <div class="rank-info">
+            <div class="rank-name">财富预言</div>
+            <div class="rank-bar-wrap"><div class="rank-bar" style="width:92%"></div></div>
+          </div>
+          <div class="rank-pct">92%</div>
+        </div>
+        <div class="rank-row">
+          <div class="rank-num top2">2</div>
+          <div class="rank-icon">⚔️</div>
+          <div class="rank-info">
+            <div class="rank-name">武侠江湖</div>
+            <div class="rank-bar-wrap"><div class="rank-bar" style="width:78%"></div></div>
+          </div>
+          <div class="rank-pct">78%</div>
+        </div>
+        <div class="rank-row">
+          <div class="rank-num top3">3</div>
+          <div class="rank-icon">🦸</div>
+          <div class="rank-info">
+            <div class="rank-name">超级英雄</div>
+            <div class="rank-bar-wrap"><div class="rank-bar" style="width:65%"></div></div>
+          </div>
+          <div class="rank-pct">65%</div>
+        </div>
+        <div class="rank-row">
+          <div class="rank-num">4</div>
+          <div class="rank-icon">🔮</div>
+          <div class="rank-info">
+            <div class="rank-name">魔法世界</div>
+            <div class="rank-bar-wrap"><div class="rank-bar" style="width:54%"></div></div>
+          </div>
+          <div class="rank-pct">54%</div>
+        </div>
+        <div class="rank-row">
+          <div class="rank-num">5</div>
+          <div class="rank-icon">🌟</div>
+          <div class="rank-info">
+            <div class="rank-name">星座传说</div>
+            <div class="rank-bar-wrap"><div class="rank-bar" style="width:43%"></div></div>
+          </div>
+          <div class="rank-pct">43%</div>
+        </div>
+        <div class="rank-row">
+          <div class="rank-num">6</div>
+          <div class="rank-icon">⚡</div>
+          <div class="rank-info">
+            <div class="rank-name">宝可梦系</div>
+            <div class="rank-bar-wrap"><div class="rank-bar" style="width:38%"></div></div>
+          </div>
+          <div class="rank-pct">38%</div>
+        </div>
+        <div class="rank-row">
+          <div class="rank-num">7</div>
+          <div class="rank-icon">👽</div>
+          <div class="rank-info">
+            <div class="rank-name">外星文明</div>
+            <div class="rank-bar-wrap"><div class="rank-bar" style="width:29%"></div></div>
+          </div>
+          <div class="rank-pct">29%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 最近生成记录（脱敏） -->
+    <div class="stat-box">
+      <div class="stat-box-title">最近生成记录</div>
+      <div id="recordList">
+        <!-- JS动态填充 -->
+      </div>
+    </div>
+
+  </div><!-- /panel-right -->
+
+</div><!-- /main -->
+
+<!-- Toast提示 -->
+<div class="toast" id="toast"></div>
+
+<!-- 隐藏Canvas，用于生成分享图片 -->
+<canvas id="shareCanvas" width="800" height="500"></canvas>
+
+<script>
+/* ══════════════════════════════════════════════
+   全局状态
+══════════════════════════════════════════════ */
+let currentTheme  = 'wuxia';  // 当前主题
+let currentStyle  = 'powerful'; // 当前风格
+let genCount      = 0;          // 本次会话已生成次数
+let lastGenName   = '';         // 上次生成的名字
+let lastGenDesc   = [];         // 上次生成的描述
+let mockTotal     = 12847;      // 模拟总生成次数
+let mockShare     = 3291;
+let mockDownload  = 1856;
+let mockCopy      = 5723;
+
+/* ══════════════════════════════════════════════
+   主题配置（渐变色 + 图标 + 名称）
+══════════════════════════════════════════════ */
+const THEME_CONFIG = {
+  wuxia:   { gradient: 'linear-gradient(135deg,#1a0533 0%,#6b21a8 50%,#dc2626 100%)', icon:'⚔️', label:'武侠江湖', textColor:'#fff' },
+  magic:   { gradient: 'linear-gradient(135deg,#0f172a 0%,#1e3a8a 40%,#7c3aed 100%)', icon:'🔮', label:'魔法世界', textColor:'#e0f2fe' },
+  alien:   { gradient: 'linear-gradient(135deg,#022c22 0%,#065f46 40%,#0ea5e9 100%)', icon:'👽', label:'外星文明', textColor:'#d1fae5' },
+  wealth:  { gradient: 'linear-gradient(135deg,#1c1000 0%,#92400e 40%,#f59e0b 100%)', icon:'💰', label:'财富预言', textColor:'#fef3c7' },
+  hero:    { gradient: 'linear-gradient(135deg,#0c0a1e 0%,#1d4ed8 40%,#ef4444 100%)', icon:'🦸', label:'超级英雄', textColor:'#dbeafe' },
+  pokemon: { gradient: 'linear-gradient(135deg,#1a1000 0%,#b45309 40%,#facc15 100%)', icon:'⚡', label:'宝可梦系',  textColor:'#fef9c3' },
+  zodiac:  { gradient: 'linear-gradient(135deg,#0b0b2a 0%,#4c1d95 40%,#db2777 100%)', icon:'🌟', label:'星座传说', textColor:'#ede9fe' },
+};
+
+/* ══════════════════════════════════════════════
+   词库：霸气 / 可爱 / 搞笑 / 神秘
+   每个主题下各风格有独立词组
+══════════════════════════════════════════════ */
+
+/* 通用工具：按名字首字母/长度取哈希，保证同名同主题同一次生成稳定 */
+function nameHash(str, salt) {
+  let h = salt || 0;
+  for (let i = 0; i < str.length; i++) {
+    h = (h * 31 + str.charCodeAt(i)) & 0xffffffff;
+  }
+  return Math.abs(h);
+}
+
+/* 带随机扰动的伪随机（每次调用都变） */
+let _randSeed = Date.now();
+function seededRand(max) {
+  _randSeed = (_randSeed * 1664525 + 1013904223) & 0xffffffff;
+  return Math.abs(_randSeed) % max;
+}
+
+/* ─── 武侠词库 ─── */
+const WUXIA = {
+  powerful: {
+    prefixes: ['独孤','天山','无极','紫霄','九天','玄冥','碧血','苍穹','万剑','乾坤','龙吟','虎啸','横刀','断魂','破天'],
+    middles:  ['剑','刀','掌','拳','气','炁','魂','影','锋','雪','霜','云','风','龙','虎'],
+    suffixes: ['魔','尊','圣','宗','王','帝','神','侠','客','君','主','宿','祖','尊','极'],
+  },
+  cute: {
+    prefixes: ['小','云朵','暖风','花开','春桃','雪儿','月兔','棉花','柔风','软糖'],
+    middles:  ['剑','花','月','云','蝶','兔','猫','桃','梅','柳'],
+    suffixes: ['仙','灵','姬','妹','娘','儿','宝','心','语','梦'],
+  },
+  funny: {
+    prefixes: ['摸鱼','划水','躺平','吃饭','睡觉','打工','跑路','摆烂','咸鱼','佛系'],
+    middles:  ['大','超级','无敌','宇宙','第一','独一','天下','世界'],
+    suffixes: ['侠','神','尊','爷','先生','大人','老师','同学','朋友','邻居'],
+  },
+  mystery: {
+    prefixes: ['暗夜','幽冥','虚空','深渊','混沌','寂灭','无名','鬼面','魅影','幻灭'],
+    middles:  ['之','无','不','非','亦','似','若','如'],
+    suffixes: ['者','人','客','魂','灵','影','印','痕','迹','道'],
+  },
+};
+
+/* ─── 魔法词库 ─── */
+const MAGIC = {
+  powerful: {
+    prefixes: ['星光','暗影','烈焰','寒冰','雷霆','虚空','时空','混沌','神圣','毁灭'],
+    middles:  ['织梦','破晓','终焉','永恒','无垠','深邃','灼热','凛冽','湮灭','重生'],
+    suffixes: ['师','术士','法师','祭司','使者','执行者','召唤者','审判者','守护者','预言者'],
+  },
+  cute:    { prefixes:['小星星','月光','泡泡','彩虹','花仙','萤火','糖果','水晶','粉红','蝴蝶'], middles:['魔法','光芒','闪闪','亮亮','柔柔','暖暖'], suffixes:['精灵','仙子','小魔女','魔法少女','萌萌','宝贝'] },
+  funny:   { prefixes:['念错咒语的','迷路的','忘带魔杖的','午睡中的','吃饭耽误施法的'], middles:['菜鸟','新手','学徒'], suffixes:['法师','术士','见习魔法师','魔法爱好者'] },
+  mystery: { prefixes:['禁忌','深渊','虚空','湮灭','无名','幽冥','失落','古老','遗忘','沉默'], middles:['之','以太','元素','时空'], suffixes:['术士','法师','预言家','低语者','凝视者','召唤者'] },
+};
+
+/* ─── 外星词库 ─── */
+const ALIEN = {
+  powerful: {
+    prefixes: ['Zyx','Kryx','Vael','Orix','Neth','Quor','Zael','Vrex','Kyth','Arix'],
+    middles:  ['·','—','格','达','塔','兹','斯','克','维','拉'],
+    suffixes: ['-Prime','-Omega','-Alpha','-7号','-X','-Zero','星际统帅','银河霸主','宇宙法则','星域主宰'],
+  },
+  cute:    { prefixes:['嘟嘟','萌萌','圆圆','软软','小绿','小蓝','小紫','甜甜','叽叽','哔哔'], middles:['·'], suffixes:['外星萌宝','可爱外星人','宇宙小精灵','星际宝贝','银河小可爱'] },
+  funny:   { prefixes:['迷路的','找不到飞碟的','吃地球零食上瘾的','说普通话的','刷短视频停不下来的'], middles:['外星'], suffixes:['人','访客','游客','旅行者','居民','打工人'] },
+  mystery: { prefixes:['虚空','暗能量','反物质','暗物质','量子','维度','时间轴','奇点'], middles:['·'], suffixes:['观察者','探测器','使节','预言者','记录者','守望者'] },
+};
+
+/* ─── 财富预言词库 ─── */
+const WEALTH = {
+  powerful: {
+    prefixes: ['年入百万的','即将逆袭的','下一个马云是','财富密码是','躺赢人生的','暗中观察的','闷声发财的','稳中求胜的','步步为营的','运筹帷幄的'],
+    middles:  ['', '', ''],  // 直接用名字
+    suffixes: ['', '', ''],
+    template: (name) => [`年入百万的${name}`,`即将逆袭的${name}`,`财富密码叫${name}`,`躺赢专家${name}`,`${name}不需要工作`]
+  },
+  cute:    { template: (name) => [`小富婆${name}`,`有钱有闲的${name}`,`${name}的零花钱超多`,`买买买达人${name}`,`${name}是我们的ATM`] },
+  funny:   { template: (name) => [`${name}的钱包永远饿`,`欠债累累的${name}`,`工资到账秒没的${name}`,`${name}月光光心慌慌`,`${name}和存款不熟`] },
+  mystery: { template: (name) => [`命中注定有钱的${name}`,`${name}的财运深不可测`,`冥冥之中${name}早已富得流油`,`宇宙馈赠${name}无尽财富`,`${name}的钱是从哪来的无人知晓`] },
+};
+
+/* ─── 超级英雄词库 ─── */
+const HERO = {
+  powerful: {
+    prefixes: ['钢铁','暗影','光速','核爆','超音速','终极','极地','熔岩','雷霆','狂风'],
+    middles:  ['守护者','骑士','战士','猎手','斗士','巡逻者','卫士','先锋'],
+    suffixes: ['','·X','·Pro','Ω','·Max','·Ultimate'],
+  },
+  cute:    { prefixes:['粉色','彩虹','花花','蝴蝶','小白','甜心','可爱','棉花糖','爱心','泡泡'], middles:['小英雄','小超人','小卫士','小骑士','小天使'] , suffixes:[''] },
+  funny:   { prefixes:['上班摸鱼','午睡三小时','外卖不到不出门','手机没电的','忘穿披风的'], middles:['超级英雄','大英雄','伪英雄'], suffixes:[''] },
+  mystery: { prefixes:['黑夜','幽灵','暗器','影子','虚无','面具','冰冷','沉默','孤独','游离'], middles:['骑士','猎人','执行者','审判者','守望者'], suffixes:[''] },
+};
+
+/* ─── 宝可梦词库 ─── */
+const POKEMON = {
+  powerful: {
+    prefixes: ['烈焰','雷光','冰晶','龙爪','钢铁','暗影','超能','火焰','水晶','风暴'],
+    middles:  ['喷火','皮卡','伊布','妙蛙','杰尼','小火','水箭','菊草','利欧','卡比'],
+    suffixes: ['龙','龟','兽','虫','鸟','猫','狗','猿','鱼','仙'],
+  },
+  cute:    { prefixes:['软萌','胖胖','圆滚滚','嗷呜','喵喵','汪汪','咕咕','嗯嗯'], middles:['皮卡','伊布','卡比','喵喵','可达'], suffixes:['宝宝','小宝','萌萌','乖乖','团子'] },
+  funny:   { prefixes:['被抓了一百次的','进化失败的','总睡觉的','只会叫自己名字的'], middles:['皮卡','可达','胖丁','迷唇'], suffixes:['的弱点是喝水','很菜','不会飞','找不到训练师'] },
+  mystery: { prefixes:['幻影','魅影','暗影','深渊','未知','禁忌','古老','湮灭'], middles:['拉帝','梦幻','超梦','无名'], suffixes:['使者','守护者','传说','神话','预言'] },
+};
+
+/* ─── 星座词库 ─── */
+const ZODIAC = {
+  powerful: {
+    prefixes: ['天秤','天蝎','射手','摩羯','水瓶','双鱼','白羊','金牛','双子','巨蟹','狮子','处女'],
+    middles:  ['座守护神','座传说','座之神','座战神','座使者','座天使'],
+    suffixes: ['','·至尊','·传承者','·觉醒','·破晓',''],
+  },
+  cute:    { prefixes:['天秤','双鱼','巨蟹','金牛','处女','双子'], middles:['座小仙女','座小可爱','座萌宝','座天使','座甜心'], suffixes:[''] },
+  funny:   { prefixes:['翻车的','今日运气为零的','塔罗牌说要注意的','水逆中的'], middles:['天蝎','射手','白羊','双子'], suffixes:['座本人'] },
+  mystery: { prefixes:['天蝎','水瓶','双鱼','摩羯','射手'], middles:['座深渊使者','座命运编织者','座星际神谕','座预言家','座时间旅人'], suffixes:[''] },
+};
+
+/* 词库映射 */
+const LIBS = { wuxia:WUXIA, magic:MAGIC, alien:ALIEN, wealth:WEALTH, hero:HERO, pokemon:POKEMON, zodiac:ZODIAC };
+
+/* ══════════════════════════════════════════════
+   描述模板（三行个性化描述）
+══════════════════════════════════════════════ */
+const DESC_TEMPLATES = {
+  wuxia: {
+    powerful: [
+      ['你是一位行走于江湖的绝世剑客，', '一剑破万法，无人能挡。', '命中注定威震天下，留名千古。'],
+      ['千里之外，已闻你的大名。', '一出手便是绝代风华，', '武林中无人敢与你为敌。'],
+      ['你自幼身怀神功，无师自通，', '一招一式皆是化境，', '天下第一，舍我其谁？'],
+    ],
+    cute: [
+      ['你是江湖中最温柔的那个侠客，', '虽不杀人，却能令人心服口服。', '你的微笑是最厉害的武器。'],
+      ['软萌外表下藏着惊天武学，', '让敌人防不胜防、缴械投降。', '江湖上都叫你"最甜的侠客"。'],
+    ],
+    funny: [
+      ['传说中的大侠就是爱睡觉，', '每次出手都是刚睡醒的状态。', '即便如此，也无人能敌。'],
+      ['你的武功深不可测……', '因为连你自己都不知道会什么招式。', '靠运气打遍天下，你是认真的。'],
+    ],
+    mystery: [
+      ['你来自哪里，无人知晓。', '出手时如鬼魅，收手时似云烟。', '江湖只有你的传说，没有你的踪迹。'],
+      ['黑夜是你的披风，沉默是你的语言。', '你的每一步都是命运的注脚。', '天机不可泄露，你早已看破一切。'],
+    ],
+  },
+  magic: {
+    powerful: [
+      ['你掌握着这个世界最强大的魔法，', '星辰为你低头，元素为你臣服。', '你的名字将被永远铭刻在魔法史册上。'],
+      ['虚空在你手中折叠，时间因你而停驻。', '一个咒语便能改变宇宙的秩序。', '这个世界因你的存在而不同。'],
+    ],
+    cute: [
+      ['你的魔法总带着甜甜的味道，', '每次施法都会有泡泡和彩虹出现。', '连最强大的恶龙也被你萌倒啦！'],
+    ],
+    funny: [
+      ['你学了十年魔法，还没学会最基础的点火术。', '但你的绊脚石准确率高达100%。', '天赋？不存在的，运气才是你的魔法。'],
+    ],
+    mystery: [
+      ['你的咒语来自远古禁忌之书，', '每一页都是世界的秘密。', '你注视着深渊，深渊也注视着你。'],
+    ],
+  },
+  alien: {
+    powerful: [
+      ['你来自银河系最强大的文明，', '一个眼神便可摧毁一颗星球。', '地球只是你的众多领地之一。'],
+      ['你的飞船横跨三千光年，', '每到一处星系都会引起震动。', '宇宙的中心，就是你所在的地方。'],
+    ],
+    cute: [
+      ['你是外星来的小萌物，', '最爱地球的棉花糖和小猫咪。', '已经决定永久定居地球了！'],
+    ],
+    funny: [
+      ['你已经在地球迷路三百年了，', '飞碟钥匙找不到，也就不走了。', '顺便把手机充上电先。'],
+    ],
+    mystery: [
+      ['你的来历无法被任何仪器探测，', '你所知道的真相远超人类认知。', '你选择沉默，是因为真相太过沉重。'],
+    ],
+  },
+  wealth: {
+    powerful: [
+      ['财富是你天生的属性，', '每一次出手都是点石成金。', '你的名字就是最好的投资标的。'],
+      ['你的财运深不可测，', '别人问你成功秘诀，你只是微微一笑。', '因为有些事，说了你也不信。'],
+    ],
+    cute: [
+      ['你是天生的小财神，', '零花钱总是不够花但总能找到新来源。', '朋友都说跟你在一起会有好运气！'],
+    ],
+    funny: [
+      ['你的存款永远只剩三位数，', '但精神上你是亿万富翁。', '下个月，这次是认真的，一定要存钱。'],
+    ],
+    mystery: [
+      ['财富如潮水般涌向你，', '却没人知道你用了什么方法。', '成功之路，自有天机。'],
+    ],
+  },
+  hero: {
+    powerful: [
+      ['你拥有常人无法理解的力量，', '每当黑暗降临，你必然出现。', '这座城市因你而安全，世界因你而继续。'],
+      ['你不需要斗篷，不需要面具，', '因为你的气场已经说明一切。', '英雄，不是称号，是你的本质。'],
+    ],
+    cute: [
+      ['你是城市里最暖心的英雄，', '专门负责帮小朋友找丢失的气球。', '大家都说你的超能力是——治愈一切！'],
+    ],
+    funny: [
+      ['你的超能力是准时迟到，', '但每次都在最后一秒化险为夷。', '其实你只是运气特别好而已。'],
+    ],
+    mystery: [
+      ['没有人知道你的真实身份，', '你在黑夜中行动，在黎明前消失。', '传说你从不失手，也从不留名。'],
+    ],
+  },
+  pokemon: {
+    powerful: [
+      ['你是传说中的神兽，', '每百年才现世一次，令所有训练师颤抖。', '你的技能满格，没有弱点。'],
+      ['对战记录 999胜 0负，', '没有任何宝可梦能接住你的第二击。', '你是这个世界最强的存在。'],
+    ],
+    cute: [
+      ['你是训练师最宠爱的小精灵，', '每次出战都带着满满的萌感。', '对手还没出手就已经被你萌化啦！'],
+    ],
+    funny: [
+      ['你的特点是总在最关键时刻没PP了，', '平时只会叫自己的名字，', '但训练师依然选择爱你。'],
+    ],
+    mystery: [
+      ['你的数据不在任何图鉴中记录，', '有人见过你，但没人能说清你的样子。', '你是宝可梦世界最深的谜。'],
+    ],
+  },
+  zodiac: {
+    powerful: [
+      ['星象早已为你写好了剧本，', '你所走的每一步都是命运的安排。', '你是星座守护神亲自选中的传人。'],
+      ['十二星座中，唯你天赋最甚。', '你的出现改变了整片星图的走向。', '命运之轮因你而旋转。'],
+    ],
+    cute: [
+      ['你是最会撒娇的星座小天使，', '每天的星座运势都是"超级幸运"。', '宇宙都在为你的可爱而微笑。'],
+    ],
+    funny: [
+      ['今日运势：建议蒙头大睡。', '水逆还没结束，先别出门。', '但这都不重要，你本来就不打算出门。'],
+    ],
+    mystery: [
+      ['你的星盘隐藏着无数秘密，', '连最权威的占星师也看不懂你的命格。', '你注定是一个谜，一个永远无解的谜。'],
+    ],
+  },
+};
+
+/* ══════════════════════════════════════════════
+   核心生成函数
+══════════════════════════════════════════════ */
+function generateName(inputName, theme, style) {
+  const lib = LIBS[theme];
+  if (!lib) return { name: inputName, desc: ['无法生成，请更换主题。'] };
+
+  let generatedName = '';
+
+  /* 财富预言主题有特殊模板 */
+  if (theme === 'wealth') {
+    const templates = lib[style] ? lib[style].template(inputName) : lib.powerful.template(inputName);
+    generatedName = templates[seededRand(templates.length)];
+  } else {
+    const styleLib = lib[style] || lib.powerful;
+
+    /* 根据名字长度决定组合方式 */
+    const len = inputName.length;
+    const h1  = nameHash(inputName, 7);
+    const h2  = nameHash(inputName, 13);
+    const h3  = nameHash(inputName, 17);
+
+    const p = styleLib.prefixes[( h1 + seededRand(3) ) % styleLib.prefixes.length];
+    const m = styleLib.middles [ ( h2 + seededRand(2) ) % styleLib.middles.length ];
+    const s = styleLib.suffixes[( h3 + seededRand(4) ) % styleLib.suffixes.length];
+
+    if (len <= 1) {
+      /* 单字名：前缀 + 中间 + 后缀 全用 */
+      generatedName = p + m + s;
+    } else if (len === 2) {
+      /* 双字名：前缀 + 后缀 */
+      generatedName = p + s;
+    } else {
+      /* 三字及以上：只用 前缀+后缀 或 前缀+中间 随机选 */
+      generatedName = seededRand(2) === 0 ? p + m + s : p + s;
+    }
+
+    /* 去掉多余空格 */
+    generatedName = generatedName.replace(/\s+/g, '');
+  }
+
+  /* 获取描述 */
+  const descPool = (DESC_TEMPLATES[theme] && DESC_TEMPLATES[theme][style])
+                   || (DESC_TEMPLATES[theme] && DESC_TEMPLATES[theme].powerful)
+                   || [['你是独一无二的存在，', '没有人能定义你的边界，', '你就是你，这已经足够。']];
+  const desc = descPool[seededRand(descPool.length)];
+
+  return { name: generatedName, desc };
+}
+
+/* ══════════════════════════════════════════════
+   UI 交互函数
+══════════════════════════════════════════════ */
+
+/* 监听名字输入 */
+function onNameInput() {
+  const val = document.getElementById('nameInput').value.trim();
+  document.getElementById('genBtn').disabled = val.length === 0;
+}
+
+/* 选择主题 */
+function selectTheme(el, theme) {
+  document.querySelectorAll('#themeList .theme-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  currentTheme = theme;
+  /* 更新游戏区标题emoji */
+  const cfg = THEME_CONFIG[theme];
+  document.querySelector('.game-title-emoji').textContent = cfg.icon;
+}
+
+/* 选择风格 */
+function selectStyle(el, style) {
+  document.querySelectorAll('#styleGroup .seg-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  currentStyle = style;
+}
+
+/* 主生成逻辑 */
+function doGenerate() {
+  const inputName = document.getElementById('nameInput').value.trim();
+  if (!inputName) { showToast('请先输入你的名字 ✏️'); return; }
+
+  const limit = parseInt(document.getElementById('limitRange').value);
+  if (genCount >= limit) {
+    document.getElementById('limitTip').className = 'limit-tip show';
+    document.getElementById('limitTip').innerHTML =
+      `<span class="limit-warn">⚠️ 已达到生成上限（${limit}次），如需继续请联系客服领取更多次数</span>`;
+    showToast('已达到生成上限！');
+    return;
+  }
+
+  /* 扰动随机种子，确保每次不同 */
+  _randSeed = Date.now() ^ (genCount * 6364136223846793005);
+
+  const result = generateName(inputName, currentTheme, currentStyle);
+  lastGenName = result.name;
+  lastGenDesc = result.desc;
+
+  /* 更新卡片外观 */
+  const cfg = THEME_CONFIG[currentTheme];
+  const card = document.getElementById('resultCard');
+  card.style.background = cfg.gradient;
+
+  document.getElementById('resultBadge').textContent = cfg.icon + ' ' + cfg.label;
+  document.getElementById('resultName').textContent   = result.name;
+  document.getElementById('resultName').style.color   = cfg.textColor;
+
+  const descEl = document.getElementById('resultDesc');
+  descEl.innerHTML = result.desc.map(line => `<p>${line}</p>`).join('');
+  descEl.style.color = 'rgba(255,255,255,0.82)';
+
+  /* 水印 */
+  const brand = document.getElementById('brandInput').value || '小游戏中台';
+  document.getElementById('resultWatermark').textContent = brand;
+
+  /* 显示结果区 */
+  const zone = document.getElementById('resultZone');
+  zone.className = 'result-zone';
+  // 触发重绘以重新激活动画
+  void zone.offsetWidth;
+  zone.className = 'result-zone show';
+
+  /* 更新计数 */
+  genCount++;
+  mockTotal++;
+  document.getElementById('totalCount').textContent = mockTotal.toLocaleString();
+
+  /* 清除上限提示 */
+  if (genCount < limit) {
+    document.getElementById('limitTip').className = 'limit-tip';
+  }
+
+  /* 添加到最近记录 */
+  addRecord(inputName, result.name, cfg.label);
+
+  showToast('✨ 你的专属名字已生成！');
+}
+
+/* 复制结果 */
+function copyResult() {
+  if (!lastGenName) { showToast('还没有生成结果哦~'); return; }
+  const brand = document.getElementById('brandInput').value || '小游戏中台';
+  const text = `【${lastGenName}】\n${lastGenDesc.join('\n')}\n\n${brand}`;
+  navigator.clipboard.writeText(text).then(() => {
+    mockCopy++;
+    document.getElementById('copyCount').textContent = mockCopy.toLocaleString();
+    showToast('✅ 已复制到剪贴板！');
+  }).catch(() => showToast('复制失败，请手动复制'));
+}
+
+/* 下载卡片 —— Canvas 绘制 */
+function downloadCard() {
+  if (!lastGenName) { showToast('还没有生成结果哦~'); return; }
+
+  const canvas = document.getElementById('shareCanvas');
+  const ctx    = canvas.getContext('2d');
+  const W = 800, H = 500;
+  canvas.width = W; canvas.height = H;
+
+  const cfg = THEME_CONFIG[currentTheme];
+  const brand = document.getElementById('brandInput').value || '小游戏中台';
+
+  /* 渐变背景 */
+  /* Canvas 不支持 CSS linear-gradient 字符串，手动设定几个主题色 */
+  const CANVAS_GRADS = {
+    wuxia:   [[0.0,'#1a0533'],[0.5,'#6b21a8'],[1.0,'#dc2626']],
+    magic:   [[0.0,'#0f172a'],[0.4,'#1e3a8a'],[1.0,'#7c3aed']],
+    alien:   [[0.0,'#022c22'],[0.4,'#065f46'],[1.0,'#0ea5e9']],
+    wealth:  [[0.0,'#1c1000'],[0.4,'#92400e'],[1.0,'#f59e0b']],
+    hero:    [[0.0,'#0c0a1e'],[0.4,'#1d4ed8'],[1.0,'#ef4444']],
+    pokemon: [[0.0,'#1a1000'],[0.4,'#b45309'],[1.0,'#facc15']],
+    zodiac:  [[0.0,'#0b0b2a'],[0.4,'#4c1d95'],[1.0,'#db2777']],
+  };
+  const gStops = CANVAS_GRADS[currentTheme] || CANVAS_GRADS.wuxia;
+  const grd = ctx.createLinearGradient(0, 0, W, H);
+  gStops.forEach(([pos, color]) => grd.addColorStop(pos, color));
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, W, H);
+
+  /* 半透明遮罩增加质感 */
+  const overlay = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, W*0.6);
+  overlay.addColorStop(0, 'rgba(255,255,255,0.05)');
+  overlay.addColorStop(1, 'rgba(0,0,0,0.2)');
+  ctx.fillStyle = overlay;
+  ctx.fillRect(0, 0, W, H);
+
+  /* 主题徽标（顶部） */
+  ctx.font = '700 16px PingFang SC, Microsoft YaHei, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${cfg.icon} ${cfg.label}`, W/2, 72);
+
+  /* 生成的名字（大字） */
+  ctx.font = '900 64px PingFang SC, Microsoft YaHei, sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.shadowColor = 'rgba(0,0,0,0.4)';
+  ctx.shadowBlur = 20;
+  ctx.textAlign = 'center';
+  ctx.fillText(lastGenName, W/2, 200);
+
+  /* 描述文字（三行） */
+  ctx.shadowBlur = 0;
+  ctx.font = '400 20px PingFang SC, Microsoft YaHei, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.textAlign = 'center';
+  lastGenDesc.forEach((line, i) => {
+    ctx.fillText(line, W/2, 280 + i * 38);
+  });
+
+  /* 分隔线 */
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(W/2 - 160, 420);
+  ctx.lineTo(W/2 + 160, 420);
+  ctx.stroke();
+
+  /* 品牌水印（右下） */
+  ctx.font = '600 14px PingFang SC, Microsoft YaHei, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.textAlign = 'right';
+  ctx.fillText(brand, W - 30, H - 22);
+
+  /* 下载 */
+  const link = document.createElement('a');
+  link.download = `我的专属名字-${lastGenName}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+
+  mockDownload++;
+  document.getElementById('downloadCount').textContent = mockDownload.toLocaleString();
+  showToast('⬇️ 卡片已下载！');
+}
+
+/* ══════════════════════════════════════════════
+   最近生成记录（脱敏 + 模拟数据）
+══════════════════════════════════════════════ */
+const MOCK_RECORDS = [
+  { user:'小**', gen:'天山雪狐剑帝', theme:'武侠江湖' },
+  { user:'李**', gen:'年入百万的李明', theme:'财富预言' },
+  { user:'A**', gen:'暗影骑士·X', theme:'超级英雄' },
+  { user:'陈**', gen:'Zyx·格瑞达-Omega', theme:'外星文明' },
+  { user:'王**', gen:'星光织梦师', theme:'魔法世界' },
+];
+
+function renderRecords(records) {
+  const list = document.getElementById('recordList');
+  list.innerHTML = records.map(r => {
+    const initial = r.user[0] || '?';
+    return `
+      <div class="record-item">
+        <div class="record-avatar">${initial}</div>
+        <div class="record-info">
+          <div class="record-user">${r.user}</div>
+          <div class="record-gen">${r.gen}</div>
+          <div class="record-theme">${r.theme}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function addRecord(inputName, genName, themeLabel) {
+  /* 脱敏：只保留首字，其余替换为** */
+  const masked = inputName[0] + (inputName.length > 1 ? '**' : '');
+  MOCK_RECORDS.unshift({ user: masked, gen: genName, theme: themeLabel });
+  if (MOCK_RECORDS.length > 8) MOCK_RECORDS.pop();
+  renderRecords(MOCK_RECORDS);
+}
+
+/* ══════════════════════════════════════════════
+   Toast 提示
+══════════════════════════════════════════════ */
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ══════════════════════════════════════════════
+   模拟实时数据跳动（增加真实感）
+══════════════════════════════════════════════ */
+function tickStats() {
+  /* 随机小幅增加总生成次数 */
+  const delta = Math.floor(Math.random() * 3);
+  if (delta > 0) {
+    mockTotal += delta;
+    document.getElementById('totalCount').textContent = mockTotal.toLocaleString();
+  }
+  /* 随机增加分享次数 */
+  if (Math.random() < 0.3) {
+    mockShare++;
+    document.getElementById('shareCount').textContent = mockShare.toLocaleString();
+  }
+}
+setInterval(tickStats, 4500);
+
+/* ══════════════════════════════════════════════
+   初始化
+══════════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  renderRecords(MOCK_RECORDS);
+
+  /* 激活导航高亮后自动滚动到可见位置 */
+  const active = document.querySelector('.nav-tab.active');
+  if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+});
+</script>
+</body>
+</html>
