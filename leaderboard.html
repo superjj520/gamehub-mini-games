@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 好友排行榜</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold:    #F5C842;
+    --bg:      #0D0720;
+    --accent:  #7C3AED;
+    --accent2: #EC4899;
+    --deep:    #1A0A2E;
+    --card:    rgba(255,255,255,0.05);
+    --border:  rgba(255,255,255,0.1);
+    --text:    #F0EAF8;
+    --muted:   rgba(240,234,248,0.5);
+    --silver:  #C0C8D8;
+    --bronze:  #CD7F32;
+    --green:   #22C55E;
+    --red:     #EF4444;
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 导航栏 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 56px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.97);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    gap: 16px;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 17px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: var(--text);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 8px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  /* 导航标签横向滚动 */
+  .nav-tabs {
+    display: flex; gap: 2px;
+    overflow-x: auto; flex: 1;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 6px 12px; border-radius: 7px;
+    font-size: 12px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  /* ─── 三列主体布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    flex: 1;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+  }
+
+  /* ─── 左/右面板公共 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.015);
+  }
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.015);
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.2px; margin-bottom: 14px;
+  }
+
+  /* ─── 通用卡片 ─── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+  .dot-accent  { background: var(--accent); }
+  .dot-accent2 { background: var(--accent2); }
+  .dot-green   { background: var(--green); }
+
+  /* ─── 开关 ─── */
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 13px;
+  }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-label { color: var(--text); }
+  .toggle-desc  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .toggle {
+    position: relative; width: 38px; height: 21px; flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; cursor: pointer; inset: 0;
+    background: rgba(255,255,255,0.1); border-radius: 21px;
+    transition: 0.3s;
+  }
+  .toggle-slider::before {
+    content: ''; position: absolute;
+    width: 15px; height: 15px; border-radius: 50%;
+    left: 3px; top: 3px; background: var(--muted);
+    transition: 0.3s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--accent); }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(17px); background: #fff; }
+
+  /* ─── Select / Input ─── */
+  .config-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 13px;
+  }
+  .config-row:last-child { border-bottom: none; }
+  .config-label { color: var(--text); }
+  .config-select, .config-input {
+    background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+    border-radius: 7px; padding: 5px 10px; color: var(--text);
+    font-size: 12px; outline: none; cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    min-width: 100px; text-align: right;
+  }
+  .config-select:focus, .config-input:focus { border-color: var(--accent); }
+  .config-input { cursor: text; min-width: 130px; }
+
+  /* ─── 奖品配置 ─── */
+  .prize-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 12px; color: var(--text);
+  }
+  .prize-row:last-child { border-bottom: none; }
+  .prize-badge {
+    width: 52px; text-align: center; flex-shrink: 0;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 0; border-radius: 4px;
+  }
+  .prize-badge.top1  { background: rgba(245,200,66,0.2);  color: var(--gold); }
+  .prize-badge.top3  { background: rgba(192,200,216,0.2); color: var(--silver); }
+  .prize-badge.top10 { background: rgba(205,127,50,0.2);  color: var(--bronze); }
+  .prize-badge.beat  { background: rgba(34,197,94,0.2);   color: var(--green); }
+  .prize-input {
+    flex: 1; background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 8px; color: var(--text);
+    font-size: 12px; outline: none;
+  }
+  .prize-input:focus { border-color: var(--accent); }
+
+  /* ─── 模拟按钮 ─── */
+  .sim-btns { display: flex; gap: 8px; margin-top: 4px; }
+  .sim-btn {
+    flex: 1; padding: 8px 0; border-radius: 8px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; border: none; transition: all 0.2s; text-align: center;
+  }
+  .sim-btn.gold  { background: rgba(245,200,66,0.12); color: var(--gold);   border: 1px solid rgba(245,200,66,0.3); }
+  .sim-btn.pink  { background: rgba(236,72,153,0.12); color: var(--accent2);border: 1px solid rgba(236,72,153,0.3); }
+  .sim-btn.green { background: rgba(34,197,94,0.12);  color: var(--green);  border: 1px solid rgba(34,197,94,0.3); }
+  .sim-btn:hover { opacity: 0.75; transform: translateY(-1px); }
+
+  /* ═══════════ 中间游戏区 ═══════════ */
+  .game-center {
+    display: flex; flex-direction: column;
+    padding: 20px 24px 16px;
+    overflow-y: auto;
+    position: relative;
+  }
+  .game-center::before {
+    content: ''; position: absolute;
+    width: 560px; height: 560px;
+    background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%);
+    top: -80px; left: 50%; transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  /* ─── 顶部标题 ─── */
+  .game-name {
+    font-size: 22px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.3px; margin-bottom: 2px; text-align: center;
+  }
+  .game-subtitle { color: var(--muted); font-size: 12px; margin-bottom: 16px; text-align: center; }
+
+  /* ─── 维度切换标签 ─── */
+  .dim-tabs {
+    display: flex; gap: 6px; justify-content: center;
+    margin-bottom: 20px;
+  }
+  .dim-tab {
+    padding: 6px 16px; border-radius: 20px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    border: 1px solid var(--border); background: transparent; color: var(--muted);
+    transition: all 0.2s;
+  }
+  .dim-tab.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-color: transparent; color: #fff;
+  }
+  .dim-tab:hover:not(.active) { border-color: var(--accent); color: var(--text); }
+
+  /* ─── 颁奖台 ─── */
+  .podium {
+    display: flex; align-items: flex-end; justify-content: center;
+    gap: 12px; margin-bottom: 20px;
+  }
+  .podium-item {
+    display: flex; flex-direction: column; align-items: center;
+    position: relative; cursor: pointer; transition: transform 0.2s;
+  }
+  .podium-item:hover { transform: translateY(-4px); }
+  .podium-crown { font-size: 22px; margin-bottom: 4px; }
+  .podium-avatar {
+    width: 56px; height: 56px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; border: 3px solid transparent;
+    position: relative; margin-bottom: 6px;
+  }
+  /* 第1名：金色光晕 */
+  .podium-1 .podium-avatar {
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(245,200,66,0.6), 0 0 40px rgba(245,200,66,0.3);
+    animation: glowGold 2s ease-in-out infinite;
+  }
+  @keyframes glowGold {
+    0%,100% { box-shadow: 0 0 16px rgba(245,200,66,0.5), 0 0 32px rgba(245,200,66,0.2); }
+    50%      { box-shadow: 0 0 28px rgba(245,200,66,0.8), 0 0 56px rgba(245,200,66,0.4); }
+  }
+  /* 第2名：银色光晕 */
+  .podium-2 .podium-avatar {
+    border-color: var(--silver);
+    box-shadow: 0 0 14px rgba(192,200,216,0.5);
+  }
+  /* 第3名：铜色光晕 */
+  .podium-3 .podium-avatar {
+    border-color: var(--bronze);
+    box-shadow: 0 0 14px rgba(205,127,50,0.5);
+  }
+  .podium-name {
+    font-size: 12px; font-weight: 600; color: var(--text);
+    max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    text-align: center;
+  }
+  .podium-score {
+    font-size: 11px; color: var(--muted); margin-top: 2px;
+  }
+  .podium-stand {
+    width: 80px; border-radius: 6px 6px 0 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 900; color: rgba(255,255,255,0.6);
+    margin-top: 8px;
+  }
+  .podium-1 .podium-stand { height: 60px; background: linear-gradient(180deg, rgba(245,200,66,0.3), rgba(245,200,66,0.1)); }
+  .podium-2 .podium-stand { height: 44px; background: linear-gradient(180deg, rgba(192,200,216,0.25), rgba(192,200,216,0.08)); }
+  .podium-3 .podium-stand { height: 32px; background: linear-gradient(180deg, rgba(205,127,50,0.25), rgba(205,127,50,0.08)); }
+
+  /* ─── 排行列表 ─── */
+  .rank-list {
+    display: flex; flex-direction: column; gap: 6px;
+    margin-bottom: 14px;
+  }
+  .rank-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--border);
+    transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  /* 自己的行：紫色高亮边框 */
+  .rank-item.is-me {
+    border-color: var(--accent);
+    background: linear-gradient(90deg, rgba(124,58,237,0.12), rgba(236,72,153,0.06));
+    box-shadow: 0 0 12px rgba(124,58,237,0.2);
+  }
+  .rank-item.is-me::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: linear-gradient(180deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+  }
+  /* 排名上升/下降动画 */
+  @keyframes slideUp {
+    from { transform: translateY(6px); opacity: 0.6; }
+    to   { transform: translateY(0);   opacity: 1; }
+  }
+  .rank-item.moving { animation: slideUp 0.4s ease-out; }
+
+  .rank-num {
+    width: 28px; text-align: center; font-size: 13px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .rank-num.top1  { color: var(--gold);   font-size: 16px; }
+  .rank-num.top2  { color: var(--silver); font-size: 15px; }
+  .rank-num.top3  { color: var(--bronze); font-size: 14px; }
+  .rank-num.other { color: var(--muted); }
+
+  .rank-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; background: rgba(255,255,255,0.07);
+    flex-shrink: 0;
+  }
+  .rank-info { flex: 1; min-width: 0; }
+  .rank-name {
+    font-size: 13px; font-weight: 600;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .rank-name .me-badge {
+    display: inline-block; margin-left: 6px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;
+    vertical-align: middle;
+  }
+  .rank-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .rank-score {
+    font-size: 14px; font-weight: 700; color: var(--gold);
+    text-align: right; flex-shrink: 0;
+  }
+  .rank-change {
+    font-size: 11px; font-weight: 700;
+    width: 36px; text-align: center; flex-shrink: 0;
+  }
+  .rank-change.up   { color: var(--green); }
+  .rank-change.down { color: var(--red); }
+  .rank-change.same { color: var(--muted); }
+
+  /* ─── 我的排名固定底栏 ─── */
+  .my-rank-bar {
+    border-top: 1px solid var(--border);
+    padding-top: 12px; margin-top: 4px;
+  }
+  .my-rank-gap {
+    text-align: center; font-size: 12px; color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .my-rank-gap strong { color: var(--accent2); }
+
+  /* ─── 超越提示动画 ─── */
+  .overtake-toast {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 10px 24px; border-radius: 30px;
+    font-size: 14px; font-weight: 700; color: #fff;
+    box-shadow: 0 8px 32px rgba(124,58,237,0.5);
+    z-index: 200; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .overtake-toast.show { opacity: 1; }
+
+  /* ─── 段位展示 ─── */
+  .rank-tier-section { margin-bottom: 16px; }
+  .tier-bar-wrap { margin-bottom: 10px; }
+  .tier-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px; font-size: 13px;
+  }
+  .tier-name { font-weight: 700; }
+  .tier-pct  { font-size: 12px; color: var(--muted); }
+  .tier-bar-bg {
+    height: 8px; background: rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden;
+  }
+  .tier-bar-fill {
+    height: 100%; border-radius: 4px;
+    transition: width 0.6s ease;
+  }
+
+  /* ─── 挑战按钮 ─── */
+  .challenge-btn {
+    padding: 5px 12px; border-radius: 6px;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    border: 1px solid rgba(236,72,153,0.4);
+    background: rgba(236,72,153,0.1); color: var(--accent2);
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .challenge-btn:hover { background: rgba(236,72,153,0.25); }
+
+  /* ═══════════ 右侧数据面板 ═══════════ */
+
+  /* ─── 我的数据卡 ─── */
+  .my-stat-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 12px;
+  }
+  .my-stat-row:last-child { border-bottom: none; }
+  .my-stat-label { color: var(--muted); }
+  .my-stat-val   { font-weight: 700; color: var(--text); }
+  .my-stat-val.gold    { color: var(--gold); }
+  .my-stat-val.green   { color: var(--green); }
+  .my-stat-val.accent2 { color: var(--accent2); }
+
+  /* ─── 折线图 SVG ─── */
+  .chart-wrap {
+    width: 100%; height: 80px;
+    position: relative; margin-bottom: 4px;
+  }
+  .chart-wrap svg { width: 100%; height: 100%; overflow: visible; }
+
+  /* ─── 可超越好友列表 ─── */
+  .beatable-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 12px;
+  }
+  .beatable-item:last-child { border-bottom: none; }
+  .beatable-avatar { font-size: 18px; flex-shrink: 0; }
+  .beatable-info { flex: 1; min-width: 0; }
+  .beatable-name { font-size: 12px; font-weight: 600; }
+  .beatable-gap  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .beatable-rank { font-size: 11px; color: var(--muted); text-align: right; }
+
+  /* ─── 奖品解锁 ─── */
+  .prize-unlock-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 12px;
+  }
+  .prize-unlock-item:last-child { border-bottom: none; }
+  .unlock-icon { font-size: 18px; flex-shrink: 0; }
+  .unlock-info { flex: 1; }
+  .unlock-name { font-size: 12px; font-weight: 600; }
+  .unlock-cond { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .unlock-badge {
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .unlock-badge.done    { background: rgba(34,197,94,0.2);  color: var(--green); }
+  .unlock-badge.pending { background: rgba(245,200,66,0.15); color: var(--gold); }
+  .unlock-badge.locked  { background: rgba(255,255,255,0.07); color: var(--muted); }
+
+  /* ─── 实时滚动榜 ─── */
+  .live-ticker {
+    overflow: hidden; height: 36px;
+    background: rgba(255,255,255,0.03); border-radius: 8px;
+    border: 1px solid var(--border); margin-bottom: 14px;
+    position: relative;
+  }
+  .live-ticker-inner {
+    display: flex; flex-direction: column;
+    transition: transform 0.5s ease;
+    position: absolute; width: 100%;
+  }
+  .live-ticker-row {
+    height: 36px; display: flex; align-items: center;
+    padding: 0 12px; gap: 8px; font-size: 12px;
+    white-space: nowrap;
+  }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); flex-shrink: 0;
+    animation: blink 1.2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ─── 加载spinner ─── */
+  .refresh-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; color: var(--muted); padding: 2px 6px;
+    background: rgba(255,255,255,0.05); border-radius: 4px;
+  }
+  .refresh-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--green); animation: blink 1.5s infinite;
+  }
+
+  /* ─── 滚动条美化 ─── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ═══ 导航栏 ═══ -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">
+    🎮 <span>Game</span>Hub
+    <span class="nav-badge">BETA</span>
+  </a>
+  <div class="nav-tabs" id="navTabs">
+    <a class="nav-tab" href="slot-machine.html">🎰 老虎机</a>
+    <a class="nav-tab" href="wheel.html">🎡 转盘</a>
+    <a class="nav-tab" href="scratch-card.html">🃏 刮刮卡</a>
+    <a class="nav-tab" href="nine-grid.html">🔲 九宫格</a>
+    <a class="nav-tab" href="red-packet-rain.html">🧧 红包雨</a>
+    <a class="nav-tab" href="claw-machine.html">🕹️ 抓娃娃</a>
+    <a class="nav-tab" href="shake-dice.html">🎲 摇骰子</a>
+    <a class="nav-tab" href="smash-egg.html">🥚 砸金蛋</a>
+    <a class="nav-tab" href="flying-chess.html">✈️ 飞行棋</a>
+    <a class="nav-tab" href="monopoly.html">🏠 大富翁</a>
+    <a class="nav-tab" href="daily-checkin.html">📅 每日签到</a>
+    <a class="nav-tab" href="gift-box.html">🎁 礼盒开箱</a>
+    <a class="nav-tab" href="whack-mole.html">🔨 打地鼠</a>
+    <a class="nav-tab" href="cup-game.html">🎩 三杯游戏</a>
+    <a class="nav-tab" href="number-bomb.html">💣 数字炸弹</a>
+    <a class="nav-tab" href="stamp-collect.html">🖼️ 集卡集章</a>
+    <a class="nav-tab" href="vote-pk.html">⚔️ 投票PK</a>
+    <a class="nav-tab" href="gashapon.html">🟡 扭蛋机</a>
+    <a class="nav-tab" href="blind-box.html">📦 盲盒抽卡</a>
+    <a class="nav-tab" href="game-2048.html">🔢 2048</a>
+    <a class="nav-tab" href="match3.html">💎 消消乐</a>
+    <a class="nav-tab" href="catch-coins.html">🪙 接金币</a>
+    <a class="nav-tab" href="grow-tree.html">🌳 成长树</a>
+    <a class="nav-tab" href="pinball.html">🎯 弹珠机</a>
+    <a class="nav-tab" href="snake.html">🐍 贪吃蛇</a>
+    <a class="nav-tab" href="slingshot.html">🏹 弹弓射击</a>
+    <a class="nav-tab" href="fruit-cut.html">🍉 切水果</a>
+    <a class="nav-tab" href="progress-unlock.html">🔓 进度解锁</a>
+    <a class="nav-tab" href="energy-collect.html">⚡ 能量收集</a>
+    <a class="nav-tab active" href="leaderboard.html">🏆 好友排行榜</a>
+  </div>
+</nav>
+
+<!-- 超越好友提示 Toast -->
+<div class="overtake-toast" id="overtakeToast">🎉 你超越了好友！排名上升！</div>
+
+<!-- ═══ 三列主体 ═══ -->
+<div class="main">
+
+  <!-- ════ 左侧配置面板 ════ -->
+  <aside class="panel-left">
+
+    <div class="panel-title">⚙ 排行配置</div>
+
+    <!-- 基础设置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>基础设置</div>
+
+      <div class="config-row">
+        <span class="config-label">活动名称</span>
+        <input class="config-input" id="cfgActivityName" value="夏日竞技赛" onchange="applyConfig()">
+      </div>
+      <div class="config-row">
+        <span class="config-label">排行维度</span>
+        <select class="config-select" id="cfgDimension" onchange="applyConfig()">
+          <option value="total">总积分</option>
+          <option value="today">今日得分</option>
+          <option value="week">本周得分</option>
+          <option value="history">历史最高</option>
+        </select>
+      </div>
+      <div class="config-row">
+        <span class="config-label">显示人数</span>
+        <select class="config-select" id="cfgShowCount" onchange="applyConfig()">
+          <option value="10" selected>前10名</option>
+          <option value="20">前20名</option>
+          <option value="50">前50名</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 功能开关 -->
+    <div class="card">
+      <div class="card-title"><span class="dot dot-accent2"></span>功能开关</div>
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">段位系统</div>
+          <div class="toggle-desc">显示青铜→钻石5段位进度</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggleTier" checked onchange="applyConfig()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">实时滚动榜</div>
+          <div class="toggle-desc">展示最新分数变动动态</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggleLive" checked onchange="applyConfig()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">超越提示动画</div>
+          <div class="toggle-desc">超越好友时弹出激励提示</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggleOvertake" checked onchange="applyConfig()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">挑战好友按钮</div>
+          <div class="toggle-desc">列表中显示「挑战」操作</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggleChallenge" checked onchange="applyConfig()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">排名变化指示</div>
+          <div class="toggle-desc">显示↑↓排名变动方向</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggleChange" checked onchange="applyConfig()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 奖品配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot dot-green"></span>奖品配置</div>
+
+      <div class="prize-row">
+        <span class="prize-badge top1">🥇 第1名</span>
+        <input class="prize-input" id="prize1" value="限量周边礼盒">
+      </div>
+      <div class="prize-row">
+        <span class="prize-badge top3">🥈🥉 前3名</span>
+        <input class="prize-input" id="prize3" value="100积分券">
+      </div>
+      <div class="prize-row">
+        <span class="prize-badge top10">前10名</span>
+        <input class="prize-input" id="prize10" value="20积分券">
+      </div>
+      <div class="prize-row">
+        <span class="prize-badge beat">超越奖励</span>
+        <input class="prize-input" id="prizeBeat" value="每超越1人+5积分">
+      </div>
+    </div>
+
+    <!-- 模拟操作 -->
+    <div class="card">
+      <div class="card-title"><span class="dot dot-accent"></span>模拟操作</div>
+      <div class="sim-btns">
+        <button class="sim-btn gold" onclick="simMyScoreUp()">📈 我加分</button>
+        <button class="sim-btn pink" onclick="simRandomRefresh()">🔀 随机刷新</button>
+      </div>
+      <div class="sim-btns" style="margin-top:8px">
+        <button class="sim-btn green" onclick="simOvertake()">🚀 触发超越</button>
+      </div>
+      <div style="margin-top:10px; font-size:11px; color:var(--muted); line-height:1.6">
+        每 5s 自动随机刷新分数模拟实时竞争感。<br>
+        「我加分」让自己排名跃升，「触发超越」强制弹出超越动画。
+      </div>
+    </div>
+
+  </aside><!-- /panel-left -->
+
+
+  <!-- ════ 中间游戏区 ════ -->
+  <main class="game-center" id="gameCenter">
+
+    <!-- 标题 -->
+    <div class="game-name" id="activityTitle">🏆 夏日竞技赛</div>
+    <div class="game-subtitle">
+      好友排行榜 · <span id="autoRefreshBadge" class="refresh-badge">
+        <span class="refresh-dot"></span>实时更新中
+      </span>
+    </div>
+
+    <!-- 维度切换 -->
+    <div class="dim-tabs" id="dimTabs">
+      <button class="dim-tab active" onclick="switchDim('total',this)">总积分</button>
+      <button class="dim-tab" onclick="switchDim('today',this)">今日</button>
+      <button class="dim-tab" onclick="switchDim('week',this)">本周</button>
+      <button class="dim-tab" onclick="switchDim('history',this)">历史</button>
+    </div>
+
+    <!-- 实时滚动榜 -->
+    <div class="live-ticker" id="liveTicker">
+      <div class="live-ticker-inner" id="liveTickerInner"></div>
+    </div>
+
+    <!-- 段位展示区 -->
+    <div class="rank-tier-section" id="tierSection"></div>
+
+    <!-- 颁奖台（前3名） -->
+    <div class="podium" id="podium"></div>
+
+    <!-- 4-10名列表 -->
+    <div class="rank-list" id="rankList"></div>
+
+    <!-- 我的排名固定底栏 -->
+    <div class="my-rank-bar">
+      <div class="my-rank-gap" id="myGapText"></div>
+      <div class="rank-list" id="myRankRow"></div>
+    </div>
+
+  </main><!-- /game-center -->
+
+
+  <!-- ════ 右侧数据面板 ════ -->
+  <aside class="panel-right">
+
+    <div class="panel-title">📊 我的数据</div>
+
+    <!-- 我的历史数据卡 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>本次活动统计</div>
+      <div class="my-stat-row">
+        <span class="my-stat-label">当前排名</span>
+        <span class="my-stat-val gold" id="statMyRank">#8</span>
+      </div>
+      <div class="my-stat-row">
+        <span class="my-stat-label">历史最高排名</span>
+        <span class="my-stat-val accent2" id="statBestRank">#5</span>
+      </div>
+      <div class="my-stat-row">
+        <span class="my-stat-label">当前积分</span>
+        <span class="my-stat-val gold" id="statMyScore">3120</span>
+      </div>
+      <div class="my-stat-row">
+        <span class="my-stat-label">今日得分</span>
+        <span class="my-stat-val green" id="statTodayScore">+280</span>
+      </div>
+      <div class="my-stat-row">
+        <span class="my-stat-label">超越好友数</span>
+        <span class="my-stat-val green" id="statBeatenCount">3人</span>
+      </div>
+      <div class="my-stat-row">
+        <span class="my-stat-label">距上一名差距</span>
+        <span class="my-stat-val accent2" id="statGapToNext">-180分</span>
+      </div>
+    </div>
+
+    <!-- 排名折线图 -->
+    <div class="card">
+      <div class="card-title"><span class="dot dot-accent"></span>排名变化趋势</div>
+      <div class="chart-wrap" id="rankChart"></div>
+      <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:4px">过去7次刷新 · 数字越小排名越高</div>
+    </div>
+
+    <!-- 可超越好友 -->
+    <div class="card">
+      <div class="card-title"><span class="dot dot-accent2"></span>可超越的好友</div>
+      <div id="beatableList"></div>
+    </div>
+
+    <!-- 奖品解锁状态 -->
+    <div class="card">
+      <div class="card-title"><span class="dot dot-green"></span>奖品解锁状态</div>
+      <div id="prizeUnlockList"></div>
+    </div>
+
+  </aside><!-- /panel-right -->
+
+</div><!-- /main -->
+
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   全局状态
+═══════════════════════════════════════════════════════════ */
+
+// 20个模拟玩家数据（「我」固定ID=0）
+const PLAYER_NAMES = [
+  '我','小熊猫','星星糖','闪电兔','宇宙飞侠','柠檬茶',
+  '风暴骑士','彩虹猫咪','奶酪球','铁甲武士','月亮女神','火焰龙',
+  '蜜蜂侠','海浪冲击','紫色梦境','金色年华','幸运草','暗黑骑士',
+  '冰雪精灵','沙漠狐狸'
+];
+const PLAYER_AVATARS = [
+  '🐼','🐨','⭐','⚡','🚀','🍋',
+  '⚔️','🐱','🧀','🛡️','🌙','🐉',
+  '🐝','🌊','💜','✨','🍀','🗡️',
+  '❄️','🦊'
+];
+
+// 当前维度
+let currentDim = 'total';
+// 历史排名记录（用于折线图）
+let myRankHistory = [12,10,9,8,10,8,8];
+// 超越统计
+let beatenCount = 3;
+// 历史最高排名
+let bestRank = 5;
+// 自动刷新timer
+let autoTimer = null;
+// 实时滚动ticker timer
+let tickerTimer = null;
+// 玩家分数表（各维度）
+let scores = {};
+
+// 初始化分数
+function initScores() {
+  ['total','today','week','history'].forEach(dim => {
+    scores[dim] = PLAYER_NAMES.map((_, i) => {
+      if (i === 0) {
+        // 「我」的分数固定在第8左右
+        return { total:3120, today:280, week:1200, history:4500 }[dim];
+      }
+      const base = { total:6000, today:600, week:3000, history:8000 }[dim];
+      return Math.floor(Math.random() * base * 0.8 + base * 0.1);
+    });
+    // 确保「我」在第8名左右
+    ensureMyRank(dim, 7); // 0-indexed第7 = 第8名
+  });
+}
+
+// 根据目标排名调整我的分数
+function ensureMyRank(dim, targetRankIdx) {
+  const arr = scores[dim].slice();
+  arr.sort((a,b) => b - a);
+  // 让我的分数略低于第targetRankIdx名、略高于第targetRankIdx+1名
+  const above = arr[targetRankIdx - 1] || arr[0];
+  const below = arr[targetRankIdx + 1] || 0;
+  scores[dim][0] = Math.floor((above + below) / 2 + Math.random() * 50);
+}
+
+// 获取当前维度排行数组（返回带原始索引的排序结果）
+function getSortedPlayers(dim) {
+  return PLAYER_NAMES.map((name, i) => ({
+    id: i, name, avatar: PLAYER_AVATARS[i],
+    score: scores[dim][i]
+  })).sort((a,b) => b.score - a.score);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   渲染工具
+═══════════════════════════════════════════════════════════ */
+
+// 格式化分数
+function fmtScore(n) {
+  return n >= 10000 ? (n/10000).toFixed(1)+'w' : n.toLocaleString();
+}
+
+// 渲染颁奖台（前3名）
+function renderPodium(sorted) {
+  const p1 = sorted[0], p2 = sorted[1], p3 = sorted[2];
+  const podium = document.getElementById('podium');
+  const makeCard = (p, cls, rank, crown) => `
+    <div class="podium-item podium-${rank}">
+      <div class="podium-crown">${crown}</div>
+      <div class="podium-avatar">${p.avatar}</div>
+      <div class="podium-name">${p.name}${p.id===0?'<span style="font-size:10px;color:var(--accent)">·我</span>':''}</div>
+      <div class="podium-score">${fmtScore(p.score)}</div>
+      <div class="podium-stand">${rank}</div>
+    </div>`;
+
+  // 颁奖台顺序：2-1-3
+  podium.innerHTML = makeCard(p2,'silver',2,'🥈') + makeCard(p1,'gold',1,'👑') + makeCard(p3,'bronze',3,'🥉');
+}
+
+// 渲染4-N名列表
+function renderRankList(sorted, showCount) {
+  const cfg = getConfig();
+  const list = document.getElementById('rankList');
+  const end = Math.min(sorted.length, showCount);
+  let html = '';
+  for (let i = 3; i < end; i++) {
+    const p = sorted[i];
+    if (p.id === 0) continue; // 我另外渲染在底部
+    const isMe = p.id === 0;
+    const change = getChangeLabel(p.id);
+    html += `
+      <div class="rank-item${isMe?' is-me':''}" id="rankItem${p.id}">
+        <div class="rank-num other">${i+1}</div>
+        <div class="rank-avatar">${p.avatar}</div>
+        <div class="rank-info">
+          <div class="rank-name">${p.name}${isMe?'<span class="me-badge">我</span>':''}</div>
+          <div class="rank-meta">${getDimLabel(currentDim)} · 积分</div>
+        </div>
+        ${cfg.toggleChange ? `<div class="rank-change ${change.cls}">${change.text}</div>` : ''}
+        <div class="rank-score">${fmtScore(p.score)}</div>
+        ${cfg.toggleChallenge && !isMe ? `<button class="challenge-btn" onclick="sendChallenge('${p.name}')">挑战</button>` : ''}
+      </div>`;
+  }
+  list.innerHTML = html;
+}
+
+// 渲染我的排名底栏
+function renderMyRank(sorted) {
+  const cfg = getConfig();
+  const myIdx = sorted.findIndex(p => p.id === 0);
+  const myRank = myIdx + 1;
+  const me = sorted[myIdx];
+  const prev = myIdx > 0 ? sorted[myIdx - 1] : null;
+  const gap = prev ? prev.score - me.score : 0;
+
+  // 更新底栏文字
+  document.getElementById('myGapText').innerHTML =
+    `我的排名：<strong>#${myRank}</strong>` +
+    (prev ? `｜距上一名 <strong>${fmtScore(gap)}分</strong>` : '｜已是第一名🎉');
+
+  const change = getChangeLabel(0);
+  const row = document.getElementById('myRankRow');
+  row.innerHTML = `
+    <div class="rank-item is-me">
+      <div class="rank-num ${myRank<=3?'top'+myRank:'other'}">${myRank<=3?['🥇','🥈','🥉'][myRank-1]:myRank}</div>
+      <div class="rank-avatar">${me.avatar}</div>
+      <div class="rank-info">
+        <div class="rank-name">${me.name}<span class="me-badge">我</span></div>
+        <div class="rank-meta">${getDimLabel(currentDim)} · 积分</div>
+      </div>
+      ${cfg.toggleChange ? `<div class="rank-change ${change.cls}">${change.text}</div>` : ''}
+      <div class="rank-score">${fmtScore(me.score)}</div>
+    </div>`;
+
+  return { myRank, gap, myScore: me.score };
+}
+
+// 渲染段位系统
+function renderTierSection(sorted) {
+  const cfg = getConfig();
+  const section = document.getElementById('tierSection');
+  if (!cfg.toggleTier) { section.innerHTML = ''; return; }
+
+  const myIdx = sorted.findIndex(p => p.id === 0);
+  const myRank = myIdx + 1;
+  const total = sorted.length;
+  const pct = (myIdx / total) * 100;
+
+  const tiers = [
+    { name:'💎 钻石', color:'#7C3AED', max:5,  label:'前5%' },
+    { name:'🏆 铂金', color:'#F5C842', max:15, label:'前15%' },
+    { name:'⚔️ 黄金', color:'#EF8E38', max:30, label:'前30%' },
+    { name:'🛡️ 白银', color:'#C0C8D8', max:60, label:'前60%' },
+    { name:'⛏️ 青铜', color:'#CD7F32', max:100,label:'其他' },
+  ];
+
+  let myTierIdx = tiers.findIndex(t => pct <= t.max);
+  if (myTierIdx < 0) myTierIdx = tiers.length - 1;
+  const myTier = tiers[myTierIdx];
+  const prevMax = myTierIdx > 0 ? tiers[myTierIdx-1].max : 0;
+  const fillPct = myTierIdx === 0 ? 100 : Math.max(0, Math.min(100,
+    ((myTier.max - pct) / (myTier.max - prevMax)) * 100
+  ));
+
+  section.innerHTML = `
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">
+        <span class="dot" style="background:${myTier.color}"></span>
+        当前段位：<span style="color:${myTier.color};font-size:14px">${myTier.name}</span>
+        <span style="font-size:11px;color:var(--muted);margin-left:auto">排名 #${myRank} / ${total}</span>
+      </div>
+      <div class="tier-bar-wrap">
+        <div class="tier-header">
+          <span class="tier-name" style="color:${myTier.color}">${myTier.label}</span>
+          <span class="tier-pct">${pct.toFixed(1)}% 区段</span>
+        </div>
+        <div class="tier-bar-bg">
+          <div class="tier-bar-fill" style="width:${fillPct}%;background:${myTier.color}"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+        ${tiers.map((t,i) => `
+          <span style="font-size:11px;padding:2px 8px;border-radius:4px;
+            background:${i===myTierIdx?t.color+'33':'rgba(255,255,255,0.05)'};
+            color:${i===myTierIdx?t.color:'var(--muted)'};
+            border:1px solid ${i===myTierIdx?t.color:'transparent'}">${t.name}</span>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+// 渲染右侧可超越好友
+function renderBeatableList(sorted) {
+  const myIdx = sorted.findIndex(p => p.id === 0);
+  const me = sorted[myIdx];
+  // 找距我较近的上方5个好友
+  const above = sorted.slice(Math.max(0, myIdx-5), myIdx).reverse();
+  const list = document.getElementById('beatableList');
+  if (above.length === 0) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:8px 0">暂无可超越目标</div>';
+    return;
+  }
+  list.innerHTML = above.map((p, i) => `
+    <div class="beatable-item">
+      <div class="beatable-avatar">${p.avatar}</div>
+      <div class="beatable-info">
+        <div class="beatable-name">${p.name}</div>
+        <div class="beatable-gap">差距：${fmtScore(p.score - me.score)}分</div>
+      </div>
+      <div class="beatable-rank" style="text-align:right">
+        <div style="color:var(--gold);font-weight:700">#${myIdx - i}</div>
+        <button class="challenge-btn" style="margin-top:3px" onclick="sendChallenge('${p.name}')">挑战</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// 渲染奖品解锁状态
+function renderPrizeUnlock(myRank) {
+  const prizes = [
+    { icon:'🏆', name:'冠军大奖', cond:'第1名', target:1, val:document.getElementById('prize1')?.value||'限量周边礼盒' },
+    { icon:'🎖️', name:'前3名奖励', cond:'前3名', target:3, val:document.getElementById('prize3')?.value||'100积分券' },
+    { icon:'🎁', name:'前10名奖励', cond:'前10名',target:10, val:document.getElementById('prize10')?.value||'20积分券' },
+    { icon:'⚡', name:'超越奖励', cond:`超越${beatenCount}人`, target:0, val:document.getElementById('prizeBeat')?.value||'每超越1人+5积分', always:true },
+  ];
+  const list = document.getElementById('prizeUnlockList');
+  list.innerHTML = prizes.map(p => {
+    let status, cls;
+    if (p.always) { status = '已获得'; cls = 'done'; }
+    else if (myRank <= p.target) { status = '已解锁'; cls = 'done'; }
+    else if (myRank <= p.target + 3) { status = '即将达成'; cls = 'pending'; }
+    else { status = '未解锁'; cls = 'locked'; }
+    return `
+      <div class="prize-unlock-item">
+        <div class="unlock-icon">${p.icon}</div>
+        <div class="unlock-info">
+          <div class="unlock-name">${p.name}</div>
+          <div class="unlock-cond">${p.cond} · ${p.val}</div>
+        </div>
+        <div class="unlock-badge ${cls}">${status}</div>
+      </div>`;
+  }).join('');
+}
+
+// 渲染右侧统计
+function renderRightStats(myRank, myScore, gap) {
+  document.getElementById('statMyRank').textContent = '#' + myRank;
+  document.getElementById('statMyScore').textContent = fmtScore(myScore);
+  document.getElementById('statGapToNext').textContent = myRank === 1 ? '我是第一' : '-' + fmtScore(gap) + '分';
+  document.getElementById('statBeatenCount').textContent = beatenCount + '人';
+  if (myRank < bestRank) {
+    bestRank = myRank;
+    document.getElementById('statBestRank').textContent = '#' + bestRank;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   折线图（SVG）
+═══════════════════════════════════════════════════════════ */
+function renderRankChart() {
+  const w = 230, h = 70;
+  const data = myRankHistory;
+  const maxR = Math.max(...data) + 1;
+  const minR = Math.max(1, Math.min(...data) - 1);
+  const pts = data.map((r, i) => ({
+    x: (i / (data.length - 1)) * w,
+    y: ((r - minR) / (maxR - minR || 1)) * h
+  }));
+
+  const path = pts.map((p, i) => `${i===0?'M':'L'}${p.x},${p.y}`).join(' ');
+  const area = path + ` L${pts[pts.length-1].x},${h} L0,${h} Z`;
+
+  const svgContent = `
+    <svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.4"/>
+          <stop offset="100%" stop-color="#7C3AED" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>
+      <!-- Y轴注意：排名越小越好，所以Y轴翻转 -->
+      <g transform="scale(1,-1) translate(0,-${h})">
+        <path d="${area}" fill="url(#chartGrad)" opacity="0.6"/>
+        <path d="${path}" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linejoin="round"/>
+        ${pts.map((p, i) => `
+          <circle cx="${p.x}" cy="${p.y}" r="3"
+            fill="${i===pts.length-1?'#EC4899':'#7C3AED'}"
+            stroke="#0D0720" stroke-width="1.5"/>
+        `).join('')}
+      </g>
+      ${pts.map((p, i) => `
+        <text x="${p.x}" y="${h - p.y - 6}" text-anchor="middle"
+          font-size="9" fill="rgba(240,234,248,0.5)">#${data[i]}</text>
+      `).join('')}
+    </svg>`;
+
+  document.getElementById('rankChart').innerHTML = svgContent;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   实时滚动榜
+═══════════════════════════════════════════════════════════ */
+let tickerMessages = [];
+let tickerIdx = 0;
+
+function buildTickerMessages(sorted) {
+  const msgs = [];
+  for (let i = 0; i < 8; i++) {
+    const p = sorted[Math.floor(Math.random() * Math.min(10, sorted.length))];
+    const delta = Math.floor(Math.random() * 200 + 50);
+    msgs.push(`${p.avatar} <strong style="color:var(--text)">${p.name}</strong> 获得 <span style="color:var(--gold)">+${delta}</span> 积分，当前排名 #${sorted.findIndex(x=>x.id===p.id)+1}`);
+  }
+  return msgs;
+}
+
+function startTicker(sorted) {
+  tickerMessages = buildTickerMessages(sorted);
+  const inner = document.getElementById('liveTickerInner');
+
+  function showNext() {
+    const msg = tickerMessages[tickerIdx % tickerMessages.length];
+    inner.innerHTML = `<div class="live-ticker-row"><span class="live-dot"></span>${msg}</div>`;
+    tickerIdx++;
+  }
+  showNext();
+  if (tickerTimer) clearInterval(tickerTimer);
+  tickerTimer = setInterval(showNext, 2800);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   主渲染入口
+═══════════════════════════════════════════════════════════ */
+// 记录上次排名（用于判断变化方向）
+let lastRankMap = {};
+
+function getChangeLabel(playerId) {
+  const last = lastRankMap[playerId];
+  const sorted = getSortedPlayers(currentDim);
+  const now = sorted.findIndex(p => p.id === playerId) + 1;
+  if (!last) return { cls:'same', text:'—' };
+  const diff = last - now; // 正值=排名上升
+  if (diff > 0)  return { cls:'up',   text:'↑'+diff };
+  if (diff < 0)  return { cls:'down', text:'↓'+Math.abs(diff) };
+  return { cls:'same', text:'—' };
+}
+
+function renderAll() {
+  const sorted = getSortedPlayers(currentDim);
+  const cfg = getConfig();
+  const showCount = parseInt(cfg.showCount);
+
+  // 颁奖台
+  renderPodium(sorted);
+  // 列表（4-N名）
+  renderRankList(sorted, showCount);
+  // 我的底栏
+  const { myRank, gap, myScore } = renderMyRank(sorted);
+  // 段位
+  renderTierSection(sorted);
+  // 右侧
+  renderRightStats(myRank, myScore, gap);
+  renderBeatableList(sorted);
+  renderPrizeUnlock(myRank);
+  renderRankChart();
+  // 实时滚动榜
+  if (cfg.toggleLive) {
+    document.getElementById('liveTicker').style.display = '';
+    startTicker(sorted);
+  } else {
+    document.getElementById('liveTicker').style.display = 'none';
+  }
+  // 更新活动标题
+  document.getElementById('activityTitle').textContent = '🏆 ' + cfg.activityName;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   分数刷新与交互
+═══════════════════════════════════════════════════════════ */
+
+// 保存当前排名快照（刷新前）
+function snapshotRanks() {
+  const sorted = getSortedPlayers(currentDim);
+  sorted.forEach((p, i) => {
+    lastRankMap[p.id] = i + 1;
+  });
+}
+
+// 随机刷新其他玩家分数（模拟实时感）
+function randomRefreshScores() {
+  snapshotRanks();
+  const dim = currentDim;
+  for (let i = 1; i < PLAYER_NAMES.length; i++) {
+    const delta = Math.floor((Math.random() - 0.4) * 300);
+    scores[dim][i] = Math.max(100, scores[dim][i] + delta);
+  }
+  // 重建ticker消息
+  tickerMessages = buildTickerMessages(getSortedPlayers(dim));
+  renderAll();
+}
+
+// 我加分
+function simMyScoreUp() {
+  snapshotRanks();
+  const delta = Math.floor(Math.random() * 400 + 200);
+  scores[currentDim][0] += delta;
+  const sorted = getSortedPlayers(currentDim);
+  const myNewRank = sorted.findIndex(p => p.id === 0) + 1;
+  const myOldRank = lastRankMap[0] || 8;
+  if (myNewRank < myOldRank) beatenCount += myOldRank - myNewRank;
+  myRankHistory.push(myNewRank);
+  if (myRankHistory.length > 7) myRankHistory.shift();
+  renderAll();
+  // 检查是否超越好友并弹出提示
+  if (myNewRank < myOldRank && document.getElementById('toggleOvertake').checked) {
+    showOvertakeToast(`🎉 超越 ${myOldRank - myNewRank} 位好友！排名上升至 #${myNewRank}`);
+  }
+}
+
+// 触发超越动画
+function simOvertake() {
+  showOvertakeToast('🚀 太强了！你超越了好友，排名飙升！');
+}
+
+// 随机刷新按钮
+function simRandomRefresh() {
+  randomRefreshScores();
+}
+
+// 显示Toast
+function showOvertakeToast(msg) {
+  const toast = document.getElementById('overtakeToast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+// 发起挑战
+function sendChallenge(name) {
+  showOvertakeToast(`⚔️ 挑战请求已发送给 ${name}！`);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   维度切换
+═══════════════════════════════════════════════════════════ */
+function switchDim(dim, el) {
+  currentDim = dim;
+  document.querySelectorAll('.dim-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  // 同步左侧select
+  document.getElementById('cfgDimension').value = dim;
+  renderAll();
+}
+
+function getDimLabel(dim) {
+  return { total:'总积分', today:'今日', week:'本周', history:'历史' }[dim] || dim;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   配置读取与应用
+═══════════════════════════════════════════════════════════ */
+function getConfig() {
+  return {
+    activityName:    document.getElementById('cfgActivityName')?.value || '夏日竞技赛',
+    showCount:       document.getElementById('cfgShowCount')?.value    || '10',
+    toggleTier:      document.getElementById('toggleTier')?.checked    ?? true,
+    toggleLive:      document.getElementById('toggleLive')?.checked    ?? true,
+    toggleOvertake:  document.getElementById('toggleOvertake')?.checked?? true,
+    toggleChallenge: document.getElementById('toggleChallenge')?.checked?? true,
+    toggleChange:    document.getElementById('toggleChange')?.checked  ?? true,
+  };
+}
+
+function applyConfig() {
+  // 同步维度下拉
+  const dim = document.getElementById('cfgDimension').value;
+  if (dim !== currentDim) {
+    currentDim = dim;
+    document.querySelectorAll('.dim-tab').forEach(t => {
+      t.classList.toggle('active', t.textContent.trim() === getDimLabel(dim));
+    });
+  }
+  renderAll();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   自动刷新（每5秒）
+═══════════════════════════════════════════════════════════ */
+function startAutoRefresh() {
+  if (autoTimer) clearInterval(autoTimer);
+  autoTimer = setInterval(() => {
+    randomRefreshScores();
+  }, 5000);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   初始化
+═══════════════════════════════════════════════════════════ */
+(function init() {
+  initScores();
+  // 初始化lastRankMap
+  getSortedPlayers(currentDim).forEach((p, i) => {
+    lastRankMap[p.id] = i + 1;
+  });
+  renderAll();
+  startAutoRefresh();
+
+  // 导航激活tab滚动到可见区域
+  const activeTab = document.querySelector('.nav-tab.active');
+  if (activeTab) activeTab.scrollIntoView({ block: 'nearest', inline: 'center' });
+})();
+</script>
+</body>
+</html>
