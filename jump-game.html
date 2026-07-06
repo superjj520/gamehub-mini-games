@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 跳一跳</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.97);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: inherit;
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .nav-links-wrap {
+    flex: 1;
+    overflow-x: auto;
+    margin: 0 20px;
+    scrollbar-width: none;
+  }
+  .nav-links-wrap::-webkit-scrollbar { display: none; }
+  .nav-links {
+    display: flex;
+    gap: 2px;
+    white-space: nowrap;
+  }
+  .nav-link {
+    padding: 6px 13px; border-radius: 7px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-link:hover { background: var(--card); color: var(--text); }
+  .nav-link.active { background: var(--card); color: var(--gold); }
+  .nav-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.4} }
+  .status-text { font-size: 12px; color: var(--muted); }
+
+  /* ─── 主体三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: calc(100vh - 57px);
+  }
+
+  /* ─── 通用面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: var(--deep);
+    position: relative;
+    overflow: hidden;
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* ─── 选项按钮组 ─── */
+  .option-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .option-btn {
+    flex: 1; padding: 9px 6px; border-radius: 8px;
+    text-align: center; font-size: 13px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s;
+    color: var(--muted); font-weight: 600;
+    min-width: 60px;
+  }
+  .option-btn:hover { border-color: rgba(124,58,237,0.5); color: var(--text); }
+  .option-btn.active {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.15);
+    color: var(--gold);
+  }
+
+  /* ─── 滑块组 ─── */
+  .slider-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+  }
+  .slider-row:last-child { margin-bottom: 0; }
+  .slider-label { font-size: 12px; color: var(--muted); width: 90px; flex-shrink: 0; }
+  .slider-wrap { flex: 1; position: relative; }
+  input[type=range] {
+    width: 100%; height: 4px;
+    -webkit-appearance: none;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px; outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 8px rgba(245,200,66,0.5);
+    cursor: pointer;
+  }
+  .slider-val {
+    font-size: 12px; color: var(--gold);
+    font-weight: 700; width: 36px; text-align: right; flex-shrink: 0;
+  }
+
+  /* ─── 奖品配置 ─── */
+  .prize-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+  }
+  .prize-row:last-child { margin-bottom: 0; }
+  .prize-icon { font-size: 18px; }
+  .prize-input {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .prize-input:focus { border-color: var(--accent); }
+  .prize-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .prize-threshold {
+    background: rgba(245,200,66,0.1);
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 700;
+    width: 58px;
+    outline: none;
+    text-align: center;
+  }
+
+  /* ─── 信息行 ─── */
+  .info-row {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .info-row:last-child { margin-bottom: 0; }
+  .info-val { color: var(--text); font-weight: 600; }
+
+  /* ─── 游戏顶部分值栏 ─── */
+  .game-stats {
+    display: flex; gap: 10px;
+    width: 100%;
+    margin-bottom: 14px;
+  }
+  .stat-item {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .stat-val {
+    font-size: 22px; font-weight: 800;
+    color: var(--gold); line-height: 1;
+    margin-bottom: 3px;
+  }
+  .stat-label {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* ─── Canvas 容器 ─── */
+  .canvas-wrap {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+    box-shadow: 0 0 40px rgba(124,58,237,0.2);
+    flex-shrink: 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  #gameCanvas {
+    display: block;
+    background: #0a051a;
+  }
+
+  /* ─── 蓄力进度条 ─── */
+  .charge-bar-wrap {
+    width: 100%;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .charge-bar-label {
+    font-size: 12px; color: var(--muted); white-space: nowrap;
+  }
+  .charge-bar-track {
+    flex: 1; height: 8px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .charge-bar-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    transition: none;
+  }
+  .charge-bar-fill.animate-reset {
+    transition: width 0.2s ease;
+  }
+  .charge-tip {
+    font-size: 11px; color: var(--muted); margin-top: 6px;
+    text-align: center;
+  }
+
+  /* ─── 覆盖层（开始/结束） ─── */
+  .overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: rgba(10,5,26,0.88);
+    backdrop-filter: blur(4px);
+    border-radius: 10px;
+    z-index: 20;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-icon { font-size: 54px; margin-bottom: 12px; }
+  .overlay-title {
+    font-size: 24px; font-weight: 800;
+    color: var(--gold); margin-bottom: 6px;
+  }
+  .overlay-sub {
+    font-size: 14px; color: var(--muted);
+    margin-bottom: 20px; text-align: center;
+    line-height: 1.5;
+  }
+  .overlay-score {
+    font-size: 42px; font-weight: 900;
+    color: var(--gold); line-height: 1;
+    margin-bottom: 6px;
+  }
+  .overlay-score-label { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+  .overlay-btn {
+    padding: 11px 32px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; font-size: 15px; font-weight: 700;
+    border: none; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin: 4px;
+  }
+  .overlay-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(124,58,237,0.55);
+  }
+
+  /* ─── 右侧统计 ─── */
+  .history-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-rank {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .history-rank.rank-1 { background: var(--gold); color: #0D0720; }
+  .history-rank.rank-2 { background: #9CA3AF; color: #0D0720; }
+  .history-rank.rank-3 { background: #CD7F32; color: #0D0720; }
+  .history-rank.rank-other { background: var(--card); color: var(--muted); border: 1px solid var(--border); }
+  .history-info { flex: 1; }
+  .history-score { font-size: 15px; font-weight: 700; color: var(--text); }
+  .history-meta { font-size: 11px; color: var(--muted); }
+  .history-badge {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 7px; border-radius: 10px;
+    background: rgba(245,200,66,0.12);
+    color: var(--gold);
+    border: 1px solid rgba(245,200,66,0.25);
+  }
+
+  /* ─── 奖品解锁列表 ─── */
+  .prize-unlock-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px;
+    margin-bottom: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  .prize-unlock-item.unlocked {
+    border-color: rgba(245,200,66,0.35);
+    background: rgba(245,200,66,0.07);
+  }
+  .prize-unlock-icon { font-size: 20px; }
+  .prize-unlock-info { flex: 1; }
+  .prize-unlock-name { font-size: 13px; font-weight: 600; }
+  .prize-unlock-cond { font-size: 11px; color: var(--muted); }
+  .prize-unlock-status {
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 8px;
+  }
+  .prize-unlock-status.locked { color: var(--muted); }
+  .prize-unlock-status.unlocked {
+    color: var(--gold);
+    background: rgba(245,200,66,0.12);
+  }
+
+  /* ─── 通知气泡 ─── */
+  .notify-bubble {
+    position: fixed;
+    top: 70px; right: 24px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; font-size: 13px; font-weight: 600;
+    padding: 10px 18px; border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    z-index: 999;
+    transform: translateY(-10px);
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none;
+  }
+  .notify-bubble.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* ─── Perfect 特效标签 ─── */
+  .perfect-popup {
+    position: absolute;
+    pointer-events: none;
+    font-size: 16px; font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 0 12px rgba(245,200,66,0.8);
+    z-index: 30;
+    animation: popupFly 1.2s ease forwards;
+  }
+  @keyframes popupFly {
+    0%   { opacity: 1; transform: translateY(0) scale(0.6); }
+    30%  { opacity: 1; transform: translateY(-20px) scale(1.2); }
+    100% { opacity: 0; transform: translateY(-60px) scale(0.9); }
+  }
+
+  /* ─── 平台类型标签 ─── */
+  .plat-type-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; padding: 3px 9px; border-radius: 10px;
+    font-weight: 600;
+    margin-right: 4px; margin-bottom: 4px;
+  }
+  .plat-type-normal { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+  .plat-type-spring { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+  .plat-type-boost  { background: rgba(245,200,66,0.12); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
+
+  /* ─── 难度仪表 ─── */
+  .difficulty-meter {
+    display: flex; gap: 4px; margin-top: 6px;
+  }
+  .diff-seg {
+    flex: 1; height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,0.08);
+    transition: background 0.4s;
+  }
+  .diff-seg.active { background: var(--accent2); }
+</style>
+</head>
+<body>
+
+<!-- ─── 顶部导航 ─── -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    🎮 <span>GameHub</span>
+    <span class="nav-badge">中台</span>
+  </a>
+  <div class="nav-links-wrap">
+    <div class="nav-links">
+      <a href="index.html"           class="nav-link">首页</a>
+      <a href="wheel.html"           class="nav-link">大转盘</a>
+      <a href="nine-grid.html"       class="nav-link">九宫格</a>
+      <a href="scratch-card.html"    class="nav-link">刮刮乐</a>
+      <a href="shake-dice.html"      class="nav-link">摇骰子</a>
+      <a href="smash-egg.html"       class="nav-link">砸金蛋</a>
+      <a href="slot-machine.html"    class="nav-link">老虎机</a>
+      <a href="gift-box.html"        class="nav-link">礼盒开箱</a>
+      <a href="whack-mole.html"      class="nav-link">打地鼠</a>
+      <a href="cup-game.html"        class="nav-link">三杯游戏</a>
+      <a href="number-bomb.html"     class="nav-link">数字炸弹</a>
+      <a href="stamp-collect.html"   class="nav-link">集卡集章</a>
+      <a href="vote-pk.html"         class="nav-link">投票PK</a>
+      <a href="gashapon.html"        class="nav-link">扭蛋机</a>
+      <a href="blind-box.html"       class="nav-link">盲盒抽卡</a>
+      <a href="game-2048.html"       class="nav-link">2048</a>
+      <a href="match3.html"          class="nav-link">消消乐</a>
+      <a href="catch-coins.html"     class="nav-link">接金币</a>
+      <a href="grow-tree.html"       class="nav-link">成长树</a>
+      <a href="pinball.html"         class="nav-link">弹珠机</a>
+      <a href="snake.html"           class="nav-link">贪吃蛇</a>
+      <a href="slingshot.html"       class="nav-link">弹弓射击</a>
+      <a href="fruit-cut.html"       class="nav-link">切水果</a>
+      <a href="progress-unlock.html" class="nav-link">进度解锁</a>
+      <a href="energy-collect.html"  class="nav-link">能量收集</a>
+      <a href="flying-chess.html"    class="nav-link">飞行棋</a>
+      <a href="monopoly.html"        class="nav-link">大富翁</a>
+      <a href="red-packet-rain.html" class="nav-link">红包雨</a>
+      <a href="claw-machine.html"    class="nav-link">夹娃娃机</a>
+      <a href="flip-match.html"      class="nav-link">翻牌配对</a>
+      <a href="shake.html"           class="nav-link">摇一摇</a>
+      <a href="quiz.html"            class="nav-link">问答闯关</a>
+      <a href="daily-checkin.html"   class="nav-link">每日签到</a>
+      <a href="jump-game.html"       class="nav-link active">跳一跳</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span class="status-text">运行中</span>
+  </div>
+</nav>
+
+<!-- ─── 通知气泡 ─── -->
+<div class="notify-bubble" id="notifyBubble"></div>
+
+<!-- ─── 主体三列布局 ─── -->
+<div class="main">
+
+  <!-- ══════════════════════════════
+       左侧配置面板
+  ══════════════════════════════ -->
+  <div class="panel-left">
+    <div class="panel-title">🎮 游戏配置</div>
+
+    <!-- 难度选择 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>难度模式</div>
+      <div class="option-btns">
+        <button class="option-btn" id="diffEasy"   onclick="setDifficulty('easy')">简单</button>
+        <button class="option-btn active" id="diffNormal" onclick="setDifficulty('normal')">普通</button>
+        <button class="option-btn" id="diffHard"   onclick="setDifficulty('hard')">困难</button>
+        <button class="option-btn" id="diffExtreme" onclick="setDifficulty('extreme')">极限</button>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="info-row">
+          <span>当前难度</span>
+          <span class="info-val" id="diffLabel">普通</span>
+        </div>
+        <div class="info-row">
+          <span>平台间距</span>
+          <span class="info-val" id="diffGap">100~180px</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 进阶速率 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>进阶参数</div>
+      <div class="slider-row">
+        <span class="slider-label">间距增速</span>
+        <div class="slider-wrap">
+          <input type="range" id="sliderGapRate" min="0" max="10" value="3" step="1"
+            oninput="updateSlider('sliderGapRate','valGapRate',this.value,'%/10跳')">
+        </div>
+        <span class="slider-val" id="valGapRate">3%</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">蓄力灵敏度</span>
+        <div class="slider-wrap">
+          <input type="range" id="sliderSensitivity" min="1" max="10" value="5" step="1"
+            oninput="updateSlider('sliderSensitivity','valSensitivity',this.value,'')">
+        </div>
+        <span class="slider-val" id="valSensitivity">5</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">平台大小</span>
+        <div class="slider-wrap">
+          <input type="range" id="sliderPlatSize" min="1" max="3" value="2" step="1"
+            oninput="updateSlider('sliderPlatSize','valPlatSize',this.value,'')">
+        </div>
+        <span class="slider-val" id="valPlatSize">2</span>
+      </div>
+    </div>
+
+    <!-- 平台类型 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>平台特效开关</div>
+      <div style="margin-bottom:8px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;">
+          <input type="checkbox" id="enableSpring" checked style="accent-color:var(--accent);">
+          <span class="plat-type-badge plat-type-spring">🌀 弹簧平台</span>
+          <span style="font-size:11px;color:var(--muted);">额外弹跳高度</span>
+        </label>
+      </div>
+      <div>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;">
+          <input type="checkbox" id="enableBoost" checked style="accent-color:var(--accent);">
+          <span class="plat-type-badge plat-type-boost">⚡ 加速平台</span>
+          <span style="font-size:11px;color:var(--muted);">视角快速推进</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 积分倍率 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>积分倍率</div>
+      <div class="slider-row">
+        <span class="slider-label">普通落地</span>
+        <div class="slider-wrap">
+          <input type="range" id="sliderBaseScore" min="1" max="5" value="1" step="1"
+            oninput="updateSlider('sliderBaseScore','valBaseScore',this.value,'分')">
+        </div>
+        <span class="slider-val" id="valBaseScore">1分</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">完美落地</span>
+        <div class="slider-wrap">
+          <input type="range" id="sliderPerfectScore" min="2" max="10" value="3" step="1"
+            oninput="updateSlider('sliderPerfectScore','valPerfectScore',this.value,'分')">
+        </div>
+        <span class="slider-val" id="valPerfectScore">3分</span>
+      </div>
+    </div>
+
+    <!-- 奖品配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品配置</div>
+      <div id="prizeList">
+        <!-- JS动态渲染 -->
+      </div>
+      <button onclick="addPrize()" style="
+        width:100%;padding:8px;border-radius:8px;margin-top:8px;
+        background:rgba(124,58,237,0.12);border:1px dashed rgba(124,58,237,0.4);
+        color:var(--muted);font-size:13px;cursor:pointer;
+      ">+ 添加奖品</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       中间游戏区
+  ══════════════════════════════ -->
+  <div class="panel-center">
+    <!-- 顶部分值 -->
+    <div class="game-stats">
+      <div class="stat-item">
+        <div class="stat-val" id="statScore">0</div>
+        <div class="stat-label">当前得分</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="statJumps">0</div>
+        <div class="stat-label">跳跃次数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="statPerfect" style="color:var(--gold)">0</div>
+        <div class="stat-label">连续完美</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="statCombo" style="color:var(--accent2)">x1</div>
+        <div class="stat-label">连击倍率</div>
+      </div>
+    </div>
+
+    <!-- Canvas 游戏主体 -->
+    <div class="canvas-wrap" id="canvasWrap">
+      <canvas id="gameCanvas" width="520" height="480"></canvas>
+
+      <!-- 开始遮罩 -->
+      <div class="overlay" id="overlayStart">
+        <div class="overlay-icon">🕹️</div>
+        <div class="overlay-title">跳一跳</div>
+        <div class="overlay-sub">按住屏幕蓄力<br>松手弹射跳跃<br>落在中心获得完美加分</div>
+        <button class="overlay-btn" onclick="startGame()">开始游戏</button>
+      </div>
+
+      <!-- 结束遮罩 -->
+      <div class="overlay hidden" id="overlayEnd">
+        <div class="overlay-icon">💥</div>
+        <div class="overlay-title">游戏结束</div>
+        <div class="overlay-score" id="finalScore">0</div>
+        <div class="overlay-score-label">本次得分</div>
+        <div class="overlay-sub" id="finalSub">跳了 0 步 · 完美落地 0 次</div>
+        <button class="overlay-btn" onclick="startGame()">再来一次</button>
+      </div>
+    </div>
+
+    <!-- 蓄力进度条 -->
+    <div class="charge-bar-wrap">
+      <span class="charge-bar-label">蓄力</span>
+      <div class="charge-bar-track">
+        <div class="charge-bar-fill" id="chargeBar"></div>
+      </div>
+    </div>
+    <div class="charge-tip" id="chargeTip">按住画面蓄力，松手起跳</div>
+  </div>
+
+  <!-- ══════════════════════════════
+       右侧数据面板
+  ══════════════════════════════ -->
+  <div class="panel-right">
+    <div class="panel-title">📊 历史数据</div>
+
+    <!-- 最高记录 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>最高记录</div>
+      <div class="info-row">
+        <span>最高得分</span>
+        <span class="info-val" id="bestScore" style="color:var(--gold)">0</span>
+      </div>
+      <div class="info-row">
+        <span>最多平台</span>
+        <span class="info-val" id="bestJumps">0 步</span>
+      </div>
+      <div class="info-row">
+        <span>最多连续完美</span>
+        <span class="info-val" id="bestPerfect" style="color:var(--accent2)">0 次</span>
+      </div>
+    </div>
+
+    <!-- 对局历史 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>对局历史</div>
+      <div id="historyList">
+        <div style="text-align:center;padding:20px 0;color:var(--muted);font-size:13px;">暂无记录</div>
+      </div>
+    </div>
+
+    <!-- 难度仪表 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>当前难度等级</div>
+      <div class="info-row">
+        <span>动态难度</span>
+        <span class="info-val" id="dynDiffLabel">Lv.1</span>
+      </div>
+      <div class="difficulty-meter" id="diffMeter">
+        <div class="diff-seg active"></div>
+        <div class="diff-seg"></div>
+        <div class="diff-seg"></div>
+        <div class="diff-seg"></div>
+        <div class="diff-seg"></div>
+        <div class="diff-seg"></div>
+        <div class="diff-seg"></div>
+        <div class="diff-seg"></div>
+        <div class="diff-seg"></div>
+        <div class="diff-seg"></div>
+      </div>
+      <div class="info-row" style="margin-top:10px;">
+        <span>平台间距</span>
+        <span class="info-val" id="liveGap">—</span>
+      </div>
+      <div class="info-row">
+        <span>下一平台类型</span>
+        <span class="info-val" id="nextPlatType">—</span>
+      </div>
+    </div>
+
+    <!-- 奖品解锁 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品解锁</div>
+      <div id="prizeUnlockList">
+        <!-- JS动态渲染 -->
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   跳一跳 — 核心游戏逻辑
+   等距视角 (Isometric)，Canvas 2D 渲染
+═══════════════════════════════════════════════════════ */
+
+const canvas  = document.getElementById('gameCanvas');
+const ctx     = canvas.getContext('2d');
+
+/* ─── 游戏状态 ─── */
+const G = {
+  state: 'idle',       // idle / playing / jumping / dead
+  score: 0,
+  jumps: 0,
+  perfectStreak: 0,    // 当前连续完美次数
+  combo: 1,            // 连击倍率
+
+  bestScore: 0,
+  bestJumps: 0,
+  bestPerfect: 0,
+  history: [],
+
+  chargeStart: 0,      // 按下时间戳
+  charging: false,
+  chargePct: 0,        // 0~1
+
+  // 游戏配置（随难度动态变化）
+  difficulty: 'normal',
+  gapMin: 100, gapMax: 180,
+  gapRate: 0.03,       // 每10跳间距增加3%
+  sensitivity: 5,      // 蓄力灵敏度 1~10
+  platSizeLevel: 2,    // 1=小 2=中 3=大
+  baseScore: 1,
+  perfectScore: 3,
+  enableSpring: true,
+  enableBoost: true,
+
+  // 视角偏移（实现平台滚动推进）
+  scrollX: 0,
+  scrollY: 0,
+  targetScrollX: 0,
+  targetScrollY: 0,
+
+  dynLevel: 1,         // 动态难度等级
+};
+
+/* ─── 奖品列表 ─── */
+let prizes = [
+  { id: 1, icon: '🎁', name: '神秘礼包',    scoreThreshold: 20,  jumpThreshold: 0,  unlocked: false },
+  { id: 2, icon: '🎀', name: '专属皮肤',    scoreThreshold: 50,  jumpThreshold: 0,  unlocked: false },
+  { id: 3, icon: '🏆', name: '大师称号',    scoreThreshold: 100, jumpThreshold: 0,  unlocked: false },
+  { id: 4, icon: '💎', name: '钻石奖励',    scoreThreshold: 0,   jumpThreshold: 30, unlocked: false },
+];
+
+/* ─── 平台结构 ─── */
+// 每个平台：{ x, y, w, h, type, color1, color2, isCurrent, isNext }
+// 等距视角：世界坐标 (wx, wy)，屏幕坐标由 isoProject 转换
+let platforms = [];
+
+/* ─── 小人结构 ─── */
+const player = {
+  wx: 0, wy: 0,      // 世界坐标
+  vx: 0, vy: 0,      // 速度
+  squash: 1,         // 压缩比例（蓄力时变矮）
+  stretch: 1,        // 拉伸
+  jumping: false,
+  onGround: true,
+  jumpVy: 0,         // 跳跃纵向速度（屏幕Y）
+  gravity: 0.55,
+  jumpStartWX: 0,
+  jumpStartWY: 0,
+  jumpTargetWX: 0,
+  jumpTargetWY: 0,
+  jumpProgress: 0,   // 0~1 跳跃进度
+  jumpDuration: 0,   // 跳跃总帧数
+  jumpHeightExtra: 0,// 弹簧平台额外高度
+};
+
+/* ─── 粒子特效 ─── */
+let particles = [];
+
+/* ─── 等距投影函数 ─── */
+// 世界坐标 (wx, wy) 转屏幕坐标 (sx, sy)
+// 等距视角：X轴向右下，Y轴向左下
+const ISO_SCALE_X = 0.866; // cos30°
+const ISO_SCALE_Y = 0.5;   // sin30°
+const ISO_TILE    = 60;    // 基础格子大小
+
+function isoProject(wx, wy, elevation = 0) {
+  // elevation：平台高度偏移
+  const sx = (wx - wy) * ISO_TILE * ISO_SCALE_X;
+  const sy = (wx + wy) * ISO_TILE * ISO_SCALE_Y - elevation;
+  return { sx, sy };
+}
+
+/* ─── 平台颜色主题 ─── */
+const PLAT_COLORS = [
+  ['#7C3AED','#5B21B6'],  // 紫
+  ['#EC4899','#BE185D'],  // 粉
+  ['#2563EB','#1D4ED8'],  // 蓝
+  ['#059669','#065F46'],  // 绿
+  ['#D97706','#92400E'],  // 橙
+  ['#0891B2','#0E7490'],  // 青
+];
+
+/* ─── 生成平台 ─── */
+function createPlatform(wx, wy, isFirst = false) {
+  // 平台宽高（世界单位），根据 platSizeLevel 决定
+  const sizeMap = { 1: [1.0, 1.0], 2: [1.3, 1.3], 3: [1.6, 1.6] };
+  const [pw, ph] = sizeMap[G.platSizeLevel] || [1.3, 1.3];
+
+  // 平台类型
+  let type = 'normal';
+  if (!isFirst && G.enableSpring && Math.random() < 0.15) type = 'spring';
+  else if (!isFirst && G.enableBoost && Math.random() < 0.12) type = 'boost';
+
+  const colorPair = PLAT_COLORS[Math.floor(Math.random() * PLAT_COLORS.length)];
+  return { wx, wy, pw, ph, type, color1: colorPair[0], color2: colorPair[1] };
+}
+
+/* ─── 生成下一个平台的偏移 ─── */
+function getNextOffset() {
+  // 动态难度：跳得越多间距越大
+  const extraRatio = 1 + G.gapRate * Math.floor(G.jumps / 10);
+  const gMin = G.gapMin * extraRatio;
+  const gMax = G.gapMax * extraRatio;
+
+  // 随机方向：沿X轴或Y轴（等距视角里的两个主轴）
+  const dist  = gMin + Math.random() * (gMax - gMin);
+  // 每次只沿一个轴跳，更像微信跳一跳
+  const dir   = Math.random() < 0.6 ? 'x' : 'y';
+  // 把屏幕像素距离换算成世界坐标格子数
+  const worldDist = dist / (ISO_TILE * ISO_SCALE_X * 2);
+  return dir === 'x'
+    ? { dx: worldDist, dy: 0 }
+    : { dx: 0,         dy: worldDist };
+}
+
+/* ─── 初始化平台序列 ─── */
+function initPlatforms() {
+  platforms = [];
+  // 起始位置（世界坐标中心）
+  const startWX = 3, startWY = 3;
+  platforms.push(createPlatform(startWX, startWY, true));
+
+  // 预生成4个平台
+  let cx = startWX, cy = startWY;
+  for (let i = 0; i < 4; i++) {
+    const { dx, dy } = getNextOffset();
+    cx += dx; cy += dy;
+    platforms.push(createPlatform(cx, cy));
+  }
+
+  // 视角偏移重置
+  G.scrollX = 0; G.scrollY = 0;
+  G.targetScrollX = 0; G.targetScrollY = 0;
+}
+
+/* ─── 初始化小人 ─── */
+function initPlayer() {
+  const p0 = platforms[0];
+  player.wx  = p0.wx;
+  player.wy  = p0.wy;
+  player.jumping    = false;
+  player.onGround   = true;
+  player.squash     = 1;
+  player.stretch    = 1;
+  player.jumpProgress = 0;
+}
+
+/* ─── 绘制等距平台 ─── */
+function drawPlatform(plat, offsetX, offsetY) {
+  const { wx, wy, pw, ph, type, color1, color2 } = plat;
+  const cx = canvas.width  / 2 + offsetX;
+  const cy = canvas.height / 2 + offsetY;
+
+  // 平台4个顶点（世界坐标）转屏幕坐标
+  // 菱形顶点：上/右/下/左
+  const corners = [
+    isoProject(wx - pw/2, wy - ph/2, 28),  // 上
+    isoProject(wx + pw/2, wy - ph/2, 28),  // 右上
+    isoProject(wx + pw/2, wy + ph/2, 28),  // 下
+    isoProject(wx - pw/2, wy + ph/2, 28),  // 左下
+  ];
+
+  // ── 绘制顶面（菱形）──
+  ctx.save();
+  ctx.translate(cx, cy);
+
+  // 特效平台：外发光
+  if (type === 'spring') {
+    ctx.shadowColor = '#4ade80';
+    ctx.shadowBlur  = 14;
+  } else if (type === 'boost') {
+    ctx.shadowColor = '#F5C842';
+    ctx.shadowBlur  = 14;
+  }
+
+  // 顶面渐变
+  const grd = ctx.createLinearGradient(
+    corners[0].sx, corners[0].sy,
+    corners[2].sx, corners[2].sy
+  );
+  grd.addColorStop(0, color1);
+  grd.addColorStop(1, color2);
+
+  ctx.beginPath();
+  ctx.moveTo(corners[0].sx, corners[0].sy);
+  ctx.lineTo(corners[1].sx, corners[1].sy);
+  ctx.lineTo(corners[2].sx, corners[2].sy);
+  ctx.lineTo(corners[3].sx, corners[3].sy);
+  ctx.closePath();
+  ctx.fillStyle = grd;
+  ctx.fill();
+
+  // 顶面边线
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // ── 绘制左侧面 ──
+  const sideH = 16;
+  const leftFaceColor = shadeColor(color2, -40);
+  ctx.beginPath();
+  ctx.moveTo(corners[0].sx, corners[0].sy);
+  ctx.lineTo(corners[3].sx, corners[3].sy);
+  ctx.lineTo(corners[3].sx, corners[3].sy + sideH);
+  ctx.lineTo(corners[0].sx, corners[0].sy + sideH);
+  ctx.closePath();
+  ctx.fillStyle = leftFaceColor;
+  ctx.fill();
+
+  // ── 绘制右侧面 ──
+  const rightFaceColor = shadeColor(color2, -20);
+  ctx.beginPath();
+  ctx.moveTo(corners[2].sx, corners[2].sy);
+  ctx.lineTo(corners[3].sx, corners[3].sy);
+  ctx.lineTo(corners[3].sx, corners[3].sy + sideH);
+  ctx.lineTo(corners[2].sx, corners[2].sy + sideH);
+  ctx.closePath();
+  ctx.fillStyle = rightFaceColor;
+  ctx.fill();
+
+  // ── 平台类型图标（中心） ──
+  const centerS = isoProject(wx, wy, 30);
+  if (type === 'spring') {
+    ctx.shadowBlur = 0;
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fff';
+    ctx.fillText('🌀', centerS.sx, centerS.sy - 2);
+  } else if (type === 'boost') {
+    ctx.shadowBlur = 0;
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fff';
+    ctx.fillText('⚡', centerS.sx, centerS.sy - 2);
+  }
+
+  ctx.shadowBlur = 0;
+  ctx.restore();
+}
+
+/* ─── 绘制完美落地中心圆点 ─── */
+function drawPlatformCenter(plat, offsetX, offsetY, alpha) {
+  const cx = canvas.width  / 2 + offsetX;
+  const cy = canvas.height / 2 + offsetY;
+  const center = isoProject(plat.wx, plat.wy, 30);
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  ctx.arc(center.sx, center.sy - 2, 6, 0, Math.PI * 2);
+  ctx.fillStyle = '#F5C842';
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+/* ─── 绘制小人（方块人） ─── */
+function drawPlayer(offsetX, offsetY) {
+  const cx = canvas.width  / 2 + offsetX;
+  const cy = canvas.height / 2 + offsetY;
+
+  // 小人站在平台顶部
+  const pos = isoProject(player.wx, player.wy, 30);
+  const bx  = cx + pos.sx;
+  // 跳跃高度弧线：0~1~0，peak 在0.5处
+  const jumpH = player.jumping
+    ? Math.sin(player.jumpProgress * Math.PI) * (80 + player.jumpHeightExtra)
+    : 0;
+  const by = cy + pos.sy - jumpH;
+
+  // 身体宽高（蓄力时压缩）
+  const bodyW = 14;
+  const bodyH = 20 * player.squash;
+  const headR = 7;
+
+  ctx.save();
+
+  // ── 阴影 ──
+  ctx.globalAlpha = 0.35;
+  ctx.beginPath();
+  ctx.ellipse(bx, cy + pos.sy + 2, 10, 4, 0, 0, Math.PI * 2);
+  ctx.fillStyle = '#000';
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // ── 身体（矩形） ──
+  const bodyGrd = ctx.createLinearGradient(bx - bodyW/2, by - bodyH, bx + bodyW/2, by);
+  bodyGrd.addColorStop(0, '#7C3AED');
+  bodyGrd.addColorStop(1, '#5B21B6');
+  ctx.beginPath();
+  ctx.roundRect(bx - bodyW/2, by - bodyH, bodyW, bodyH, 3);
+  ctx.fillStyle = bodyGrd;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // ── 头部（圆） ──
+  const headGrd = ctx.createRadialGradient(bx, by - bodyH - headR + 3, 1, bx, by - bodyH - headR, headR);
+  headGrd.addColorStop(0, '#F5C842');
+  headGrd.addColorStop(1, '#D97706');
+  ctx.beginPath();
+  ctx.arc(bx, by - bodyH - headR, headR, 0, Math.PI * 2);
+  ctx.fillStyle = headGrd;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // ── 眼睛 ──
+  ctx.fillStyle = '#0D0720';
+  ctx.beginPath();
+  ctx.arc(bx - 2.5, by - bodyH - headR, 1.8, 0, Math.PI * 2);
+  ctx.arc(bx + 2.5, by - bodyH - headR, 1.8, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/* ─── 绘制粒子 ─── */
+function drawParticles() {
+  particles = particles.filter(p => p.life > 0);
+  for (const p of particles) {
+    ctx.save();
+    ctx.globalAlpha = p.life / p.maxLife;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+    ctx.restore();
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.15;
+    p.life--;
+  }
+}
+
+/* ─── 生成粒子特效（完美落地） ─── */
+function spawnPerfectParticles(sx, sy) {
+  const colors = ['#F5C842','#EC4899','#7C3AED','#fff','#60A5FA'];
+  for (let i = 0; i < 22; i++) {
+    const angle = (Math.PI * 2 / 22) * i;
+    const speed = 2 + Math.random() * 3;
+    particles.push({
+      x: sx, y: sy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 2,
+      r: 2 + Math.random() * 3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      life: 40 + Math.random() * 20,
+      maxLife: 60,
+    });
+  }
+}
+
+/* ─── 完美落地光圈 ─── */
+let perfectRings = []; // { x, y, r, alpha }
+function spawnPerfectRing(sx, sy) {
+  perfectRings.push({ x: sx, y: sy, r: 10, alpha: 1 });
+}
+function drawPerfectRings() {
+  perfectRings = perfectRings.filter(r => r.alpha > 0);
+  for (const r of perfectRings) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(245,200,66,${r.alpha})`;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.restore();
+    r.r     += 3;
+    r.alpha -= 0.04;
+  }
+}
+
+/* ─── 辅助：颜色加深/减淡 ─── */
+function shadeColor(hex, amount) {
+  let r = parseInt(hex.slice(1,3),16) + amount;
+  let g = parseInt(hex.slice(3,5),16) + amount;
+  let b = parseInt(hex.slice(5,7),16) + amount;
+  r = Math.max(0, Math.min(255, r));
+  g = Math.max(0, Math.min(255, g));
+  b = Math.max(0, Math.min(255, b));
+  return `rgb(${r},${g},${b})`;
+}
+
+/* ─── 主渲染循环 ─── */
+let rafId = null;
+let centerDotAlpha = 0;     // 当前平台中心圆点闪烁
+let centerDotDir   = 1;
+
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 背景渐变
+  const bgGrd = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  bgGrd.addColorStop(0, '#0D0720');
+  bgGrd.addColorStop(1, '#1A0A2E');
+  ctx.fillStyle = bgGrd;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // 视角平滑跟随
+  G.scrollX += (G.targetScrollX - G.scrollX) * 0.08;
+  G.scrollY += (G.targetScrollY - G.scrollY) * 0.08;
+
+  const ox = G.scrollX;
+  const oy = G.scrollY;
+
+  // 中心圆点闪烁（当前平台）
+  centerDotAlpha += 0.03 * centerDotDir;
+  if (centerDotAlpha >= 1) { centerDotAlpha = 1; centerDotDir = -1; }
+  if (centerDotAlpha <= 0) { centerDotAlpha = 0; centerDotDir = 1; }
+
+  // 绘制平台（从后往前，等距视角排序：wx+wy小的先画）
+  const sorted = [...platforms].sort((a, b) => (a.wx + a.wy) - (b.wx + b.wy));
+  for (const plat of sorted) {
+    drawPlatform(plat, ox, oy);
+  }
+
+  // 绘制当前平台中心圆点
+  if (G.state !== 'idle' && platforms[0]) {
+    drawPlatformCenter(platforms[0], ox, oy, centerDotAlpha * 0.8 + 0.2);
+  }
+
+  // 完美光圈
+  drawPerfectRings();
+
+  // 粒子
+  drawParticles();
+
+  // 小人
+  if (G.state !== 'idle') {
+    drawPlayer(ox, oy);
+  }
+
+  // 更新跳跃动画
+  if (player.jumping) {
+    updateJump();
+  }
+
+  rafId = requestAnimationFrame(gameLoop);
+}
+
+/* ─── 跳跃物理更新 ─── */
+function updateJump() {
+  player.jumpProgress += 1 / player.jumpDuration;
+  if (player.jumpProgress >= 1) {
+    player.jumpProgress = 1;
+    finishJump();
+    return;
+  }
+  // 插值当前世界坐标
+  player.wx = player.jumpStartWX + (player.jumpTargetWX - player.jumpStartWX) * player.jumpProgress;
+  player.wy = player.jumpStartWY + (player.jumpTargetWY - player.jumpStartWY) * player.jumpProgress;
+}
+
+/* ─── 落地判定 ─── */
+function finishJump() {
+  player.jumping = false;
+  player.wx = player.jumpTargetWX;
+  player.wy = player.jumpTargetWY;
+  player.jumpProgress = 0;
+  player.squash = 1;
+  player.jumpHeightExtra = 0;
+
+  // 检测是否落在某个平台上（从第1个开始，跳过当前脚下的）
+  let landed = false;
+  let landedPlat = null;
+
+  for (let i = 1; i < platforms.length; i++) {
+    const plat = platforms[i];
+    const dx = Math.abs(player.wx - plat.wx);
+    const dy = Math.abs(player.wy - plat.wy);
+    const halfW = plat.pw / 2 * 1.1;  // 容差10%
+    const halfH = plat.ph / 2 * 1.1;
+
+    if (dx <= halfW && dy <= halfH) {
+      landed   = true;
+      landedPlat = plat;
+
+      // 完美落地判定：距中心 < 0.15格
+      const isPerfect = dx < 0.15 * plat.pw && dy < 0.15 * plat.ph;
+
+      // 计算落地屏幕坐标（用于粒子）
+      const pos = isoProject(player.wx, player.wy, 30);
+      const sx  = canvas.width/2 + G.scrollX + pos.sx;
+      const sy  = canvas.height/2 + G.scrollY + pos.sy;
+
+      if (isPerfect) {
+        G.perfectStreak++;
+        G.combo = Math.min(5, 1 + Math.floor(G.perfectStreak / 2));
+        const pts = G.perfectScore * G.combo;
+        G.score += pts;
+        spawnPerfectParticles(sx, sy);
+        spawnPerfectRing(sx, sy);
+        showPerfectPopup(sx, sy);
+        showNotify(`🎯 Perfect！+${pts} 分`);
+      } else {
+        G.perfectStreak = 0;
+        G.combo = 1;
+        const pts = G.baseScore;
+        G.score += pts;
+      }
+
+      G.jumps++;
+
+      // 弹簧平台：额外弹跳（下次跳跃加高度）
+      if (landedPlat.type === 'spring') {
+        player.jumpHeightExtra = 40;
+        showNotify('🌀 弹簧！弹跳加高');
+      }
+      // 加速平台：视角推进更快
+      if (landedPlat.type === 'boost') {
+        showNotify('⚡ 加速！');
+      }
+
+      // 推进平台序列：移除第0个（已跳离），把落地平台变为第0个
+      platforms.splice(0, i);
+
+      // 补充新平台
+      while (platforms.length < 5) {
+        const last = platforms[platforms.length - 1];
+        const { dx: ndx, dy: ndy } = getNextOffset();
+        platforms.push(createPlatform(last.wx + ndx, last.wy + ndy));
+      }
+
+      // 更新视角目标：使当前平台回到屏幕中心
+      const newCenter = isoProject(platforms[0].wx, platforms[0].wy, 28);
+      G.targetScrollX = -newCenter.sx;
+      G.targetScrollY = -newCenter.sy;
+
+      // 更新动态难度
+      G.dynLevel = Math.min(10, 1 + Math.floor(G.jumps / 5));
+      updateDiffMeter(G.dynLevel);
+
+      // 更新UI
+      updateGameUI();
+
+      // 检查奖品解锁
+      checkPrizes();
+
+      G.state = 'playing';
+      break;
+    }
+  }
+
+  if (!landed) {
+    // 落空：游戏结束
+    triggerGameOver();
+  }
+}
+
+/* ─── 游戏结束 ─── */
+function triggerGameOver() {
+  G.state = 'dead';
+
+  // 更新最高记录
+  let newBest = false;
+  if (G.score > G.bestScore) { G.bestScore = G.score; newBest = true; }
+  if (G.jumps > G.bestJumps)   G.bestJumps   = G.jumps;
+  if (G.perfectStreak > G.bestPerfect) G.bestPerfect = G.perfectStreak;
+
+  // 写入历史
+  G.history.unshift({ score: G.score, jumps: G.jumps, perfect: G.perfectStreak, date: new Date() });
+  if (G.history.length > 10) G.history.pop();
+
+  // 更新右侧面板
+  document.getElementById('bestScore').textContent  = G.bestScore;
+  document.getElementById('bestJumps').textContent  = G.bestJumps + ' 步';
+  document.getElementById('bestPerfect').textContent = G.bestPerfect + ' 次';
+  renderHistory();
+
+  // 显示结束遮罩
+  document.getElementById('finalScore').textContent = G.score;
+  document.getElementById('finalSub').textContent   =
+    `跳了 ${G.jumps} 步 · 完美落地 ${G.perfectStreak} 次` + (newBest ? ' 🎉 新记录！' : '');
+  document.getElementById('overlayEnd').classList.remove('hidden');
+}
+
+/* ─── 开始/重新开始游戏 ─── */
+function startGame() {
+  // 隐藏覆盖层
+  document.getElementById('overlayStart').classList.add('hidden');
+  document.getElementById('overlayEnd').classList.add('hidden');
+
+  // 重置状态
+  G.state  = 'playing';
+  G.score  = 0;
+  G.jumps  = 0;
+  G.perfectStreak = 0;
+  G.combo  = 1;
+  G.dynLevel = 1;
+  particles = [];
+  perfectRings = [];
+
+  // 同步配置
+  syncConfig();
+
+  // 初始化平台和小人
+  initPlatforms();
+  initPlayer();
+
+  // 更新视角到第0个平台中心
+  const c0 = isoProject(platforms[0].wx, platforms[0].wy, 28);
+  G.scrollX = -c0.sx; G.scrollY = -c0.sy;
+  G.targetScrollX = -c0.sx; G.targetScrollY = -c0.sy;
+
+  updateGameUI();
+  updateDiffMeter(1);
+  updateNextPlatInfo();
+}
+
+/* ─── 蓄力 / 起跳 ─── */
+function onPointerDown(e) {
+  if (G.state !== 'playing') return;
+  e.preventDefault();
+  G.charging   = true;
+  G.chargeStart = Date.now();
+  // 开始蓄力动画
+  startChargeAnim();
+}
+
+function onPointerUp(e) {
+  if (!G.charging || G.state !== 'playing') return;
+  e.preventDefault();
+  G.charging = false;
+
+  const elapsed = Date.now() - G.chargeStart;
+  // 最大蓄力 2000ms
+  const maxMs   = 2000;
+  G.chargePct   = Math.min(1, elapsed / maxMs);
+
+  // 重置进度条动画
+  const bar = document.getElementById('chargeBar');
+  bar.classList.add('animate-reset');
+  bar.style.width = '0%';
+  setTimeout(() => bar.classList.remove('animate-reset'), 250);
+
+  // 恢复小人形态
+  player.squash  = 1;
+  player.stretch = 1;
+
+  // 计算跳跃距离（世界格子数）
+  const sensitivity = G.sensitivity / 5; // 0.2~2
+  const minJump = 0.5;
+  const maxJump = (G.gapMax / (ISO_TILE * ISO_SCALE_X * 2)) *
+                  (1 + G.gapRate * Math.floor(G.jumps / 10)) * 1.1;
+  const jumpDist = (minJump + (maxJump - minJump) * G.chargePct) * sensitivity;
+
+  // 目标方向：朝下一个平台
+  const nextPlat = platforms[1];
+  const dx = nextPlat.wx - platforms[0].wx;
+  const dy = nextPlat.wy - platforms[0].wy;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const nx = dist > 0 ? dx / dist : 1;
+  const ny = dist > 0 ? dy / dist : 0;
+
+  player.jumpStartWX  = player.wx;
+  player.jumpStartWY  = player.wy;
+  player.jumpTargetWX = player.wx + nx * jumpDist;
+  player.jumpTargetWY = player.wy + ny * jumpDist;
+  player.jumpDuration = 28 + G.chargePct * 12; // 28~40帧
+  player.jumpProgress = 0;
+  player.jumping      = true;
+  player.jumpHeightExtra = player.jumpHeightExtra || 0;
+
+  G.state = 'jumping';
+  document.getElementById('chargeTip').textContent = '跳跃中…';
+}
+
+/* ─── 蓄力动画更新 ─── */
+let chargeAnimId = null;
+function startChargeAnim() {
+  if (chargeAnimId) cancelAnimationFrame(chargeAnimId);
+  const bar = document.getElementById('chargeBar');
+
+  function tick() {
+    if (!G.charging) return;
+    const elapsed = Date.now() - G.chargeStart;
+    const pct     = Math.min(1, elapsed / 2000);
+    bar.style.width = (pct * 100) + '%';
+    // 小人压缩：蓄力越久越矮
+    player.squash  = 1 - pct * 0.45;
+    document.getElementById('chargeTip').textContent =
+      pct < 0.3 ? '轻轻一跳…' : pct < 0.7 ? '蓄力中…' : pct < 0.95 ? '全力一击！' : '⚠️ 已蓄满！';
+    chargeAnimId = requestAnimationFrame(tick);
+  }
+  tick();
+}
+
+/* ─── Perfect 弹出文字 ─── */
+function showPerfectPopup(sx, sy) {
+  const el = document.createElement('div');
+  el.className = 'perfect-popup';
+  el.style.left = sx + 'px';
+  el.style.top  = (sy - 10) + 'px';
+  el.textContent = G.combo > 1 ? `🎯 Perfect ×${G.combo}!` : '🎯 Perfect!';
+  document.getElementById('canvasWrap').appendChild(el);
+  setTimeout(() => el.remove(), 1300);
+}
+
+/* ─── 通知气泡 ─── */
+let notifyTimer = null;
+function showNotify(msg) {
+  const el = document.getElementById('notifyBubble');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (notifyTimer) clearTimeout(notifyTimer);
+  notifyTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+/* ─── 更新分值UI ─── */
+function updateGameUI() {
+  document.getElementById('statScore').textContent   = G.score;
+  document.getElementById('statJumps').textContent   = G.jumps;
+  document.getElementById('statPerfect').textContent = G.perfectStreak;
+  document.getElementById('statCombo').textContent   = 'x' + G.combo;
+  document.getElementById('chargeTip').textContent   = '按住画面蓄力，松手起跳';
+  updateNextPlatInfo();
+}
+
+/* ─── 更新难度仪表 ─── */
+function updateDiffMeter(level) {
+  document.getElementById('dynDiffLabel').textContent = 'Lv.' + level;
+  const segs = document.querySelectorAll('.diff-seg');
+  segs.forEach((seg, i) => {
+    seg.classList.toggle('active', i < level);
+  });
+}
+
+/* ─── 更新下一平台信息 ─── */
+function updateNextPlatInfo() {
+  if (platforms.length < 2) return;
+  const next = platforms[1];
+  const p0   = platforms[0];
+  const dx = next.wx - p0.wx;
+  const dy = next.wy - p0.wy;
+  const dist = Math.sqrt(dx*dx + dy*dy) * ISO_TILE * ISO_SCALE_X * 2;
+
+  document.getElementById('liveGap').textContent =
+    Math.round(dist) + 'px';
+
+  const typeMap = { normal: '普通平台', spring: '🌀 弹簧平台', boost: '⚡ 加速平台' };
+  document.getElementById('nextPlatType').textContent =
+    typeMap[next.type] || '普通平台';
+}
+
+/* ─── 渲染历史记录 ─── */
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (G.history.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px 0;color:var(--muted);font-size:13px;">暂无记录</div>';
+    return;
+  }
+  el.innerHTML = G.history.slice(0, 5).map((h, i) => {
+    const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-other';
+    const t = h.date;
+    const timeStr = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
+    return `
+      <div class="history-item">
+        <div class="history-rank ${rankClass}">${i+1}</div>
+        <div class="history-info">
+          <div class="history-score">${h.score} 分</div>
+          <div class="history-meta">${h.jumps} 步 · ${timeStr}</div>
+        </div>
+        ${h.perfect >= 3 ? `<span class="history-badge">🎯 ${h.perfect}连完美</span>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+/* ─── 奖品配置渲染 ─── */
+function renderPrizeList() {
+  const el = document.getElementById('prizeList');
+  el.innerHTML = prizes.map((p, i) => `
+    <div class="prize-row">
+      <span class="prize-icon">${p.icon}</span>
+      <input class="prize-input" type="text" value="${p.name}"
+        onchange="prizes[${i}].name=this.value;renderPrizeUnlockList()">
+      <input class="prize-threshold" type="number" value="${p.scoreThreshold}"
+        onchange="prizes[${i}].scoreThreshold=+this.value;renderPrizeUnlockList()"
+        title="得分达到X解锁">
+      <span class="prize-label">分</span>
+    </div>
+  `).join('');
+}
+
+/* ─── 奖品解锁面板渲染 ─── */
+function renderPrizeUnlockList() {
+  const el = document.getElementById('prizeUnlockList');
+  if (prizes.length === 0) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:10px;">暂无奖品配置</div>';
+    return;
+  }
+  el.innerHTML = prizes.map(p => {
+    const cond = p.scoreThreshold > 0
+      ? `得分达 ${p.scoreThreshold} 分`
+      : `跳跃 ${p.jumpThreshold} 步`;
+    return `
+      <div class="prize-unlock-item ${p.unlocked ? 'unlocked' : ''}">
+        <span class="prize-unlock-icon">${p.icon}</span>
+        <div class="prize-unlock-info">
+          <div class="prize-unlock-name">${p.name}</div>
+          <div class="prize-unlock-cond">${cond}</div>
+        </div>
+        <span class="prize-unlock-status ${p.unlocked ? 'unlocked' : 'locked'}">
+          ${p.unlocked ? '已解锁' : '未解锁'}
+        </span>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ─── 检查奖品解锁 ─── */
+function checkPrizes() {
+  let anyNew = false;
+  for (const p of prizes) {
+    if (p.unlocked) continue;
+    if (p.scoreThreshold > 0 && G.score >= p.scoreThreshold) {
+      p.unlocked = true; anyNew = true;
+      showNotify(`🎉 解锁奖品：${p.name}！`);
+    }
+    if (p.jumpThreshold > 0 && G.jumps >= p.jumpThreshold) {
+      p.unlocked = true; anyNew = true;
+      showNotify(`🎉 解锁奖品：${p.name}！`);
+    }
+  }
+  if (anyNew) renderPrizeUnlockList();
+}
+
+/* ─── 添加奖品 ─── */
+function addPrize() {
+  const icons = ['🎪','🎠','🧧','🎟️','🏅','🌟'];
+  prizes.push({
+    id: Date.now(),
+    icon: icons[Math.floor(Math.random() * icons.length)],
+    name: '新奖品',
+    scoreThreshold: 30,
+    jumpThreshold: 0,
+    unlocked: false,
+  });
+  renderPrizeList();
+  renderPrizeUnlockList();
+}
+
+/* ─── 难度预设 ─── */
+const DIFF_PRESETS = {
+  easy:    { gapMin: 60,  gapMax: 120, label: '简单',  range: '60~120px'  },
+  normal:  { gapMin: 100, gapMax: 180, label: '普通',  range: '100~180px' },
+  hard:    { gapMin: 140, gapMax: 230, label: '困难',  range: '140~230px' },
+  extreme: { gapMin: 180, gapMax: 280, label: '极限',  range: '180~280px' },
+};
+function setDifficulty(mode) {
+  G.difficulty = mode;
+  const p = DIFF_PRESETS[mode];
+  G.gapMin = p.gapMin; G.gapMax = p.gapMax;
+  document.getElementById('diffLabel').textContent = p.label;
+  document.getElementById('diffGap').textContent   = p.range;
+  ['easy','normal','hard','extreme'].forEach(d => {
+    document.getElementById('diff' + d.charAt(0).toUpperCase() + d.slice(1))
+      .classList.toggle('active', d === mode);
+  });
+}
+
+/* ─── 滑块更新 ─── */
+function updateSlider(sliderId, valId, value, suffix) {
+  document.getElementById(valId).textContent = value + suffix;
+  // 同步到G
+  if (sliderId === 'sliderGapRate')     G.gapRate = value * 0.01;
+  if (sliderId === 'sliderSensitivity') G.sensitivity = +value;
+  if (sliderId === 'sliderPlatSize')    G.platSizeLevel = +value;
+  if (sliderId === 'sliderBaseScore')   G.baseScore = +value;
+  if (sliderId === 'sliderPerfectScore') G.perfectScore = +value;
+}
+
+/* ─── 同步左侧配置到G ─── */
+function syncConfig() {
+  G.gapRate      = +document.getElementById('sliderGapRate').value * 0.01;
+  G.sensitivity  = +document.getElementById('sliderSensitivity').value;
+  G.platSizeLevel= +document.getElementById('sliderPlatSize').value;
+  G.baseScore    = +document.getElementById('sliderBaseScore').value;
+  G.perfectScore = +document.getElementById('sliderPerfectScore').value;
+  G.enableSpring = document.getElementById('enableSpring').checked;
+  G.enableBoost  = document.getElementById('enableBoost').checked;
+}
+
+/* ─── 绑定事件 ─── */
+function bindEvents() {
+  const wrap = document.getElementById('canvasWrap');
+  wrap.addEventListener('mousedown',  onPointerDown, { passive: false });
+  wrap.addEventListener('mouseup',    onPointerUp,   { passive: false });
+  wrap.addEventListener('mouseleave', onPointerUp,   { passive: false });
+  wrap.addEventListener('touchstart', onPointerDown, { passive: false });
+  wrap.addEventListener('touchend',   onPointerUp,   { passive: false });
+}
+
+/* ─── 页面初始化 ─── */
+function init() {
+  renderPrizeList();
+  renderPrizeUnlockList();
+  setDifficulty('normal');
+  bindEvents();
+  gameLoop(); // 启动渲染循环（即使在idle状态也保持动画）
+}
+
+init();
+</script>
+</body>
+</html>
