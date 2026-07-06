@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 迷宫寻宝</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.97);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: inherit;
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .nav-links-wrap {
+    flex: 1;
+    overflow-x: auto;
+    margin: 0 20px;
+    scrollbar-width: none;
+  }
+  .nav-links-wrap::-webkit-scrollbar { display: none; }
+  .nav-links {
+    display: flex;
+    gap: 2px;
+    white-space: nowrap;
+  }
+  .nav-link {
+    padding: 6px 13px; border-radius: 7px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-link:hover { background: var(--card); color: var(--text); }
+  .nav-link.active { background: var(--card); color: var(--gold); }
+  .nav-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.4} }
+  .status-text { font-size: 12px; color: var(--muted); }
+
+  /* ─── 主体三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: calc(100vh - 57px - 42px);
+  }
+
+  /* ─── 通用面板样式 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: var(--deep);
+    position: relative;
+    overflow: hidden;
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* ─── 选项按钮组 ─── */
+  .option-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .option-btn {
+    flex: 1; padding: 9px 6px; border-radius: 8px;
+    text-align: center; font-size: 13px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s;
+    color: var(--muted); font-weight: 600;
+    min-width: 60px;
+  }
+  .option-btn:hover { border-color: rgba(124,58,237,0.5); color: var(--text); }
+  .option-btn.active {
+    border-color: var(--accent);
+    background: rgba(124,58,237,0.15);
+    color: var(--gold);
+  }
+
+  /* ─── 奖品配置 ─── */
+  .prize-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+  }
+  .prize-row:last-child { margin-bottom: 0; }
+  .prize-icon { font-size: 18px; }
+  .prize-input {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .prize-input:focus { border-color: var(--accent); }
+  .prize-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .prize-threshold {
+    background: rgba(245,200,66,0.1);
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 700;
+    width: 54px;
+    outline: none;
+    text-align: center;
+  }
+
+  /* ─── 信息行 ─── */
+  .info-row {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .info-row:last-child { margin-bottom: 0; }
+  .info-val { color: var(--text); font-weight: 600; }
+
+  /* ─── 游戏顶部指标栏 ─── */
+  .game-stats {
+    display: flex; gap: 10px;
+    width: 100%;
+    margin-bottom: 14px;
+  }
+  .stat-item {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .stat-val {
+    font-size: 22px; font-weight: 800;
+    color: var(--gold); line-height: 1;
+    margin-bottom: 3px;
+  }
+  /* 倒计时变红 */
+  .stat-val.danger { color: #F87171; }
+  .stat-label {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* ─── Canvas 容器 ─── */
+  .canvas-wrap {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+    box-shadow: 0 0 40px rgba(124,58,237,0.2);
+    flex-shrink: 0;
+  }
+  #mazeCanvas {
+    display: block;
+    background: #080414;
+  }
+
+  /* ─── 覆盖层（开始/结束/暂停/胜利） ─── */
+  .overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: rgba(8,4,20,0.9);
+    backdrop-filter: blur(6px);
+    border-radius: 10px;
+    transition: opacity 0.3s;
+    z-index: 10;
+  }
+  .overlay.hidden { display: none; }
+  .overlay-icon { font-size: 58px; margin-bottom: 12px; }
+  .overlay-title {
+    font-size: 24px; font-weight: 800;
+    color: var(--gold); margin-bottom: 6px;
+  }
+  .overlay-sub {
+    font-size: 14px; color: var(--muted);
+    margin-bottom: 20px; text-align: center;
+    line-height: 1.6; max-width: 280px;
+  }
+  .overlay-score {
+    font-size: 32px; font-weight: 900;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .overlay-score-label {
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 18px;
+  }
+  .overlay-btn {
+    padding: 11px 32px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; font-size: 15px; font-weight: 700;
+    border: none; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin: 4px;
+  }
+  .overlay-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(124,58,237,0.55);
+  }
+  .overlay-btn.secondary {
+    background: rgba(255,255,255,0.08);
+    box-shadow: none;
+  }
+  .overlay-btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+  /* ─── 虚拟方向键 ─── */
+  .dpad-wrap {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, 52px);
+    grid-template-rows: repeat(3, 52px);
+    gap: 5px;
+  }
+  .dpad-btn {
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; cursor: pointer;
+    transition: all 0.15s;
+    user-select: none; -webkit-user-select: none;
+    color: var(--text);
+  }
+  .dpad-btn:active, .dpad-btn.pressed {
+    background: rgba(124,58,237,0.3);
+    border-color: var(--accent);
+    transform: scale(0.91);
+  }
+  .dpad-empty { background: transparent; border: none; cursor: default; }
+
+  /* ─── 游戏控制按钮 ─── */
+  .game-controls {
+    display: flex; gap: 10px;
+    margin-top: 14px;
+    width: 100%;
+    justify-content: center;
+  }
+  .ctrl-btn {
+    padding: 9px 22px; border-radius: 9px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .ctrl-btn:hover { border-color: var(--accent); color: var(--gold); }
+  .ctrl-btn.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: #fff;
+    box-shadow: 0 3px 14px rgba(124,58,237,0.35);
+  }
+  .ctrl-btn.primary:hover { transform: translateY(-1px); }
+
+  /* ─── 右侧：金币收集进度 ─── */
+  .coin-progress-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .coin-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), #FFA500);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .coin-info-row {
+    display: flex; justify-content: space-between;
+    font-size: 12px; margin-top: 6px;
+  }
+  .coin-cur { color: var(--gold); font-weight: 700; }
+  .coin-total { color: var(--muted); }
+
+  /* ─── 最快记录 ─── */
+  .best-display {
+    text-align: center;
+    padding: 14px 0 6px;
+  }
+  .best-num {
+    font-size: 38px; font-weight: 900;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .best-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .best-detail { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .best-detail span { color: var(--text); font-weight: 600; }
+
+  /* ─── 奖品解锁状态 ─── */
+  .prize-status-list { display: flex; flex-direction: column; gap: 10px; }
+  .prize-status-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+    transition: all 0.3s;
+  }
+  .prize-status-item.unlocked {
+    border-color: rgba(245,200,66,0.5);
+    background: rgba(245,200,66,0.06);
+  }
+  .prize-status-icon { font-size: 22px; }
+  .prize-status-info { flex: 1; }
+  .prize-status-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .prize-status-cond { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .prize-lock {
+    font-size: 16px;
+    filter: grayscale(1) opacity(0.4);
+    transition: all 0.3s;
+  }
+  .prize-status-item.unlocked .prize-lock {
+    filter: none;
+    animation: prizePop 0.5s ease;
+  }
+  @keyframes prizePop {
+    0%   { transform: scale(0.6) rotate(-20deg); }
+    60%  { transform: scale(1.2) rotate(5deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  /* ─── 通知气泡 ─── */
+  .notify-bubble {
+    position: fixed;
+    top: 80px; left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; font-size: 14px; font-weight: 700;
+    padding: 8px 22px; border-radius: 24px;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.5);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 999;
+  }
+  .notify-bubble.show {
+    animation: notifyAnim 2.2s ease forwards;
+  }
+  @keyframes notifyAnim {
+    0%   { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    15%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+    75%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-12px); }
+  }
+
+  /* ─── 胜利粒子特效层 ─── */
+  #particleCanvas {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    border-radius: 10px;
+    z-index: 5;
+  }
+
+  /* ─── 底部状态栏 ─── */
+  .footer {
+    padding: 10px 28px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .footer-tags { display: flex; gap: 8px; }
+  .ftag {
+    padding: 2px 8px; border-radius: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    font-size: 11px;
+  }
+
+  /* ─── 滚动条 ─── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+  /* ─── 历史记录列表 ─── */
+  .history-list { display: flex; flex-direction: column; gap: 6px; }
+  .history-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .history-rank { color: var(--gold); font-weight: 700; width: 20px; }
+  .history-info { flex: 1; padding: 0 8px; color: var(--muted); }
+  .history-score { color: var(--text); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ─── 顶部导航 ─── -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    🎮 <span>GameHub</span>
+    <span class="nav-badge">中台</span>
+  </a>
+  <div class="nav-links-wrap">
+    <div class="nav-links">
+      <a href="index.html"           class="nav-link">首页</a>
+      <a href="wheel.html"           class="nav-link">大转盘</a>
+      <a href="nine-grid.html"       class="nav-link">九宫格</a>
+      <a href="scratch-card.html"    class="nav-link">刮刮乐</a>
+      <a href="shake-dice.html"      class="nav-link">摇骰子</a>
+      <a href="smash-egg.html"       class="nav-link">砸金蛋</a>
+      <a href="slot-machine.html"    class="nav-link">老虎机</a>
+      <a href="gift-box.html"        class="nav-link">礼盒开箱</a>
+      <a href="whack-mole.html"      class="nav-link">打地鼠</a>
+      <a href="cup-game.html"        class="nav-link">三杯游戏</a>
+      <a href="number-bomb.html"     class="nav-link">数字炸弹</a>
+      <a href="stamp-collect.html"   class="nav-link">集卡集章</a>
+      <a href="vote-pk.html"         class="nav-link">投票PK</a>
+      <a href="gashapon.html"        class="nav-link">扭蛋机</a>
+      <a href="blind-box.html"       class="nav-link">盲盒抽卡</a>
+      <a href="game-2048.html"       class="nav-link">2048</a>
+      <a href="match3.html"          class="nav-link">消消乐</a>
+      <a href="catch-coins.html"     class="nav-link">接金币</a>
+      <a href="grow-tree.html"       class="nav-link">成长树</a>
+      <a href="pinball.html"         class="nav-link">弹珠机</a>
+      <a href="snake.html"           class="nav-link">贪吃蛇</a>
+      <a href="slingshot.html"       class="nav-link">弹弓射击</a>
+      <a href="fruit-cut.html"       class="nav-link">切水果</a>
+      <a href="progress-unlock.html" class="nav-link">进度解锁</a>
+      <a href="energy-collect.html"  class="nav-link">能量收集</a>
+      <a href="flying-chess.html"    class="nav-link">飞行棋</a>
+      <a href="monopoly.html"        class="nav-link">大富翁</a>
+      <a href="red-packet-rain.html" class="nav-link">红包雨</a>
+      <a href="claw-machine.html"    class="nav-link">夹娃娃机</a>
+      <a href="flip-match.html"      class="nav-link">翻牌配对</a>
+      <a href="shake.html"           class="nav-link">摇一摇</a>
+      <a href="quiz.html"            class="nav-link">问答闯关</a>
+      <a href="daily-checkin.html"   class="nav-link">每日签到</a>
+      <a href="maze.html"            class="nav-link active">迷宫寻宝</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span class="status-text">运行中</span>
+  </div>
+</nav>
+
+<!-- ─── 通知气泡 ─── -->
+<div class="notify-bubble" id="notifyBubble"></div>
+
+<!-- ─── 主体三列布局 ─── -->
+<div class="main">
+
+  <!-- ══════════════════════════════
+       左侧配置面板
+  ══════════════════════════════ -->
+  <div class="panel-left">
+    <div class="panel-title">🗺️ 游戏配置</div>
+
+    <!-- 迷宫大小 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>迷宫大小</div>
+      <div class="option-btns">
+        <button class="option-btn" id="size10" onclick="setMazeSize(10)">10×10</button>
+        <button class="option-btn active" id="size15" onclick="setMazeSize(15)">15×15</button>
+        <button class="option-btn" id="size20" onclick="setMazeSize(20)">20×20</button>
+      </div>
+      <div style="margin-top:10px;" class="info-row">
+        <span>通道格数</span>
+        <span class="info-val" id="sizeDesc">225格</span>
+      </div>
+      <div class="info-row">
+        <span>算法</span>
+        <span class="info-val">DFS 深度优先回溯</span>
+      </div>
+    </div>
+
+    <!-- 限时设置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>限时挑战</div>
+      <div class="option-btns">
+        <button class="option-btn" id="time60"  onclick="setTimeLimit(60)">60秒</button>
+        <button class="option-btn active" id="time90"  onclick="setTimeLimit(90)">90秒</button>
+        <button class="option-btn" id="time120" onclick="setTimeLimit(120)">120秒</button>
+        <button class="option-btn" id="timeInf" onclick="setTimeLimit(0)">无限</button>
+      </div>
+      <div style="margin-top:10px;" class="info-row">
+        <span>时间加成</span>
+        <span class="info-val">剩余每秒 +1分</span>
+      </div>
+    </div>
+
+    <!-- 金币密度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>金币密度</div>
+      <div class="option-btns">
+        <button class="option-btn" id="coinLow"  onclick="setCoinDensity('low')">稀少</button>
+        <button class="option-btn active" id="coinMid"  onclick="setCoinDensity('mid')">适中</button>
+        <button class="option-btn" id="coinHigh" onclick="setCoinDensity('high')">密集</button>
+      </div>
+      <div style="margin-top:10px;" class="info-row">
+        <span>当前金币数量</span>
+        <span class="info-val" id="coinCountDesc">约15枚</span>
+      </div>
+      <div class="info-row">
+        <span>金币得分</span>
+        <span class="info-val">每枚 +5分</span>
+      </div>
+    </div>
+
+    <!-- 玩法说明 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>玩法说明</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.8;">
+        <div>🟣 紫色圆点：你的角色</div>
+        <div>🟡 金色圆点：散落金币（+5分）</div>
+        <div>🎁 终点宝箱：到达即胜利</div>
+        <div>⏱️ 限时内到达获得时间加成</div>
+        <div>🏅 收集全部金币额外奖励</div>
+        <div style="margin-top:8px; color:rgba(240,234,248,0.35);">
+          键盘：↑↓←→ 或 WASD<br>
+          触屏：画面内虚拟方向键
+        </div>
+      </div>
+    </div>
+
+    <!-- 奖品配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>宝箱奖品配置</div>
+      <div class="prize-row">
+        <span class="prize-icon">🎁</span>
+        <input class="prize-threshold" id="prize1Score" type="number" value="50" min="1">
+        <span class="prize-label">分以上</span>
+        <input class="prize-input" id="prize1Name" type="text" value="小惊喜礼包" placeholder="奖品名称">
+      </div>
+      <div class="prize-row">
+        <span class="prize-icon">🏆</span>
+        <input class="prize-threshold" id="prize2Score" type="number" value="100" min="1">
+        <span class="prize-label">分以上</span>
+        <input class="prize-input" id="prize2Name" type="text" value="限定优惠券" placeholder="奖品名称">
+      </div>
+      <div class="prize-row">
+        <span class="prize-icon">👑</span>
+        <input class="prize-threshold" id="prize3Score" type="number" value="150" min="1">
+        <span class="prize-label">分以上</span>
+        <input class="prize-input" id="prize3Name" type="text" value="超级大礼包" placeholder="奖品名称">
+      </div>
+      <div style="font-size:11px; color:var(--muted); margin-top:4px;">
+        到达终点宝箱后按最终分数解锁对应奖品
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       中间游戏区域
+  ══════════════════════════════ -->
+  <div class="panel-center">
+
+    <!-- 顶部指标栏 -->
+    <div class="game-stats">
+      <div class="stat-item">
+        <div class="stat-val" id="statScore">0</div>
+        <div class="stat-label">当前分数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="statTimer">90</div>
+        <div class="stat-label">剩余时间</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="statCoins">0</div>
+        <div class="stat-label">金币收集</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="statSteps">0</div>
+        <div class="stat-label">步数</div>
+      </div>
+    </div>
+
+    <!-- Canvas 游戏画布 -->
+    <div class="canvas-wrap">
+      <canvas id="mazeCanvas"></canvas>
+      <!-- 胜利粒子特效层 -->
+      <canvas id="particleCanvas"></canvas>
+
+      <!-- 开始覆盖层 -->
+      <div class="overlay" id="overlayStart">
+        <div class="overlay-icon">🗺️</div>
+        <div class="overlay-title">迷宫寻宝</div>
+        <div class="overlay-sub">
+          穿越迷宫收集金币，找到宝箱即可胜利！<br>
+          越快到达分数越高，快去探索吧～
+        </div>
+        <div class="overlay-btn-row">
+          <button class="overlay-btn" onclick="startGame()">开始探索</button>
+        </div>
+      </div>
+
+      <!-- 暂停覆盖层 -->
+      <div class="overlay hidden" id="overlayPause">
+        <div class="overlay-icon">⏸️</div>
+        <div class="overlay-title">游戏暂停</div>
+        <div class="overlay-sub">按空格键或点击继续恢复游戏</div>
+        <div class="overlay-btn-row">
+          <button class="overlay-btn" onclick="resumeGame()">继续游戏</button>
+          <button class="overlay-btn secondary" onclick="resetGame()">重新开始</button>
+        </div>
+      </div>
+
+      <!-- 胜利覆盖层 -->
+      <div class="overlay hidden" id="overlayWin">
+        <div class="overlay-icon">🎉</div>
+        <div class="overlay-title">宝藏到手！</div>
+        <div class="overlay-score" id="winScore">0</div>
+        <div class="overlay-score-label">最终得分</div>
+        <div class="overlay-sub" id="winDetail">耗时 -- 秒，收集 -- 枚金币</div>
+        <div id="winPrize" style="font-size:16px; margin-bottom:16px; color:var(--gold); font-weight:700;"></div>
+        <div class="overlay-btn-row">
+          <button class="overlay-btn" onclick="resetGame()">再玩一局</button>
+          <button class="overlay-btn secondary" onclick="shareResult()">分享成绩</button>
+        </div>
+      </div>
+
+      <!-- 失败覆盖层（超时） -->
+      <div class="overlay hidden" id="overlayFail">
+        <div class="overlay-icon">⏰</div>
+        <div class="overlay-title">时间到了！</div>
+        <div class="overlay-score" id="failScore">0</div>
+        <div class="overlay-score-label">本局得分</div>
+        <div class="overlay-sub" id="failDetail">差一点就找到宝藏了，再试一次！</div>
+        <div class="overlay-btn-row">
+          <button class="overlay-btn" onclick="resetGame()">再来一次</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 游戏控制按钮 -->
+    <div class="game-controls">
+      <button class="ctrl-btn primary" onclick="startGame()" id="btnStart">开始 / 重来</button>
+      <button class="ctrl-btn" onclick="togglePause()" id="btnPause">暂停</button>
+      <button class="ctrl-btn" onclick="generateNewMaze()">新迷宫</button>
+    </div>
+
+    <!-- 虚拟方向键（移动端） -->
+    <div class="dpad-wrap">
+      <div class="dpad-empty"></div>
+      <div class="dpad-btn" id="dpadUp"    ontouchstart="dpadPress('up')"    ontouchend="dpadRelease('up')">▲</div>
+      <div class="dpad-empty"></div>
+      <div class="dpad-btn" id="dpadLeft"  ontouchstart="dpadPress('left')"  ontouchend="dpadRelease('left')">◀</div>
+      <div class="dpad-empty dpad-btn" style="background:rgba(124,58,237,0.08); border:1px solid var(--border);">✦</div>
+      <div class="dpad-btn" id="dpadRight" ontouchstart="dpadPress('right')" ontouchend="dpadRelease('right')">▶</div>
+      <div class="dpad-empty"></div>
+      <div class="dpad-btn" id="dpadDown"  ontouchstart="dpadPress('down')"  ontouchend="dpadRelease('down')">▼</div>
+      <div class="dpad-empty"></div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════
+       右侧数据面板
+  ══════════════════════════════ -->
+  <div class="panel-right">
+    <div class="panel-title">📊 游戏数据</div>
+
+    <!-- 金币收集进度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>金币收集进度</div>
+      <div class="coin-progress-bar">
+        <div class="coin-progress-fill" id="coinProgressFill" style="width:0%"></div>
+      </div>
+      <div class="coin-info-row">
+        <span class="coin-cur" id="coinCur">0</span>
+        <span class="coin-total" id="coinTotalText">/ 0 枚</span>
+      </div>
+      <div style="margin-top:10px;" class="info-row">
+        <span>金币奖励</span>
+        <span class="info-val" id="coinBonusText">+0分</span>
+      </div>
+      <div class="info-row">
+        <span>全收集奖励</span>
+        <span class="info-val">+50分</span>
+      </div>
+    </div>
+
+    <!-- 当局统计 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>当局统计</div>
+      <div class="info-row">
+        <span>用时</span>
+        <span class="info-val" id="statElapsed">--</span>
+      </div>
+      <div class="info-row">
+        <span>迷宫大小</span>
+        <span class="info-val" id="statSize">15×15</span>
+      </div>
+      <div class="info-row">
+        <span>金币得分</span>
+        <span class="info-val" id="statCoinScore">0</span>
+      </div>
+      <div class="info-row">
+        <span>时间加成</span>
+        <span class="info-val" id="statTimeBonus">0</span>
+      </div>
+      <div class="info-row">
+        <span>游戏状态</span>
+        <span class="info-val" id="statState">待开始</span>
+      </div>
+    </div>
+
+    <!-- 历史最快 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>历史最快</div>
+      <div class="best-display">
+        <div class="best-num" id="bestScoreNum">---</div>
+        <div class="best-label">历史最高分</div>
+        <div class="best-detail" id="bestDetail">暂无记录</div>
+      </div>
+    </div>
+
+    <!-- 奖品解锁状态 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>宝箱奖品</div>
+      <div class="prize-status-list" id="prizeStatusList">
+        <div class="prize-status-item" id="prizeItem1">
+          <span class="prize-status-icon">🎁</span>
+          <div class="prize-status-info">
+            <div class="prize-status-name" id="prizeStatusName1">小惊喜礼包</div>
+            <div class="prize-status-cond" id="prizeStatusCond1">达到 50 分解锁</div>
+          </div>
+          <span class="prize-lock" id="prizeLock1">🔒</span>
+        </div>
+        <div class="prize-status-item" id="prizeItem2">
+          <span class="prize-status-icon">🏆</span>
+          <div class="prize-status-info">
+            <div class="prize-status-name" id="prizeStatusName2">限定优惠券</div>
+            <div class="prize-status-cond" id="prizeStatusCond2">达到 100 分解锁</div>
+          </div>
+          <span class="prize-lock" id="prizeLock2">🔒</span>
+        </div>
+        <div class="prize-status-item" id="prizeItem3">
+          <span class="prize-status-icon">👑</span>
+          <div class="prize-status-info">
+            <div class="prize-status-name" id="prizeStatusName3">超级大礼包</div>
+            <div class="prize-status-cond" id="prizeStatusCond3">达到 150 分解锁</div>
+          </div>
+          <span class="prize-lock" id="prizeLock3">🔒</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 近期记录 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>近期记录</div>
+      <div class="history-list" id="historyList">
+        <div style="font-size:12px; color:var(--muted); text-align:center; padding:10px 0;">暂无记录</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── 底部状态栏 ─── -->
+<footer class="footer">
+  <span>迷宫寻宝 · DFS 完美迷宫生成</span>
+  <div class="footer-tags">
+    <span class="ftag">Canvas 2D</span>
+    <span class="ftag">深度优先算法</span>
+    <span class="ftag">限时挑战</span>
+    <span class="ftag">营销解锁</span>
+  </div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   迷宫寻宝 · 核心逻辑
+   DFS深度优先回溯算法生成完美迷宫（保证有路可走，无孤岛）
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── 游戏状态 ─── */
+const STATE = {
+  IDLE:    'idle',
+  PLAYING: 'playing',
+  PAUSED:  'paused',
+  WIN:     'win',
+  FAIL:    'fail'
+};
+
+/* ─── 配置变量 ─── */
+let mazeSize   = 15;   // 迷宫尺寸（行/列数，单位：通道格）
+let timeLimit  = 90;   // 限时（秒），0 = 无限制
+let coinDensity = 'mid'; // 金币密度：low / mid / high
+
+/* ─── 游戏运行时变量 ─── */
+let state      = STATE.IDLE;
+let maze       = [];   // 迷宫格子二维数组
+let player     = { x: 0, y: 0 };    // 玩家位置（通道格坐标）
+let coins      = [];   // 金币列表 [{x,y,collected}]
+let trail      = [];   // 已走路径
+let score      = 0;
+let steps      = 0;
+let coinsCollected = 0;
+let totalCoins = 0;
+let timeLeft   = 90;
+let elapsed    = 0;
+let timerInterval = null;
+let animFrame  = null;
+
+/* ─── 历史记录 ─── */
+let historyRecords = [];
+let bestScore = null;
+let bestDetail = null;
+
+/* ─── Canvas ─── */
+const canvas     = document.getElementById('mazeCanvas');
+const ctx        = canvas.getContext('2d');
+const pCanvas    = document.getElementById('particleCanvas');
+const pCtx       = pCanvas.getContext('2d');
+
+/* ─── 粒子系统 ─── */
+let particles    = [];
+
+/* ─── 迷宫单元格结构 ─── */
+/*
+  每个单元格记录四方向墙壁：top/right/bottom/left
+  true = 有墙，false = 已打通（通道）
+*/
+
+/* ════════════════════════════════
+   DFS 深度优先回溯算法生成完美迷宫
+   ════════════════════════════════ */
+function generateMaze(n) {
+  // 初始化：所有格子四面都有墙
+  const grid = [];
+  for (let r = 0; r < n; r++) {
+    grid[r] = [];
+    for (let c = 0; c < n; c++) {
+      grid[r][c] = { top: true, right: true, bottom: true, left: true, visited: false };
+    }
+  }
+
+  // DFS 栈回溯
+  const stack = [];
+  const start = { r: 0, c: 0 };
+  grid[0][0].visited = true;
+  stack.push(start);
+
+  while (stack.length > 0) {
+    const cur = stack[stack.length - 1];
+    // 找未访问的邻居
+    const neighbors = getUnvisitedNeighbors(grid, cur.r, cur.c, n);
+    if (neighbors.length === 0) {
+      stack.pop(); // 回溯
+    } else {
+      // 随机选一个邻居
+      const next = neighbors[Math.floor(Math.random() * neighbors.length)];
+      // 打通当前格与邻居之间的墙
+      removeWall(grid, cur.r, cur.c, next.r, next.c);
+      grid[next.r][next.c].visited = true;
+      stack.push(next);
+    }
+  }
+
+  return grid;
+}
+
+function getUnvisitedNeighbors(grid, r, c, n) {
+  const dirs = [
+    { dr: -1, dc: 0 }, // 上
+    { dr: 0,  dc: 1 }, // 右
+    { dr: 1,  dc: 0 }, // 下
+    { dr: 0,  dc: -1 } // 左
+  ];
+  const result = [];
+  for (const d of dirs) {
+    const nr = r + d.dr;
+    const nc = c + d.dc;
+    if (nr >= 0 && nr < n && nc >= 0 && nc < n && !grid[nr][nc].visited) {
+      result.push({ r: nr, c: nc });
+    }
+  }
+  return result;
+}
+
+function removeWall(grid, r1, c1, r2, c2) {
+  const dr = r2 - r1;
+  const dc = c2 - c1;
+  if (dr === -1) { grid[r1][c1].top    = false; grid[r2][c2].bottom = false; }
+  if (dr ===  1) { grid[r1][c1].bottom = false; grid[r2][c2].top    = false; }
+  if (dc === -1) { grid[r1][c1].left   = false; grid[r2][c2].right  = false; }
+  if (dc ===  1) { grid[r1][c1].right  = false; grid[r2][c2].left   = false; }
+}
+
+/* ════════════════════════════════
+   随机散布金币（避开起点和终点）
+   ════════════════════════════════ */
+function generateCoins(n, density) {
+  const densityMap = { low: 0.06, mid: 0.12, high: 0.2 };
+  const ratio = densityMap[density] || 0.12;
+  const count = Math.round(n * n * ratio);
+
+  const list = [];
+  const placed = new Set();
+  // 避开起点(0,0)和终点(n-1,n-1)
+  placed.add('0,0');
+  placed.add(`${n-1},${n-1}`);
+
+  let attempts = 0;
+  while (list.length < count && attempts < count * 10) {
+    attempts++;
+    const x = Math.floor(Math.random() * n);
+    const y = Math.floor(Math.random() * n);
+    const key = `${x},${y}`;
+    if (!placed.has(key)) {
+      placed.add(key);
+      list.push({ x, y, collected: false });
+    }
+  }
+  return list;
+}
+
+/* ════════════════════════════════
+   Canvas 尺寸计算
+   ════════════════════════════════ */
+function calcCellSize(n) {
+  // 根据迷宫大小动态计算格子尺寸，保证画布适中
+  const maxSize = 520; // 最大画布尺寸（px）
+  return Math.floor(maxSize / n);
+}
+
+function resizeCanvas(n) {
+  const cell = calcCellSize(n);
+  const size = cell * n;
+  canvas.width  = size;
+  canvas.height = size;
+  pCanvas.width  = size;
+  pCanvas.height = size;
+}
+
+/* ════════════════════════════════
+   迷宫绘制
+   ════════════════════════════════ */
+// 全局动画时间戳，用于闪烁效果
+let animTime = 0;
+
+function drawMaze() {
+  animTime += 0.05;
+  const n    = mazeSize;
+  const cell = calcCellSize(n);
+  const W    = cell * n;
+
+  ctx.clearRect(0, 0, W, W);
+
+  /* ── 背景 ── */
+  ctx.fillStyle = '#080414';
+  ctx.fillRect(0, 0, W, W);
+
+  /* ── 已走路径（淡色轨迹） ── */
+  if (trail.length > 1) {
+    for (const t of trail) {
+      ctx.fillStyle = 'rgba(124,58,237,0.13)';
+      ctx.fillRect(t.x * cell + 1, t.y * cell + 1, cell - 2, cell - 2);
+    }
+  }
+
+  /* ── 金币 ── */
+  for (const coin of coins) {
+    if (coin.collected) continue;
+    const cx = coin.x * cell + cell / 2;
+    const cy = coin.y * cell + cell / 2;
+    const pulse = 0.7 + 0.3 * Math.sin(animTime * 3 + coin.x + coin.y);
+    const r = (cell * 0.2) * pulse;
+
+    // 金币光晕
+    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 2);
+    grd.addColorStop(0, 'rgba(245,200,66,0.5)');
+    grd.addColorStop(1, 'rgba(245,200,66,0)');
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 2, 0, Math.PI * 2);
+    ctx.fillStyle = grd;
+    ctx.fill();
+
+    // 金币主体
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = '#F5C842';
+    ctx.fill();
+  }
+
+  /* ── 终点宝箱 ── */
+  const ex = (n - 1) * cell + cell / 2;
+  const ey = (n - 1) * cell + cell / 2;
+  const glow = 0.5 + 0.5 * Math.sin(animTime * 2);
+
+  // 宝箱发光
+  const tGrd = ctx.createRadialGradient(ex, ey, 0, ex, ey, cell * 0.8);
+  tGrd.addColorStop(0, `rgba(236,72,153,${0.3 + 0.2 * glow})`);
+  tGrd.addColorStop(1, 'rgba(236,72,153,0)');
+  ctx.beginPath();
+  ctx.arc(ex, ey, cell * 0.8, 0, Math.PI * 2);
+  ctx.fillStyle = tGrd;
+  ctx.fill();
+
+  // 宝箱emoji
+  ctx.font = `${cell * 0.65}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🎁', ex, ey);
+
+  /* ── 玩家 ── */
+  const px = player.x * cell + cell / 2;
+  const py = player.y * cell + cell / 2;
+  const pr = cell * 0.3;
+
+  // 玩家光晕
+  const pGrd = ctx.createRadialGradient(px, py, 0, px, py, pr * 2.5);
+  pGrd.addColorStop(0, 'rgba(124,58,237,0.7)');
+  pGrd.addColorStop(1, 'rgba(124,58,237,0)');
+  ctx.beginPath();
+  ctx.arc(px, py, pr * 2.5, 0, Math.PI * 2);
+  ctx.fillStyle = pGrd;
+  ctx.fill();
+
+  // 玩家主体
+  ctx.beginPath();
+  ctx.arc(px, py, pr, 0, Math.PI * 2);
+  ctx.fillStyle = '#A78BFA';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  /* ── 迷宫墙壁 ── */
+  ctx.strokeStyle = 'rgba(240,234,248,0.85)';
+  ctx.lineWidth = 1.5;
+  ctx.lineCap = 'round';
+
+  for (let r = 0; r < n; r++) {
+    for (let c = 0; c < n; c++) {
+      const cell_obj = maze[r][c];
+      const x0 = c * cell;
+      const y0 = r * cell;
+
+      ctx.beginPath();
+      if (cell_obj.top) {
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x0 + cell, y0);
+      }
+      if (cell_obj.right) {
+        ctx.moveTo(x0 + cell, y0);
+        ctx.lineTo(x0 + cell, y0 + cell);
+      }
+      if (cell_obj.bottom) {
+        ctx.moveTo(x0, y0 + cell);
+        ctx.lineTo(x0 + cell, y0 + cell);
+      }
+      if (cell_obj.left) {
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x0, y0 + cell);
+      }
+      ctx.stroke();
+    }
+  }
+
+  /* ── 起点标记 ── */
+  ctx.font = `${cell * 0.5}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  // 起点只在玩家不在起点时显示标记
+  if (!(player.x === 0 && player.y === 0)) {
+    ctx.globalAlpha = 0.5;
+    ctx.fillText('🚩', cell / 2, cell / 2);
+    ctx.globalAlpha = 1;
+  }
+}
+
+/* ════════════════════════════════
+   游戏循环
+   ════════════════════════════════ */
+function gameLoop() {
+  if (state === STATE.PLAYING) {
+    drawMaze();
+    drawParticles();
+  }
+  animFrame = requestAnimationFrame(gameLoop);
+}
+
+/* ════════════════════════════════
+   玩家移动
+   ════════════════════════════════ */
+function movePlayer(dir) {
+  if (state !== STATE.PLAYING) return;
+
+  const { x, y } = player;
+  const cell_obj = maze[y][x];
+
+  let nx = x, ny = y;
+  let canMove = false;
+
+  if (dir === 'up'    && !cell_obj.top)    { ny -= 1; canMove = true; }
+  if (dir === 'down'  && !cell_obj.bottom) { ny += 1; canMove = true; }
+  if (dir === 'left'  && !cell_obj.left)   { nx -= 1; canMove = true; }
+  if (dir === 'right' && !cell_obj.right)  { nx += 1; canMove = true; }
+
+  if (!canMove) return;
+
+  player.x = nx;
+  player.y = ny;
+  steps++;
+
+  // 记录轨迹
+  trail.push({ x: nx, y: ny });
+
+  // 检查金币
+  for (const coin of coins) {
+    if (!coin.collected && coin.x === nx && coin.y === ny) {
+      coin.collected = true;
+      coinsCollected++;
+      score += 5;
+      showNotify(`💰 +5分！已收集 ${coinsCollected}/${totalCoins} 枚金币`);
+      updateStats();
+    }
+  }
+
+  // 检查到达终点
+  if (nx === mazeSize - 1 && ny === mazeSize - 1) {
+    winGame();
+    return;
+  }
+
+  updateStats();
+}
+
+/* ════════════════════════════════
+   游戏控制
+   ════════════════════════════════ */
+function startGame() {
+  clearInterval(timerInterval);
+  if (animFrame) cancelAnimationFrame(animFrame);
+
+  // 生成迷宫
+  maze  = generateMaze(mazeSize);
+  coins = generateCoins(mazeSize, coinDensity);
+  totalCoins = coins.length;
+
+  // 重置状态
+  player         = { x: 0, y: 0 };
+  trail          = [{ x: 0, y: 0 }];
+  score          = 0;
+  steps          = 0;
+  coinsCollected = 0;
+  elapsed        = 0;
+  timeLeft       = timeLimit > 0 ? timeLimit : Infinity;
+  particles      = [];
+
+  state = STATE.PLAYING;
+
+  // 隐藏所有覆盖层
+  hideAllOverlays();
+
+  // 调整 Canvas 尺寸
+  resizeCanvas(mazeSize);
+
+  // 更新统计
+  updateStats();
+  syncPrizeStatus();
+
+  // 启动计时器
+  if (timeLimit > 0) {
+    timerInterval = setInterval(tickTimer, 1000);
+  }
+
+  // 启动渲染循环
+  gameLoop();
+
+  document.getElementById('statState').textContent = '探索中';
+}
+
+function resetGame() {
+  startGame();
+}
+
+function generateNewMaze() {
+  if (state === STATE.PLAYING || state === STATE.PAUSED) {
+    if (!confirm('重新生成迷宫会结束当前局，确认吗？')) return;
+  }
+  startGame();
+}
+
+function togglePause() {
+  if (state === STATE.PLAYING) {
+    state = STATE.PAUSED;
+    clearInterval(timerInterval);
+    document.getElementById('overlayPause').classList.remove('hidden');
+    document.getElementById('statState').textContent = '已暂停';
+  } else if (state === STATE.PAUSED) {
+    resumeGame();
+  }
+}
+
+function resumeGame() {
+  if (state !== STATE.PAUSED) return;
+  state = STATE.PLAYING;
+  document.getElementById('overlayPause').classList.add('hidden');
+  document.getElementById('statState').textContent = '探索中';
+  if (timeLimit > 0) {
+    timerInterval = setInterval(tickTimer, 1000);
+  }
+}
+
+function tickTimer() {
+  if (state !== STATE.PLAYING) return;
+  elapsed++;
+  if (timeLimit > 0) {
+    timeLeft = timeLimit - elapsed;
+    if (timeLeft <= 0) {
+      failGame();
+      return;
+    }
+    // 最后10秒变红
+    const el = document.getElementById('statTimer');
+    el.classList.toggle('danger', timeLeft <= 10);
+    el.textContent = timeLeft;
+  }
+  updateStats();
+}
+
+/* ─── 胜利 ─── */
+function winGame() {
+  state = STATE.WIN;
+  clearInterval(timerInterval);
+
+  // 时间加成：剩余每秒1分
+  const timeBonus = timeLimit > 0 ? Math.max(0, timeLeft) : 0;
+  score += timeBonus;
+
+  // 全收集奖励
+  let allBonus = 0;
+  if (coinsCollected >= totalCoins && totalCoins > 0) {
+    allBonus = 50;
+    score += allBonus;
+    showNotify('🏅 全部金币已收集！额外奖励 +50分');
+  }
+
+  // 更新历史
+  saveRecord(score, elapsed, coinsCollected, true);
+
+  // 显示胜利覆盖层
+  document.getElementById('winScore').textContent = score;
+  document.getElementById('winDetail').textContent =
+    `耗时 ${elapsed} 秒，收集 ${coinsCollected}/${totalCoins} 枚金币，时间加成 +${timeBonus}分`;
+
+  // 检查奖品
+  const prizeText = checkWinPrize(score);
+  document.getElementById('winPrize').textContent = prizeText;
+
+  document.getElementById('statState').textContent = '已通关';
+  document.getElementById('statTimeBonus').textContent = `+${timeBonus}`;
+
+  document.getElementById('overlayWin').classList.remove('hidden');
+
+  // 触发粒子特效
+  triggerParticles();
+
+  updateStats();
+  syncPrizeStatus();
+}
+
+/* ─── 失败 ─── */
+function failGame() {
+  state = STATE.FAIL;
+  clearInterval(timerInterval);
+
+  saveRecord(score, elapsed, coinsCollected, false);
+
+  document.getElementById('failScore').textContent = score;
+  document.getElementById('failDetail').textContent =
+    `已走 ${steps} 步，收集 ${coinsCollected}/${totalCoins} 枚金币，再试一次！`;
+  document.getElementById('overlayFail').classList.remove('hidden');
+  document.getElementById('statState').textContent = '超时失败';
+
+  updateStats();
+}
+
+/* ─── 分享 ─── */
+function shareResult() {
+  const text = `我在【迷宫寻宝】中得了 ${score} 分！耗时 ${elapsed} 秒，收集了 ${coinsCollected} 枚金币 🎁`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => showNotify('✅ 成绩已复制到剪贴板'));
+  } else {
+    showNotify('成绩：' + text);
+  }
+}
+
+/* ════════════════════════════════
+   UI 更新
+   ════════════════════════════════ */
+function updateStats() {
+  document.getElementById('statScore').textContent = score;
+  document.getElementById('statSteps').textContent = steps;
+  document.getElementById('statCoinScore').textContent = coinsCollected * 5;
+  document.getElementById('statElapsed').textContent = elapsed > 0 ? `${elapsed} 秒` : '--';
+
+  if (timeLimit > 0) {
+    const t = Math.max(0, timeLeft);
+    document.getElementById('statTimer').textContent = isFinite(t) ? t : '--';
+  } else {
+    document.getElementById('statTimer').textContent = '∞';
+  }
+
+  // 金币进度
+  const pct = totalCoins > 0 ? (coinsCollected / totalCoins * 100) : 0;
+  document.getElementById('coinProgressFill').style.width = pct + '%';
+  document.getElementById('coinCur').textContent = coinsCollected;
+  document.getElementById('coinTotalText').textContent = `/ ${totalCoins} 枚`;
+  document.getElementById('coinBonusText').textContent = `+${coinsCollected * 5}分`;
+  document.getElementById('statCoins').textContent = coinsCollected;
+}
+
+function hideAllOverlays() {
+  ['overlayStart','overlayPause','overlayWin','overlayFail'].forEach(id => {
+    document.getElementById(id).classList.add('hidden');
+  });
+}
+
+/* ─── 奖品解锁状态同步 ─── */
+function syncPrizeStatus() {
+  for (let i = 1; i <= 3; i++) {
+    const threshold = parseInt(document.getElementById(`prize${i}Score`).value) || 0;
+    const name = document.getElementById(`prize${i}Name`).value || `奖品${i}`;
+    document.getElementById(`prizeStatusName${i}`).textContent = name;
+    document.getElementById(`prizeStatusCond${i}`).textContent = `达到 ${threshold} 分解锁`;
+
+    const item = document.getElementById(`prizeItem${i}`);
+    const lock = document.getElementById(`prizeLock${i}`);
+    if (state === STATE.WIN && score >= threshold) {
+      item.classList.add('unlocked');
+      lock.textContent = '🔓';
+    } else {
+      item.classList.remove('unlocked');
+      lock.textContent = '🔒';
+    }
+  }
+}
+
+/* ─── 检查胜利奖品 ─── */
+function checkWinPrize(finalScore) {
+  let highest = '';
+  for (let i = 3; i >= 1; i--) {
+    const threshold = parseInt(document.getElementById(`prize${i}Score`).value) || 0;
+    const name = document.getElementById(`prize${i}Name`).value || '';
+    if (finalScore >= threshold && name) {
+      highest = `🎉 恭喜解锁：${name}`;
+      break;
+    }
+  }
+  return highest || '继续努力，争取解锁大奖！';
+}
+
+/* ─── 历史记录 ─── */
+function saveRecord(s, time, coinsCnt, isWin) {
+  historyRecords.unshift({ score: s, time, coins: coinsCnt, isWin, size: mazeSize });
+  if (historyRecords.length > 5) historyRecords.pop();
+
+  // 更新最高分
+  if (isWin && (bestScore === null || s > bestScore)) {
+    bestScore = s;
+    bestDetail = `${mazeSize}×${mazeSize} · ${time}秒 · ${coinsCnt}金币`;
+  }
+
+  renderHistory();
+}
+
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (historyRecords.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:10px 0;">暂无记录</div>';
+    return;
+  }
+
+  el.innerHTML = historyRecords.map((r, i) => `
+    <div class="history-item">
+      <span class="history-rank">${i + 1}</span>
+      <span class="history-info">${r.size}×${r.size} · ${r.time}s · ${r.coins}🟡 ${r.isWin ? '✅' : '❌'}</span>
+      <span class="history-score">${r.score}</span>
+    </div>
+  `).join('');
+
+  // 更新最高分显示
+  const bsEl = document.getElementById('bestScoreNum');
+  const bdEl = document.getElementById('bestDetail');
+  if (bestScore !== null) {
+    bsEl.textContent = bestScore;
+    bdEl.innerHTML = `<span>${bestDetail}</span>`;
+  }
+}
+
+/* ════════════════════════════════
+   粒子特效（胜利撒花）
+   ════════════════════════════════ */
+function triggerParticles() {
+  particles = [];
+  const W = pCanvas.width;
+  const H = pCanvas.height;
+  const colors = ['#F5C842','#EC4899','#7C3AED','#22C55E','#60A5FA','#F97316'];
+  for (let i = 0; i < 100; i++) {
+    particles.push({
+      x: W / 2, y: H / 2,
+      vx: (Math.random() - 0.5) * 8,
+      vy: (Math.random() - 0.8) * 8,
+      r: 3 + Math.random() * 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      alpha: 1,
+      life: 1
+    });
+  }
+}
+
+function drawParticles() {
+  pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+  particles = particles.filter(p => p.life > 0);
+  for (const p of particles) {
+    p.x  += p.vx;
+    p.y  += p.vy;
+    p.vy += 0.2; // 重力
+    p.life -= 0.018;
+    p.alpha = p.life;
+
+    pCtx.globalAlpha = p.alpha;
+    pCtx.beginPath();
+    pCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    pCtx.fillStyle = p.color;
+    pCtx.fill();
+  }
+  pCtx.globalAlpha = 1;
+}
+
+/* ════════════════════════════════
+   通知气泡
+   ════════════════════════════════ */
+let notifyTimer = null;
+function showNotify(text) {
+  const el = document.getElementById('notifyBubble');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth; // 强制重绘
+  el.classList.add('show');
+  clearTimeout(notifyTimer);
+  notifyTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+/* ════════════════════════════════
+   键盘控制
+   ════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  const dirMap = {
+    'ArrowUp': 'up', 'ArrowDown': 'down', 'ArrowLeft': 'left', 'ArrowRight': 'right',
+    'w': 'up', 's': 'down', 'a': 'left', 'd': 'right',
+    'W': 'up', 'S': 'down', 'A': 'left', 'D': 'right'
+  };
+  if (dirMap[e.key]) {
+    e.preventDefault();
+    movePlayer(dirMap[e.key]);
+  }
+  if (e.key === ' ') {
+    e.preventDefault();
+    if (state === STATE.IDLE) {
+      startGame();
+    } else {
+      togglePause();
+    }
+  }
+});
+
+/* ─── 虚拟方向键（触屏） ─── */
+function dpadPress(dir) {
+  movePlayer(dir);
+  const idMap = { up:'dpadUp', down:'dpadDown', left:'dpadLeft', right:'dpadRight' };
+  document.getElementById(idMap[dir]).classList.add('pressed');
+}
+function dpadRelease(dir) {
+  const idMap = { up:'dpadUp', down:'dpadDown', left:'dpadLeft', right:'dpadRight' };
+  document.getElementById(idMap[dir]).classList.remove('pressed');
+}
+
+// 桌面端也支持鼠标点击方向键
+['dpadUp','dpadDown','dpadLeft','dpadRight'].forEach(id => {
+  const el = document.getElementById(id);
+  const dirMap = { dpadUp:'up', dpadDown:'down', dpadLeft:'left', dpadRight:'right' };
+  el.addEventListener('mousedown', () => {
+    dpadPress(dirMap[id]);
+    setTimeout(() => dpadRelease(dirMap[id]), 150);
+  });
+});
+
+/* ════════════════════════════════
+   配置切换函数
+   ════════════════════════════════ */
+function setMazeSize(n) {
+  mazeSize = n;
+  document.querySelectorAll('[id^="size"]').forEach(b => b.classList.remove('active'));
+  document.getElementById(`size${n}`).classList.add('active');
+  document.getElementById('sizeDesc').textContent = `${n*n}格`;
+  document.getElementById('statSize').textContent = `${n}×${n}`;
+  // 更新金币数量预览
+  updateCoinCountDesc();
+}
+
+function setTimeLimit(t) {
+  timeLimit = t;
+  document.querySelectorAll('[id^="time"]').forEach(b => b.classList.remove('active'));
+  const idMap = { 60:'time60', 90:'time90', 120:'time120', 0:'timeInf' };
+  document.getElementById(idMap[t]).classList.add('active');
+}
+
+function setCoinDensity(d) {
+  coinDensity = d;
+  document.querySelectorAll('[id^="coin"]').forEach(b => {
+    if (b.id === 'coinCur' || b.id === 'coinTotalText' || b.id === 'coinBonusText' || b.id === 'coinCountDesc' || b.id === 'coinProgressFill') return;
+    b.classList.remove('active');
+  });
+  document.getElementById(`coin${d.charAt(0).toUpperCase() + d.slice(1)}`).classList.add('active');
+  updateCoinCountDesc();
+}
+
+function updateCoinCountDesc() {
+  const densityMap = { low: 0.06, mid: 0.12, high: 0.2 };
+  const r = densityMap[coinDensity] || 0.12;
+  const count = Math.round(mazeSize * mazeSize * r);
+  document.getElementById('coinCountDesc').textContent = `约${count}枚`;
+}
+
+/* ─── 奖品配置输入监听 ─── */
+for (let i = 1; i <= 3; i++) {
+  document.getElementById(`prize${i}Score`).addEventListener('input', syncPrizeStatus);
+  document.getElementById(`prize${i}Name`).addEventListener('input', syncPrizeStatus);
+}
+
+/* ════════════════════════════════
+   初始化
+   ════════════════════════════════ */
+(function init() {
+  resizeCanvas(mazeSize);
+  updateCoinCountDesc();
+  // 显示开始覆盖层
+  document.getElementById('overlayStart').classList.remove('hidden');
+  // 绘制一个静态预览迷宫（生成但不开始游戏）
+  maze  = generateMaze(mazeSize);
+  coins = generateCoins(mazeSize, coinDensity);
+  totalCoins = coins.length;
+  player = { x: 0, y: 0 };
+  trail  = [];
+  drawMaze();
+  // 启动渲染循环，让终点宝箱和金币有动画效果
+  animFrame = requestAnimationFrame(function loop() {
+    if (state === STATE.IDLE) {
+      drawMaze();
+    }
+    requestAnimationFrame(loop);
+  });
+})();
+</script>
+</body>
+</html>
