@@ -1487,6 +1487,11 @@ function redeemEnergy() {
   const timeStr = `${now.getMonth()+1}/${now.getDate()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
   state.history.unshift({ prize, time: timeStr, energy: state.energy });
 
+  // 排行榜 + 成就 + 金币 + 经验
+  if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'能量收集',score:state.energy||0,result:state.energy+'能量'});
+  if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('retention',1);
+  if (typeof GameUser !== 'undefined') { GameUser.addExp(8); GameUser.addCoins(6,'能量收集'); }
+
   // 重置能量
   state.energy = 0;
   FRIENDS.forEach(f => f.energy = 0);
@@ -1681,6 +1686,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

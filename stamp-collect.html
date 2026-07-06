@@ -1319,6 +1319,11 @@ function checkSetComplete(set) {
     // 更新完成标识
     updateCompleteBadge();
     showToast(`🎉 套装${set === 1 ? '一' : '二'}已集齐！可以兑换奖品啦`, 'gold');
+    // 排行榜 + 成就 + 金币 + 经验
+    const totalStamps = state.cardsPerSet || 0;
+    if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'集章',score:totalStamps*50||0,result:'集了'+totalStamps+'章'});
+    if (typeof GameAchievement !== 'undefined') { GameAchievement.trigger('retention',1); GameAchievement.unlock('stamp_complete'); }
+    if (typeof GameUser !== 'undefined') { GameUser.addExp(10); GameUser.addCoins(8,'集章'); }
   }
 }
 
@@ -1561,6 +1566,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>

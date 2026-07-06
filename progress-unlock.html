@@ -1476,6 +1476,10 @@ function doAction(action, evt) {
       setTimeout(() => burstNode(i), 400);
       // 弹窗
       setTimeout(() => showClaimModal(i), 700);
+      // 排行榜 + 成就 + 金币 + 经验
+      if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'进度解锁',score:progress||m.threshold*20||0,result:'进度'+progress+'%'});
+      if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('retention',1);
+      if (typeof GameUser !== 'undefined') { GameUser.addExp(8); GameUser.addCoins(6,'进度解锁'); }
     }
   });
 
@@ -1626,6 +1630,7 @@ function toggleSound() {
 
 <script src="sound.js"></script>
 <script src="share.js"></script>
+<script src="leaderboard.js"></script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
