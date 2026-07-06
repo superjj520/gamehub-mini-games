@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>接入文档 — GameHub 小游戏中台</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+    --deep: #1A0A2E;
+    --code-bg: #1a0d2e;
+    --nav-h: 60px;
+    --sidebar-w: 240px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    height: var(--nav-h);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.96);
+    backdrop-filter: blur(16px);
+  }
+
+  .nav-left {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none; color: var(--text);
+    font-size: 17px; font-weight: 800; letter-spacing: -0.5px;
+    white-space: nowrap;
+  }
+  .nav-logo .highlight { color: var(--gold); }
+  .nav-logo-sep {
+    color: var(--border);
+    font-size: 18px;
+    margin: 0 4px;
+  }
+  .nav-doc-label {
+    font-size: 13px; color: var(--muted); font-weight: 500;
+  }
+
+  .nav-tabs {
+    display: flex; align-items: center; gap: 4px;
+  }
+  .nav-tab {
+    padding: 6px 14px; border-radius: 8px;
+    font-size: 13px; font-weight: 500; color: var(--muted);
+    cursor: pointer; border: none; background: transparent;
+    transition: all 0.2s; text-decoration: none;
+  }
+  .nav-tab:hover { color: var(--text); background: var(--card); }
+  .nav-tab.active {
+    color: var(--text);
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.3);
+  }
+
+  .nav-right {
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .search-box {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 12px;
+    transition: border-color 0.2s;
+  }
+  .search-box:focus-within { border-color: rgba(124,58,237,0.5); }
+  .search-box svg { color: var(--muted); flex-shrink: 0; }
+  .search-input {
+    background: transparent; border: none; outline: none;
+    font-size: 13px; color: var(--text); width: 160px;
+    font-family: inherit;
+  }
+  .search-input::placeholder { color: var(--muted); }
+
+  .btn-demo {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; font-size: 13px; font-weight: 600;
+    text-decoration: none; white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+  .btn-demo:hover { opacity: 0.85; }
+
+  /* ─── 搜索高亮 ─── */
+  mark.search-highlight {
+    background: rgba(245,200,66,0.35);
+    color: var(--gold);
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+
+  /* ─── 布局主体 ─── */
+  .layout {
+    display: flex;
+    margin-top: var(--nav-h);
+    min-height: calc(100vh - var(--nav-h));
+  }
+
+  /* ─── 左侧目录 ─── */
+  .sidebar {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    position: fixed;
+    top: var(--nav-h);
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+    background: rgba(13,7,32,0.7);
+    padding: 24px 0 40px;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .sidebar-group {
+    margin-bottom: 8px;
+  }
+  .sidebar-group-title {
+    padding: 6px 20px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    color: var(--muted); text-transform: uppercase;
+    user-select: none;
+  }
+  .sidebar-item {
+    display: block; padding: 6px 20px;
+    font-size: 13px; color: var(--muted);
+    text-decoration: none; cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    line-height: 1.5;
+  }
+  .sidebar-item:hover { color: var(--text); background: var(--card); }
+  .sidebar-item.active {
+    color: #A78BFA;
+    border-left-color: var(--accent);
+    background: rgba(124,58,237,0.08);
+    font-weight: 600;
+  }
+  .sidebar-item.sub {
+    padding-left: 32px;
+    font-size: 12.5px;
+  }
+
+  /* ─── 右侧内容 ─── */
+  .content {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    padding: 40px 60px 80px 52px;
+    max-width: 900px;
+  }
+
+  /* ─── 章节标题 ─── */
+  .doc-section {
+    margin-bottom: 56px;
+    scroll-margin-top: calc(var(--nav-h) + 24px);
+  }
+
+  .section-header-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 28px;
+  }
+  .section-num {
+    width: 32px; height: 32px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 22px; font-weight: 800; letter-spacing: -0.3px;
+  }
+  .section-line {
+    flex: 1; height: 1px; background: var(--border);
+  }
+
+  .subsection {
+    margin-bottom: 36px;
+    scroll-margin-top: calc(var(--nav-h) + 24px);
+  }
+  .subsection-title {
+    font-size: 16px; font-weight: 700; margin-bottom: 14px;
+    color: var(--text);
+  }
+  .subsection-title::before {
+    content: '# ';
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  p, li {
+    font-size: 14px; line-height: 1.8; color: rgba(240,234,248,0.85);
+  }
+  ul, ol { padding-left: 20px; margin: 8px 0; }
+  li { margin-bottom: 4px; }
+
+  /* ─── 步骤卡 ─── */
+  .steps { display: flex; flex-direction: column; gap: 20px; }
+  .step-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .step-card:hover { border-color: rgba(124,58,237,0.3); }
+  .step-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(124,58,237,0.06);
+  }
+  .step-badge {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; flex-shrink: 0;
+  }
+  .step-title {
+    font-size: 14px; font-weight: 700;
+  }
+  .step-body { padding: 0; }
+
+  /* ─── 代码块 ─── */
+  .code-block {
+    position: relative;
+    background: var(--code-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 12px 0;
+  }
+  .step-card .code-block {
+    margin: 0;
+    border-radius: 0;
+    border-top: none;
+  }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .code-lang {
+    font-size: 11px; color: var(--muted);
+    font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+    letter-spacing: 0.5px;
+  }
+  .copy-btn {
+    font-size: 11px; color: var(--muted);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 5px; padding: 3px 10px;
+    cursor: pointer; transition: all 0.15s;
+    font-family: inherit;
+  }
+  .copy-btn:hover { color: var(--text); border-color: rgba(124,58,237,0.4); }
+  .copy-btn.copied {
+    color: #22C55E; border-color: rgba(34,197,94,0.4);
+    background: rgba(34,197,94,0.08);
+  }
+  pre {
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: 13px; line-height: 1.7;
+  }
+  pre::-webkit-scrollbar { height: 4px; }
+  pre::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+  code { color: #C4B5FD; }
+
+  /* 语法着色 */
+  .c-comment { color: #6B7280; font-style: italic; }
+  .c-keyword { color: #F472B6; }
+  .c-string { color: #86EFAC; }
+  .c-number { color: #FCD34D; }
+  .c-fn { color: #93C5FD; }
+  .c-prop { color: #C4B5FD; }
+  .c-tag { color: #F472B6; }
+  .c-attr { color: #FCD34D; }
+  .c-type { color: #34D399; }
+  .c-punct { color: rgba(240,234,248,0.4); }
+
+  /* ─── 表格 ─── */
+  .doc-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  .doc-table th {
+    text-align: left;
+    padding: 10px 14px;
+    background: rgba(124,58,237,0.1);
+    border: 1px solid var(--border);
+    font-size: 12px; font-weight: 700; color: #A78BFA;
+    letter-spacing: 0.3px;
+  }
+  .doc-table td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    color: rgba(240,234,248,0.85);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .doc-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .doc-table .req-yes {
+    color: #F472B6; font-weight: 600; font-size: 12px;
+  }
+  .doc-table .req-no {
+    color: var(--muted); font-size: 12px;
+  }
+  code.inline {
+    background: rgba(124,58,237,0.15);
+    color: #C4B5FD;
+    padding: 1px 6px; border-radius: 4px;
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  /* ─── 对比表格 ─── */
+  .compare-table { margin: 14px 0; }
+  .compare-table th:first-child,
+  .compare-table td:first-child { width: 120px; }
+
+  /* ─── 信息框 ─── */
+  .info-box {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 14px 16px; border-radius: 10px;
+    margin: 14px 0;
+    font-size: 13px; line-height: 1.7;
+  }
+  .info-box.tip {
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.2);
+    color: rgba(240,234,248,0.85);
+  }
+  .info-box.warn {
+    background: rgba(245,200,66,0.08);
+    border: 1px solid rgba(245,200,66,0.2);
+    color: rgba(240,234,248,0.85);
+  }
+  .info-box.note {
+    background: rgba(124,58,237,0.08);
+    border: 1px solid rgba(124,58,237,0.2);
+    color: rgba(240,234,248,0.85);
+  }
+  .info-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ─── 错误码 ─── */
+  .error-code-badge {
+    display: inline-block;
+    padding: 2px 8px; border-radius: 5px;
+    font-family: 'SF Mono', monospace; font-size: 12px; font-weight: 700;
+  }
+  .ec-ok { background: rgba(34,197,94,0.12); color: #22C55E; }
+  .ec-err { background: rgba(236,72,153,0.12); color: #EC4899; }
+
+  /* ─── FAQ ─── */
+  .faq-list { display: flex; flex-direction: column; gap: 12px; }
+  .faq-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .faq-item:hover { border-color: rgba(124,58,237,0.3); }
+  .faq-item.open { border-color: rgba(124,58,237,0.4); }
+  .faq-q {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px;
+    font-size: 14px; font-weight: 600;
+  }
+  .faq-q-left { display: flex; align-items: center; gap: 10px; }
+  .faq-q-icon {
+    width: 22px; height: 22px; border-radius: 6px;
+    background: rgba(124,58,237,0.2); color: #A78BFA;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; flex-shrink: 0;
+  }
+  .faq-chevron {
+    color: var(--muted); transition: transform 0.2s;
+  }
+  .faq-item.open .faq-chevron { transform: rotate(180deg); }
+  .faq-a {
+    display: none;
+    padding: 0 18px 16px 50px;
+    font-size: 13px; line-height: 1.8;
+    color: rgba(240,234,248,0.75);
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+  .faq-item.open .faq-a { display: block; }
+
+  /* ─── 组件小卡 ─── */
+  .component-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 16px; margin-top: 16px;
+  }
+  .component-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    transition: border-color 0.2s;
+  }
+  .component-card:hover { border-color: rgba(124,58,237,0.35); }
+  .comp-card-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  }
+  .comp-emoji { font-size: 20px; }
+  .comp-name { font-size: 15px; font-weight: 700; }
+  .comp-tag {
+    margin-left: auto;
+    padding: 2px 8px; border-radius: 5px;
+    font-size: 11px; font-weight: 600;
+    background: rgba(34,197,94,0.12); color: #22C55E;
+    border: 1px solid rgba(34,197,94,0.25);
+  }
+  .comp-desc {
+    font-size: 13px; color: var(--muted); line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  /* ─── 方法/事件表格标题 ─── */
+  .api-label {
+    font-size: 12px; font-weight: 700; color: var(--muted);
+    letter-spacing: 1px; text-transform: uppercase;
+    margin: 20px 0 8px;
+  }
+
+  /* ─── 防作弊条目 ─── */
+  .principle-list { display: flex; flex-direction: column; gap: 10px; margin: 14px 0; }
+  .principle-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 16px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--border);
+  }
+  .principle-num {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; flex-shrink: 0;
+  }
+  .principle-text { font-size: 13px; line-height: 1.7; color: rgba(240,234,248,0.85); }
+  .principle-text strong { color: var(--text); }
+
+  /* ─── 响应式 ─── */
+  @media (max-width: 960px) {
+    .sidebar { display: none; }
+    .content { margin-left: 0; padding: 24px 24px 60px; }
+    .nav-tabs { display: none; }
+    .search-box { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ 顶部导航 ═══════════════ -->
+<nav class="nav">
+  <div class="nav-left">
+    <a href="index.html" class="nav-logo">
+      🎮 <span>Game<span class="highlight">Hub</span> 中台</span>
+    </a>
+    <span class="nav-logo-sep">/</span>
+    <span class="nav-doc-label">接入文档</span>
+  </div>
+
+  <div class="nav-tabs">
+    <a class="nav-tab active" href="#quickstart">快速开始</a>
+    <a class="nav-tab" href="#api">API 参考</a>
+    <a class="nav-tab" href="#prize-pool">配置指南</a>
+    <a class="nav-tab" href="#backend">后端对接</a>
+  </div>
+
+  <div class="nav-right">
+    <div class="search-box">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input class="search-input" id="searchInput" placeholder="搜索文档…" autocomplete="off">
+    </div>
+    <a href="index.html" class="btn-demo">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+      体验 Demo
+    </a>
+  </div>
+</nav>
+
+<!-- ═══════════════ 主布局 ═══════════════ -->
+<div class="layout">
+
+  <!-- 左侧目录 -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">快速开始</div>
+      <a class="sidebar-item sub" href="#quickstart-10min">10 分钟接入</a>
+      <a class="sidebar-item sub" href="#quickstart-choose">接入方式选择</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">游戏组件 API</div>
+      <a class="sidebar-item sub" href="#api-wheel">大转盘</a>
+      <a class="sidebar-item sub" href="#api-nine">九宫格</a>
+      <a class="sidebar-item sub" href="#api-scratch">刮刮乐</a>
+      <a class="sidebar-item sub" href="#api-dice">摇骰子</a>
+      <a class="sidebar-item sub" href="#api-egg">砸金蛋</a>
+      <a class="sidebar-item sub" href="#api-more">更多组件…</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">奖池配置</div>
+      <a class="sidebar-item sub" href="#prize-structure">奖品结构</a>
+      <a class="sidebar-item sub" href="#prize-prob">概率规则</a>
+      <a class="sidebar-item sub" href="#prize-guarantee">保底机制</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">后端对接</div>
+      <a class="sidebar-item sub" href="#backend-api">抽奖接口</a>
+      <a class="sidebar-item sub" href="#backend-callback">回调协议</a>
+      <a class="sidebar-item sub" href="#backend-anticheat">防作弊</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">帮助</div>
+      <a class="sidebar-item sub" href="#faq">常见问题</a>
+    </div>
+  </aside>
+
+  <!-- 右侧内容 -->
+  <main class="content" id="docContent">
+
+    <!-- ══════════════════════════════════════
+         §1  快速开始
+    ══════════════════════════════════════ -->
+    <section class="doc-section" id="quickstart">
+      <div class="section-header-row">
+        <div class="section-num">1</div>
+        <h2 class="section-title">快速开始</h2>
+        <div class="section-line"></div>
+      </div>
+
+      <!-- 10分钟接入 -->
+      <div class="subsection" id="quickstart-10min">
+        <h3 class="subsection-title">10 分钟接入</h3>
+        <p>按以下三步即可完成大转盘游戏的完整接入，从引入脚本到响应中奖结果全部覆盖。</p>
+
+        <div class="steps" style="margin-top:16px;">
+
+          <!-- Step 1 -->
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-badge">1</div>
+              <span class="step-title">引入组件</span>
+            </div>
+            <div class="step-body">
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">html</span>
+                  <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+<pre><code><span class="c-comment">&lt;!-- 方式一：CDN 引入（推荐）--&gt;</span>
+<span class="c-tag">&lt;script</span> <span class="c-attr">src</span>=<span class="c-string">"https://cdn.gamehub.io/v1/gamehub.min.js"</span><span class="c-tag">&gt;&lt;/script&gt;</span>
+
+<span class="c-comment">&lt;!-- 方式二：npm 安装 --&gt;</span>
+npm install <span class="c-string">@gamehub/mini-games</span></code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-badge">2</div>
+              <span class="step-title">初始化游戏</span>
+            </div>
+            <div class="step-body">
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">javascript</span>
+                  <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+<pre><code><span class="c-keyword">const</span> <span class="c-prop">game</span> = <span class="c-fn">GameHub</span>.<span class="c-fn">create</span>(<span class="c-string">'lucky-wheel'</span>, {
+  <span class="c-prop">container</span>: <span class="c-string">'#game-container'</span>,
+  <span class="c-prop">prizes</span>: [
+    { <span class="c-prop">id</span>: <span class="c-string">'prize_1'</span>, <span class="c-prop">name</span>: <span class="c-string">'100元优惠券'</span>, <span class="c-prop">probability</span>: <span class="c-number">0.05</span> },
+    { <span class="c-prop">id</span>: <span class="c-string">'prize_2'</span>, <span class="c-prop">name</span>: <span class="c-string">'谢谢参与'</span>,    <span class="c-prop">probability</span>: <span class="c-number">0.50</span> },
+    <span class="c-comment">// ... 更多奖品</span>
+  ],
+  <span class="c-prop">onSpin</span>: <span class="c-keyword">async</span> () => {
+    <span class="c-comment">// 调用你的后端接口获取结果</span>
+    <span class="c-keyword">const</span> <span class="c-prop">result</span> = <span class="c-keyword">await</span> <span class="c-fn">fetch</span>(<span class="c-string">'/api/lottery/spin'</span>);
+    <span class="c-keyword">return</span> result.<span class="c-fn">json</span>(); <span class="c-comment">// { prizeId: 'prize_1' }</span>
+  },
+  <span class="c-prop">onComplete</span>: (prize) => {
+    console.<span class="c-fn">log</span>(<span class="c-string">'中奖了：'</span>, prize.<span class="c-prop">name</span>);
+  }
+});</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-badge">3</div>
+              <span class="step-title">触发抽奖</span>
+            </div>
+            <div class="step-body">
+              <div class="code-block">
+                <div class="code-header">
+                  <span class="code-lang">javascript</span>
+                  <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+<pre><code><span class="c-comment">// 用户点击后手动调用</span>
+game.<span class="c-fn">spin</span>();
+
+<span class="c-comment">// 或者让组件自动处理点击</span>
+game.<span class="c-fn">mount</span>(); <span class="c-comment">// 自动绑定点击事件</span></code></pre>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /steps -->
+
+        <div class="info-box tip" style="margin-top:20px;">
+          <span class="info-icon">✅</span>
+          <span>三步完成后刷新页面，大转盘即可正常渲染并响应抽奖操作。如需深度定制样式，参考 <code class="inline">theme</code> 和 <code class="inline">customStyles</code> 配置项。</span>
+        </div>
+      </div>
+
+      <!-- 接入方式选择 -->
+      <div class="subsection" id="quickstart-choose">
+        <h3 class="subsection-title">接入方式选择</h3>
+        <p style="margin-bottom:14px;">根据你的技术栈和场景需求，选择最合适的接入方式：</p>
+        <table class="doc-table compare-table">
+          <thead>
+            <tr>
+              <th>接入方式</th>
+              <th>接入复杂度</th>
+              <th>适用场景</th>
+              <th>定制程度</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>H5 嵌入</strong><br><code class="inline">CDN / iframe</code></td>
+              <td>⭐ 极低<br><span style="color:var(--muted);font-size:12px;">5 分钟可上线</span></td>
+              <td>H5 活动页、公众号、落地页</td>
+              <td>中等，支持主题切换</td>
+            </tr>
+            <tr>
+              <td><strong>小程序</strong><br><code class="inline">npm 包</code></td>
+              <td>⭐⭐ 低<br><span style="color:var(--muted);font-size:12px;">需 npm build</span></td>
+              <td>微信/支付宝/抖音小程序</td>
+              <td>较高，支持自定义 WXML</td>
+            </tr>
+            <tr>
+              <td><strong>SDK 集成</strong><br><code class="inline">ES Module</code></td>
+              <td>⭐⭐⭐ 中等<br><span style="color:var(--muted);font-size:12px;">需构建工具</span></td>
+              <td>React / Vue / 原生 App WebView</td>
+              <td>最高，完整 API 控制</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         §2  游戏组件 API
+    ══════════════════════════════════════ -->
+    <section class="doc-section" id="api">
+      <div class="section-header-row">
+        <div class="section-num">2</div>
+        <h2 class="section-title">游戏组件 API</h2>
+        <div class="section-line"></div>
+      </div>
+
+      <!-- 大转盘 -->
+      <div class="subsection" id="api-wheel">
+        <h3 class="subsection-title">大转盘 LuckyWheel</h3>
+        <p style="margin-bottom:16px;">经典概率转盘，支持自定义格数、主题色、动效速度与保底策略。</p>
+
+        <div class="api-label">配置参数</div>
+        <table class="doc-table">
+          <thead>
+            <tr><th>参数名</th><th>类型</th><th>必填</th><th>默认值</th><th>说明</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="inline">container</code></td>
+              <td><code class="inline">string | Element</code></td>
+              <td class="req-yes">必填</td>
+              <td>—</td>
+              <td>CSS 选择器或 DOM 元素</td>
+            </tr>
+            <tr>
+              <td><code class="inline">prizes</code></td>
+              <td><code class="inline">Prize[]</code></td>
+              <td class="req-yes">必填</td>
+              <td>—</td>
+              <td>奖品列表，见下方 Prize 结构</td>
+            </tr>
+            <tr>
+              <td><code class="inline">theme</code></td>
+              <td><code class="inline">string</code></td>
+              <td class="req-no">否</td>
+              <td><code class="inline">'default'</code></td>
+              <td>主题：<code class="inline">default</code> / <code class="inline">red</code> / <code class="inline">ocean</code> / <code class="inline">gold</code></td>
+            </tr>
+            <tr>
+              <td><code class="inline">dailyLimit</code></td>
+              <td><code class="inline">number</code></td>
+              <td class="req-no">否</td>
+              <td><code class="inline">3</code></td>
+              <td>每日抽奖次数上限，0 表示不限</td>
+            </tr>
+            <tr>
+              <td><code class="inline">guarantee</code></td>
+              <td><code class="inline">object</code></td>
+              <td class="req-no">否</td>
+              <td><code class="inline">null</code></td>
+              <td>保底配置，详见奖池配置章节</td>
+            </tr>
+            <tr>
+              <td><code class="inline">onSpin</code></td>
+              <td><code class="inline">async function</code></td>
+              <td class="req-yes">必填</td>
+              <td>—</td>
+              <td>抽奖回调，需返回 <code class="inline">{ prizeId }</code></td>
+            </tr>
+            <tr>
+              <td><code class="inline">onComplete</code></td>
+              <td><code class="inline">function</code></td>
+              <td class="req-no">否</td>
+              <td>—</td>
+              <td>结果动画播放完成回调，参数为 Prize 对象</td>
+            </tr>
+            <tr>
+              <td><code class="inline">onError</code></td>
+              <td><code class="inline">function</code></td>
+              <td class="req-no">否</td>
+              <td>—</td>
+              <td>错误处理，参数为 Error 对象</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="api-label" style="margin-top:24px;">Prize 对象结构</div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">typescript</span>
+            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+          </div>
+<pre><code><span class="c-keyword">interface</span> <span class="c-type">Prize</span> {
+  <span class="c-prop">id</span>:          <span class="c-type">string</span>;   <span class="c-comment">// 奖品唯一 ID</span>
+  <span class="c-prop">name</span>:        <span class="c-type">string</span>;   <span class="c-comment">// 奖品名称</span>
+  <span class="c-prop">probability</span>: <span class="c-type">number</span>;   <span class="c-comment">// 概率 0–1，所有奖品之和应 ≤ 1</span>
+  <span class="c-prop">stock</span>?:      <span class="c-type">number</span>;   <span class="c-comment">// 库存，不传则不限</span>
+  <span class="c-prop">emoji</span>?:      <span class="c-type">string</span>;   <span class="c-comment">// 显示图标，如 '🎁'</span>
+  <span class="c-prop">color</span>?:      <span class="c-type">string</span>;   <span class="c-comment">// 格子背景色，如 '#7C3AED'</span>
+}</code></pre>
+        </div>
+
+        <div class="api-label" style="margin-top:24px;">Methods 实例方法</div>
+        <table class="doc-table">
+          <thead>
+            <tr><th>方法</th><th>参数</th><th>返回值</th><th>说明</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="inline">spin()</code></td>
+              <td>—</td>
+              <td><code class="inline">Promise&lt;Prize&gt;</code></td>
+              <td>触发一次抽奖，异步返回中奖奖品</td>
+            </tr>
+            <tr>
+              <td><code class="inline">reset()</code></td>
+              <td>—</td>
+              <td><code class="inline">void</code></td>
+              <td>重置状态（次数/动画），不销毁实例</td>
+            </tr>
+            <tr>
+              <td><code class="inline">updatePrizes(prizes)</code></td>
+              <td><code class="inline">Prize[]</code></td>
+              <td><code class="inline">void</code></td>
+              <td>动态更新奖品列表，实时生效</td>
+            </tr>
+            <tr>
+              <td><code class="inline">destroy()</code></td>
+              <td>—</td>
+              <td><code class="inline">void</code></td>
+              <td>销毁实例，解绑所有事件，释放内存</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="api-label" style="margin-top:24px;">Events 事件</div>
+        <table class="doc-table">
+          <thead>
+            <tr><th>事件名</th><th>触发时机</th><th>回调参数</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="inline">spin-start</code></td>
+              <td>转盘开始旋转时</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code class="inline">spin-end</code></td>
+              <td>转盘停止、后端结果返回后</td>
+              <td><code class="inline">{ prize: Prize }</code></td>
+            </tr>
+            <tr>
+              <td><code class="inline">prize-claimed</code></td>
+              <td>用户确认领奖弹窗后</td>
+              <td><code class="inline">{ prize: Prize, serialNo: string }</code></td>
+            </tr>
+            <tr>
+              <td><code class="inline">error</code></td>
+              <td>抽奖请求失败或超时</td>
+              <td><code class="inline">{ code: number, message: string }</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 其他4个组件 -->
+      <div class="subsection" id="api-nine">
+        <h3 class="subsection-title">九宫格 NineGrid</h3>
+      </div>
+      <div class="subsection" id="api-scratch">
+        <h3 class="subsection-title">刮刮乐 ScratchCard</h3>
+      </div>
+      <div class="subsection" id="api-dice">
+        <h3 class="subsection-title">摇骰子 ShakeDice</h3>
+      </div>
+      <div class="subsection" id="api-egg">
+        <h3 class="subsection-title">砸金蛋 SmashEgg</h3>
+      </div>
+      <div class="subsection" id="api-more">
+        <h3 class="subsection-title">更多组件…</h3>
+      </div>
+
+      <div class="component-cards">
+        <div class="component-card">
+          <div class="comp-card-header">
+            <span class="comp-emoji">🎯</span>
+            <span class="comp-name">九宫格 NineGrid</span>
+            <span class="comp-tag">Phase 1</span>
+          </div>
+          <p class="comp-desc">九格跑马灯抽奖，按概率顺序循环高亮。核心差异参数：</p>
+          <code class="inline">speed</code> — 初始滚动速度（ms）&nbsp;&nbsp;
+          <code class="inline">loops</code> — 最少滚动圈数（默认 3）&nbsp;&nbsp;
+          <code class="inline">layout</code> — 支持 <code class="inline">3x3</code> / <code class="inline">3x4</code>
+        </div>
+        <div class="component-card">
+          <div class="comp-card-header">
+            <span class="comp-emoji">🎴</span>
+            <span class="comp-name">刮刮乐 ScratchCard</span>
+            <span class="comp-tag">Phase 1</span>
+          </div>
+          <p class="comp-desc">Canvas 手绘刮涂层，刮开面积达阈值后自动揭晓奖品。核心差异参数：</p>
+          <code class="inline">revealThreshold</code> — 刮开比例触发（默认 0.6）&nbsp;&nbsp;
+          <code class="inline">brushSize</code> — 画笔粗细（默认 24px）&nbsp;&nbsp;
+          <code class="inline">coverImage</code> — 涂层图片 URL
+        </div>
+        <div class="component-card">
+          <div class="comp-card-header">
+            <span class="comp-emoji">🎲</span>
+            <span class="comp-name">摇骰子 ShakeDice</span>
+            <span class="comp-tag">Phase 1</span>
+          </div>
+          <p class="comp-desc">陀螺仪摇一摇触发（移动端）或点击触发，3D 骰子动效。核心差异参数：</p>
+          <code class="inline">diceCount</code> — 骰子个数（1~3）&nbsp;&nbsp;
+          <code class="inline">shakeThreshold</code> — 摇动灵敏度（默认 15）&nbsp;&nbsp;
+          <code class="inline">animDuration</code> — 动画时长（ms）
+        </div>
+        <div class="component-card">
+          <div class="comp-card-header">
+            <span class="comp-emoji">🥚</span>
+            <span class="comp-name">砸金蛋 SmashEgg</span>
+            <span class="comp-tag">Phase 1</span>
+          </div>
+          <p class="comp-desc">点击金蛋破壳动画，支持多蛋多选或单蛋必中。核心差异参数：</p>
+          <code class="inline">eggCount</code> — 金蛋数量（1~9）&nbsp;&nbsp;
+          <code class="inline">selectCount</code> — 允许选择个数（默认 1）&nbsp;&nbsp;
+          <code class="inline">showBeforeReveal</code> — 破蛋前展示悬念动效
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         §3  奖池配置
+    ══════════════════════════════════════ -->
+    <section class="doc-section" id="prize-pool">
+      <div class="section-header-row">
+        <div class="section-num">3</div>
+        <h2 class="section-title">奖池配置</h2>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="subsection" id="prize-structure">
+        <h3 class="subsection-title">奖品结构</h3>
+        <p>每个奖品是一个 <code class="inline">Prize</code> 对象，最少提供 <code class="inline">id</code>、<code class="inline">name</code>、<code class="inline">probability</code> 三个字段。建议同时配置 <code class="inline">stock</code> 以防止热门奖品超发。</p>
+        <div class="code-block" style="margin-top:14px;">
+          <div class="code-header">
+            <span class="code-lang">javascript</span>
+            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+          </div>
+<pre><code><span class="c-keyword">const</span> <span class="c-prop">prizes</span> = [
+  { <span class="c-prop">id</span>: <span class="c-string">'p1'</span>, <span class="c-prop">name</span>: <span class="c-string">'iPhone 15'</span>,  <span class="c-prop">probability</span>: <span class="c-number">0.001</span>, <span class="c-prop">stock</span>: <span class="c-number">5</span>,   <span class="c-prop">emoji</span>: <span class="c-string">'📱'</span> },
+  { <span class="c-prop">id</span>: <span class="c-string">'p2'</span>, <span class="c-prop">name</span>: <span class="c-string">'100元券'</span>,  <span class="c-prop">probability</span>: <span class="c-number">0.05</span>,  <span class="c-prop">stock</span>: <span class="c-number">200</span>, <span class="c-prop">emoji</span>: <span class="c-string">'🎟'</span>  },
+  { <span class="c-prop">id</span>: <span class="c-string">'p3'</span>, <span class="c-prop">name</span>: <span class="c-string">'10元券'</span>,   <span class="c-prop">probability</span>: <span class="c-number">0.15</span>,  <span class="c-prop">stock</span>: <span class="c-number">500</span>, <span class="c-prop">emoji</span>: <span class="c-string">'🎫'</span>  },
+  { <span class="c-prop">id</span>: <span class="c-string">'p4'</span>, <span class="c-prop">name</span>: <span class="c-string">'谢谢参与'</span>, <span class="c-prop">probability</span>: <span class="c-number">0.799</span>              },
+];</code></pre>
+        </div>
+        <div class="info-box note">
+          <span class="info-icon">💡</span>
+          <span>所有奖品概率之和建议等于 1.0。若总和小于 1，剩余概率会自动分配给概率最高的奖品（通常是"谢谢参与"）。</span>
+        </div>
+      </div>
+
+      <div class="subsection" id="prize-prob">
+        <h3 class="subsection-title">概率规则</h3>
+        <p style="margin-bottom:12px;">GameHub 采用<strong>服务端加权随机</strong>算法确定最终奖品，前端只负责播放动效，杜绝客户端作弊。概率计算流程如下：</p>
+        <ol style="margin-left:20px; line-height:2;">
+          <li>服务端按 <code class="inline">probability</code> 权重生成随机数，命中对应奖品区间</li>
+          <li>检查该奖品库存，若已售罄则按概率降级到下一个有库存奖品</li>
+          <li>触发保底检查（如已配置），条件满足时强制覆盖为保底奖品</li>
+          <li>返回最终 <code class="inline">prizeId</code> 给前端，前端播放对应格子的动效</li>
+        </ol>
+        <div class="info-box warn">
+          <span class="info-icon">⚠️</span>
+          <span>前端传入的 <code class="inline">probability</code> 仅用于本地 Demo 模式预览；生产环境中实际中奖结果完全由后端决定，前端概率配置不影响真实发奖。</span>
+        </div>
+      </div>
+
+      <div class="subsection" id="prize-guarantee">
+        <h3 class="subsection-title">保底机制</h3>
+        <p style="margin-bottom:14px;">为提升用户留存，可配置连续 N 次未中指定奖品后强制触发保底：</p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">javascript</span>
+            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+          </div>
+<pre><code><span class="c-prop">guarantee</span>: {
+  <span class="c-prop">enabled</span>:      <span class="c-keyword">true</span>,
+  <span class="c-prop">triggerAfter</span>: <span class="c-number">5</span>,          <span class="c-comment">// 连续 N 次未中大奖后触发</span>
+  <span class="c-prop">prizes</span>:      [<span class="c-string">'prize_1'</span>, <span class="c-string">'prize_3'</span>]  <span class="c-comment">// 保底奖品范围（随机命中其一）</span>
+}</code></pre>
+        </div>
+        <p style="margin-top:14px;margin-bottom:10px;"><strong>库存控制说明</strong></p>
+        <p>配置 <code class="inline">stock</code> 字段后，每次发奖自动扣减库存。库存归零时该奖品自动下架，抽奖结果降级为备用奖品（概率最高且有库存的奖品）。建议对高价值奖品始终配置 <code class="inline">stock</code>，避免超发风险。</p>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         §4  后端对接
+    ══════════════════════════════════════ -->
+    <section class="doc-section" id="backend">
+      <div class="section-header-row">
+        <div class="section-num">4</div>
+        <h2 class="section-title">后端对接</h2>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="subsection" id="backend-api">
+        <h3 class="subsection-title">抽奖接口规范</h3>
+        <p style="margin-bottom:16px;">GameHub 前端通过 <code class="inline">onSpin</code> 回调调用业务方自有后端，接口格式建议遵循以下规范以便使用中台提供的签名验签工具。</p>
+
+        <p style="margin-bottom:10px; color:var(--muted); font-size:13px; font-weight:600;">▸ 请求（前端 → 后端）</p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">json</span>
+            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+          </div>
+<pre><code><span class="c-fn">POST</span> <span class="c-string">/api/lottery/spin</span>
+{
+  <span class="c-prop">"gameId"</span>:    <span class="c-string">"activity_001"</span>,
+  <span class="c-prop">"userId"</span>:    <span class="c-string">"user_123"</span>,
+  <span class="c-prop">"gameType"</span>:  <span class="c-string">"lucky-wheel"</span>,
+  <span class="c-prop">"timestamp"</span>: <span class="c-number">1720000000</span>,
+  <span class="c-prop">"sign"</span>:      <span class="c-string">"md5(gameId + userId + timestamp + secret)"</span>
+}</code></pre>
+        </div>
+
+        <p style="margin-top:20px; margin-bottom:10px; color:var(--muted); font-size:13px; font-weight:600;">▸ 响应（后端 → 前端）</p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">json</span>
+            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+          </div>
+<pre><code>{
+  <span class="c-prop">"code"</span>: <span class="c-number">0</span>,
+  <span class="c-prop">"data"</span>: {
+    <span class="c-prop">"prizeId"</span>:      <span class="c-string">"prize_1"</span>,
+    <span class="c-prop">"prizeName"</span>:    <span class="c-string">"100元优惠券"</span>,
+    <span class="c-prop">"serialNo"</span>:     <span class="c-string">"LT20260706001234"</span>,
+    <span class="c-prop">"remainChance"</span>: <span class="c-number">2</span>
+  }
+}</code></pre>
+        </div>
+
+        <div class="api-label" style="margin-top:24px;">错误码说明</div>
+        <table class="doc-table">
+          <thead>
+            <tr><th>code</th><th>含义</th><th>前端处理建议</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="error-code-badge ec-ok">0</span></td>
+              <td>成功</td>
+              <td>播放中奖动效</td>
+            </tr>
+            <tr>
+              <td><span class="error-code-badge ec-err">1001</span></td>
+              <td>今日次数已用完</td>
+              <td>展示「明日再来」提示，禁用按钮</td>
+            </tr>
+            <tr>
+              <td><span class="error-code-badge ec-err">1002</span></td>
+              <td>库存不足</td>
+              <td>降级展示备用奖品，不报错</td>
+            </tr>
+            <tr>
+              <td><span class="error-code-badge ec-err">1003</span></td>
+              <td>签名错误</td>
+              <td>检查 secret 配置，不暴露给用户</td>
+            </tr>
+            <tr>
+              <td><span class="error-code-badge ec-err">1004</span></td>
+              <td>活动未开始</td>
+              <td>展示活动倒计时</td>
+            </tr>
+            <tr>
+              <td><span class="error-code-badge ec-err">1005</span></td>
+              <td>活动已结束</td>
+              <td>展示活动结束页</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection" id="backend-callback">
+        <h3 class="subsection-title">回调协议</h3>
+        <p style="margin-bottom:14px;">中奖后如需异步通知业务后端（如发放优惠券、积分），可配置 <code class="inline">callbackUrl</code>，GameHub 服务端将在用户确认领奖后主动推送：</p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">json</span>
+            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+          </div>
+<pre><code><span class="c-fn">POST</span> <span class="c-string">{callbackUrl}</span>
+{
+  <span class="c-prop">"event"</span>:     <span class="c-string">"prize.claimed"</span>,
+  <span class="c-prop">"gameId"</span>:    <span class="c-string">"activity_001"</span>,
+  <span class="c-prop">"userId"</span>:    <span class="c-string">"user_123"</span>,
+  <span class="c-prop">"prizeId"</span>:   <span class="c-string">"prize_1"</span>,
+  <span class="c-prop">"serialNo"</span>:  <span class="c-string">"LT20260706001234"</span>,
+  <span class="c-prop">"timestamp"</span>: <span class="c-number">1720000100</span>,
+  <span class="c-prop">"sign"</span>:      <span class="c-string">"md5(gameId+userId+serialNo+timestamp+secret)"</span>
+}</code></pre>
+        </div>
+        <div class="info-box tip">
+          <span class="info-icon">✅</span>
+          <span>业务后端收到回调后，需在 5 秒内返回 HTTP 200 及 <code class="inline">{"code":0}</code>，否则 GameHub 将按指数退避重试，最多 5 次。</span>
+        </div>
+      </div>
+
+      <div class="subsection" id="backend-anticheat">
+        <h3 class="subsection-title">防作弊说明</h3>
+        <div class="principle-list">
+          <div class="principle-item">
+            <div class="principle-num">1</div>
+            <div class="principle-text">
+              <strong>结果由后端决定</strong> — 前端 <code class="inline">onSpin</code> 回调必须请求业务后端，由服务端完成随机抽奖并返回 <code class="inline">prizeId</code>。禁止在前端 JS 中直接决定中奖结果，否则用户可通过修改 JS 变量获取任意奖品。
+            </div>
+          </div>
+          <div class="principle-item">
+            <div class="principle-num">2</div>
+            <div class="principle-text">
+              <strong>时间戳签名验签</strong> — 每次抽奖请求携带 <code class="inline">timestamp</code> 和 <code class="inline">sign</code>（HMAC-MD5），后端验证签名有效且时间戳在 ±60 秒内，防止重放攻击。<code class="inline">secret</code> 务必保存在服务端，不得写入前端代码。
+            </div>
+          </div>
+          <div class="principle-item">
+            <div class="principle-num">3</div>
+            <div class="principle-text">
+              <strong>接口限流</strong> — 建议对 <code class="inline">/api/lottery/spin</code> 接口按用户 ID 限制 QPS（推荐 1 次/秒），同时在数据库层对 <code class="inline">serialNo</code> 加唯一索引，确保同一请求不被重复发奖。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         §5  常见问题
+    ══════════════════════════════════════ -->
+    <section class="doc-section" id="faq">
+      <div class="section-header-row">
+        <div class="section-num">5</div>
+        <h2 class="section-title">常见问题</h2>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">
+            <div class="faq-q-left">
+              <div class="faq-q-icon">Q</div>
+              <span>转盘指针停止后没有弹出中奖弹窗，是什么原因？</span>
+            </div>
+            <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+          <div class="faq-a">
+            通常是 <code class="inline">onSpin</code> 回调返回的 <code class="inline">prizeId</code> 与 <code class="inline">prizes</code> 列表中的 <code class="inline">id</code> 不匹配。请检查后端返回值是否与前端配置的奖品 ID 完全一致（区分大小写）。也可临时开启 <code class="inline">debug: true</code> 选项，控制台会输出详细匹配日志。
+          </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">
+            <div class="faq-q-left">
+              <div class="faq-q-icon">Q</div>
+              <span>每日次数限制是前端控制还是后端控制？能否绕过？</span>
+            </div>
+            <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+          <div class="faq-a">
+            <code class="inline">dailyLimit</code> 参数仅做前端 UI 层拦截（禁用按钮、展示提示），不可作为安全保障。<strong>真正可信的次数校验必须在后端实现</strong>：后端收到请求时先查询该用户当日已抽次数，超限则返回错误码 1001。前端限制可清除 localStorage 绕过，请务必不要省略后端校验。
+          </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">
+            <div class="faq-q-left">
+              <div class="faq-q-icon">Q</div>
+              <span>能在微信小程序中使用吗？有哪些限制？</span>
+            </div>
+            <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+          <div class="faq-a">
+            支持微信小程序，需通过 npm 方式接入（<code class="inline">npm install @gamehub/mini-games</code>），在小程序开发者工具中执行「构建 npm」后即可使用。注意：Canvas 2D 模式在真机上性能更好，刮刮乐组件会自动检测环境并使用 WebGL 降级方案。陀螺仪摇骰子需在 <code class="inline">app.json</code> 中申请 <code class="inline">scope.deviceMotion</code> 权限。
+          </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">
+            <div class="faq-q-left">
+              <div class="faq-q-icon">Q</div>
+              <span>如何自定义转盘/格子的样式，不想用内置主题？</span>
+            </div>
+            <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+          <div class="faq-a">
+            在 <code class="inline">Prize</code> 对象上设置 <code class="inline">color</code>（格子背景色）和 <code class="inline">emoji</code>（图标）可完成基础定制。需要深度定制（自定义字体、边框、指针图片等），使用 <code class="inline">customStyles</code> 配置对象，支持传入 CSS 变量覆盖。极端情况可设置 <code class="inline">renderMode: 'custom'</code>，由组件仅负责概率逻辑，渲染层完全由业务方接管。
+          </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">
+            <div class="faq-q-left">
+              <div class="faq-q-icon">Q</div>
+              <span>回调通知失败了，用户已看到中奖弹窗，奖品还会发吗？</span>
+            </div>
+            <svg class="faq-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+          <div class="faq-a">
+            GameHub 服务端会按指数退避重试回调，最多 5 次（间隔约 1s→2s→4s→8s→16s）。若全部失败，该 <code class="inline">serialNo</code> 会进入<strong>待处理队列</strong>，可在管理后台手动触发补发或查看详情。建议业务后端实现幂等处理：以 <code class="inline">serialNo</code> 为唯一键，重复回调时直接返回成功而不重复发奖。
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// ─── 代码复制 ───
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  // 取纯文本，去掉 HTML 标签
+  const text = pre.innerText || pre.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '已复制 ✓';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '复制';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    // 降级方案
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '已复制 ✓';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '复制';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// ─── FAQ 折叠 ───
+function toggleFaq(el) {
+  el.classList.toggle('open');
+}
+
+// ─── 目录高亮（IntersectionObserver）───
+const sidebarItems = document.querySelectorAll('.sidebar-item');
+const sections = document.querySelectorAll('[id]');
+
+const observerOptions = {
+  rootMargin: '-64px 0px -60% 0px',
+  threshold: 0
+};
+
+const activeIds = new Set();
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      activeIds.add(entry.target.id);
+    } else {
+      activeIds.delete(entry.target.id);
+    }
+  });
+  updateSidebar();
+}, observerOptions);
+
+sections.forEach(s => observer.observe(s));
+
+function updateSidebar() {
+  // 找最靠前的可见 section
+  let topId = null;
+  let topY = Infinity;
+  activeIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < topY) { topY = rect.top; topId = id; }
+    }
+  });
+
+  sidebarItems.forEach(item => {
+    const href = item.getAttribute('href');
+    if (!href) return;
+    const targetId = href.replace('#', '');
+    item.classList.toggle('active', targetId === topId);
+  });
+}
+
+// ─── 顶部导航 tab 同步 ───
+const navTabs = document.querySelectorAll('.nav-tab[href^="#"]');
+const sectionMap = {
+  'quickstart': 0,
+  'quickstart-10min': 0,
+  'quickstart-choose': 0,
+  'api': 1,
+  'api-wheel': 1,
+  'api-nine': 1,
+  'api-scratch': 1,
+  'api-dice': 1,
+  'api-egg': 1,
+  'api-more': 1,
+  'prize-pool': 2,
+  'prize-structure': 2,
+  'prize-prob': 2,
+  'prize-guarantee': 2,
+  'backend': 3,
+  'backend-api': 3,
+  'backend-callback': 3,
+  'backend-anticheat': 3,
+  'faq': 3,
+};
+
+const secObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const tabIdx = sectionMap[entry.target.id];
+      if (tabIdx !== undefined) {
+        navTabs.forEach((t, i) => t.classList.toggle('active', i === tabIdx));
+      }
+    }
+  });
+}, { rootMargin: '-64px 0px -50% 0px', threshold: 0 });
+
+document.querySelectorAll('.doc-section').forEach(s => secObserver.observe(s));
+
+// ─── 搜索高亮 ───
+const searchInput = document.getElementById('searchInput');
+const docContent = document.getElementById('docContent');
+let originalHTML = null;
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim();
+
+  // 第一次触发时保存原始 HTML
+  if (originalHTML === null) {
+    originalHTML = docContent.innerHTML;
+  }
+
+  // 还原
+  docContent.innerHTML = originalHTML;
+
+  if (!q || q.length < 2) return;
+
+  // 高亮文本节点中的关键词
+  highlightText(docContent, q);
+});
+
+function highlightText(root, keyword) {
+  const re = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const skip = ['SCRIPT', 'STYLE', 'CODE', 'PRE'];
+      if (skip.includes(node.parentNode.tagName)) return NodeFilter.FILTER_REJECT;
+      return re.test(node.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+    }
+  });
+
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+
+  nodes.forEach(node => {
+    re.lastIndex = 0;
+    const span = document.createElement('span');
+    span.innerHTML = node.nodeValue.replace(re, m => `<mark class="search-highlight">${m}</mark>`);
+    node.parentNode.replaceChild(span, node);
+  });
+
+  // 滚动到第一个高亮处
+  const first = docContent.querySelector('mark.search-highlight');
+  if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// 清空搜索时还原
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    searchInput.value = '';
+    if (originalHTML) {
+      docContent.innerHTML = originalHTML;
+      originalHTML = null;
+    }
+    searchInput.blur();
+  }
+});
+</script>
+</body>
+</html>
