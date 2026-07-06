@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 成长树养成</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 导航栏 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    height: 52px;
+    gap: 16px;
+    overflow: hidden;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 16px; font-weight: 700;
+    text-decoration: none; color: var(--text);
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-scroll {
+    display: flex; gap: 2px;
+    overflow-x: auto; flex: 1;
+    scrollbar-width: none;
+  }
+  .nav-scroll::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 6px 12px; border-radius: 6px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  /* ─── 三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    height: calc(100vh - 52px - 40px);
+    overflow: hidden;
+  }
+
+  /* ─── 左侧面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.5px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold); flex-shrink: 0;
+  }
+
+  /* ─── 表单控件 ─── */
+  .form-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 0; font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .form-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .form-label {
+    flex: 1; color: var(--muted); font-size: 12px;
+  }
+  .form-input {
+    width: 90px; background: rgba(255,255,255,0.07);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 8px; color: var(--text); font-size: 12px;
+    text-align: center; transition: border 0.2s;
+  }
+  .form-input:focus { outline: none; border-color: var(--accent); }
+  .form-input-wide {
+    width: 100%; background: rgba(255,255,255,0.07);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 10px; color: var(--text); font-size: 13px;
+    transition: border 0.2s; margin-bottom: 10px;
+  }
+  .form-input-wide:focus { outline: none; border-color: var(--accent); }
+
+  /* 阶段奖品配置 */
+  .stage-config-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .stage-config-row:last-child { border-bottom: none; }
+  .stage-emoji { font-size: 16px; flex-shrink: 0; width: 24px; text-align: center; }
+  .stage-name { width: 50px; color: var(--gold); font-weight: 600; flex-shrink: 0; }
+  .stage-prize-input {
+    flex: 1; background: rgba(255,255,255,0.07);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 8px; color: var(--text); font-size: 12px;
+  }
+  .stage-prize-input:focus { outline: none; border-color: var(--accent2); }
+
+  /* 应用按钮 */
+  .btn-apply {
+    width: 100%; padding: 9px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 8px;
+    color: #fff; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: opacity 0.2s;
+    margin-top: 4px;
+  }
+  .btn-apply:hover { opacity: 0.85; }
+
+  /* ─── 中间游戏区 ─── */
+  .panel-center {
+    display: flex; flex-direction: column;
+    overflow: hidden; position: relative;
+  }
+
+  /* 场景区域 */
+  .scene {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, #0a0520 0%, #1a1050 40%, #0D0720 100%);
+    min-height: 0;
+  }
+
+  /* 天空星星 */
+  .stars {
+    position: absolute; inset: 0; pointer-events: none;
+  }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: #fff;
+    animation: twinkle var(--dur) ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
+  }
+
+  /* 太阳/月亮 */
+  .sun {
+    position: absolute;
+    top: 20px; right: 60px;
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #FFE066 0%, #F5C842 60%, rgba(245,200,66,0) 100%);
+    box-shadow: 0 0 30px 10px rgba(245,200,66,0.3);
+    animation: sunPulse 4s ease-in-out infinite;
+  }
+  @keyframes sunPulse {
+    0%, 100% { box-shadow: 0 0 30px 10px rgba(245,200,66,0.3); }
+    50% { box-shadow: 0 0 50px 20px rgba(245,200,66,0.5); }
+  }
+
+  /* 云朵 */
+  .cloud {
+    position: absolute;
+    background: rgba(255,255,255,0.07);
+    border-radius: 50px;
+    animation: floatCloud linear infinite;
+  }
+  .cloud::before, .cloud::after {
+    content: '';
+    position: absolute;
+    background: rgba(255,255,255,0.07);
+    border-radius: 50%;
+  }
+  @keyframes floatCloud {
+    0% { transform: translateX(-120px); }
+    100% { transform: translateX(calc(100vw + 120px)); }
+  }
+
+  /* 地面 */
+  .ground {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 90px;
+    background: linear-gradient(180deg, #2d1a0a 0%, #1a0e05 100%);
+    border-top: 2px solid rgba(100,60,20,0.5);
+  }
+  .ground::before {
+    content: '';
+    position: absolute;
+    top: -8px; left: 0; right: 0;
+    height: 16px;
+    background: linear-gradient(180deg, #4a2e12 0%, #2d1a0a 100%);
+    border-radius: 8px 8px 0 0;
+  }
+
+  /* 泥土纹理小点 */
+  .ground-dots {
+    position: absolute;
+    top: 6px; left: 0; right: 0;
+    display: flex; flex-wrap: wrap; gap: 4px;
+    padding: 0 8px;
+    pointer-events: none;
+  }
+  .ground-dot {
+    width: 3px; height: 2px;
+    background: rgba(200,140,60,0.3);
+    border-radius: 50%;
+  }
+
+  /* ─── 树木容器 ─── */
+  .tree-container {
+    position: absolute;
+    bottom: 85px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* ─── 阶段1：种子 ─── */
+  .tree-stage-1 .tree-main {
+    width: 18px; height: 18px;
+    background: radial-gradient(circle, #8B5E3C 0%, #5C3A1E 100%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow: 0 2px 8px rgba(92,58,30,0.5);
+    position: relative;
+  }
+  .tree-stage-1 .tree-main::after {
+    content: '';
+    position: absolute;
+    top: -4px; left: 50%; transform: translateX(-50%);
+    width: 3px; height: 6px;
+    background: #5C3A1E;
+    border-radius: 2px;
+  }
+
+  /* ─── 阶段2：嫩芽 ─── */
+  .tree-stage-2 .tree-main {
+    position: relative;
+    width: 30px; height: 40px;
+  }
+  /* 茎 */
+  .tree-stage-2 .tree-main::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 24px;
+    background: linear-gradient(180deg, #5a9a3a 0%, #3d6e27 100%);
+    border-radius: 2px;
+  }
+  /* 左叶 */
+  .leaf-l {
+    position: absolute;
+    bottom: 14px; left: 0;
+    width: 16px; height: 22px;
+    background: radial-gradient(ellipse at 60% 30%, #7bc94a 0%, #4a8a2a 100%);
+    border-radius: 50% 0 50% 50%;
+    transform: rotate(-30deg);
+    transform-origin: right bottom;
+  }
+  /* 右叶 */
+  .leaf-r {
+    position: absolute;
+    bottom: 14px; right: 0;
+    width: 16px; height: 22px;
+    background: radial-gradient(ellipse at 40% 30%, #7bc94a 0%, #4a8a2a 100%);
+    border-radius: 0 50% 50% 50%;
+    transform: rotate(30deg);
+    transform-origin: left bottom;
+  }
+
+  /* ─── 阶段3：幼树 ─── */
+  .tree-stage-3 .tree-main {
+    position: relative;
+    width: 60px; height: 80px;
+  }
+  .tree-stage-3 .trunk {
+    position: absolute;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 10px; height: 40px;
+    background: linear-gradient(180deg, #8B6914 0%, #5C4010 100%);
+    border-radius: 3px;
+  }
+  .tree-stage-3 .crown {
+    position: absolute;
+    bottom: 30px; left: 50%; transform: translateX(-50%);
+    width: 50px; height: 55px;
+    background: radial-gradient(ellipse at 50% 60%, #5ab832 0%, #2d7a1a 80%);
+    border-radius: 50% 50% 40% 40%;
+  }
+  .tree-stage-3 .crown::before {
+    content: '';
+    position: absolute;
+    top: -15px; left: 50%; transform: translateX(-50%);
+    width: 35px; height: 35px;
+    background: radial-gradient(ellipse, #6dca3a 0%, #3d8a20 100%);
+    border-radius: 50%;
+  }
+
+  /* ─── 阶段4：大树 ─── */
+  .tree-stage-4 .tree-main {
+    position: relative;
+    width: 110px; height: 130px;
+  }
+  .tree-stage-4 .trunk {
+    position: absolute;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 16px; height: 60px;
+    background: linear-gradient(180deg, #9B7520 0%, #6B4E10 100%);
+    border-radius: 4px;
+  }
+  /* 根部微微展开 */
+  .tree-stage-4 .trunk::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: -5px;
+    width: 10px; height: 20px;
+    background: #6B4E10;
+    border-radius: 0 0 4px 8px;
+    transform: rotate(-10deg);
+  }
+  .tree-stage-4 .trunk::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: -5px;
+    width: 10px; height: 20px;
+    background: #6B4E10;
+    border-radius: 0 0 8px 4px;
+    transform: rotate(10deg);
+  }
+  .tree-stage-4 .crown {
+    position: absolute;
+    bottom: 45px; left: 50%; transform: translateX(-50%);
+    width: 90px; height: 70px;
+    background: radial-gradient(ellipse at 50% 65%, #4db028 0%, #2a7015 80%);
+    border-radius: 50% 50% 40% 40%;
+  }
+  .tree-stage-4 .crown::before {
+    content: '';
+    position: absolute;
+    top: -25px; left: 50%; transform: translateX(-50%);
+    width: 70px; height: 55px;
+    background: radial-gradient(ellipse, #5dc830 0%, #328018 100%);
+    border-radius: 50%;
+  }
+  .tree-stage-4 .crown::after {
+    content: '';
+    position: absolute;
+    top: -10px; left: -10px;
+    width: 45px; height: 45px;
+    background: radial-gradient(ellipse, #5dc830 0%, #328018 100%);
+    border-radius: 50%;
+  }
+
+  /* ─── 阶段5：开花 ─── */
+  .tree-stage-5 .tree-main {
+    position: relative;
+    width: 130px; height: 150px;
+  }
+  .tree-stage-5 .trunk {
+    position: absolute;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 18px; height: 65px;
+    background: linear-gradient(180deg, #9B7520 0%, #6B4E10 100%);
+    border-radius: 5px;
+  }
+  .tree-stage-5 .trunk::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: -6px;
+    width: 12px; height: 22px;
+    background: #6B4E10;
+    border-radius: 0 0 4px 8px;
+    transform: rotate(-10deg);
+  }
+  .tree-stage-5 .trunk::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: -6px;
+    width: 12px; height: 22px;
+    background: #6B4E10;
+    border-radius: 0 0 8px 4px;
+    transform: rotate(10deg);
+  }
+  .tree-stage-5 .crown {
+    position: absolute;
+    bottom: 50px; left: 50%; transform: translateX(-50%);
+    width: 110px; height: 80px;
+    background: radial-gradient(ellipse at 50% 65%, #4db028 0%, #2a7015 80%);
+    border-radius: 50% 50% 40% 40%;
+  }
+  .tree-stage-5 .crown::before {
+    content: '';
+    position: absolute;
+    top: -30px; left: 50%; transform: translateX(-50%);
+    width: 85px; height: 65px;
+    background: radial-gradient(ellipse, #5dc830 0%, #328018 100%);
+    border-radius: 50%;
+  }
+  /* 花朵 */
+  .flower {
+    position: absolute;
+    width: 14px; height: 14px;
+  }
+  .flower::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, #FFB6C1 50%, #FF69B4 100%);
+    box-shadow: 0 0 6px rgba(255,105,180,0.6);
+  }
+  .flower::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #FFE066;
+  }
+
+  /* ─── 阶段6：结果 ─── */
+  .tree-stage-6 .tree-main {
+    position: relative;
+    width: 150px; height: 170px;
+  }
+  .tree-stage-6 .trunk {
+    position: absolute;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 20px; height: 70px;
+    background: linear-gradient(180deg, #9B7520 0%, #6B4E10 100%);
+    border-radius: 5px;
+  }
+  .tree-stage-6 .trunk::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: -8px;
+    width: 14px; height: 25px;
+    background: #6B4E10;
+    border-radius: 0 0 4px 10px;
+    transform: rotate(-12deg);
+  }
+  .tree-stage-6 .trunk::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: -8px;
+    width: 14px; height: 25px;
+    background: #6B4E10;
+    border-radius: 0 0 10px 4px;
+    transform: rotate(12deg);
+  }
+  .tree-stage-6 .crown {
+    position: absolute;
+    bottom: 54px; left: 50%; transform: translateX(-50%);
+    width: 130px; height: 90px;
+    background: radial-gradient(ellipse at 50% 65%, #4db028 0%, #2a7015 80%);
+    border-radius: 50% 50% 40% 40%;
+  }
+  .tree-stage-6 .crown::before {
+    content: '';
+    position: absolute;
+    top: -35px; left: 50%; transform: translateX(-50%);
+    width: 100px; height: 75px;
+    background: radial-gradient(ellipse, #5dc830 0%, #328018 100%);
+    border-radius: 50%;
+  }
+  /* 果实 */
+  .fruit {
+    position: absolute;
+    width: 16px; height: 18px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: radial-gradient(circle at 35% 35%, #FF6B6B 0%, #CC1010 80%);
+    box-shadow: 0 2px 6px rgba(200,20,20,0.4);
+  }
+  .fruit::before {
+    content: '';
+    position: absolute;
+    top: -4px; left: 50%; transform: translateX(-50%);
+    width: 2px; height: 6px;
+    background: #5C4010;
+    border-radius: 1px;
+  }
+  .fruit::after {
+    content: '';
+    position: absolute;
+    top: -5px; left: 54%;
+    width: 8px; height: 6px;
+    border: 2px solid #3a7020;
+    border-bottom: none;
+    border-radius: 50% 50% 0 0;
+    transform: rotate(20deg);
+  }
+
+  /* ─── 光圈升级效果 ─── */
+  .upgrade-ring {
+    position: absolute;
+    bottom: 85px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .upgrade-ring.animate {
+    animation: ringExpand 0.8s ease-out forwards;
+  }
+  @keyframes ringExpand {
+    0% { opacity: 1; transform: translateX(-50%) scale(0.2); }
+    100% { opacity: 0; transform: translateX(-50%) scale(2.5); }
+  }
+
+  /* ─── 水滴动画 ─── */
+  .water-drop {
+    position: absolute;
+    width: 8px; height: 12px;
+    border-radius: 50% 50% 60% 60%;
+    background: linear-gradient(180deg, #60c8ff 0%, #0090e0 100%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 20;
+    filter: drop-shadow(0 2px 4px rgba(0,144,224,0.6));
+  }
+  .water-drop.falling {
+    animation: waterFall 0.8s ease-in forwards;
+  }
+  @keyframes waterFall {
+    0% { opacity: 1; transform: translateY(0) scaleX(0.8); }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(260px) scaleX(1.2) scaleY(0.3); }
+  }
+
+  /* 土地湿润 */
+  .wet-ground {
+    position: absolute;
+    bottom: 85px;
+    left: 50%; transform: translateX(-50%);
+    width: 60px; height: 8px;
+    background: radial-gradient(ellipse, rgba(0,100,200,0.5) 0%, transparent 100%);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 5;
+  }
+  .wet-ground.show { opacity: 1; animation: wetFade 1.5s ease-out forwards; }
+  @keyframes wetFade {
+    0% { opacity: 0.8; width: 60px; }
+    100% { opacity: 0; width: 90px; }
+  }
+
+  /* ─── 金色粒子 ─── */
+  .particle {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    pointer-events: none;
+    z-index: 15;
+    opacity: 0;
+  }
+  .particle.burst {
+    animation: particleBurst 1s ease-out forwards;
+  }
+  @keyframes particleBurst {
+    0% { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0); }
+  }
+
+  /* ─── 能量进度条 ─── */
+  .energy-bar-area {
+    padding: 16px 24px 14px;
+    background: rgba(13,7,32,0.6);
+    border-top: 1px solid var(--border);
+  }
+  .energy-bar-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .energy-stage-label {
+    font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .energy-stage-emoji { font-size: 18px; }
+  .energy-num {
+    font-size: 12px; color: var(--muted);
+  }
+  .energy-num span { color: var(--gold); font-weight: 700; }
+  .bar-track {
+    height: 10px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    border-radius: 10px;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+  }
+  .bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 16px; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+    border-radius: 0 10px 10px 0;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+  }
+
+  /* ─── 操作按钮 ─── */
+  .action-area {
+    padding: 14px 24px 16px;
+    display: flex; gap: 10px;
+    background: rgba(13,7,32,0.8);
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .action-btn {
+    flex: 1; min-width: 100px;
+    padding: 10px 12px;
+    border-radius: 10px; border: none;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    position: relative;
+    overflow: hidden;
+  }
+  .action-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.1);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .action-btn:hover:not(:disabled)::before { opacity: 1; }
+  .action-btn:active:not(:disabled) { transform: scale(0.96); }
+  .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .action-btn .btn-icon { font-size: 20px; }
+  .action-btn .btn-text { font-size: 12px; }
+  .action-btn .btn-count {
+    font-size: 10px; color: rgba(255,255,255,0.6);
+  }
+  .btn-water {
+    background: linear-gradient(135deg, #0a7fd4, #0051a8);
+    color: #fff;
+  }
+  .btn-sign {
+    background: linear-gradient(135deg, #2d8a1e, #1a5c0e);
+    color: #fff;
+  }
+  .btn-share {
+    background: linear-gradient(135deg, #9b3aed, #6b1acc);
+    color: #fff;
+  }
+  .btn-invite {
+    background: linear-gradient(135deg, #ec4899, #b91c6a);
+    color: #fff;
+  }
+
+  /* 收获按钮 */
+  .harvest-area {
+    padding: 14px 24px;
+    background: rgba(13,7,32,0.8);
+    border-top: 1px solid var(--border);
+    display: none;
+  }
+  .harvest-area.show { display: block; }
+  .btn-harvest {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--gold), #e8a800);
+    border: none; border-radius: 12px;
+    color: #1a0a00; font-size: 15px; font-weight: 800;
+    cursor: pointer; transition: all 0.2s;
+    letter-spacing: 0.5px;
+    animation: harvestPulse 1.5s ease-in-out infinite;
+  }
+  @keyframes harvestPulse {
+    0%, 100% { box-shadow: 0 4px 20px rgba(245,200,66,0.4); }
+    50% { box-shadow: 0 4px 40px rgba(245,200,66,0.8); }
+  }
+  .btn-harvest:hover { transform: scale(1.02); }
+
+  /* 枯萎预警 */
+  .wither-warning {
+    margin: 0 24px 10px;
+    padding: 8px 14px;
+    background: rgba(255, 80, 60, 0.12);
+    border: 1px solid rgba(255,80,60,0.3);
+    border-radius: 8px;
+    font-size: 12px; color: #ff6b5b;
+    display: none; align-items: center; gap: 8px;
+  }
+  .wither-warning.show { display: flex; }
+
+  /* ─── 右侧数据面板 ─── */
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .stat-title {
+    font-size: 11px; color: var(--muted); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .stat-main {
+    font-size: 28px; font-weight: 800;
+    color: var(--gold); line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-sub {
+    font-size: 12px; color: var(--muted);
+  }
+  .stat-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 0; font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-row .label { color: var(--muted); font-size: 12px; }
+  .stat-row .value { font-weight: 600; }
+  .stat-row .value.gold { color: var(--gold); }
+  .stat-row .value.green { color: #4db028; }
+  .stat-row .value.pink { color: var(--accent2); }
+
+  /* 阶段进度 */
+  .stage-progress {
+    display: flex; flex-direction: column; gap: 6px;
+    margin-top: 4px;
+  }
+  .stage-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 10px;
+    border-radius: 8px; font-size: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid transparent;
+    transition: all 0.3s;
+  }
+  .stage-item.done { border-color: rgba(77,176,40,0.3); }
+  .stage-item.current {
+    border-color: var(--gold);
+    background: rgba(245,200,66,0.08);
+  }
+  .stage-item.locked { opacity: 0.4; }
+  .stage-item .stage-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    background: var(--border);
+  }
+  .stage-item.done .stage-dot { background: #4db028; }
+  .stage-item.current .stage-dot { background: var(--gold); animation: dotPulse 1s ease-in-out infinite; }
+  @keyframes dotPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .stage-item .stage-name { flex: 1; }
+  .stage-item .stage-req { color: var(--muted); font-size: 11px; }
+
+  /* 奖品预览 */
+  .prize-preview {
+    background: rgba(245,200,66,0.06);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: 6px;
+    font-size: 13px;
+    text-align: center;
+  }
+  .prize-preview .prize-name { color: var(--gold); font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .prize-preview .prize-desc { color: var(--muted); font-size: 12px; }
+
+  /* ─── 底部状态栏 ─── */
+  .statusbar {
+    height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-top: 1px solid var(--border);
+    background: rgba(13,7,32,0.8);
+    font-size: 12px; color: var(--muted);
+    gap: 20px;
+    flex-shrink: 0;
+  }
+  .statusbar .dot { color: var(--gold); }
+
+  /* ─── Toast提示 ─── */
+  .toast {
+    position: fixed;
+    top: 70px; left: 50%; transform: translateX(-50%) translateY(-10px);
+    background: rgba(30,15,60,0.95);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 14px; font-weight: 600;
+    color: var(--text);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 999;
+    transition: all 0.3s;
+    white-space: nowrap;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ─── 收获弹窗 ─── */
+  .harvest-modal {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: none; align-items: center; justify-content: center;
+  }
+  .harvest-modal.show { display: flex; }
+  .harvest-box {
+    background: var(--deep);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 48px;
+    text-align: center;
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .harvest-box .big-emoji { font-size: 64px; margin-bottom: 16px; }
+  .harvest-box h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; color: var(--gold); }
+  .harvest-box p { color: var(--muted); font-size: 14px; margin-bottom: 6px; }
+  .harvest-box .prize-box {
+    background: rgba(245,200,66,0.1);
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 12px;
+    padding: 14px 24px;
+    margin: 16px 0;
+    color: var(--gold); font-size: 16px; font-weight: 700;
+  }
+  .harvest-modal-btns {
+    display: flex; gap: 12px; justify-content: center;
+    margin-top: 20px;
+  }
+  .btn-modal-close {
+    padding: 10px 28px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text); font-size: 14px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-modal-close:hover { background: rgba(255,255,255,0.12); }
+  .btn-modal-restart {
+    padding: 10px 28px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: #fff; font-size: 14px;
+    font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-modal-restart:hover { opacity: 0.85; }
+</style>
+</head>
+<body>
+
+<!-- ─── 导航栏 ─── -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">
+    🎮 <span>GameHub</span>
+  </a>
+  <div class="nav-scroll">
+    <a class="nav-tab" href="index.html">首页</a>
+    <a class="nav-tab" href="wheel.html">大转盘</a>
+    <a class="nav-tab" href="nine-grid.html">九宫格</a>
+    <a class="nav-tab" href="scratch-card.html">刮刮乐</a>
+    <a class="nav-tab" href="shake-dice.html">摇骰子</a>
+    <a class="nav-tab" href="smash-egg.html">砸金蛋</a>
+    <a class="nav-tab" href="slot-machine.html">老虎机</a>
+    <a class="nav-tab" href="gift-box.html">礼盒开箱</a>
+    <a class="nav-tab" href="whack-mole.html">打地鼠</a>
+    <a class="nav-tab" href="cup-game.html">三杯游戏</a>
+    <a class="nav-tab" href="number-bomb.html">数字炸弹</a>
+    <a class="nav-tab" href="stamp-collect.html">集卡集章</a>
+    <a class="nav-tab" href="vote-pk.html">投票PK</a>
+    <a class="nav-tab" href="gashapon.html">扭蛋机</a>
+    <a class="nav-tab" href="blind-box.html">盲盒抽卡</a>
+    <a class="nav-tab" href="game-2048.html">2048</a>
+    <a class="nav-tab" href="match3.html">消消乐</a>
+    <a class="nav-tab" href="catch-coins.html">接金币</a>
+    <a class="nav-tab active" href="grow-tree.html">成长树</a>
+    <a class="nav-tab" href="flying-chess.html">飞行棋</a>
+    <a class="nav-tab" href="monopoly.html">大富翁</a>
+    <a class="nav-tab" href="red-packet-rain.html">红包雨</a>
+    <a class="nav-tab" href="claw-machine.html">夹娃娃机</a>
+    <a class="nav-tab" href="flip-match.html">翻牌配对</a>
+    <a class="nav-tab" href="shake.html">摇一摇</a>
+    <a class="nav-tab" href="quiz.html">问答闯关</a>
+    <a class="nav-tab" href="daily-checkin.html">每日签到</a>
+  </div>
+</nav>
+
+<!-- ─── 三列主体 ─── -->
+<div class="main">
+
+  <!-- ═══════ 左侧配置面板 ═══════ -->
+  <aside class="panel-left">
+    <div class="panel-title">⚙ 活动配置</div>
+
+    <!-- 基础设置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>基础设置</div>
+      <input type="text" class="form-input-wide" id="activityName" value="我的成长树" placeholder="活动名称">
+      <div class="form-row">
+        <span class="form-label">开始时间</span>
+        <input type="date" class="form-input" id="startDate">
+      </div>
+      <div class="form-row">
+        <span class="form-label">结束时间</span>
+        <input type="date" class="form-input" id="endDate">
+      </div>
+      <div class="form-row">
+        <span class="form-label">每日浇水上限</span>
+        <input type="number" class="form-input" id="waterLimit" value="5" min="1" max="20">
+      </div>
+    </div>
+
+    <!-- 行为能量奖励 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>行为能量奖励</div>
+      <div class="form-row">
+        <span class="form-label">💧 浇水 +能量</span>
+        <input type="number" class="form-input" id="energyWater" value="5" min="1">
+      </div>
+      <div class="form-row">
+        <span class="form-label">📅 签到 +能量</span>
+        <input type="number" class="form-input" id="energySign" value="10" min="1">
+      </div>
+      <div class="form-row">
+        <span class="form-label">📤 分享 +能量</span>
+        <input type="number" class="form-input" id="energyShare" value="15" min="1">
+      </div>
+      <div class="form-row">
+        <span class="form-label">👥 邀请好友 +能量</span>
+        <input type="number" class="form-input" id="energyInvite" value="30" min="1">
+      </div>
+      <div class="form-row">
+        <span class="form-label">每日自然消耗</span>
+        <input type="number" class="form-input" id="dailyDecay" value="3" min="0" max="50">
+      </div>
+    </div>
+
+    <!-- 阶段奖品配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>各阶段解锁奖品</div>
+      <div class="stage-config-row">
+        <span class="stage-emoji">🌱</span>
+        <span class="stage-name">种子</span>
+        <input type="text" class="stage-prize-input" id="prize1" value="无" placeholder="奖品名称">
+      </div>
+      <div class="stage-config-row">
+        <span class="stage-emoji">🌿</span>
+        <span class="stage-name">嫩芽</span>
+        <input type="text" class="stage-prize-input" id="prize2" value="积分×10" placeholder="奖品名称">
+      </div>
+      <div class="stage-config-row">
+        <span class="stage-emoji">🌲</span>
+        <span class="stage-name">幼树</span>
+        <input type="text" class="stage-prize-input" id="prize3" value="优惠券5元" placeholder="奖品名称">
+      </div>
+      <div class="stage-config-row">
+        <span class="stage-emoji">🌳</span>
+        <span class="stage-name">大树</span>
+        <input type="text" class="stage-prize-input" id="prize4" value="优惠券20元" placeholder="奖品名称">
+      </div>
+      <div class="stage-config-row">
+        <span class="stage-emoji">🌸</span>
+        <span class="stage-name">开花</span>
+        <input type="text" class="stage-prize-input" id="prize5" value="神秘礼品" placeholder="奖品名称">
+      </div>
+      <div class="stage-config-row">
+        <span class="stage-emoji">🍎</span>
+        <span class="stage-name">结果</span>
+        <input type="text" class="stage-prize-input" id="prize6" value="大奖·价值99元礼包" placeholder="奖品名称">
+      </div>
+    </div>
+
+    <button class="btn-apply" onclick="applyConfig()">✓ 应用配置</button>
+  </aside>
+
+  <!-- ═══════ 中间游戏区 ═══════ -->
+  <main class="panel-center">
+
+    <!-- 枯萎预警 -->
+    <div class="wither-warning" id="witherWarning">
+      <span>⚠️</span>
+      <span>树苗有点干渴了，快来浇水吧！能量每天会自然消耗 <strong id="decayShow">3</strong> 点</span>
+    </div>
+
+    <!-- 场景 -->
+    <div class="scene" id="scene">
+      <!-- 星星背景（JS动态生成） -->
+      <div class="stars" id="starsContainer"></div>
+      <!-- 太阳 -->
+      <div class="sun"></div>
+
+      <!-- 树木容器 -->
+      <div class="tree-container" id="treeContainer">
+        <!-- 树木（JS动态渲染） -->
+      </div>
+
+      <!-- 升级光圈 -->
+      <div class="upgrade-ring" id="upgradeRing"></div>
+      <!-- 土地湿润 -->
+      <div class="wet-ground" id="wetGround"></div>
+
+      <!-- 地面 -->
+      <div class="ground">
+        <div class="ground-dots" id="groundDots"></div>
+      </div>
+    </div>
+
+    <!-- 能量进度条 -->
+    <div class="energy-bar-area">
+      <div class="energy-bar-header">
+        <div class="energy-stage-label">
+          <span class="energy-stage-emoji" id="curStageEmoji">🌱</span>
+          <span id="curStageName">种子阶段</span>
+        </div>
+        <div class="energy-num">
+          能量：<span id="curEnergy">0</span> / <span id="nextEnergy">20</span>
+        </div>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" id="barFill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="action-area" id="actionArea">
+      <button class="action-btn btn-water" id="btnWater" onclick="doAction('water')">
+        <span class="btn-icon">💧</span>
+        <span class="btn-text">浇水</span>
+        <span class="btn-count" id="waterCountTip">今日剩余 5 次</span>
+      </button>
+      <button class="action-btn btn-sign" id="btnSign" onclick="doAction('sign')">
+        <span class="btn-icon">📅</span>
+        <span class="btn-text">签到</span>
+        <span class="btn-count" id="signCountTip">今日可签到</span>
+      </button>
+      <button class="action-btn btn-share" id="btnShare" onclick="doAction('share')">
+        <span class="btn-icon">📤</span>
+        <span class="btn-text">分享</span>
+        <span class="btn-count" id="shareCountTip">今日剩余 3 次</span>
+      </button>
+      <button class="action-btn btn-invite" id="btnInvite" onclick="doAction('invite')">
+        <span class="btn-icon">👥</span>
+        <span class="btn-text">邀请好友</span>
+        <span class="btn-count" id="inviteCountTip">今日剩余 2 次</span>
+      </button>
+    </div>
+
+    <!-- 收获按钮（仅第6阶段显示） -->
+    <div class="harvest-area" id="harvestArea">
+      <button class="btn-harvest" onclick="doHarvest()">
+        🍎 收获果实，兑换奖品！
+      </button>
+    </div>
+  </main>
+
+  <!-- ═══════ 右侧数据面板 ═══════ -->
+  <aside class="panel-right">
+    <div class="panel-title">📊 成长数据</div>
+
+    <!-- 当前阶段卡片 -->
+    <div class="stat-card">
+      <div class="stat-title">当前阶段</div>
+      <div class="stat-main" id="statStageNum">第1阶段</div>
+      <div class="stat-sub" id="statStageName">🌱 种子 · 萌芽中</div>
+    </div>
+
+    <!-- 关键数值 -->
+    <div class="stat-card">
+      <div class="stat-title">能量统计</div>
+      <div class="stat-row">
+        <span class="label">当前能量</span>
+        <span class="value gold" id="rCurEnergy">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="label">今日获得</span>
+        <span class="value green" id="rTodayEnergy">+0</span>
+      </div>
+      <div class="stat-row">
+        <span class="label">累计获得</span>
+        <span class="value" id="rTotalEnergy">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="label">距下阶段还需</span>
+        <span class="value pink" id="rNextNeeded">20</span>
+      </div>
+    </div>
+
+    <!-- 今日行为次数 -->
+    <div class="stat-card">
+      <div class="stat-title">今日行为</div>
+      <div class="stat-row">
+        <span class="label">💧 浇水次数</span>
+        <span class="value gold" id="rWaterCount">0 次</span>
+      </div>
+      <div class="stat-row">
+        <span class="label">📅 已签到</span>
+        <span class="value" id="rSignStatus">未签到</span>
+      </div>
+      <div class="stat-row">
+        <span class="label">📤 分享次数</span>
+        <span class="value" id="rShareCount">0 次</span>
+      </div>
+      <div class="stat-row">
+        <span class="label">👥 邀请次数</span>
+        <span class="value" id="rInviteCount">0 次</span>
+      </div>
+    </div>
+
+    <!-- 阶段进度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>阶段进度</div>
+      <div class="stage-progress" id="stageProgress"></div>
+    </div>
+
+    <!-- 下阶段奖品预览 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>下阶段奖品</div>
+      <div class="prize-preview" id="prizePreview">
+        <div class="prize-name" id="previewPrizeName">积分×10</div>
+        <div class="prize-desc" id="previewPrizeDesc">解锁 🌿 嫩芽阶段获得</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- ─── 底部状态栏 ─── -->
+<div class="statusbar">
+  <span>6阶段成长 <span class="dot">·</span> localStorage跨日</span>
+  <span class="dot">|</span>
+  <span>多行为能量获取</span>
+  <span class="dot">|</span>
+  <span id="statusActivity">成长树养成</span>
+</div>
+
+<!-- Toast提示 -->
+<div class="toast" id="toast"></div>
+
+<!-- 收获弹窗 -->
+<div class="harvest-modal" id="harvestModal">
+  <div class="harvest-box">
+    <div class="big-emoji">🍎</div>
+    <h2>恭喜！果实成熟了！</h2>
+    <p>你的树木经历了漫长的成长，终于结出了果实</p>
+    <div class="prize-box" id="harvestPrizeName">大奖·价值99元礼包</div>
+    <p style="font-size:12px;margin-bottom:0">请联系活动运营人员领取奖品</p>
+    <div class="harvest-modal-btns">
+      <button class="btn-modal-close" onclick="closeHarvestModal()">关闭</button>
+      <button class="btn-modal-restart" onclick="restartTree()">🌱 重新种植</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// 常量与配置
+// ─────────────────────────────────────────────
+
+/** 6个成长阶段定义 */
+const STAGES = [
+  { id: 1, emoji: '🌱', name: '种子',   minEnergy: 0,   maxEnergy: 20  },
+  { id: 2, emoji: '🌿', name: '嫩芽',   minEnergy: 20,  maxEnergy: 60  },
+  { id: 3, emoji: '🌲', name: '幼树',   minEnergy: 60,  maxEnergy: 150 },
+  { id: 4, emoji: '🌳', name: '大树',   minEnergy: 150, maxEnergy: 300 },
+  { id: 5, emoji: '🌸', name: '开花',   minEnergy: 300, maxEnergy: 500 },
+  { id: 6, emoji: '🍎', name: '结果',   minEnergy: 500, maxEnergy: 999 },
+];
+
+/** 行为每日次数上限 */
+const ACTION_LIMITS = {
+  water:  5,
+  sign:   1,
+  share:  3,
+  invite: 2,
+};
+
+// ─────────────────────────────────────────────
+// 状态 (localStorage持久化)
+// ─────────────────────────────────────────────
+let state = {};
+
+/** 获取今日日期字符串 YYYY-MM-DD */
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/** 加载状态，跨日重置每日计数 */
+function loadState() {
+  const raw = localStorage.getItem('growTree_state');
+  if (raw) {
+    try { state = JSON.parse(raw); } catch(e) { state = {}; }
+  }
+  const today = todayKey();
+  // 初始化或跨日重置
+  if (!state.energy) state.energy = 0;
+  if (!state.totalEnergy) state.totalEnergy = 0;
+  if (!state.stageId) state.stageId = 1;
+  if (!state.harvestCount) state.harvestCount = 0;
+  // 跨日处理
+  if (state.lastDate !== today) {
+    // 记录前一天日期，自然消耗能量
+    if (state.lastDate) {
+      const decay = getConfig('dailyDecay');
+      state.energy = Math.max(0, state.energy - decay);
+    }
+    state.lastDate = today;
+    state.todayEnergy = 0;
+    state.waterCount = 0;
+    state.signDone = false;
+    state.shareCount = 0;
+    state.inviteCount = 0;
+  }
+  saveState();
+}
+
+/** 保存状态 */
+function saveState() {
+  localStorage.setItem('growTree_state', JSON.stringify(state));
+}
+
+// ─────────────────────────────────────────────
+// 配置读取
+// ─────────────────────────────────────────────
+function getConfig(key) {
+  const el = document.getElementById(key);
+  if (!el) return 0;
+  const v = parseFloat(el.value);
+  return isNaN(v) ? 0 : v;
+}
+
+function getPrize(stageId) {
+  const el = document.getElementById('prize' + stageId);
+  return el ? el.value.trim() : '';
+}
+
+/** 应用配置（点击按钮时） */
+function applyConfig() {
+  // 更新枯萎提示中的数值
+  document.getElementById('decayShow').textContent = getConfig('dailyDecay');
+  // 更新底部活动名
+  document.getElementById('statusActivity').textContent =
+    document.getElementById('activityName').value || '成长树养成';
+  renderAll();
+  showToast('✅ 配置已应用');
+}
+
+// ─────────────────────────────────────────────
+// 阶段计算
+// ─────────────────────────────────────────────
+
+/** 根据能量计算当前阶段 */
+function calcStage(energy) {
+  for (let i = STAGES.length - 1; i >= 0; i--) {
+    if (energy >= STAGES[i].minEnergy) return STAGES[i];
+  }
+  return STAGES[0];
+}
+
+/** 进度百分比（当前阶段内） */
+function calcProgress(energy) {
+  const stage = calcStage(energy);
+  if (stage.id === 6) return 100;
+  const range = stage.maxEnergy - stage.minEnergy;
+  const cur = energy - stage.minEnergy;
+  return Math.min(100, Math.round(cur / range * 100));
+}
+
+// ─────────────────────────────────────────────
+// 树木HTML生成
+// ─────────────────────────────────────────────
+
+/** 根据阶段生成树木HTML */
+function buildTreeHTML(stageId) {
+  switch (stageId) {
+    case 1:
+      return `<div class="tree-stage-1"><div class="tree-main"></div></div>`;
+    case 2:
+      return `
+        <div class="tree-stage-2">
+          <div class="tree-main">
+            <div class="leaf-l"></div>
+            <div class="leaf-r"></div>
+          </div>
+        </div>`;
+    case 3:
+      return `
+        <div class="tree-stage-3">
+          <div class="tree-main">
+            <div class="crown"></div>
+            <div class="trunk"></div>
+          </div>
+        </div>`;
+    case 4:
+      return `
+        <div class="tree-stage-4">
+          <div class="tree-main">
+            <div class="crown"></div>
+            <div class="trunk"></div>
+          </div>
+        </div>`;
+    case 5:
+      // 开花：树冠上随机散落花朵
+      let flowers = '';
+      const flowerPositions = [
+        {top:'10px', left:'15px'}, {top:'5px', left:'42px'}, {top:'18px', left:'68px'},
+        {top:'30px', left:'8px'}, {top:'38px', left:'55px'}, {top:'15px', left:'85px'},
+        {top:'-2px', left:'30px'}, {top:'50px', left:'20px'}, {top:'45px', left:'75px'},
+      ];
+      flowerPositions.forEach(p => {
+        flowers += `<div class="flower" style="top:${p.top};left:${p.left}"></div>`;
+      });
+      return `
+        <div class="tree-stage-5">
+          <div class="tree-main">
+            <div class="crown" style="position:relative">${flowers}</div>
+            <div class="trunk"></div>
+          </div>
+        </div>`;
+    case 6:
+      // 结果：挂满红苹果
+      let fruits = '';
+      const fruitPositions = [
+        {top:'20px', left:'10px'}, {top:'30px', left:'38px'}, {top:'15px', left:'65px'},
+        {top:'45px', left:'15px'}, {top:'50px', left:'55px'}, {top:'60px', left:'32px'},
+        {top:'5px', left:'48px'}, {top:'40px', left:'80px'}, {top:'70px', left:'18px'},
+        {top:'25px', left:'90px'}, {top:'65px', left:'65px'},
+      ];
+      fruitPositions.forEach(p => {
+        fruits += `<div class="fruit" style="top:${p.top};left:${p.left}"></div>`;
+      });
+      return `
+        <div class="tree-stage-6">
+          <div class="tree-main">
+            <div class="crown" style="position:relative">${fruits}</div>
+            <div class="trunk"></div>
+          </div>
+        </div>`;
+    default:
+      return `<div class="tree-stage-1"><div class="tree-main"></div></div>`;
+  }
+}
+
+// ─────────────────────────────────────────────
+// 渲染函数
+// ─────────────────────────────────────────────
+
+function renderAll() {
+  const energy = state.energy;
+  const stage = calcStage(energy);
+  const progress = calcProgress(energy);
+  const nextStage = STAGES[stage.id] || null;
+  const nextNeeded = nextStage ? nextStage.minEnergy - energy : 0;
+
+  // ── 渲染树木 ──
+  const prevStageId = state.stageId || 1;
+  const isUpgrade = stage.id > prevStageId;
+  document.getElementById('treeContainer').innerHTML = buildTreeHTML(stage.id);
+  if (isUpgrade) {
+    state.stageId = stage.id;
+    saveState();
+    triggerUpgradeEffect();
+  }
+
+  // ── 能量进度条 ──
+  document.getElementById('curStageEmoji').textContent = stage.emoji;
+  document.getElementById('curStageName').textContent = stage.name + ' 阶段';
+  document.getElementById('curEnergy').textContent = energy;
+  document.getElementById('nextEnergy').textContent =
+    stage.id === 6 ? '已满' : nextStage.minEnergy;
+  document.getElementById('barFill').style.width = progress + '%';
+
+  // ── 右侧数据 ──
+  document.getElementById('statStageNum').textContent = '第' + stage.id + '阶段';
+  document.getElementById('statStageName').textContent =
+    stage.emoji + ' ' + stage.name + ' · 生长中';
+  document.getElementById('rCurEnergy').textContent = energy;
+  document.getElementById('rTodayEnergy').textContent = '+' + (state.todayEnergy || 0);
+  document.getElementById('rTotalEnergy').textContent = state.totalEnergy || 0;
+  document.getElementById('rNextNeeded').textContent =
+    stage.id === 6 ? '已结果' : nextNeeded + ' 能量';
+
+  // ── 今日行为统计 ──
+  const waterLimit = parseInt(document.getElementById('waterLimit').value) || 5;
+  document.getElementById('rWaterCount').textContent = (state.waterCount || 0) + ' 次';
+  document.getElementById('rSignStatus').textContent = state.signDone ? '✅ 已签到' : '❌ 未签到';
+  document.getElementById('rShareCount').textContent = (state.shareCount || 0) + ' 次';
+  document.getElementById('rInviteCount').textContent = (state.inviteCount || 0) + ' 次';
+
+  // ── 按钮状态 ──
+  const btnWater = document.getElementById('btnWater');
+  const btnSign = document.getElementById('btnSign');
+  const btnShare = document.getElementById('btnShare');
+  const btnInvite = document.getElementById('btnInvite');
+  const waterRemain = waterLimit - (state.waterCount || 0);
+  const shareRemain = 3 - (state.shareCount || 0);
+  const inviteRemain = 2 - (state.inviteCount || 0);
+
+  btnWater.disabled = waterRemain <= 0 || stage.id === 6;
+  btnSign.disabled = !!state.signDone || stage.id === 6;
+  btnShare.disabled = shareRemain <= 0 || stage.id === 6;
+  btnInvite.disabled = inviteRemain <= 0 || stage.id === 6;
+
+  document.getElementById('waterCountTip').textContent =
+    waterRemain > 0 ? `今日剩余 ${waterRemain} 次` : '今日已用完';
+  document.getElementById('signCountTip').textContent =
+    state.signDone ? '今日已签到' : '今日可签到';
+  document.getElementById('shareCountTip').textContent =
+    shareRemain > 0 ? `今日剩余 ${shareRemain} 次` : '今日已用完';
+  document.getElementById('inviteCountTip').textContent =
+    inviteRemain > 0 ? `今日剩余 ${inviteRemain} 次` : '今日已用完';
+
+  // ── 收获按钮 ──
+  const harvestArea = document.getElementById('harvestArea');
+  const actionArea = document.getElementById('actionArea');
+  if (stage.id === 6) {
+    harvestArea.classList.add('show');
+    document.getElementById('harvestPrizeName').textContent = getPrize(6);
+  } else {
+    harvestArea.classList.remove('show');
+  }
+
+  // ── 枯萎预警（能量低于当前阶段最低+5时警告） ──
+  const witherWarn = document.getElementById('witherWarning');
+  document.getElementById('decayShow').textContent = getConfig('dailyDecay');
+  if (energy > 0 && energy - stage.minEnergy <= 5 && stage.id < 6) {
+    witherWarn.classList.add('show');
+  } else {
+    witherWarn.classList.remove('show');
+  }
+
+  // ── 阶段进度列表 ──
+  renderStageProgress(stage.id, energy);
+
+  // ── 下阶段奖品预览 ──
+  if (nextStage) {
+    document.getElementById('previewPrizeName').textContent = getPrize(nextStage.id);
+    document.getElementById('previewPrizeDesc').textContent =
+      `解锁 ${nextStage.emoji} ${nextStage.name} 阶段获得`;
+  } else {
+    document.getElementById('previewPrizeName').textContent = '已达最高阶段';
+    document.getElementById('previewPrizeDesc').textContent = '收获果实获得大奖';
+  }
+}
+
+/** 渲染右侧阶段进度列表 */
+function renderStageProgress(curStageId, energy) {
+  const container = document.getElementById('stageProgress');
+  container.innerHTML = '';
+  STAGES.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'stage-item';
+    if (s.id < curStageId) div.classList.add('done');
+    else if (s.id === curStageId) div.classList.add('current');
+    else div.classList.add('locked');
+
+    const req = s.id === 1 ? '起点' : s.minEnergy + '+ 能量';
+    div.innerHTML = `
+      <div class="stage-dot"></div>
+      <span class="stage-name">${s.emoji} ${s.name}</span>
+      <span class="stage-req">${req}</span>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// ─────────────────────────────────────────────
+// 行为处理
+// ─────────────────────────────────────────────
+
+/** 执行行为，增加能量 */
+function doAction(type) {
+  const waterLimit = parseInt(document.getElementById('waterLimit').value) || 5;
+  let add = 0;
+  let msg = '';
+
+  switch (type) {
+    case 'water':
+      if ((state.waterCount || 0) >= waterLimit) {
+        showToast('💧 今日浇水次数已用完');
+        return;
+      }
+      add = getConfig('energyWater') || 5;
+      state.waterCount = (state.waterCount || 0) + 1;
+      msg = `💧 浇水成功！+${add} 能量`;
+      triggerWaterEffect();
+      break;
+    case 'sign':
+      if (state.signDone) {
+        showToast('📅 今日已经签到过了');
+        return;
+      }
+      add = getConfig('energySign') || 10;
+      state.signDone = true;
+      msg = `📅 签到成功！+${add} 能量`;
+      break;
+    case 'share':
+      if ((state.shareCount || 0) >= 3) {
+        showToast('📤 今日分享次数已用完');
+        return;
+      }
+      add = getConfig('energyShare') || 15;
+      state.shareCount = (state.shareCount || 0) + 1;
+      msg = `📤 分享成功！+${add} 能量`;
+      break;
+    case 'invite':
+      if ((state.inviteCount || 0) >= 2) {
+        showToast('👥 今日邀请次数已用完');
+        return;
+      }
+      add = getConfig('energyInvite') || 30;
+      state.inviteCount = (state.inviteCount || 0) + 1;
+      msg = `👥 邀请好友成功！+${add} 能量`;
+      break;
+  }
+
+  if (add > 0) {
+    state.energy = (state.energy || 0) + add;
+    state.todayEnergy = (state.todayEnergy || 0) + add;
+    state.totalEnergy = (state.totalEnergy || 0) + add;
+    saveState();
+    showToast(msg);
+    renderAll();
+  }
+}
+
+/** 收获果实 */
+function doHarvest() {
+  document.getElementById('harvestPrizeName').textContent = getPrize(6);
+  document.getElementById('harvestModal').classList.add('show');
+}
+
+/** 关闭收获弹窗 */
+function closeHarvestModal() {
+  document.getElementById('harvestModal').classList.remove('show');
+}
+
+/** 重新种植 */
+function restartTree() {
+  state.energy = 0;
+  state.stageId = 1;
+  state.todayEnergy = 0;
+  state.totalEnergy = 0;
+  state.waterCount = 0;
+  state.signDone = false;
+  state.shareCount = 0;
+  state.inviteCount = 0;
+  state.harvestCount = (state.harvestCount || 0) + 1;
+  saveState();
+  closeHarvestModal();
+  showToast('🌱 已重新种植，加油养成！');
+  renderAll();
+}
+
+// ─────────────────────────────────────────────
+// 视觉特效
+// ─────────────────────────────────────────────
+
+/** 浇水水滴动画 */
+function triggerWaterEffect() {
+  const scene = document.getElementById('scene');
+  const sceneRect = scene.getBoundingClientRect();
+  const centerX = sceneRect.width / 2;
+
+  // 生成多个水滴
+  for (let i = 0; i < 6; i++) {
+    const drop = document.createElement('div');
+    drop.className = 'water-drop';
+    const offsetX = (Math.random() - 0.5) * 40;
+    drop.style.left = (centerX + offsetX) + 'px';
+    drop.style.top = '20px';
+    scene.appendChild(drop);
+    // 错开时间
+    setTimeout(() => {
+      drop.classList.add('falling');
+      setTimeout(() => drop.remove(), 900);
+    }, i * 80);
+  }
+
+  // 土地湿润效果
+  const wet = document.getElementById('wetGround');
+  wet.classList.remove('show');
+  void wet.offsetWidth; // 重排触发动画
+  wet.classList.add('show');
+  setTimeout(() => wet.classList.remove('show'), 1600);
+}
+
+/** 升级光圈+粒子爆发 */
+function triggerUpgradeEffect() {
+  // 光圈
+  const ring = document.getElementById('upgradeRing');
+  ring.classList.remove('animate');
+  void ring.offsetWidth;
+  ring.classList.add('animate');
+  setTimeout(() => ring.classList.remove('animate'), 900);
+
+  // 粒子
+  const scene = document.getElementById('scene');
+  const sceneRect = scene.getBoundingClientRect();
+  const centerX = sceneRect.width / 2;
+  const centerY = sceneRect.height * 0.55;
+  for (let i = 0; i < 16; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const angle = (i / 16) * Math.PI * 2;
+    const dist = 60 + Math.random() * 60;
+    p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    p.style.left = centerX + 'px';
+    p.style.top = centerY + 'px';
+    scene.appendChild(p);
+    setTimeout(() => {
+      p.classList.add('burst');
+      setTimeout(() => p.remove(), 1000);
+    }, Math.random() * 100);
+  }
+
+  showToast('✨ 树木升级了！阶段提升！');
+}
+
+// ─────────────────────────────────────────────
+// Toast 提示
+// ─────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ─────────────────────────────────────────────
+// 场景装饰初始化
+// ─────────────────────────────────────────────
+
+/** 生成星星 */
+function initStars() {
+  const container = document.getElementById('starsContainer');
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = 1 + Math.random() * 2.5;
+    s.style.cssText = `
+      width:${size}px; height:${size}px;
+      top:${Math.random() * 70}%;
+      left:${Math.random() * 100}%;
+      --dur:${2 + Math.random() * 3}s;
+      animation-delay:${Math.random() * 3}s;
+    `;
+    container.appendChild(s);
+  }
+}
+
+/** 生成地面泥土小点 */
+function initGroundDots() {
+  const container = document.getElementById('groundDots');
+  for (let i = 0; i < 40; i++) {
+    const d = document.createElement('div');
+    d.className = 'ground-dot';
+    container.appendChild(d);
+  }
+}
+
+/** 生成飘动云朵 */
+function initClouds() {
+  const scene = document.getElementById('scene');
+  const cloudConfigs = [
+    { width: 80, height: 25, top: '15%', duration: 35 },
+    { width: 60, height: 20, top: '25%', duration: 50 },
+    { width: 100, height: 30, top: '10%', duration: 45 },
+  ];
+  cloudConfigs.forEach((cfg, i) => {
+    const c = document.createElement('div');
+    c.className = 'cloud';
+    c.style.cssText = `
+      width:${cfg.width}px; height:${cfg.height}px;
+      top:${cfg.top}; left:-${cfg.width}px;
+      animation-duration:${cfg.duration}s;
+      animation-delay:${-i * 12}s;
+    `;
+    // 云朵的前后伪元素通过CSS已设置，这里只需设置主体
+    c.style.setProperty('--cloud-size', cfg.width + 'px');
+    scene.insertBefore(c, scene.firstChild);
+  });
+}
+
+// ─────────────────────────────────────────────
+// 日期初始化
+// ─────────────────────────────────────────────
+function initDates() {
+  const today = todayKey();
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() + 30);
+  document.getElementById('startDate').value = today;
+  document.getElementById('endDate').value = endDate.toISOString().slice(0, 10);
+}
+
+// ─────────────────────────────────────────────
+// 主入口
+// ─────────────────────────────────────────────
+(function init() {
+  initDates();
+  loadState();
+  initStars();
+  initGroundDots();
+  initClouds();
+  // 同步 stageId 与当前能量对应的阶段（防止数据错乱）
+  state.stageId = calcStage(state.energy).id;
+  saveState();
+  renderAll();
+})();
+</script>
+</body>
+</html>
