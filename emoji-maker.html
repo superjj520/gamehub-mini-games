@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 表情包生成器</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    gap: 16px;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+  }
+  /* 横向滚动导航 */
+  .nav-tabs-wrap {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-tabs-wrap::-webkit-scrollbar { display: none; }
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    min-width: max-content;
+  }
+  .nav-tab {
+    padding: 7px 14px; border-radius: 8px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap;
+  }
+  .nav-tab.active, .nav-tab:hover {
+    background: var(--card); color: var(--text);
+  }
+  .nav-tab.active { color: var(--gold); }
+  .nav-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22C55E;
+    box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .status-text { font-size: 12px; color: var(--muted); }
+
+  /* ─── 主体三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: calc(100vh - 65px);
+  }
+
+  /* ─── 左侧配置面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* 模板选择 */
+  .tpl-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  .tpl-item {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .tpl-item:hover { border-color: rgba(124,58,237,0.5); transform: scale(1.04); }
+  .tpl-item.active { border-color: var(--gold); box-shadow: 0 0 10px rgba(245,200,66,0.4); }
+  .tpl-item canvas { width: 100%; height: 100%; display: block; }
+  .tpl-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    text-align: center; font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    padding: 2px 0;
+  }
+
+  /* 文字输入 */
+  .input-row { margin-bottom: 10px; }
+  .input-label {
+    font-size: 12px; color: var(--muted);
+    margin-bottom: 5px; display: block;
+  }
+  .text-input {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .text-input:focus { border-color: var(--accent); }
+  .text-input::placeholder { color: var(--muted); }
+
+  /* 颜色选择 */
+  .color-row {
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+  }
+  .color-dot {
+    width: 26px; height: 26px; border-radius: 50%;
+    cursor: pointer; border: 2px solid transparent;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .color-dot:hover { transform: scale(1.15); }
+  .color-dot.active { border-color: #fff; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
+
+  /* 字号滑块 */
+  .slider-wrap { display: flex; align-items: center; gap: 10px; }
+  .slider-val {
+    font-size: 13px; font-weight: 700; color: var(--gold);
+    min-width: 32px; text-align: right;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    flex: 1; height: 4px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 2px; outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--gold); cursor: pointer;
+    box-shadow: 0 0 6px rgba(245,200,66,0.5);
+  }
+
+  /* 贴纸网格 */
+  .sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+  }
+  .sticker-btn {
+    aspect-ratio: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .sticker-btn:hover {
+    background: rgba(124,58,237,0.2);
+    border-color: var(--accent);
+    transform: scale(1.1);
+  }
+  .sticker-btn.selected {
+    background: rgba(124,58,237,0.3);
+    border-color: var(--gold);
+  }
+
+  /* 按钮 */
+  .btn {
+    width: 100%; padding: 11px;
+    border-radius: 10px; border: none;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(124,58,237,0.4); }
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold), #FFAB00);
+    color: #1a0a2e;
+    margin-top: 8px;
+  }
+  .btn-gold:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(245,200,66,0.4); }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    margin-top: 8px; font-size: 13px;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--text); }
+
+  /* ─── 中间 Canvas 区 ─── */
+  .game-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .game-center::before {
+    content: '';
+    position: absolute;
+    width: 560px; height: 560px;
+    background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .game-header {
+    text-align: center; margin-bottom: 20px;
+  }
+  .game-name {
+    font-size: 22px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  .game-desc {
+    font-size: 13px; color: var(--muted);
+  }
+
+  /* Canvas 容器 */
+  .canvas-wrap {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(124,58,237,0.3), 0 0 0 1px var(--border);
+    cursor: crosshair;
+    background: #fff;
+  }
+  #mainCanvas {
+    display: block;
+    width: 400px; height: 400px;
+  }
+
+  /* 贴纸覆盖层（用于拖动） */
+  .sticker-overlay {
+    position: absolute; inset: 0;
+    pointer-events: none;
+  }
+  .sticker-item {
+    position: absolute;
+    font-size: 32px;
+    line-height: 1;
+    cursor: move;
+    user-select: none;
+    pointer-events: all;
+    transform: translate(-50%, -50%);
+    transition: filter 0.1s;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+  .sticker-item:hover { filter: drop-shadow(0 0 8px rgba(245,200,66,0.7)); }
+  .sticker-item.active-drag { z-index: 99; }
+
+  /* 操作提示 */
+  .canvas-hint {
+    margin-top: 12px;
+    font-size: 12px; color: var(--muted);
+    text-align: center;
+  }
+  .canvas-hint span { color: var(--gold); }
+
+  /* ─── 右侧面板 ─── */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+
+  /* 生成历史 */
+  .history-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .history-item {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .history-item:hover { border-color: var(--gold); transform: scale(1.03); }
+  .history-item img { width: 100%; display: block; }
+  .history-empty {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 20px 0;
+    grid-column: span 2;
+  }
+
+  /* 热门模板展示 */
+  .hot-tpl-list { display: flex; flex-direction: column; gap: 8px; }
+  .hot-tpl-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .hot-tpl-item:hover { border-color: rgba(124,58,237,0.4); background: rgba(124,58,237,0.06); }
+  .hot-tpl-thumb {
+    width: 44px; height: 44px; border-radius: 6px;
+    overflow: hidden; flex-shrink: 0;
+  }
+  .hot-tpl-thumb canvas { width: 100%; height: 100%; display: block; }
+  .hot-tpl-info { flex: 1; min-width: 0; }
+  .hot-tpl-name { font-size: 13px; font-weight: 600; }
+  .hot-tpl-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .hot-tpl-badge {
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 20px;
+    background: rgba(245,200,66,0.1);
+    color: var(--gold);
+    border: 1px solid rgba(245,200,66,0.2);
+    flex-shrink: 0;
+  }
+
+  /* 统计数字 */
+  .stat-row {
+    display: flex; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .stat-item {
+    text-align: center; flex: 1;
+    padding: 12px 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .stat-item + .stat-item { margin-left: 8px; }
+  .stat-num {
+    font-size: 22px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    display: block;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* toast提示 */
+  .toast {
+    position: fixed; bottom: 32px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(26,10,46,0.95);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+    color: var(--text);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 9999;
+    pointer-events: none;
+    backdrop-filter: blur(12px);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ─── 顶部导航 ─── -->
+<nav class="nav">
+  <div class="nav-logo">
+    🎮 <span>GameHub</span>
+    <span class="nav-badge">DEMO</span>
+  </div>
+  <div class="nav-tabs-wrap">
+    <div class="nav-tabs">
+      <a class="nav-tab" href="index.html">首页</a>
+      <a class="nav-tab" href="wheel.html">大转盘</a>
+      <a class="nav-tab" href="nine-grid.html">九宫格</a>
+      <a class="nav-tab" href="scratch-card.html">刮刮乐</a>
+      <a class="nav-tab" href="shake-dice.html">摇骰子</a>
+      <a class="nav-tab" href="smash-egg.html">砸金蛋</a>
+      <a class="nav-tab" href="slot-machine.html">老虎机</a>
+      <a class="nav-tab" href="gift-box.html">礼盒开箱</a>
+      <a class="nav-tab" href="whack-mole.html">打地鼠</a>
+      <a class="nav-tab" href="cup-game.html">三杯游戏</a>
+      <a class="nav-tab" href="number-bomb.html">数字炸弹</a>
+      <a class="nav-tab" href="stamp-collect.html">集卡集章</a>
+      <a class="nav-tab" href="vote-pk.html">投票PK</a>
+      <a class="nav-tab" href="gashapon.html">扭蛋机</a>
+      <a class="nav-tab" href="blind-box.html">盲盒抽卡</a>
+      <a class="nav-tab" href="game-2048.html">2048</a>
+      <a class="nav-tab" href="match3.html">消消乐</a>
+      <a class="nav-tab" href="catch-coins.html">接金币</a>
+      <a class="nav-tab" href="grow-tree.html">成长树</a>
+      <a class="nav-tab" href="pinball.html">弹珠机</a>
+      <a class="nav-tab" href="snake.html">贪吃蛇</a>
+      <a class="nav-tab" href="slingshot.html">弹弓射击</a>
+      <a class="nav-tab" href="fruit-cut.html">切水果</a>
+      <a class="nav-tab" href="progress-unlock.html">进度解锁</a>
+      <a class="nav-tab" href="energy-collect.html">能量收集</a>
+      <a class="nav-tab" href="flying-chess.html">飞行棋</a>
+      <a class="nav-tab" href="monopoly.html">大富翁</a>
+      <a class="nav-tab" href="red-packet-rain.html">红包雨</a>
+      <a class="nav-tab" href="claw-machine.html">夹娃娃机</a>
+      <a class="nav-tab" href="flip-match.html">翻牌配对</a>
+      <a class="nav-tab" href="shake.html">摇一摇</a>
+      <a class="nav-tab" href="quiz.html">问答闯关</a>
+      <a class="nav-tab" href="daily-checkin.html">每日签到</a>
+      <a class="nav-tab active" href="emoji-maker.html">表情包</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span class="status-text">运行中</span>
+  </div>
+</nav>
+
+<!-- ─── 主体布局 ─── -->
+<div class="main">
+
+  <!-- ═══ 左侧配置 ═══ -->
+  <aside class="panel-left">
+    <div class="panel-title">表情包配置</div>
+
+    <!-- 模板选择 -->
+    <div class="card">
+      <div class="card-title"><div class="dot"></div>选择模板</div>
+      <div class="tpl-grid" id="tplGrid">
+        <!-- JS 动态渲染 -->
+      </div>
+    </div>
+
+    <!-- 文字编辑 -->
+    <div class="card">
+      <div class="card-title"><div class="dot"></div>文字内容</div>
+      <div class="input-row">
+        <label class="input-label">顶部文字</label>
+        <input class="text-input" id="topText" type="text" placeholder="在这里输入顶部文字…" maxlength="30">
+      </div>
+      <div class="input-row">
+        <label class="input-label">底部文字</label>
+        <input class="text-input" id="botText" type="text" placeholder="在这里输入底部文字…" maxlength="30">
+      </div>
+    </div>
+
+    <!-- 文字样式 -->
+    <div class="card">
+      <div class="card-title"><div class="dot"></div>文字样式</div>
+      <div class="input-row">
+        <label class="input-label">文字颜色</label>
+        <div class="color-row" id="colorRow">
+          <div class="color-dot active" data-color="#FFFFFF" style="background:#FFFFFF;" title="白色"></div>
+          <div class="color-dot" data-color="#000000" style="background:#000000;" title="黑色"></div>
+          <div class="color-dot" data-color="#F5C842" style="background:#F5C842;" title="金色"></div>
+          <div class="color-dot" data-color="#EC4899" style="background:#EC4899;" title="粉红"></div>
+          <div class="color-dot" data-color="#22C55E" style="background:#22C55E;" title="绿色"></div>
+          <div class="color-dot" data-color="#FF6B35" style="background:#FF6B35;" title="橙色"></div>
+        </div>
+      </div>
+      <div class="input-row">
+        <label class="input-label">字体大小 <span id="fontSizeLabel" style="color:var(--gold);font-weight:700;">32px</span></label>
+        <div class="slider-wrap">
+          <span style="font-size:12px;color:var(--muted);">16</span>
+          <input type="range" id="fontSizeSlider" min="16" max="60" value="32">
+          <span style="font-size:12px;color:var(--muted);">60</span>
+        </div>
+      </div>
+      <div class="input-row">
+        <label class="input-label">字体风格</label>
+        <select class="text-input" id="fontStyle" style="cursor:pointer;">
+          <option value="Impact">Impact（经典冲击体）</option>
+          <option value="Arial Black">Arial Black（粗黑）</option>
+          <option value="PingFang SC">PingFang SC（苹方）</option>
+          <option value="Georgia">Georgia（衬线）</option>
+          <option value="Comic Sans MS">Comic Sans（手写风）</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 贴纸添加 -->
+    <div class="card">
+      <div class="card-title"><div class="dot"></div>添加贴纸 <span style="font-size:11px;color:var(--muted);font-weight:400;">（选中后点击画布放置）</span></div>
+      <div class="sticker-grid" id="stickerGrid">
+        <!-- JS 动态渲染 -->
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--muted);">
+        已选：<span id="selectedStickerLabel" style="color:var(--gold);">无</span>
+        <button onclick="clearStickerSelect()" style="float:right;background:none;border:1px solid var(--border);color:var(--muted);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px;">取消选中</button>
+      </div>
+    </div>
+
+    <!-- 品牌水印 -->
+    <div class="card">
+      <div class="card-title"><div class="dot"></div>品牌水印</div>
+      <div class="input-row">
+        <label class="input-label">水印文字（右下角）</label>
+        <input class="text-input" id="watermarkText" type="text" placeholder="@品牌名称" value="@GameHub" maxlength="20">
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <button class="btn btn-primary" onclick="generateMeme()">✨ 生成表情包</button>
+    <button class="btn btn-gold" onclick="downloadMeme()">⬇️ 下载图片</button>
+    <button class="btn btn-outline" onclick="clearCanvas()">🗑️ 清空重做</button>
+  </aside>
+
+  <!-- ═══ 中间游戏区 ═══ -->
+  <section class="game-center">
+    <div class="game-header">
+      <div class="game-name">🎭 表情包生成器</div>
+      <div class="game-desc">选模板 · 写文字 · 加贴纸 · 一键分享裂变</div>
+    </div>
+
+    <!-- Canvas 预览区 -->
+    <div class="canvas-wrap" id="canvasWrap">
+      <canvas id="mainCanvas" width="400" height="400"></canvas>
+      <!-- 贴纸覆盖层，支持拖动 -->
+      <div class="sticker-overlay" id="stickerOverlay"></div>
+    </div>
+
+    <div class="canvas-hint">
+      点击画布可放置贴纸 · <span>拖动</span>贴纸调整位置 · 实时预览效果
+    </div>
+  </section>
+
+  <!-- ═══ 右侧数据 ═══ -->
+  <aside class="panel-right">
+
+    <!-- 统计 -->
+    <div class="panel-title">数据统计</div>
+    <div class="stat-row">
+      <div class="stat-item">
+        <span class="stat-num" id="statGenerate">0</span>
+        <div class="stat-label">已生成</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="statDownload">0</span>
+        <div class="stat-label">已下载</div>
+      </div>
+    </div>
+
+    <!-- 生成历史 -->
+    <div class="panel-title">生成历史</div>
+    <div class="history-grid" id="historyGrid">
+      <div class="history-empty">暂无历史记录</div>
+    </div>
+
+    <!-- 热门模板 -->
+    <div class="panel-title" style="margin-top:16px;">热门模板</div>
+    <div class="hot-tpl-list" id="hotTplList">
+      <!-- JS 动态渲染 -->
+    </div>
+
+    <!-- 玩法说明 -->
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title"><div class="dot"></div>玩法说明</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.8;">
+        1. 选择喜欢的模板风格<br>
+        2. 在左侧输入顶部/底部文字<br>
+        3. 选择贴纸点击画布放置<br>
+        4. 点击「生成」合并所有元素<br>
+        5. 下载图片一键分享传播
+      </div>
+    </div>
+
+    <!-- 营销价值 -->
+    <div class="card">
+      <div class="card-title"><div class="dot"></div>营销价值</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.8;">
+        • 用户 UGC 自发传播<br>
+        • 品牌水印自带曝光<br>
+        • 裂变系数 ×3~×8<br>
+        • 互动率提升 60%+
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- Toast 提示 -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── 全局状态 ───
+const state = {
+  currentTpl: 0,        // 当前模板索引
+  topText: '',          // 顶部文字
+  botText: '',          // 底部文字
+  textColor: '#FFFFFF', // 文字颜色
+  fontSize: 32,         // 字号
+  fontStyle: 'Impact',  // 字体
+  watermark: '@GameHub',// 水印文字
+  selectedSticker: null,// 当前选中贴纸 emoji
+  stickers: [],         // 已添加的贴纸列表 [{emoji, x, y}]
+  generateCount: 0,     // 生成次数
+  downloadCount: 0,     // 下载次数
+  history: [],          // 生成历史 (dataURL)
+};
+
+// ─── 5种模板定义 ───
+const TEMPLATES = [
+  {
+    name: '经典白底',
+    desc: '简洁百搭',
+    draw: (ctx, w, h) => {
+      // 纯白背景
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, w, h);
+      // 黑色边框
+      ctx.strokeStyle = '#222222';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(3, 3, w-6, h-6);
+    }
+  },
+  {
+    name: '渐变彩色',
+    desc: '活力四射',
+    draw: (ctx, w, h) => {
+      // 渐变背景
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, '#667EEA');
+      grad.addColorStop(0.5, '#764BA2');
+      grad.addColorStop(1, '#F093FB');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      // 光晕装饰
+      const radGrad = ctx.createRadialGradient(w*0.3, h*0.3, 0, w*0.3, h*0.3, w*0.4);
+      radGrad.addColorStop(0, 'rgba(255,255,255,0.15)');
+      radGrad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = radGrad;
+      ctx.fillRect(0, 0, w, h);
+    }
+  },
+  {
+    name: '节日喜庆',
+    desc: '红火热闹',
+    draw: (ctx, w, h) => {
+      // 红色渐变
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, '#C0392B');
+      grad.addColorStop(1, '#E74C3C');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      // 金色圆圈装饰
+      ctx.strokeStyle = 'rgba(245,200,66,0.35)';
+      ctx.lineWidth = 3;
+      for (let i = 0; i < 5; i++) {
+        ctx.beginPath();
+        ctx.arc(w/2, h/2, 40 + i*36, 0, Math.PI*2);
+        ctx.stroke();
+      }
+      // 金色边框
+      ctx.strokeStyle = '#F5C842';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(8, 8, w-16, h-16);
+    }
+  },
+  {
+    name: '暗色酷炫',
+    desc: '科技感十足',
+    draw: (ctx, w, h) => {
+      // 深色背景
+      ctx.fillStyle = '#0D0720';
+      ctx.fillRect(0, 0, w, h);
+      // 紫色光晕
+      const grad1 = ctx.createRadialGradient(w*0.2, h*0.2, 0, w*0.2, h*0.2, w*0.6);
+      grad1.addColorStop(0, 'rgba(124,58,237,0.4)');
+      grad1.addColorStop(1, 'rgba(124,58,237,0)');
+      ctx.fillStyle = grad1;
+      ctx.fillRect(0, 0, w, h);
+      // 粉色光晕
+      const grad2 = ctx.createRadialGradient(w*0.8, h*0.8, 0, w*0.8, h*0.8, w*0.5);
+      grad2.addColorStop(0, 'rgba(236,72,153,0.3)');
+      grad2.addColorStop(1, 'rgba(236,72,153,0)');
+      ctx.fillStyle = grad2;
+      ctx.fillRect(0, 0, w, h);
+      // 网格线装饰
+      ctx.strokeStyle = 'rgba(124,58,237,0.2)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= w; x += 40) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+      for (let y = 0; y <= h; y += 40) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+    }
+  },
+  {
+    name: '卡通粉色',
+    desc: '萌系可爱',
+    draw: (ctx, w, h) => {
+      // 粉色背景
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#FFD6E7');
+      grad.addColorStop(1, '#FFABCC');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      // 云朵装饰（圆圈组合）
+      const drawCloud = (cx, cy, size) => {
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.beginPath(); ctx.arc(cx, cy, size, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx+size*0.8, cy+size*0.2, size*0.75, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx-size*0.7, cy+size*0.25, size*0.7, 0, Math.PI*2); ctx.fill();
+      };
+      drawCloud(60, 50, 24);
+      drawCloud(320, 70, 20);
+      drawCloud(w-60, 150, 18);
+      // 粉色圆点装饰
+      ctx.fillStyle = 'rgba(255,105,180,0.2)';
+      for (let i = 0; i < 12; i++) {
+        const px = (i % 4) * (w/4) + w/8;
+        const py = Math.floor(i / 4) * (h/3) + h/6;
+        ctx.beginPath(); ctx.arc(px, py, 8, 0, Math.PI*2); ctx.fill();
+      }
+      // 粉边框
+      ctx.strokeStyle = 'rgba(255,105,180,0.6)';
+      ctx.lineWidth = 5;
+      ctx.strokeRect(5, 5, w-10, h-10);
+    }
+  }
+];
+
+// ─── 贴纸列表（30个 emoji）───
+const STICKERS = [
+  '😂','😭','🤣','😍','🥰','😎',
+  '🤔','😡','🥳','😱','🤩','😴',
+  '🔥','💥','⭐','💯','❤️','💔',
+  '👍','👎','🙌','💪','🤝','☝️',
+  '🎉','🎊','🏆','🥇','💰','💎'
+];
+
+// 热门模板信息
+const HOT_TPLS = [
+  { tpl: 0, name: '经典白底', count: '1.2k 次使用', heat: '🔥 热' },
+  { tpl: 3, name: '暗色酷炫', count: '986 次使用',  heat: '🔥 热' },
+  { tpl: 1, name: '渐变彩色', count: '754 次使用',  heat: '↑ 涨' },
+  { tpl: 2, name: '节日喜庆', count: '512 次使用',  heat: '节日' },
+  { tpl: 4, name: '卡通粉色', count: '391 次使用',  heat: '萌' },
+];
+
+// ─── Canvas 获取 ───
+const mainCanvas = document.getElementById('mainCanvas');
+const ctx = mainCanvas.getContext('2d');
+const CANVAS_SIZE = 400; // 逻辑像素
+
+// ─── 初始化 ───
+function init() {
+  renderTplGrid();
+  renderStickerGrid();
+  renderHotTpls();
+  bindEvents();
+  renderCanvas(); // 首次渲染
+}
+
+// ─── 渲染模板缩略图 ───
+function renderTplGrid() {
+  const grid = document.getElementById('tplGrid');
+  grid.innerHTML = '';
+  TEMPLATES.forEach((tpl, i) => {
+    const div = document.createElement('div');
+    div.className = 'tpl-item' + (i === state.currentTpl ? ' active' : '');
+    div.title = tpl.name;
+
+    // 缩略图 canvas
+    const thumbCanvas = document.createElement('canvas');
+    thumbCanvas.width = 60; thumbCanvas.height = 60;
+    const tCtx = thumbCanvas.getContext('2d');
+    tpl.draw(tCtx, 60, 60);
+
+    const label = document.createElement('div');
+    label.className = 'tpl-label';
+    label.textContent = tpl.name;
+
+    div.appendChild(thumbCanvas);
+    div.appendChild(label);
+    div.addEventListener('click', () => selectTemplate(i));
+    grid.appendChild(div);
+  });
+}
+
+// ─── 渲染贴纸格 ───
+function renderStickerGrid() {
+  const grid = document.getElementById('stickerGrid');
+  grid.innerHTML = '';
+  STICKERS.forEach(emoji => {
+    const btn = document.createElement('div');
+    btn.className = 'sticker-btn';
+    btn.textContent = emoji;
+    btn.title = emoji;
+    btn.addEventListener('click', () => selectSticker(emoji, btn));
+    grid.appendChild(btn);
+  });
+}
+
+// ─── 渲染热门模板 ───
+function renderHotTpls() {
+  const list = document.getElementById('hotTplList');
+  list.innerHTML = '';
+  HOT_TPLS.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'hot-tpl-item';
+
+    const thumbWrap = document.createElement('div');
+    thumbWrap.className = 'hot-tpl-thumb';
+    const thumbCanvas = document.createElement('canvas');
+    thumbCanvas.width = 44; thumbCanvas.height = 44;
+    const tCtx = thumbCanvas.getContext('2d');
+    TEMPLATES[item.tpl].draw(tCtx, 44, 44);
+    thumbWrap.appendChild(thumbCanvas);
+
+    div.innerHTML = `
+      <div class="hot-tpl-info">
+        <div class="hot-tpl-name">${item.name}</div>
+        <div class="hot-tpl-meta">${item.count}</div>
+      </div>
+      <div class="hot-tpl-badge">${item.heat}</div>
+    `;
+    div.insertBefore(thumbWrap, div.firstChild);
+    div.addEventListener('click', () => selectTemplate(item.tpl));
+    list.appendChild(div);
+  });
+}
+
+// ─── 绑定事件 ───
+function bindEvents() {
+  // 文字输入实时渲染
+  document.getElementById('topText').addEventListener('input', e => {
+    state.topText = e.target.value;
+    renderCanvas();
+  });
+  document.getElementById('botText').addEventListener('input', e => {
+    state.botText = e.target.value;
+    renderCanvas();
+  });
+
+  // 颜色选择
+  document.querySelectorAll('.color-dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+      document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+      state.textColor = dot.dataset.color;
+      renderCanvas();
+    });
+  });
+
+  // 字号滑块
+  const slider = document.getElementById('fontSizeSlider');
+  slider.addEventListener('input', () => {
+    state.fontSize = parseInt(slider.value);
+    document.getElementById('fontSizeLabel').textContent = state.fontSize + 'px';
+    renderCanvas();
+  });
+
+  // 字体选择
+  document.getElementById('fontStyle').addEventListener('change', e => {
+    state.fontStyle = e.target.value;
+    renderCanvas();
+  });
+
+  // 水印文字
+  document.getElementById('watermarkText').addEventListener('input', e => {
+    state.watermark = e.target.value;
+    renderCanvas();
+  });
+
+  // 点击画布放置贴纸
+  document.getElementById('canvasWrap').addEventListener('click', e => {
+    if (!state.selectedSticker) return;
+    const wrap = document.getElementById('canvasWrap');
+    const rect = wrap.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    addStickerToOverlay(state.selectedSticker, x, y);
+  });
+}
+
+// ─── 选择模板 ───
+function selectTemplate(idx) {
+  state.currentTpl = idx;
+  renderTplGrid(); // 更新 active 状态
+  renderCanvas();
+}
+
+// ─── 选择贴纸 ───
+function selectSticker(emoji, btn) {
+  // 取消之前选中
+  document.querySelectorAll('.sticker-btn').forEach(b => b.classList.remove('selected'));
+  if (state.selectedSticker === emoji) {
+    // 再次点击取消选中
+    state.selectedSticker = null;
+    document.getElementById('selectedStickerLabel').textContent = '无';
+  } else {
+    state.selectedSticker = emoji;
+    btn.classList.add('selected');
+    document.getElementById('selectedStickerLabel').textContent = emoji;
+    showToast('已选中 ' + emoji + '，点击画布放置贴纸');
+  }
+}
+
+// ─── 取消贴纸选中 ───
+function clearStickerSelect() {
+  state.selectedSticker = null;
+  document.querySelectorAll('.sticker-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('selectedStickerLabel').textContent = '无';
+}
+
+// ─── 在覆盖层添加可拖动贴纸 ───
+function addStickerToOverlay(emoji, xPct, yPct) {
+  const overlay = document.getElementById('stickerOverlay');
+  const span = document.createElement('span');
+  span.className = 'sticker-item';
+  span.textContent = emoji;
+  span.style.left = xPct + '%';
+  span.style.top = yPct + '%';
+
+  // 拖动逻辑
+  let isDragging = false;
+  let startX, startY, startLeft, startTop;
+
+  span.addEventListener('mousedown', e => {
+    e.stopPropagation();
+    isDragging = true;
+    span.classList.add('active-drag');
+    startX = e.clientX; startY = e.clientY;
+    startLeft = parseFloat(span.style.left);
+    startTop  = parseFloat(span.style.top);
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const wrap = document.getElementById('canvasWrap');
+    const rect = wrap.getBoundingClientRect();
+    const dx = ((e.clientX - startX) / rect.width) * 100;
+    const dy = ((e.clientY - startY) / rect.height) * 100;
+    span.style.left = Math.max(0, Math.min(100, startLeft + dx)) + '%';
+    span.style.top  = Math.max(0, Math.min(100, startTop + dy))  + '%';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      span.classList.remove('active-drag');
+    }
+  });
+
+  // 双击删除
+  span.addEventListener('dblclick', e => {
+    e.stopPropagation();
+    overlay.removeChild(span);
+    showToast('贴纸已删除（双击可删除贴纸）');
+  });
+
+  overlay.appendChild(span);
+  showToast('贴纸放置成功，可拖动调整位置 · 双击删除');
+}
+
+// ─── Canvas 渲染（实时预览）───
+function renderCanvas() {
+  const w = CANVAS_SIZE, h = CANVAS_SIZE;
+  ctx.clearRect(0, 0, w, h);
+
+  // 1. 绘制模板背景
+  TEMPLATES[state.currentTpl].draw(ctx, w, h);
+
+  // 2. 绘制顶部文字（带描边，增强可读性）
+  if (state.topText) {
+    drawText(ctx, state.topText, w/2, 52, state.fontSize, state.fontStyle, state.textColor);
+  }
+
+  // 3. 绘制底部文字
+  if (state.botText) {
+    drawText(ctx, state.botText, w/2, h - 30, state.fontSize, state.fontStyle, state.textColor);
+  }
+
+  // 4. 绘制品牌水印（右下角，半透明小字）
+  if (state.watermark) {
+    ctx.save();
+    ctx.font = 'bold 14px PingFang SC, Arial';
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'bottom';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 4;
+    ctx.fillText(state.watermark, w - 12, h - 10);
+    ctx.restore();
+  }
+}
+
+// ─── 绘制带描边的文字 ───
+function drawText(ctx, text, x, y, size, font, color) {
+  ctx.save();
+  ctx.font = `bold ${size}px "${font}", PingFang SC, Impact, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // 自动换行（超长文字截断）
+  const maxW = CANVAS_SIZE - 32;
+
+  // 文字描边（黑色轮廓，增强对比）
+  ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+  ctx.lineWidth = size > 30 ? 6 : 4;
+  ctx.lineJoin = 'round';
+  ctx.strokeText(text, x, y, maxW);
+
+  // 文字填充
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y, maxW);
+  ctx.restore();
+}
+
+// ─── 生成表情包（将覆盖层贴纸合并到 Canvas）───
+function generateMeme() {
+  // 先重新渲染底图
+  renderCanvas();
+
+  // 将覆盖层中的贴纸绘制到 Canvas 上
+  const overlay = document.getElementById('stickerOverlay');
+  const stickers = overlay.querySelectorAll('.sticker-item');
+  const wrap = document.getElementById('canvasWrap');
+  const wrapRect = wrap.getBoundingClientRect();
+
+  stickers.forEach(span => {
+    const leftPct = parseFloat(span.style.left) / 100;
+    const topPct  = parseFloat(span.style.top)  / 100;
+    const cx = leftPct * CANVAS_SIZE;
+    const cy = topPct  * CANVAS_SIZE;
+
+    ctx.save();
+    ctx.font = '48px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(span.textContent, cx, cy);
+    ctx.restore();
+  });
+
+  // 重新绘制水印（确保在最上层）
+  if (state.watermark) {
+    ctx.save();
+    ctx.font = 'bold 14px PingFang SC, Arial';
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'bottom';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 4;
+    ctx.fillText(state.watermark, CANVAS_SIZE - 12, CANVAS_SIZE - 10);
+    ctx.restore();
+  }
+
+  // 记录历史缩略图
+  const dataURL = mainCanvas.toDataURL('image/png');
+  addHistory(dataURL);
+
+  // 更新统计
+  state.generateCount++;
+  document.getElementById('statGenerate').textContent = state.generateCount;
+
+  showToast('🎉 表情包生成成功！点击下载保存');
+}
+
+// ─── 下载图片 ───
+function downloadMeme() {
+  // 生成一次确保最新
+  generateMeme();
+
+  mainCanvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const now = new Date();
+    const ts = `${now.getMonth()+1}${now.getDate()}${now.getHours()}${now.getMinutes()}`;
+    a.download = `meme_${ts}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    state.downloadCount++;
+    document.getElementById('statDownload').textContent = state.downloadCount;
+    showToast('📥 图片已下载到本地');
+  }, 'image/png');
+}
+
+// ─── 清空重做 ───
+function clearCanvas() {
+  state.topText = ''; state.botText = '';
+  document.getElementById('topText').value = '';
+  document.getElementById('botText').value = '';
+  // 清空贴纸覆盖层
+  document.getElementById('stickerOverlay').innerHTML = '';
+  clearStickerSelect();
+  renderCanvas();
+  showToast('已清空，重新开始创作');
+}
+
+// ─── 添加历史记录 ───
+function addHistory(dataURL) {
+  state.history.unshift(dataURL);
+  if (state.history.length > 6) state.history = state.history.slice(0, 6);
+  renderHistory();
+}
+
+// ─── 渲染历史缩略图 ───
+function renderHistory() {
+  const grid = document.getElementById('historyGrid');
+  if (state.history.length === 0) {
+    grid.innerHTML = '<div class="history-empty">暂无历史记录</div>';
+    return;
+  }
+  grid.innerHTML = '';
+  state.history.forEach((url, i) => {
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    div.title = '点击加载此历史版本';
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = '历史' + (i + 1);
+    div.appendChild(img);
+    div.addEventListener('click', () => {
+      // 将历史图加载回 Canvas
+      const image = new Image();
+      image.onload = () => {
+        ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        ctx.drawImage(image, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      };
+      image.src = url;
+      showToast('已加载历史版本');
+    });
+    grid.appendChild(div);
+  });
+}
+
+// ─── Toast 通知 ───
+let toastTimer = null;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ─── 启动 ───
+init();
+</script>
+</body>
+</html>
