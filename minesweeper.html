@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 扫雷</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.97);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: inherit;
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .nav-links-wrap {
+    flex: 1;
+    overflow-x: auto;
+    margin: 0 20px;
+    scrollbar-width: none;
+  }
+  .nav-links-wrap::-webkit-scrollbar { display: none; }
+  .nav-links {
+    display: flex;
+    gap: 2px;
+    white-space: nowrap;
+  }
+  .nav-link {
+    padding: 6px 13px; border-radius: 7px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-link:hover { background: var(--card); color: var(--text); }
+  .nav-link.active { background: var(--card); color: var(--gold); }
+  .nav-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22C55E; box-shadow: 0 0 6px #22C55E;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.4} }
+  .status-text { font-size: 12px; color: var(--muted); }
+
+  /* ─── 主体三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: calc(100vh - 57px);
+  }
+
+  /* ─── 通用面板样式 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: var(--deep);
+    position: relative;
+    overflow: hidden;
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* ─── 难度选择按钮组 ─── */
+  .btn-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .btn-option {
+    flex: 1; min-width: 70px;
+    padding: 10px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    font-family: inherit;
+  }
+  .btn-option:hover { border-color: var(--accent); color: var(--text); }
+  .btn-option.active {
+    border-color: var(--gold);
+    background: rgba(245,200,66,0.12);
+    color: var(--gold);
+    font-weight: 600;
+  }
+  .btn-option .opt-label { font-size: 12px; display: block; margin-top: 2px; color: var(--muted); }
+  .btn-option.active .opt-label { color: rgba(245,200,66,0.7); }
+
+  /* ─── 滑块 ─── */
+  .slider-wrap { margin-top: 4px; }
+  .slider-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .slider-row label { font-size: 12px; color: var(--muted); width: 90px; flex-shrink: 0; }
+  .slider-row input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+  }
+  .slider-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(245,200,66,0.5);
+  }
+  .slider-val {
+    font-size: 12px; color: var(--gold);
+    width: 36px; text-align: right; flex-shrink: 0;
+  }
+
+  /* ─── 奖品配置 ─── */
+  .prize-item {
+    display: flex; align-items: center;
+    gap: 10px; margin-bottom: 10px;
+  }
+  .prize-item input[type=text] {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--text);
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  .prize-item input[type=text]:focus { border-color: var(--accent); }
+  .prize-emoji { font-size: 18px; }
+  .prize-rank {
+    font-size: 11px; color: var(--muted);
+    width: 22px; text-align: center; flex-shrink: 0;
+  }
+
+  /* ─── 主按钮 ─── */
+  .btn-primary {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(124,58,237,0.4); }
+  .btn-primary:active { transform: translateY(0); }
+
+  /* ─── 中间区域：状态栏 ─── */
+  .game-status {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 24px;
+    width: 100%;
+    max-width: 700px;
+    justify-content: space-between;
+  }
+  .status-item {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .status-icon { font-size: 18px; }
+  .status-num {
+    font-size: 22px; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--gold);
+    min-width: 48px; text-align: center;
+  }
+  .status-lbl { font-size: 11px; color: var(--muted); }
+
+  /* ─── 棋盘 ─── */
+  .board-wrap {
+    position: relative;
+    overflow: auto;
+    max-width: 100%;
+    max-height: calc(100vh - 200px);
+  }
+  #board {
+    display: inline-grid;
+    gap: 3px;
+    padding: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    user-select: none;
+  }
+
+  /* ─── 单元格 ─── */
+  .cell {
+    width: 36px; height: 36px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+    /* 未翻开：浮雕感 */
+    background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(0,0,0,0.2));
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.4), -1px -1px 2px rgba(255,255,255,0.06);
+  }
+  .cell:hover:not(.revealed):not(.game-over-cell) {
+    background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(0,0,0,0.15));
+    transform: scale(1.04);
+    box-shadow: 0 0 8px rgba(124,58,237,0.4);
+  }
+  .cell:active:not(.revealed) { transform: scale(0.95); }
+
+  /* 已翻开：普通 */
+  .cell.revealed {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: inset 1px 1px 3px rgba(0,0,0,0.4);
+    cursor: default;
+  }
+
+  /* 翻开数字颜色 */
+  .cell.n1 { color: #60A5FA; }   /* 蓝 */
+  .cell.n2 { color: #34D399; }   /* 绿 */
+  .cell.n3 { color: #F87171; }   /* 红 */
+  .cell.n4 { color: #818CF8; }   /* 深蓝紫 */
+  .cell.n5 { color: #F97316; }   /* 橙 */
+  .cell.n6 { color: #22D3EE; }   /* 青 */
+  .cell.n7 { color: #E879F9; }   /* 紫粉 */
+  .cell.n8 { color: var(--muted); }
+
+  /* 插旗 */
+  .cell.flagged {
+    background: rgba(245,200,66,0.08);
+    border-color: rgba(245,200,66,0.3);
+  }
+  .cell.flagged::after {
+    content: '🚩';
+    font-size: 16px;
+  }
+
+  /* 地雷爆炸 */
+  .cell.mine-explode {
+    background: radial-gradient(circle, rgba(239,68,68,0.9), rgba(127,29,29,0.8)) !important;
+    border-color: #ef4444 !important;
+    animation: explode 0.4s ease-out;
+  }
+  @keyframes explode {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.3); }
+    60% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+  }
+
+  /* 地雷普通显示（游戏结束时其他地雷） */
+  .cell.mine-reveal {
+    background: rgba(100,20,20,0.6) !important;
+    border-color: rgba(239,68,68,0.3) !important;
+  }
+
+  /* 礼物格：金色发光 */
+  .cell.gift-reveal {
+    background: rgba(245,200,66,0.12) !important;
+    border-color: rgba(245,200,66,0.4) !important;
+    box-shadow: 0 0 10px rgba(245,200,66,0.3), inset 1px 1px 3px rgba(0,0,0,0.3) !important;
+    animation: giftGlow 0.5s ease-out;
+  }
+  @keyframes giftGlow {
+    0% { box-shadow: 0 0 0 rgba(245,200,66,0); transform: scale(1); }
+    50% { box-shadow: 0 0 20px rgba(245,200,66,0.6); transform: scale(1.1); }
+    100% { box-shadow: 0 0 10px rgba(245,200,66,0.3); transform: scale(1); }
+  }
+
+  /* 标记错误（游戏结束显示插错的旗） */
+  .cell.flag-wrong::after {
+    content: '❌';
+    font-size: 14px;
+  }
+
+  /* ─── 游戏消息覆盖层 ─── */
+  .game-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(13,7,32,0.88);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    gap: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .game-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .overlay-title {
+    font-size: 32px; font-weight: 800;
+    text-align: center;
+  }
+  .overlay-title.win { color: var(--gold); text-shadow: 0 0 20px rgba(245,200,66,0.6); }
+  .overlay-title.lose { color: #F87171; text-shadow: 0 0 20px rgba(248,113,113,0.5); }
+  .overlay-sub { font-size: 14px; color: var(--muted); }
+  .overlay-prize-box {
+    background: rgba(245,200,66,0.1);
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 14px;
+    padding: 14px 24px;
+    text-align: center;
+    max-width: 320px;
+  }
+  .overlay-prize-title { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .overlay-prize-content { font-size: 16px; font-weight: 600; color: var(--gold); }
+  .overlay-btns { display: flex; gap: 10px; margin-top: 8px; }
+  .btn-restart {
+    padding: 10px 24px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.2s;
+  }
+  .btn-restart:hover { opacity: 0.85; }
+
+  /* ─── 烟花 ─── */
+  .firework {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: fireworkAnim 1.2s ease-out forwards;
+  }
+  @keyframes fireworkAnim {
+    0% { transform: translate(0,0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+  }
+
+  /* ─── 右侧面板 ─── */
+  .record-item {
+    display: flex; justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+  }
+  .record-item:last-child { border-bottom: none; }
+  .record-label { color: var(--muted); }
+  .record-val { font-weight: 600; color: var(--gold); }
+
+  /* 礼物收集进度 */
+  .gift-progress-wrap { margin-bottom: 6px; }
+  .gift-progress-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; margin-bottom: 6px;
+  }
+  .gift-progress-bar-bg {
+    height: 6px; border-radius: 6px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .gift-progress-bar-fill {
+    height: 100%; border-radius: 6px;
+    background: linear-gradient(90deg, var(--gold), var(--accent2));
+    transition: width 0.4s ease;
+  }
+
+  /* 奖品解锁列表 */
+  .prize-unlock-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    margin-bottom: 8px;
+    transition: all 0.3s;
+  }
+  .prize-unlock-item.unlocked {
+    border-color: rgba(245,200,66,0.35);
+    background: rgba(245,200,66,0.07);
+  }
+  .prize-unlock-icon { font-size: 18px; }
+  .prize-unlock-text { flex: 1; font-size: 12px; color: var(--muted); }
+  .prize-unlock-item.unlocked .prize-unlock-text { color: var(--text); }
+  .prize-unlock-badge {
+    font-size: 11px; padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.06); color: var(--muted);
+  }
+  .prize-unlock-item.unlocked .prize-unlock-badge {
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    color: #1A0A2E; font-weight: 700;
+  }
+
+  /* 最近收集记录 */
+  .gift-log {
+    font-size: 12px; color: var(--muted);
+    max-height: 100px; overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .gift-log::-webkit-scrollbar { display: none; }
+  .gift-log-item {
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .gift-log-new { color: var(--gold); animation: fadeIn 0.4s; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; } }
+
+  /* 通知浮窗 */
+  .notify-bubble {
+    position: fixed;
+    bottom: 30px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(26,10,46,0.95);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.3s;
+    white-space: nowrap;
+    backdrop-filter: blur(10px);
+  }
+  .notify-bubble.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── 顶部导航 ─── -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">
+    🎮 <span>GameHub</span>
+    <span class="nav-badge">中台</span>
+  </a>
+  <div class="nav-links-wrap">
+    <div class="nav-links">
+      <a href="index.html"           class="nav-link">首页</a>
+      <a href="wheel.html"           class="nav-link">大转盘</a>
+      <a href="nine-grid.html"       class="nav-link">九宫格</a>
+      <a href="scratch-card.html"    class="nav-link">刮刮乐</a>
+      <a href="shake-dice.html"      class="nav-link">摇骰子</a>
+      <a href="smash-egg.html"       class="nav-link">砸金蛋</a>
+      <a href="slot-machine.html"    class="nav-link">老虎机</a>
+      <a href="gift-box.html"        class="nav-link">礼盒开箱</a>
+      <a href="whack-mole.html"      class="nav-link">打地鼠</a>
+      <a href="cup-game.html"        class="nav-link">三杯游戏</a>
+      <a href="number-bomb.html"     class="nav-link">数字炸弹</a>
+      <a href="stamp-collect.html"   class="nav-link">集卡集章</a>
+      <a href="vote-pk.html"         class="nav-link">投票PK</a>
+      <a href="gashapon.html"        class="nav-link">扭蛋机</a>
+      <a href="blind-box.html"       class="nav-link">盲盒抽卡</a>
+      <a href="game-2048.html"       class="nav-link">2048</a>
+      <a href="match3.html"          class="nav-link">消消乐</a>
+      <a href="catch-coins.html"     class="nav-link">接金币</a>
+      <a href="grow-tree.html"       class="nav-link">成长树</a>
+      <a href="pinball.html"         class="nav-link">弹珠机</a>
+      <a href="snake.html"           class="nav-link">贪吃蛇</a>
+      <a href="slingshot.html"       class="nav-link">弹弓射击</a>
+      <a href="fruit-cut.html"       class="nav-link">切水果</a>
+      <a href="progress-unlock.html" class="nav-link">进度解锁</a>
+      <a href="energy-collect.html"  class="nav-link">能量收集</a>
+      <a href="flying-chess.html"    class="nav-link">飞行棋</a>
+      <a href="monopoly.html"        class="nav-link">大富翁</a>
+      <a href="red-packet-rain.html" class="nav-link">红包雨</a>
+      <a href="claw-machine.html"    class="nav-link">夹娃娃机</a>
+      <a href="flip-match.html"      class="nav-link">翻牌配对</a>
+      <a href="shake.html"           class="nav-link">摇一摇</a>
+      <a href="quiz.html"            class="nav-link">问答闯关</a>
+      <a href="daily-checkin.html"   class="nav-link">每日签到</a>
+      <a href="minesweeper.html"     class="nav-link active">扫雷</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span class="status-text">运行中</span>
+  </div>
+</nav>
+
+<!-- 通知浮窗 -->
+<div class="notify-bubble" id="notifyBubble"></div>
+
+<!-- ─── 主体三列布局 ─── -->
+<div class="main">
+
+  <!-- ══════════════════════════════
+       左侧配置面板
+  ══════════════════════════════ -->
+  <div class="panel-left">
+    <div class="panel-title">⚙ 游戏配置</div>
+
+    <!-- 难度选择 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>难度选择</div>
+      <div class="btn-group" id="diffGroup">
+        <button class="btn-option active" data-diff="easy" onclick="setDiff('easy')">
+          简单
+          <span class="opt-label">9×9 · 10雷</span>
+        </button>
+        <button class="btn-option" data-diff="normal" onclick="setDiff('normal')">
+          普通
+          <span class="opt-label">12×12 · 20雷</span>
+        </button>
+        <button class="btn-option" data-diff="hard" onclick="setDiff('hard')">
+          困难
+          <span class="opt-label">16×16 · 40雷</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 礼物配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>营销礼物设置</div>
+      <div class="slider-wrap">
+        <div class="slider-row">
+          <label>礼物出现概率</label>
+          <input type="range" id="giftRate" min="5" max="40" value="20" step="5"
+            oninput="updateSlider('giftRate','giftRateVal',this.value,'%')">
+          <span class="slider-val" id="giftRateVal">20%</span>
+        </div>
+        <div class="slider-row">
+          <label>礼物收集目标</label>
+          <input type="range" id="giftTarget" min="3" max="20" value="8" step="1"
+            oninput="updateSlider('giftTarget','giftTargetVal',this.value,'个')">
+          <span class="slider-val" id="giftTargetVal">8个</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 奖品配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品配置</div>
+      <div id="prizeConfig">
+        <div class="prize-item">
+          <span class="prize-rank">🥇</span>
+          <span class="prize-emoji">🎁</span>
+          <input type="text" id="prize1" value="现金红包 ¥88" placeholder="大奖（全部翻开）">
+        </div>
+        <div class="prize-item">
+          <span class="prize-rank">🏅</span>
+          <span class="prize-emoji">🎀</span>
+          <input type="text" id="prize2" value="优惠券 ¥20" placeholder="礼物奖（集满目标）">
+        </div>
+        <div class="prize-item">
+          <span class="prize-rank">🎖</span>
+          <span class="prize-emoji">✨</span>
+          <input type="text" id="prize3" value="积分 × 500" placeholder="参与奖">
+        </div>
+      </div>
+    </div>
+
+    <!-- 说明 -->
+    <div class="card" style="border-color:rgba(124,58,237,0.25);background:rgba(124,58,237,0.06)">
+      <div class="card-title"><span class="dot" style="background:var(--accent)"></span>玩法说明</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.8;">
+        <div>🖱 左键点击 → 翻开格子</div>
+        <div>🚩 右键点击 → 插旗标记地雷</div>
+        <div>💥 踩到地雷 → 游戏结束</div>
+        <div>🎁 翻开礼物格 → 收集小礼物</div>
+        <div>🏆 翻开全部安全格 → 解锁大奖！</div>
+        <div style="margin-top:6px;color:rgba(245,200,66,0.7);">首次点击保证不踩雷</div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="restartGame()">🚀 开始新游戏</button>
+  </div>
+
+  <!-- ══════════════════════════════
+       中间游戏区
+  ══════════════════════════════ -->
+  <div class="panel-center">
+
+    <!-- 状态栏 -->
+    <div class="game-status">
+      <div class="status-item">
+        <span class="status-icon">💣</span>
+        <div>
+          <div class="status-num" id="mineCount">10</div>
+          <div class="status-lbl">剩余地雷</div>
+        </div>
+      </div>
+      <div class="status-item">
+        <span class="status-icon">🎁</span>
+        <div>
+          <div class="status-num" id="giftCount">0</div>
+          <div class="status-lbl">礼物收集</div>
+        </div>
+      </div>
+      <div class="status-item" style="cursor:pointer" onclick="restartGame()" title="重新开始">
+        <span class="status-icon" id="faceBtn" style="font-size:28px">😊</span>
+      </div>
+      <div class="status-item">
+        <span class="status-icon">⏱</span>
+        <div>
+          <div class="status-num" id="timerDisplay">000</div>
+          <div class="status-lbl">秒</div>
+        </div>
+      </div>
+      <div class="status-item">
+        <span class="status-icon">📍</span>
+        <div>
+          <div class="status-num" id="flagCount">0</div>
+          <div class="status-lbl">插旗数</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 棋盘区域（含游戏结束覆盖层） -->
+    <div style="position:relative">
+      <div class="board-wrap">
+        <div id="board"></div>
+      </div>
+      <div class="game-overlay" id="gameOverlay">
+        <div class="overlay-title" id="overlayTitle"></div>
+        <div class="overlay-sub" id="overlaySub"></div>
+        <div class="overlay-prize-box" id="overlayPrizeBox" style="display:none">
+          <div class="overlay-prize-title">🎉 恭喜解锁奖品</div>
+          <div class="overlay-prize-content" id="overlayPrizeContent"></div>
+        </div>
+        <div class="overlay-btns">
+          <button class="btn-restart" onclick="restartGame()">🔄 再来一局</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部提示 -->
+    <div style="margin-top:16px;font-size:12px;color:var(--muted);text-align:center;">
+      左键翻开 · 右键插旗 · 翻开全部安全格赢得大奖
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       右侧数据面板
+  ══════════════════════════════ -->
+  <div class="panel-right">
+    <div class="panel-title">📊 游戏数据</div>
+
+    <!-- 最佳记录 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>历史最快用时</div>
+      <div class="record-item">
+        <span class="record-label">简单</span>
+        <span class="record-val" id="bestEasy">--</span>
+      </div>
+      <div class="record-item">
+        <span class="record-label">普通</span>
+        <span class="record-val" id="bestNormal">--</span>
+      </div>
+      <div class="record-item">
+        <span class="record-label">困难</span>
+        <span class="record-val" id="bestHard">--</span>
+      </div>
+    </div>
+
+    <!-- 本局统计 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>本局统计</div>
+      <div class="record-item">
+        <span class="record-label">翻开格数</span>
+        <span class="record-val" id="revealedCount">0</span>
+      </div>
+      <div class="record-item">
+        <span class="record-label">剩余安全格</span>
+        <span class="record-val" id="safeLeft">0</span>
+      </div>
+      <div class="record-item">
+        <span class="record-label">礼物收集</span>
+        <span class="record-val" id="giftCollected">0 / 0</span>
+      </div>
+      <div class="record-item">
+        <span class="record-label">胜率</span>
+        <span class="record-val" id="winRate">--</span>
+      </div>
+    </div>
+
+    <!-- 礼物收集进度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>礼物收集进度</div>
+      <div class="gift-progress-wrap">
+        <div class="gift-progress-row">
+          <span style="font-size:12px;color:var(--muted)" id="giftProgressLabel">0 / 8 个</span>
+          <span style="font-size:12px;color:var(--gold)" id="giftProgressPct">0%</span>
+        </div>
+        <div class="gift-progress-bar-bg">
+          <div class="gift-progress-bar-fill" id="giftProgressBar" style="width:0%"></div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">集满目标解锁奖品</div>
+
+      <!-- 最近收集 -->
+      <div class="gift-log" id="giftLog">
+        <div style="color:var(--muted);font-size:12px;padding:4px 0">暂无礼物收集记录</div>
+      </div>
+    </div>
+
+    <!-- 奖品解锁状态 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品解锁</div>
+      <div id="prizeUnlockList">
+        <!-- 由JS动态渲染 -->
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ════════════════════════════════════════════════
+// 游戏核心状态
+// ════════════════════════════════════════════════
+
+/** 难度配置 */
+const DIFFICULTY = {
+  easy:   { rows: 9,  cols: 9,  mines: 10 },
+  normal: { rows: 12, cols: 12, mines: 20 },
+  hard:   { rows: 16, cols: 16, mines: 40 },
+};
+
+/** 小礼物 emoji 列表（安全格随机出现） */
+const GIFT_EMOJIS = ['🍀','⭐','💎','🌸','🎵','🔮','🍭','🌈','🦋','✨'];
+
+// 全局游戏状态
+let cfg = { ...DIFFICULTY.easy };        // 当前难度配置
+let currentDiff = 'easy';
+
+let board = [];       // 二维数组，每格：{ mine, number, revealed, flagged, gift, giftEmoji }
+let gameState = 'ready';   // ready / playing / win / lose
+let firstClick = true;     // 首次点击标志
+let timerInterval = null;  // 计时器
+let elapsedSec = 0;        // 已用时
+let flagsPlaced = 0;       // 已插旗数
+let revealedCnt = 0;       // 已翻开格数
+let giftCollectedCnt = 0;  // 已收集礼物数
+let giftTarget = 8;        // 礼物目标
+let giftRate = 0.20;       // 礼物出现概率
+
+// 胜负统计（本会话，不持久化）
+let sessionStats = { easy:{win:0,total:0}, normal:{win:0,total:0}, hard:{win:0,total:0} };
+let bestTime = { easy: null, normal: null, hard: null };
+
+// ════════════════════════════════════════════════
+// 初始化 / 重置
+// ════════════════════════════════════════════════
+
+/** 读取左侧配置并重置游戏 */
+function restartGame() {
+  // 读取礼物参数
+  giftRate   = parseInt(document.getElementById('giftRate').value) / 100;
+  giftTarget = parseInt(document.getElementById('giftTarget').value);
+
+  resetGame();
+  renderBoard();
+  updateRightPanel();
+}
+
+/** 重置游戏核心状态 */
+function resetGame() {
+  stopTimer();
+  gameState    = 'ready';
+  firstClick   = true;
+  elapsedSec   = 0;
+  flagsPlaced  = 0;
+  revealedCnt  = 0;
+  giftCollectedCnt = 0;
+
+  // 初始化空棋盘（此时不放地雷，等首次点击后再放）
+  board = [];
+  for (let r = 0; r < cfg.rows; r++) {
+    board[r] = [];
+    for (let c = 0; c < cfg.cols; c++) {
+      board[r][c] = { mine: false, number: 0, revealed: false, flagged: false, gift: false, giftEmoji: '' };
+    }
+  }
+
+  // 更新状态栏
+  document.getElementById('mineCount').textContent    = String(cfg.mines).padStart(3,'0');
+  document.getElementById('timerDisplay').textContent = '000';
+  document.getElementById('flagCount').textContent    = '0';
+  document.getElementById('giftCount').textContent    = '0';
+  document.getElementById('faceBtn').textContent      = '😊';
+
+  // 隐藏覆盖层
+  document.getElementById('gameOverlay').classList.remove('show');
+}
+
+// ════════════════════════════════════════════════
+// 首次点击后生成地雷（保证首格安全）
+// ════════════════════════════════════════════════
+
+/** 生成地雷，排除 safeR/safeC 及其周围 */
+function placeMines(safeR, safeC) {
+  // 安全区域：首次点击格及周围8格
+  const safeSet = new Set();
+  for (let dr = -1; dr <= 1; dr++) {
+    for (let dc = -1; dc <= 1; dc++) {
+      const nr = safeR + dr, nc = safeC + dc;
+      if (nr >= 0 && nr < cfg.rows && nc >= 0 && nc < cfg.cols) {
+        safeSet.add(nr * cfg.cols + nc);
+      }
+    }
+  }
+
+  // 收集可放雷格
+  let candidates = [];
+  for (let r = 0; r < cfg.rows; r++) {
+    for (let c = 0; c < cfg.cols; c++) {
+      if (!safeSet.has(r * cfg.cols + c)) candidates.push([r, c]);
+    }
+  }
+
+  // Fisher-Yates 随机取前 mines 个
+  for (let i = candidates.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+  }
+
+  // 放雷
+  for (let i = 0; i < cfg.mines; i++) {
+    const [r, c] = candidates[i];
+    board[r][c].mine = true;
+  }
+
+  // 计算每格数字（周围地雷数）
+  for (let r = 0; r < cfg.rows; r++) {
+    for (let c = 0; c < cfg.cols; c++) {
+      if (!board[r][c].mine) {
+        board[r][c].number = countAdjMines(r, c);
+      }
+    }
+  }
+
+  // 分配礼物（安全格中随机）
+  for (let r = 0; r < cfg.rows; r++) {
+    for (let c = 0; c < cfg.cols; c++) {
+      if (!board[r][c].mine && Math.random() < giftRate) {
+        board[r][c].gift = true;
+        board[r][c].giftEmoji = GIFT_EMOJIS[Math.floor(Math.random() * GIFT_EMOJIS.length)];
+      }
+    }
+  }
+}
+
+/** 统计 (r,c) 周围8格中地雷数量 */
+function countAdjMines(r, c) {
+  let cnt = 0;
+  forAdj(r, c, (nr, nc) => { if (board[nr][nc].mine) cnt++; });
+  return cnt;
+}
+
+/** 遍历 (r,c) 周围8格 */
+function forAdj(r, c, fn) {
+  for (let dr = -1; dr <= 1; dr++) {
+    for (let dc = -1; dc <= 1; dc++) {
+      if (dr === 0 && dc === 0) continue;
+      const nr = r + dr, nc = c + dc;
+      if (nr >= 0 && nr < cfg.rows && nc >= 0 && nc < cfg.cols) fn(nr, nc);
+    }
+  }
+}
+
+// ════════════════════════════════════════════════
+// 棋盘渲染
+// ════════════════════════════════════════════════
+
+/** 根据 board[][] 状态渲染 DOM */
+function renderBoard() {
+  const el = document.getElementById('board');
+  el.style.gridTemplateColumns = `repeat(${cfg.cols}, 36px)`;
+  el.innerHTML = '';
+
+  for (let r = 0; r < cfg.rows; r++) {
+    for (let c = 0; c < cfg.cols; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.r = r;
+      cell.dataset.c = c;
+      cell.addEventListener('click', onLeftClick);
+      cell.addEventListener('contextmenu', onRightClick);
+      el.appendChild(cell);
+    }
+  }
+}
+
+/** 更新单个格子的视觉表现 */
+function updateCell(r, c) {
+  const el = document.getElementById('board').children[r * cfg.cols + c];
+  const cell = board[r][c];
+
+  // 重置
+  el.className = 'cell';
+  el.textContent = '';
+
+  if (cell.flagged) {
+    el.classList.add('flagged');
+    return;
+  }
+
+  if (!cell.revealed) return;
+
+  // 已翻开
+  el.classList.add('revealed');
+
+  if (cell.mine) {
+    el.classList.add('mine-reveal');
+    el.textContent = '💣';
+    return;
+  }
+
+  if (cell.gift) {
+    el.classList.add('gift-reveal');
+    el.textContent = cell.giftEmoji;
+    return;
+  }
+
+  if (cell.number > 0) {
+    el.classList.add(`n${cell.number}`);
+    el.textContent = cell.number;
+  }
+  // number===0 保持空白
+}
+
+// ════════════════════════════════════════════════
+// 点击处理
+// ════════════════════════════════════════════════
+
+/** 左键：翻开格子 */
+function onLeftClick(e) {
+  if (gameState === 'win' || gameState === 'lose') return;
+
+  const r = parseInt(this.dataset.r);
+  const c = parseInt(this.dataset.c);
+  const cell = board[r][c];
+
+  if (cell.flagged || cell.revealed) return;
+
+  // 首次点击：放雷 + 启动计时
+  if (firstClick) {
+    firstClick = false;
+    gameState = 'playing';
+    placeMines(r, c);
+    startTimer();
+    // 重新渲染（礼物已分配）
+    renderBoard();
+  }
+
+  if (cell.mine) {
+    // 踩雷
+    cell.revealed = true;
+    updateCell(r, c);
+    // 爆炸效果
+    const el = document.getElementById('board').children[r * cfg.cols + c];
+    el.classList.remove('revealed');
+    el.classList.add('mine-explode');
+    el.textContent = '💣';
+    triggerLose();
+    return;
+  }
+
+  // BFS 翻开（空白区域连锁展开）
+  revealBFS(r, c);
+  checkWin();
+}
+
+/** 右键：插旗 / 取旗 */
+function onRightClick(e) {
+  e.preventDefault();
+  if (gameState === 'win' || gameState === 'lose') return;
+
+  const r = parseInt(this.dataset.r);
+  const c = parseInt(this.dataset.c);
+  const cell = board[r][c];
+
+  if (cell.revealed) return;
+
+  if (cell.flagged) {
+    cell.flagged = false;
+    flagsPlaced--;
+  } else {
+    cell.flagged = true;
+    flagsPlaced++;
+  }
+
+  updateCell(r, c);
+
+  // 更新状态栏
+  const remaining = cfg.mines - flagsPlaced;
+  document.getElementById('mineCount').textContent = String(Math.max(0, remaining)).padStart(3,'0');
+  document.getElementById('flagCount').textContent = flagsPlaced;
+}
+
+// ════════════════════════════════════════════════
+// BFS 翻开空白区域
+// ════════════════════════════════════════════════
+
+/** 从 (r,c) 出发 BFS 翻开所有可连锁翻开的格子 */
+function revealBFS(startR, startC) {
+  const queue = [[startR, startC]];
+  const visited = new Set([startR * cfg.cols + startC]);
+
+  while (queue.length > 0) {
+    const [r, c] = queue.shift();
+    const cell = board[r][c];
+
+    if (cell.revealed || cell.flagged || cell.mine) continue;
+
+    cell.revealed = true;
+    revealedCnt++;
+    updateCell(r, c);
+
+    // 收集礼物
+    if (cell.gift) {
+      giftCollectedCnt++;
+      document.getElementById('giftCount').textContent = giftCollectedCnt;
+      addGiftLog(cell.giftEmoji);
+      updateGiftProgress();
+    }
+
+    // 如果是数字格（number>0），不继续向外扩展
+    // 如果是空白格（number===0），继续 BFS 扩展周围
+    if (cell.number === 0) {
+      forAdj(r, c, (nr, nc) => {
+        const key = nr * cfg.cols + nc;
+        if (!visited.has(key) && !board[nr][nc].revealed && !board[nr][nc].flagged && !board[nr][nc].mine) {
+          visited.add(key);
+          queue.push([nr, nc]);
+        }
+      });
+    }
+  }
+
+  // 更新本局统计
+  updateRightPanel();
+}
+
+// ════════════════════════════════════════════════
+// 胜负判定
+// ════════════════════════════════════════════════
+
+/** 获取总安全格数 */
+function totalSafe() {
+  return cfg.rows * cfg.cols - cfg.mines;
+}
+
+/** 检查是否获胜（所有安全格已翻开） */
+function checkWin() {
+  if (revealedCnt >= totalSafe()) {
+    triggerWin();
+  }
+}
+
+/** 触发胜利 */
+function triggerWin() {
+  gameState = 'win';
+  stopTimer();
+  document.getElementById('faceBtn').textContent = '😎';
+
+  // 更新最佳时间
+  if (bestTime[currentDiff] === null || elapsedSec < bestTime[currentDiff]) {
+    bestTime[currentDiff] = elapsedSec;
+    updateBestTime();
+  }
+
+  // 更新胜率
+  sessionStats[currentDiff].win++;
+  sessionStats[currentDiff].total++;
+  updateWinRate();
+
+  // 判断解锁哪个奖品
+  let prize = '';
+  if (giftCollectedCnt >= giftTarget) {
+    prize = document.getElementById('prize1').value || '现金红包 ¥88';
+    unlockPrize(0);
+  } else if (giftCollectedCnt > 0) {
+    prize = document.getElementById('prize2').value || '优惠券 ¥20';
+    unlockPrize(1);
+  } else {
+    prize = document.getElementById('prize3').value || '积分 × 500';
+    unlockPrize(2);
+  }
+
+  // 烟花
+  spawnFireworks();
+
+  // 显示覆盖层
+  const overlay = document.getElementById('gameOverlay');
+  document.getElementById('overlayTitle').className = 'overlay-title win';
+  document.getElementById('overlayTitle').textContent = '🎉 恭喜通关！';
+  document.getElementById('overlaySub').textContent = `用时 ${elapsedSec} 秒，收集礼物 ${giftCollectedCnt} 个`;
+  document.getElementById('overlayPrizeContent').textContent = prize;
+  document.getElementById('overlayPrizeBox').style.display = 'block';
+  overlay.classList.add('show');
+
+  showNotify('🏆 扫雷成功！奖品已解锁');
+}
+
+/** 触发失败 */
+function triggerLose() {
+  gameState = 'lose';
+  stopTimer();
+  document.getElementById('faceBtn').textContent = '😵';
+
+  // 更新胜率统计
+  sessionStats[currentDiff].total++;
+  updateWinRate();
+
+  // 短暂延迟后显示所有地雷
+  setTimeout(() => {
+    revealAllMines();
+    // 显示覆盖层
+    const overlay = document.getElementById('gameOverlay');
+    document.getElementById('overlayTitle').className = 'overlay-title lose';
+    document.getElementById('overlayTitle').textContent = '💥 踩到地雷！';
+    document.getElementById('overlaySub').textContent = `已翻开 ${revealedCnt} 格，收集礼物 ${giftCollectedCnt} 个`;
+    document.getElementById('overlayPrizeBox').style.display = 'none';
+    overlay.classList.add('show');
+  }, 400);
+
+  showNotify('💥 踩到地雷，游戏结束');
+}
+
+/** 游戏结束后展示所有地雷 */
+function revealAllMines() {
+  const boardEl = document.getElementById('board');
+  for (let r = 0; r < cfg.rows; r++) {
+    for (let c = 0; c < cfg.cols; c++) {
+      const cell = board[r][c];
+      if (cell.mine && !cell.revealed) {
+        // 揭示未被发现的地雷
+        const el = boardEl.children[r * cfg.cols + c];
+        if (cell.flagged) {
+          // 插对了：不变
+        } else {
+          el.className = 'cell mine-reveal';
+          el.textContent = '💣';
+        }
+      } else if (!cell.mine && cell.flagged) {
+        // 插错旗：显示叉
+        const el = boardEl.children[r * cfg.cols + c];
+        el.className = 'cell revealed flag-wrong';
+        el.textContent = '';
+      }
+    }
+  }
+}
+
+// ════════════════════════════════════════════════
+// 计时器
+// ════════════════════════════════════════════════
+
+function startTimer() {
+  elapsedSec = 0;
+  timerInterval = setInterval(() => {
+    elapsedSec++;
+    document.getElementById('timerDisplay').textContent = String(elapsedSec).padStart(3,'0');
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+// ════════════════════════════════════════════════
+// 右侧面板更新
+// ════════════════════════════════════════════════
+
+function updateRightPanel() {
+  // 本局统计
+  document.getElementById('revealedCount').textContent = revealedCnt;
+  document.getElementById('safeLeft').textContent = Math.max(0, totalSafe() - revealedCnt);
+  document.getElementById('giftCollected').textContent = `${giftCollectedCnt} / ${giftTarget}`;
+  updateGiftProgress();
+  updateWinRate();
+  renderPrizeUnlockList();
+}
+
+/** 更新礼物进度条 */
+function updateGiftProgress() {
+  const pct = giftTarget > 0 ? Math.min(100, Math.round(giftCollectedCnt / giftTarget * 100)) : 0;
+  document.getElementById('giftProgressLabel').textContent = `${giftCollectedCnt} / ${giftTarget} 个`;
+  document.getElementById('giftProgressPct').textContent   = `${pct}%`;
+  document.getElementById('giftProgressBar').style.width   = `${pct}%`;
+  document.getElementById('giftCollected').textContent     = `${giftCollectedCnt} / ${giftTarget}`;
+}
+
+/** 更新胜率 */
+function updateWinRate() {
+  const s = sessionStats[currentDiff];
+  const rate = s.total > 0 ? Math.round(s.win / s.total * 100) + '%' : '--';
+  document.getElementById('winRate').textContent = rate;
+}
+
+/** 更新最佳时间 */
+function updateBestTime() {
+  ['easy','normal','hard'].forEach(d => {
+    const el = document.getElementById(`best${d.charAt(0).toUpperCase()+d.slice(1)}`);
+    el.textContent = bestTime[d] !== null ? `${bestTime[d]} 秒` : '--';
+  });
+}
+
+/** 渲染奖品解锁列表 */
+function renderPrizeUnlockList() {
+  const prizes = [
+    { icon: '🎁', label: document.getElementById('prize1').value || '现金红包 ¥88', cond: `集满 ${giftTarget} 个礼物 + 全部翻开`, unlocked: false },
+    { icon: '🎀', label: document.getElementById('prize2').value || '优惠券 ¥20',   cond: `收集到至少 1 个礼物 + 全部翻开`, unlocked: false },
+    { icon: '✨', label: document.getElementById('prize3').value || '积分 × 500',   cond: `完成全部翻开`, unlocked: false },
+  ];
+
+  const ul = document.getElementById('prizeUnlockList');
+  ul.innerHTML = '';
+  prizes.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'prize-unlock-item' + (p.unlocked ? ' unlocked' : '');
+    div.id = `prizeUnlock${i}`;
+    div.innerHTML = `
+      <span class="prize-unlock-icon">${p.icon}</span>
+      <div style="flex:1">
+        <div class="prize-unlock-text">${p.label}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${p.cond}</div>
+      </div>
+      <span class="prize-unlock-badge">待解锁</span>
+    `;
+    ul.appendChild(div);
+  });
+}
+
+/** 解锁指定奖品（0=大奖/1=中奖/2=参与） */
+function unlockPrize(idx) {
+  const el = document.getElementById(`prizeUnlock${idx}`);
+  if (!el) return;
+  el.classList.add('unlocked');
+  el.querySelector('.prize-unlock-badge').textContent = '已解锁 🎉';
+}
+
+/** 添加礼物收集日志 */
+function addGiftLog(emoji) {
+  const log = document.getElementById('giftLog');
+  // 清除"暂无"提示
+  if (log.querySelector('[data-empty]')) log.innerHTML = '';
+
+  const item = document.createElement('div');
+  item.className = 'gift-log-item gift-log-new';
+  item.textContent = `${emoji} 收集到一个礼物！`;
+  log.insertBefore(item, log.firstChild);
+
+  // 保留最近10条
+  while (log.children.length > 10) log.removeChild(log.lastChild);
+}
+
+// ════════════════════════════════════════════════
+// 烟花特效
+// ════════════════════════════════════════════════
+
+function spawnFireworks() {
+  const center = document.querySelector('.panel-center');
+  const colors = ['#F5C842','#EC4899','#7C3AED','#60A5FA','#34D399','#F97316'];
+
+  for (let burst = 0; burst < 6; burst++) {
+    setTimeout(() => {
+      const bx = 30 + Math.random() * 40; // % 水平位置
+      const by = 20 + Math.random() * 40; // % 垂直位置
+
+      for (let p = 0; p < 16; p++) {
+        const fw = document.createElement('div');
+        fw.className = 'firework';
+        const angle = (p / 16) * Math.PI * 2;
+        const dist  = 60 + Math.random() * 80;
+        fw.style.cssText = `
+          left: ${bx}%; top: ${by}%;
+          background: ${colors[Math.floor(Math.random() * colors.length)]};
+          --dx: ${Math.cos(angle) * dist}px;
+          --dy: ${Math.sin(angle) * dist}px;
+          animation-duration: ${0.8 + Math.random() * 0.6}s;
+          animation-delay: ${Math.random() * 0.2}s;
+        `;
+        center.appendChild(fw);
+        setTimeout(() => fw.remove(), 1600);
+      }
+    }, burst * 250);
+  }
+}
+
+// ════════════════════════════════════════════════
+// 通知浮窗
+// ════════════════════════════════════════════════
+
+let notifyTimer = null;
+function showNotify(msg) {
+  const el = document.getElementById('notifyBubble');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (notifyTimer) clearTimeout(notifyTimer);
+  notifyTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// ════════════════════════════════════════════════
+// 难度切换 / 滑块
+// ════════════════════════════════════════════════
+
+function setDiff(diff) {
+  currentDiff = diff;
+  cfg = { ...DIFFICULTY[diff] };
+  document.querySelectorAll('#diffGroup .btn-option').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.diff === diff);
+  });
+  restartGame();
+}
+
+function updateSlider(sliderId, valId, val, unit) {
+  document.getElementById(valId).textContent = val + unit;
+}
+
+// ════════════════════════════════════════════════
+// 游戏初始化入口
+// ════════════════════════════════════════════════
+
+(function init() {
+  resetGame();
+  renderBoard();
+  updateRightPanel();
+  // 设置礼物日志初始占位
+  const log = document.getElementById('giftLog');
+  log.innerHTML = '<div data-empty style="color:var(--muted);font-size:12px;padding:4px 0">暂无礼物收集记录</div>';
+})();
+</script>
+</body>
+</html>
