@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 扭蛋机</title>
+<style>
+  /* ===== 基础重置 ===== */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* ===== CSS 变量（设计语言） ===== */
+  :root {
+    --gold:    #F5C842;
+    --bg:      #0D0720;
+    --accent:  #7C3AED;
+    --accent2: #EC4899;
+    --deep:    #1A0A2E;
+    --card:    rgba(255,255,255,0.05);
+    --border:  rgba(255,255,255,0.1);
+    --text:    #F0EAF8;
+    --muted:   rgba(240,234,248,0.5);
+  }
+
+  /* ===== 页面整体 ===== */
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== 顶部导航 ===== */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.97);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    min-height: 52px;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 16px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: var(--text); flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 8px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; flex-shrink: 0;
+  }
+  /* 横向滚动标签栏 */
+  .nav-tabs {
+    display: flex; gap: 2px;
+    overflow-x: auto; flex: 1;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 6px 13px; border-radius: 7px;
+    font-size: 13px; cursor: pointer; white-space: nowrap;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center; flex-shrink: 0;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  /* ===== 三列主布局 ===== */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    flex: 1;
+    height: calc(100vh - 52px - 40px);
+    overflow: hidden;
+  }
+
+  /* ===== 左侧面板 ===== */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.2px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 13px;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .card-title .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); flex-shrink:0; }
+
+  /* 奖品池列表 */
+  .prize-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .prize-item:last-child { border-bottom: none; }
+  .prize-egg {
+    width: 28px; height: 32px; border-radius: 50% 50% 45% 45%;
+    flex-shrink: 0; position: relative; overflow: hidden;
+  }
+  .prize-egg::after {
+    content: '';
+    position: absolute; left: 0; right: 0; top: 50%; bottom: 0;
+    background: rgba(0,0,0,0.25);
+  }
+  .prize-info { flex: 1; min-width: 0; }
+  .prize-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prize-rare {
+    font-size: 11px; font-weight: 700;
+    padding: 2px 7px; border-radius: 4px; display: inline-block; margin-top: 2px;
+  }
+  .prize-rate { font-size: 12px; color: var(--gold); font-weight: 700; flex-shrink: 0; }
+
+  /* 稀有度颜色 */
+  .rarity-normal  { background: rgba(160,160,160,0.15); color: #aaa; }
+  .rarity-rare    { background: rgba(56,189,248,0.15);  color: #38bdf8; }
+  .rarity-epic    { background: rgba(167,139,250,0.15); color: #a78bfa; }
+  .rarity-legend  { background: rgba(245,200,66,0.2);   color: var(--gold); }
+  .rarity-limited { background: rgba(236,72,153,0.15);  color: var(--accent2); }
+
+  /* 蛋颜色 */
+  .egg-normal  { background: linear-gradient(160deg,#c0c0c0,#888); }
+  .egg-rare    { background: linear-gradient(160deg,#7dd3fc,#0ea5e9); }
+  .egg-epic    { background: linear-gradient(160deg,#c4b5fd,#7c3aed); }
+  .egg-legend  { background: linear-gradient(160deg,#fde68a,#f59e0b); }
+  .egg-limited { background: linear-gradient(160deg,#f9a8d4,#ec4899); }
+
+  /* 模式切换 */
+  .mode-switch { display: flex; gap: 8px; }
+  .mode-btn {
+    flex: 1; padding: 10px 0; text-align: center;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--muted); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .mode-btn.active { background: rgba(124,58,237,0.2); border-color: var(--accent); color: var(--gold); }
+  .mode-btn:hover:not(.active) { border-color: rgba(124,58,237,0.4); color: var(--text); }
+
+  /* 保底配置 */
+  .guarantee-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+  }
+  .guarantee-row:last-child { border-bottom: none; }
+  .guarantee-label { flex: 1; color: var(--muted); }
+  .guarantee-input {
+    width: 64px; padding: 5px 8px; text-align: center;
+    background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-size: 13px;
+  }
+  .guarantee-input:focus { outline: none; border-color: var(--accent); }
+  .guarantee-toggle {
+    width: 38px; height: 22px; border-radius: 11px;
+    background: rgba(255,255,255,0.1); border: none; cursor: pointer;
+    position: relative; transition: background 0.3s; flex-shrink: 0;
+  }
+  .guarantee-toggle.on { background: var(--accent); }
+  .guarantee-toggle::after {
+    content: ''; position: absolute;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #fff; top: 3px; left: 3px;
+    transition: transform 0.3s;
+  }
+  .guarantee-toggle.on::after { transform: translateX(16px); }
+
+  /* 概率编辑 */
+  .prob-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .prob-row:last-child { border-bottom: none; }
+  .prob-row-label { flex: 1; color: var(--muted); }
+  .prob-input {
+    width: 56px; padding: 4px 7px; text-align: center;
+    background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+    border-radius: 5px; color: var(--text); font-size: 12px;
+  }
+  .prob-input:focus { outline: none; border-color: var(--accent); }
+
+  /* ===== 中间游戏区 ===== */
+  .game-center {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 20px 28px; position: relative; overflow: hidden;
+    gap: 20px;
+  }
+
+  /* 背景装饰 */
+  .bg-glow {
+    position: absolute; border-radius: 50%; pointer-events: none; opacity: 0;
+    transition: opacity 0.5s;
+  }
+  .bg-glow.show { opacity: 1; animation: glowPulse 1.2s ease-out forwards; }
+  @keyframes glowPulse {
+    0%   { opacity: 0.8; transform: scale(0.6); }
+    60%  { opacity: 0.5; transform: scale(1.2); }
+    100% { opacity: 0; transform: scale(1.5); }
+  }
+  .glow-normal  { width: 320px; height: 320px; background: radial-gradient(circle,rgba(160,160,160,0.3),transparent 70%); }
+  .glow-rare    { width: 380px; height: 380px; background: radial-gradient(circle,rgba(56,189,248,0.4),transparent 70%); }
+  .glow-epic    { width: 420px; height: 420px; background: radial-gradient(circle,rgba(167,139,250,0.5),transparent 70%); }
+  .glow-legend  { width: 480px; height: 480px; background: radial-gradient(circle,rgba(245,200,66,0.55),transparent 70%); }
+  .glow-limited { width: 500px; height: 500px; background: radial-gradient(circle,rgba(236,72,153,0.6),transparent 70%); }
+
+  /* 光柱（稀有以上） */
+  .light-beam {
+    position: absolute; width: 4px; top: 0; bottom: 0;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.6), transparent);
+    pointer-events: none; opacity: 0;
+    animation: none;
+  }
+  .light-beam.show { animation: beamAnim 1.5s ease-out forwards; }
+  @keyframes beamAnim {
+    0%   { opacity: 0; transform: scaleY(0); }
+    30%  { opacity: 0.8; transform: scaleY(1); }
+    100% { opacity: 0; transform: scaleY(1); }
+  }
+
+  /* ===== 扭蛋机整体 ===== */
+  .machine-wrap {
+    position: relative; display: flex; flex-direction: column;
+    align-items: center; flex-shrink: 0;
+  }
+
+  /* 机器顶部标题牌 */
+  .machine-header {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 6px 28px; border-radius: 12px 12px 0 0;
+    font-size: 14px; font-weight: 800; letter-spacing: 2px;
+    text-align: center; position: relative;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+  }
+  .machine-header::before,
+  .machine-header::after {
+    content: '★'; font-size: 12px; color: var(--gold); margin: 0 6px;
+  }
+
+  /* 机器主体框架 */
+  .machine-body {
+    background: linear-gradient(180deg, #2a1550 0%, #1a0a35 100%);
+    border: 2px solid rgba(124,58,237,0.5);
+    border-radius: 0 0 16px 16px;
+    padding: 12px 16px 16px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+    position: relative;
+    transition: transform 0.1s;
+  }
+  .machine-body.shake {
+    animation: machineShake 0.4s ease-out;
+  }
+  @keyframes machineShake {
+    0%,100% { transform: translateX(0); }
+    15%     { transform: translateX(-5px) rotate(-1deg); }
+    30%     { transform: translateX(5px)  rotate(1deg); }
+    45%     { transform: translateX(-4px) rotate(-0.8deg); }
+    60%     { transform: translateX(4px)  rotate(0.8deg); }
+    75%     { transform: translateX(-2px); }
+    90%     { transform: translateX(2px); }
+  }
+
+  /* 球仓（大圆形玻璃球仓） */
+  .ball-tank {
+    width: 200px; height: 200px; border-radius: 50%;
+    background: radial-gradient(ellipse at 35% 30%, rgba(255,255,255,0.15) 0%, rgba(124,58,237,0.08) 60%, rgba(13,7,32,0.6) 100%);
+    border: 3px solid rgba(255,255,255,0.2);
+    box-shadow:
+      0 0 0 4px rgba(124,58,237,0.2),
+      inset 0 4px 20px rgba(0,0,0,0.5),
+      0 4px 30px rgba(124,58,237,0.3);
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  /* 玻璃高光 */
+  .ball-tank::before {
+    content: '';
+    position: absolute; top: 14px; left: 30px;
+    width: 60px; height: 40px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    transform: rotate(-20deg);
+    pointer-events: none;
+  }
+  /* 球仓旋转层 */
+  .tank-inner {
+    width: 100%; height: 100%;
+    position: relative;
+  }
+  .tank-inner.spinning {
+    animation: tankSpin 0.6s ease-in-out;
+  }
+  @keyframes tankSpin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* 球仓内的彩色小球 */
+  .mini-ball {
+    position: absolute;
+    width: 26px; height: 30px;
+    border-radius: 50% 50% 45% 45%;
+    animation: floatBall linear infinite;
+  }
+  @keyframes floatBall {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    25%  { transform: translate(6px, -8px) rotate(90deg); }
+    50%  { transform: translate(-4px, 4px) rotate(180deg); }
+    75%  { transform: translate(8px, 2px) rotate(270deg); }
+    100% { transform: translate(0, 0) rotate(360deg); }
+  }
+
+  /* 机器中间：出口槽区域 */
+  .machine-mid {
+    width: 220px; display: flex; align-items: center; gap: 0;
+    position: relative; height: 36px;
+  }
+  /* 出口导槽 */
+  .outlet-slot {
+    width: 60px; height: 28px;
+    background: linear-gradient(180deg, #0d0720, #1a0a35);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: inset 0 4px 8px rgba(0,0,0,0.5);
+  }
+  .outlet-slot::before {
+    content: '';
+    position: absolute; top: -1px; left: 10px; right: 10px; height: 4px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 0 0 4px 4px;
+  }
+
+  /* 摇杆组件（机器右侧） */
+  .lever-wrap {
+    position: absolute; right: -14px; top: 50%;
+    transform: translateY(-50%);
+    display: flex; flex-direction: column; align-items: center;
+    cursor: pointer; user-select: none;
+    z-index: 10;
+  }
+  .lever-ball {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #f472b6, var(--accent2));
+    box-shadow: 0 2px 8px rgba(236,72,153,0.6);
+    transition: transform 0.15s;
+    flex-shrink: 0;
+  }
+  .lever-shaft {
+    width: 8px; height: 40px;
+    background: linear-gradient(180deg, #6d28d9, #4c1d95);
+    border-radius: 4px;
+    transform-origin: top center;
+    transition: transform 0.15s;
+  }
+  .lever-base {
+    width: 18px; height: 10px; border-radius: 0 0 6px 6px;
+    background: linear-gradient(180deg,#4c1d95,#2d1470);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  /* 摇杆按下动画 */
+  .lever-wrap.pressed .lever-shaft { transform: rotate(35deg); }
+  .lever-wrap.pressed .lever-ball  { transform: translateX(10px) translateY(4px); }
+
+  /* 托盘 */
+  .tray {
+    width: 220px; height: 56px;
+    background: radial-gradient(ellipse at 50% 30%, rgba(124,58,237,0.15) 0%, rgba(13,7,32,0.8) 100%);
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: visible;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4), inset 0 -4px 12px rgba(0,0,0,0.3);
+  }
+  /* 聚光灯 */
+  .tray::before {
+    content: '';
+    position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+    width: 80px; height: 80px;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .tray.spotlight::before { opacity: 1; animation: spotlightAnim 1.5s ease-out; }
+  @keyframes spotlightAnim {
+    0%   { opacity: 0; }
+    30%  { opacity: 1; }
+    100% { opacity: 0.3; }
+  }
+
+  /* ===== 飞蛋动画 ===== */
+  .flying-egg {
+    position: absolute;
+    width: 40px; height: 46px;
+    border-radius: 50% 50% 45% 45%;
+    pointer-events: none;
+    z-index: 50;
+    display: none;
+  }
+  .flying-egg.animate {
+    display: block;
+    animation: eggFly 0.7s cubic-bezier(.2,.8,.5,1) forwards;
+  }
+  /* 动画从出口到托盘，路径由 JS 控制 transform，用 keyframes 控制抛物线 */
+  @keyframes eggFly {
+    0%   { opacity: 1; transform: translate(0,0) rotate(0deg) scale(0.6); }
+    40%  { transform: translate(-20px, -30px) rotate(-20deg) scale(1); }
+    100% { transform: translate(-20px, 60px) rotate(15deg) scale(1); opacity: 1; }
+  }
+
+  /* ===== 托盘上的蛋（结果展示） ===== */
+  .result-egg {
+    width: 70px; height: 80px;
+    border-radius: 50% 50% 45% 45%;
+    position: relative; cursor: pointer;
+    display: none; flex-shrink: 0;
+    z-index: 20;
+  }
+  .result-egg.show {
+    display: block;
+    animation: eggAppear 0.35s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes eggAppear {
+    0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+  /* 蛋闪烁 */
+  .result-egg.flashing { animation: eggFlash 0.6s ease-in-out 3; }
+  @keyframes eggFlash {
+    0%,100% { filter: brightness(1); }
+    50%     { filter: brightness(2) saturate(1.5); }
+  }
+  /* 蛋破壳 */
+  .result-egg.cracking { animation: eggCrack 0.4s ease-out; }
+  @keyframes eggCrack {
+    0%   { transform: scale(1) rotate(0); }
+    20%  { transform: scale(1.05) rotate(-5deg); }
+    40%  { transform: scale(0.95) rotate(5deg); }
+    60%  { transform: scale(1.1) rotate(-3deg); }
+    100% { transform: scale(0) rotate(15deg); opacity: 0; }
+  }
+
+  /* 裂缝 SVG */
+  .egg-crack-svg {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .result-egg.flashing .egg-crack-svg { opacity: 0.5; }
+
+  /* 奖品浮出 */
+  .prize-reveal {
+    width: 100px; height: 100px;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; z-index: 30; position: relative;
+  }
+  .prize-reveal.show {
+    display: flex;
+    animation: prizeFloat 0.6s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes prizeFloat {
+    0%   { transform: scale(0) translateY(20px); opacity: 0; }
+    60%  { transform: scale(1.2) translateY(-8px); opacity: 1; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  .prize-icon { font-size: 40px; line-height: 1; }
+  .prize-reveal-name { font-size: 12px; font-weight: 700; text-align: center; }
+  .prize-reveal-rare {
+    font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 4px;
+  }
+
+  /* 十连抽结果网格 */
+  .multi-result {
+    display: none; flex-wrap: wrap; gap: 8px; justify-content: center;
+    max-width: 340px;
+  }
+  .multi-result.show { display: flex; animation: fadeInUp 0.4s ease-out; }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .multi-card {
+    width: 60px; display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 8px 4px;
+    animation: cardPop 0.3s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  .multi-card:nth-child(2)  { animation-delay: 0.05s; }
+  .multi-card:nth-child(3)  { animation-delay: 0.10s; }
+  .multi-card:nth-child(4)  { animation-delay: 0.15s; }
+  .multi-card:nth-child(5)  { animation-delay: 0.20s; }
+  .multi-card:nth-child(6)  { animation-delay: 0.25s; }
+  .multi-card:nth-child(7)  { animation-delay: 0.30s; }
+  .multi-card:nth-child(8)  { animation-delay: 0.35s; }
+  .multi-card:nth-child(9)  { animation-delay: 0.40s; }
+  .multi-card:nth-child(10) { animation-delay: 0.45s; }
+  @keyframes cardPop {
+    0%   { opacity: 0; transform: scale(0.4); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  .multi-card-egg {
+    width: 30px; height: 35px; border-radius: 50% 50% 45% 45%;
+  }
+  .multi-card-name { font-size: 10px; text-align: center; color: var(--muted); overflow: hidden; }
+  .multi-card-rare {
+    font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px;
+  }
+
+  /* 按钮组 */
+  .action-btns { display: flex; gap: 12px; }
+  .btn-spin {
+    padding: 12px 28px; border-radius: 10px; font-size: 15px; font-weight: 700;
+    cursor: pointer; border: none; transition: all 0.2s; letter-spacing: 0.5px;
+  }
+  .btn-spin-1 {
+    background: linear-gradient(135deg, var(--accent), #6d28d9);
+    color: #fff; box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+  }
+  .btn-spin-1:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(124,58,237,0.55); }
+  .btn-spin-10 {
+    background: linear-gradient(135deg, var(--accent2), #be185d);
+    color: #fff; box-shadow: 0 4px 20px rgba(236,72,153,0.4);
+  }
+  .btn-spin-10:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(236,72,153,0.55); }
+  .btn-spin:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+  /* 保底进度条 */
+  .guarantee-bar-wrap {
+    width: 100%; max-width: 340px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 16px;
+  }
+  .guarantee-bar-label {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--muted); margin-bottom: 8px;
+  }
+  .guarantee-bar-label span:last-child { color: var(--gold); font-weight: 700; }
+  .bar-track {
+    width: 100%; height: 8px; background: rgba(255,255,255,0.08);
+    border-radius: 4px; overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.4s ease;
+    min-width: 4px;
+  }
+  /* 抽取计数 */
+  .spin-count {
+    font-size: 12px; color: var(--muted); text-align: center; margin-top: 6px;
+  }
+  .spin-count strong { color: var(--text); font-size: 14px; }
+
+  /* ===== 右侧数据面板 ===== */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+
+  /* 统计卡片 */
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .stat-cell {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 10px;
+    text-align: center;
+  }
+  .stat-cell-val { font-size: 22px; font-weight: 800; }
+  .stat-cell-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* 稀有度分布 */
+  .dist-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .dist-row:last-child { border-bottom: none; }
+  .dist-name { width: 40px; flex-shrink: 0; }
+  .dist-bar-track {
+    flex: 1; height: 5px; background: rgba(255,255,255,0.08);
+    border-radius: 3px; overflow: hidden;
+  }
+  .dist-bar-fill {
+    height: 100%; border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+  .dist-count { width: 24px; text-align: right; font-weight: 700; color: var(--muted); }
+
+  /* 最近获得列表 */
+  .recent-list { display: flex; flex-direction: column; gap: 6px; }
+  .recent-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    animation: slideIn 0.3s ease-out;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(12px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .recent-egg {
+    width: 22px; height: 26px; border-radius: 50% 50% 45% 45%; flex-shrink: 0;
+  }
+  .recent-info { flex: 1; min-width: 0; }
+  .recent-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .recent-rare { font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 3px; margin-top: 1px; display: inline-block; }
+  .recent-time { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+
+  /* 保底计数显示 */
+  .guarantee-counter {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+  .guarantee-counter-title { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .guarantee-counter-val { font-size: 28px; font-weight: 800; color: var(--gold); line-height: 1; }
+  .guarantee-counter-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* 重置按钮 */
+  .btn-reset {
+    width: 100%; padding: 9px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    color: var(--muted); cursor: pointer; transition: all 0.2s; margin-bottom: 14px;
+  }
+  .btn-reset:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* ===== 底部状态栏 ===== */
+  .statusbar {
+    height: 40px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    gap: 20px; padding: 0 32px; font-size: 12px;
+    color: var(--muted); background: rgba(255,255,255,0.02);
+    flex-shrink: 0;
+  }
+  .statusbar-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); flex-shrink: 0;
+  }
+
+  /* ===== 滚动条 ===== */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部导航 ===== -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">🎮 <span>Game</span>Hub</a>
+  <span class="nav-badge">中台</span>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="index.html">首页</a>
+    <a class="nav-tab" href="wheel.html">大转盘</a>
+    <a class="nav-tab" href="nine-grid.html">九宫格</a>
+    <a class="nav-tab" href="scratch-card.html">刮刮乐</a>
+    <a class="nav-tab" href="shake-dice.html">摇骰子</a>
+    <a class="nav-tab" href="smash-egg.html">砸金蛋</a>
+    <a class="nav-tab" href="slot-machine.html">老虎机</a>
+    <a class="nav-tab" href="gift-box.html">礼盒开箱</a>
+    <a class="nav-tab" href="whack-mole.html">打地鼠</a>
+    <a class="nav-tab" href="cup-game.html">三杯游戏</a>
+    <a class="nav-tab" href="number-bomb.html">数字炸弹</a>
+    <a class="nav-tab" href="stamp-collect.html">集卡集章</a>
+    <a class="nav-tab" href="vote-pk.html">投票PK</a>
+    <a class="nav-tab active" href="gashapon.html">扭蛋机</a>
+    <a class="nav-tab" href="blind-box.html">盲盒抽卡</a>
+    <a class="nav-tab" href="game-2048.html">2048</a>
+    <a class="nav-tab" href="match3.html">消消乐</a>
+    <a class="nav-tab" href="catch-coins.html">接金币</a>
+    <a class="nav-tab" href="grow-tree.html">成长树</a>
+    <a class="nav-tab" href="flying-chess.html">飞行棋</a>
+    <a class="nav-tab" href="monopoly.html">大富翁</a>
+    <a class="nav-tab" href="red-packet-rain.html">红包雨</a>
+    <a class="nav-tab" href="claw-machine.html">夹娃娃机</a>
+    <a class="nav-tab" href="flip-match.html">翻牌配对</a>
+    <a class="nav-tab" href="shake.html">摇一摇</a>
+    <a class="nav-tab" href="quiz.html">问答闯关</a>
+    <a class="nav-tab" href="daily-checkin.html">每日签到</a>
+  </div>
+</nav>
+
+<!-- ===== 三列布局 ===== -->
+<div class="main">
+
+  <!-- ===== 左侧配置面板 ===== -->
+  <aside class="panel-left">
+    <p class="panel-title">配置面板</p>
+
+    <!-- 奖品池 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品池</div>
+      <div id="prizePoolList">
+        <!-- 由 JS 动态渲染 -->
+      </div>
+    </div>
+
+    <!-- 抽取模式 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>抽取模式</div>
+      <div class="mode-switch">
+        <button class="mode-btn active" id="modeBtn1" onclick="setMode(1)">单次扭</button>
+        <button class="mode-btn" id="modeBtn10" onclick="setMode(10)">十连扭</button>
+      </div>
+    </div>
+
+    <!-- 保底机制 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>保底机制</div>
+      <div class="guarantee-row">
+        <span class="guarantee-label">启用保底</span>
+        <button class="guarantee-toggle on" id="guaranteeToggle" onclick="toggleGuarantee()"></button>
+      </div>
+      <div class="guarantee-row">
+        <span class="guarantee-label">X抽内必出稀有+</span>
+        <input class="guarantee-input" type="number" id="guaranteeCount" value="10" min="1" max="100" onchange="updateGuarantee()">
+      </div>
+      <div class="guarantee-row">
+        <span class="guarantee-label">X抽内必出史诗+</span>
+        <input class="guarantee-input" type="number" id="guaranteeEpicCount" value="30" min="1" max="200" onchange="updateGuarantee()">
+      </div>
+    </div>
+
+    <!-- 概率编辑 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>概率配置（%）</div>
+      <div class="prob-row">
+        <span class="prob-row-label">普通</span>
+        <input class="prob-input" type="number" id="prob0" value="50" min="0" max="100" step="1">
+      </div>
+      <div class="prob-row">
+        <span class="prob-row-label">稀有</span>
+        <input class="prob-input" type="number" id="prob1" value="30" min="0" max="100" step="1">
+      </div>
+      <div class="prob-row">
+        <span class="prob-row-label">史诗</span>
+        <input class="prob-input" type="number" id="prob2" value="12" min="0" max="100" step="1">
+      </div>
+      <div class="prob-row">
+        <span class="prob-row-label">传说</span>
+        <input class="prob-input" type="number" id="prob3" value="6" min="0" max="100" step="1">
+      </div>
+      <div class="prob-row">
+        <span class="prob-row-label">限定</span>
+        <input class="prob-input" type="number" id="prob4" value="2" min="0" max="100" step="1">
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== 中间游戏区 ===== -->
+  <section class="game-center" id="gameCenter">
+
+    <!-- 背景光晕（抽取时触发） -->
+    <div class="bg-glow" id="bgGlow" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);"></div>
+
+    <!-- 光柱组（稀有以上） -->
+    <div id="lightBeams"></div>
+
+    <!-- 扭蛋机 -->
+    <div class="machine-wrap">
+      <!-- 机器顶部标题牌 -->
+      <div class="machine-header">✦ 扭蛋机 ✦</div>
+
+      <!-- 机器主体 -->
+      <div class="machine-body" id="machineBody">
+
+        <!-- 球仓 -->
+        <div class="ball-tank">
+          <div class="tank-inner" id="tankInner">
+            <!-- 彩色小球由 JS 渲染 -->
+          </div>
+        </div>
+
+        <!-- 出口槽 + 摇杆区域 -->
+        <div class="machine-mid">
+          <div class="outlet-slot" id="outletSlot"></div>
+          <!-- 摇杆 -->
+          <div class="lever-wrap" id="leverWrap" onclick="handleLeverClick()">
+            <div class="lever-ball"></div>
+            <div class="lever-shaft"></div>
+            <div class="lever-base"></div>
+          </div>
+        </div>
+
+        <!-- 托盘 -->
+        <div class="tray" id="tray">
+          <!-- 飞行蛋（动画用） -->
+          <div class="flying-egg" id="flyingEgg"></div>
+          <!-- 结果蛋（破壳展示） -->
+          <div class="result-egg" id="resultEgg">
+            <svg class="egg-crack-svg" viewBox="0 0 70 80">
+              <path d="M35 10 L30 35 L40 50" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" fill="none"/>
+              <path d="M20 40 L28 38 L24 55" stroke="rgba(255,255,255,0.5)" stroke-width="1" fill="none"/>
+              <path d="M50 30 L42 42 L48 58" stroke="rgba(255,255,255,0.4)" stroke-width="1" fill="none"/>
+            </svg>
+          </div>
+          <!-- 奖品浮出 -->
+          <div class="prize-reveal" id="prizeReveal">
+            <div class="prize-icon" id="prizeIcon"></div>
+            <div class="prize-reveal-name" id="prizeRevealName"></div>
+            <div class="prize-reveal-rare" id="prizeRevealRare"></div>
+          </div>
+        </div>
+
+      </div><!-- /machine-body -->
+    </div><!-- /machine-wrap -->
+
+    <!-- 十连抽结果网格 -->
+    <div class="multi-result" id="multiResult"></div>
+
+    <!-- 操作按钮 -->
+    <div class="action-btns">
+      <button class="btn-spin btn-spin-1" id="btnSpin1" onclick="spin(1)">扭一下</button>
+      <button class="btn-spin btn-spin-10" id="btnSpin10" onclick="spin(10)">十连扭</button>
+    </div>
+
+    <!-- 保底进度条 -->
+    <div class="guarantee-bar-wrap">
+      <div class="guarantee-bar-label">
+        <span id="guaranteeBarLabel">保底进度（稀有+）</span>
+        <span id="guaranteeBarText">0 / 10</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" id="guaranteeBarFill" style="width:0%"></div>
+      </div>
+      <div class="spin-count">
+        已抽 <strong id="totalSpinCount">0</strong> 次
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===== 右侧数据面板 ===== -->
+  <aside class="panel-right">
+    <p class="panel-title">数据统计</p>
+
+    <!-- 总览 -->
+    <div class="stat-grid">
+      <div class="stat-cell">
+        <div class="stat-cell-val" id="statTotal">0</div>
+        <div class="stat-cell-label">总抽取</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-cell-val" id="statLegend" style="color:var(--gold)">0</div>
+        <div class="stat-cell-label">传说+限定</div>
+      </div>
+    </div>
+
+    <!-- 保底计数 -->
+    <div class="guarantee-counter">
+      <div class="guarantee-counter-title">距下次保底（稀有+）</div>
+      <div class="guarantee-counter-val" id="counterVal">10</div>
+      <div class="guarantee-counter-sub" id="counterSub">还差 10 抽触发</div>
+    </div>
+
+    <!-- 稀有度分布 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>稀有度分布</div>
+      <div id="distRows">
+        <!-- 由 JS 渲染 -->
+      </div>
+    </div>
+
+    <!-- 最近获得 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>最近获得</div>
+      <div class="recent-list" id="recentList">
+        <div style="font-size:12px;color:var(--muted);text-align:center;padding:12px 0;">暂无记录</div>
+      </div>
+    </div>
+
+    <!-- 重置 -->
+    <button class="btn-reset" onclick="resetStats()">重置统计数据</button>
+  </aside>
+
+</div>
+
+<!-- ===== 底部状态栏 ===== -->
+<div class="statusbar">
+  <span class="statusbar-dot"></span>
+  <span>5档稀有度 · 保底机制</span>
+  <span class="statusbar-dot"></span>
+  <span>十连抽支持</span>
+  <span class="statusbar-dot"></span>
+  <span>权重随机算法</span>
+</div>
+
+<script>
+/* ================================================================
+   扭蛋机 · 核心逻辑
+   ================================================================ */
+
+// ===== 稀有度定义 =====
+const RARITIES = [
+  { key: 'normal',  label: '普通', eggClass: 'egg-normal',  rareClass: 'rarity-normal',  color: '#aaaaaa', barColor: '#aaa' },
+  { key: 'rare',    label: '稀有', eggClass: 'egg-rare',    rareClass: 'rarity-rare',    color: '#38bdf8', barColor: '#38bdf8' },
+  { key: 'epic',    label: '史诗', eggClass: 'egg-epic',    rareClass: 'rarity-epic',    color: '#a78bfa', barColor: '#a78bfa' },
+  { key: 'legend',  label: '传说', eggClass: 'egg-legend',  rareClass: 'rarity-legend',  color: '#F5C842', barColor: '#F5C842' },
+  { key: 'limited', label: '限定', eggClass: 'egg-limited', rareClass: 'rarity-limited', color: '#ec4899', barColor: '#ec4899' },
+];
+
+// ===== 默认奖品池 =====
+const defaultPrizes = [
+  { id: 0, name: '铜牌勋章',   rarity: 0, icon: '🏅', stock: -1 },
+  { id: 1, name: '魔法书签',   rarity: 1, icon: '📖', stock: -1 },
+  { id: 2, name: '紫晶宝石',   rarity: 2, icon: '💎', stock: -1 },
+  { id: 3, name: '黄金王冠',   rarity: 3, icon: '👑', stock: -1 },
+  { id: 4, name: '彩虹独角兽', rarity: 4, icon: '🦄', stock: -1 },
+];
+
+// ===== 状态 =====
+let prizes       = JSON.parse(JSON.stringify(defaultPrizes));
+let mode         = 1;          // 当前模式：1 或 10
+let guaranteeOn  = true;       // 保底开关
+let guaranteeN   = 10;         // X抽内必出稀有+
+let guaranteeEpicN = 30;       // X抽内必出史诗+
+let pityCount    = 0;          // 距稀有+保底计数
+let pityEpicCount = 0;         // 距史诗+保底计数
+let totalSpins   = 0;
+let spinLock     = false;      // 防止连点
+
+// 统计
+let stats = { normal:0, rare:0, epic:0, legend:0, limited:0 };
+
+// 概率（百分比，由 input 读取）
+function getProbs() {
+  return [0,1,2,3,4].map(i => parseFloat(document.getElementById('prob'+i).value) || 0);
+}
+
+// ===== 初始化 =====
+function init() {
+  renderPrizePool();
+  renderMiniBalles();
+  renderDistRows();
+  renderRecentList([]);
+  updateGuaranteeUI();
+}
+
+// ===== 渲染奖品池 =====
+function renderPrizePool() {
+  const el = document.getElementById('prizePoolList');
+  el.innerHTML = prizes.map(p => {
+    const r = RARITIES[p.rarity];
+    return `<div class="prize-item">
+      <div class="prize-egg ${r.eggClass}"></div>
+      <div class="prize-info">
+        <div class="prize-name">${p.icon} ${p.name}</div>
+        <span class="prize-rare ${r.rareClass}">${r.label}</span>
+      </div>
+      <div class="prize-rate">${getProbs()[p.rarity]}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== 渲染球仓内小球 =====
+function renderMiniBalles() {
+  const tank = document.getElementById('tankInner');
+  const positions = [
+    {top:'15%',left:'18%',delay:'0s',dur:'3.5s'},
+    {top:'20%',left:'55%',delay:'0.5s',dur:'4.2s'},
+    {top:'48%',left:'12%',delay:'1s',dur:'3.8s'},
+    {top:'55%',left:'60%',delay:'0.3s',dur:'4.5s'},
+    {top:'30%',left:'35%',delay:'0.7s',dur:'3.2s'},
+    {top:'65%',left:'28%',delay:'1.2s',dur:'4s'},
+    {top:'70%',left:'52%',delay:'0.2s',dur:'3.6s'},
+    {top:'10%',left:'72%',delay:'0.9s',dur:'4.1s'},
+  ];
+  const eggClasses = ['egg-normal','egg-rare','egg-epic','egg-legend','egg-limited','egg-rare','egg-epic','egg-normal'];
+  tank.innerHTML = positions.map((p,i) => `
+    <div class="mini-ball ${eggClasses[i]}"
+      style="top:${p.top};left:${p.left};animation-duration:${p.dur};animation-delay:${p.delay}">
+    </div>
+  `).join('');
+}
+
+// ===== 渲染稀有度分布行 =====
+function renderDistRows() {
+  const total = Object.values(stats).reduce((a,b)=>a+b,0) || 1;
+  const el = document.getElementById('distRows');
+  el.innerHTML = RARITIES.map(r => {
+    const cnt = stats[r.key] || 0;
+    const pct = Math.round(cnt / total * 100);
+    return `<div class="dist-row">
+      <span class="dist-name" style="color:${r.color}">${r.label}</span>
+      <div class="dist-bar-track">
+        <div class="dist-bar-fill" style="width:${pct}%;background:${r.barColor}"></div>
+      </div>
+      <span class="dist-count">${cnt}</span>
+    </div>`;
+  }).join('');
+}
+
+// ===== 渲染最近获得 =====
+let recentItems = [];
+function renderRecentList(newItems) {
+  recentItems = [...newItems, ...recentItems].slice(0, 12);
+  const el = document.getElementById('recentList');
+  if (recentItems.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px 0;">暂无记录</div>';
+    return;
+  }
+  el.innerHTML = recentItems.map(item => {
+    const r = RARITIES[item.rarity];
+    const now = new Date();
+    return `<div class="recent-item">
+      <div class="recent-egg ${r.eggClass}"></div>
+      <div class="recent-info">
+        <div class="recent-name">${item.icon} ${item.name}</div>
+        <span class="recent-rare ${r.rareClass}">${r.label}</span>
+      </div>
+      <span class="recent-time">${item.timeStr}</span>
+    </div>`;
+  }).join('');
+}
+
+// ===== 权重随机抽取 =====
+function weightedRandom(probArr) {
+  const sum = probArr.reduce((a,b)=>a+b,0);
+  if (sum <= 0) return 0;
+  let r = Math.random() * sum;
+  for (let i = 0; i < probArr.length; i++) {
+    r -= probArr[i];
+    if (r <= 0) return i;
+  }
+  return probArr.length - 1;
+}
+
+// ===== 保底逻辑：返回稀有度索引 =====
+function drawRarity() {
+  const probs = getProbs();
+  let rarityIdx = weightedRandom(probs);
+
+  if (guaranteeOn) {
+    // 稀有+ 保底
+    if (pityCount >= guaranteeN - 1 && rarityIdx < 1) {
+      rarityIdx = 1; // 至少稀有
+    }
+    // 史诗+ 保底
+    if (pityEpicCount >= guaranteeEpicN - 1 && rarityIdx < 2) {
+      rarityIdx = 2;
+    }
+  }
+  return rarityIdx;
+}
+
+// ===== 单次抽取（返回奖品对象 + 稀有度） =====
+function drawOnce() {
+  const rarityIdx = drawRarity();
+  const rarity = RARITIES[rarityIdx];
+
+  // 更新保底计数
+  if (rarityIdx >= 1) { pityCount = 0; }      // 命中稀有+，重置稀有保底
+  else                { pityCount++; }
+
+  if (rarityIdx >= 2) { pityEpicCount = 0; }   // 命中史诗+，重置史诗保底
+  else                { pityEpicCount++; }
+
+  // 从该稀有度奖品中随机选一个
+  const candidates = prizes.filter(p => p.rarity === rarityIdx);
+  const prize = candidates.length > 0
+    ? candidates[Math.floor(Math.random() * candidates.length)]
+    : prizes[0];
+
+  // 统计
+  stats[rarity.key] = (stats[rarity.key] || 0) + 1;
+  totalSpins++;
+
+  return { ...prize, rarityIdx, rarity };
+}
+
+// ===== 更新 UI 统计 =====
+function updateStats() {
+  document.getElementById('statTotal').textContent = totalSpins;
+  document.getElementById('statLegend').textContent = (stats.legend||0) + (stats.limited||0);
+  renderDistRows();
+  updateGuaranteeUI();
+}
+
+// ===== 更新保底进度条 =====
+function updateGuaranteeUI() {
+  const n = guaranteeN;
+  const cur = pityCount;
+  const pct = Math.min(100, Math.round(cur / n * 100));
+  document.getElementById('guaranteeBarFill').style.width = pct + '%';
+  document.getElementById('guaranteeBarText').textContent = `${cur} / ${n}`;
+  document.getElementById('guaranteeBarLabel').textContent = `保底进度（稀有+，${n}抽）`;
+
+  const remain = n - cur;
+  document.getElementById('counterVal').textContent = remain;
+  document.getElementById('counterSub').textContent = `还差 ${remain} 抽触发`;
+  document.getElementById('totalSpinCount').textContent = totalSpins;
+}
+
+// ===== 摇杆点击事件（单次模式触发 spin(1)） =====
+function handleLeverClick() {
+  if (spinLock) return;
+  if (mode === 1) spin(1);
+  else spin(10);
+}
+
+// ===== 主抽取入口 =====
+function spin(count) {
+  if (spinLock) return;
+  spinLock = true;
+  setButtonsDisabled(true);
+
+  if (count === 1) {
+    spinSingle();
+  } else {
+    spinMulti(count);
+  }
+}
+
+// ===== 单次抽取动画流程 =====
+function spinSingle() {
+  const result = drawOnce();
+
+  // 1. 摇杆按下 + 机器震动
+  const lever    = document.getElementById('leverWrap');
+  const machine  = document.getElementById('machineBody');
+  const tankInner= document.getElementById('tankInner');
+
+  lever.classList.add('pressed');
+  setTimeout(() => lever.classList.remove('pressed'), 300);
+
+  machine.classList.add('shake');
+  tankInner.classList.add('spinning');
+  setTimeout(() => { machine.classList.remove('shake'); tankInner.classList.remove('spinning'); }, 600);
+
+  // 2. 蛋出现在出口，飞向托盘
+  const flyEgg = document.getElementById('flyingEgg');
+  const r = RARITIES[result.rarityIdx];
+  flyEgg.className = 'flying-egg ' + r.eggClass;
+  flyEgg.classList.add('animate');
+
+  // 隐藏之前的结果
+  hideResults();
+
+  setTimeout(() => {
+    flyEgg.classList.remove('animate');
+    flyEgg.style.display = 'none';
+
+    // 3. 蛋在托盘显示
+    showResultEgg(result, () => {
+      // 5. 奖品浮出
+      showPrizeReveal(result);
+      updateStats();
+      addToRecent([result]);
+      triggerGlow(result.rarityIdx);
+      if (result.rarityIdx >= 2) triggerBeams(result.rarityIdx);
+
+      // 解锁
+      setTimeout(() => {
+        spinLock = false;
+        setButtonsDisabled(false);
+      }, 800);
+    });
+  }, 750);
+}
+
+// ===== 十连抽流程 =====
+function spinMulti(count) {
+  // 隐藏单次结果
+  hideResults();
+
+  const lever   = document.getElementById('leverWrap');
+  const machine = document.getElementById('machineBody');
+  const tankInner= document.getElementById('tankInner');
+
+  lever.classList.add('pressed');
+  machine.classList.add('shake');
+  tankInner.classList.add('spinning');
+  setTimeout(() => {
+    lever.classList.remove('pressed');
+    machine.classList.remove('shake');
+    tankInner.classList.remove('spinning');
+  }, 500);
+
+  // 抽出结果
+  const results = [];
+  for (let i = 0; i < count; i++) results.push(drawOnce());
+
+  setTimeout(() => {
+    // 渲染十连结果卡片
+    const grid = document.getElementById('multiResult');
+    grid.innerHTML = results.map(res => {
+      const r = RARITIES[res.rarityIdx];
+      return `<div class="multi-card">
+        <div class="multi-card-egg ${r.eggClass}"></div>
+        <div class="multi-card-name">${res.icon} ${res.name}</div>
+        <span class="multi-card-rare ${r.rareClass}">${r.label}</span>
+      </div>`;
+    }).join('');
+    grid.classList.add('show');
+
+    // 找最高稀有度
+    const maxRarity = Math.max(...results.map(r => r.rarityIdx));
+    triggerGlow(maxRarity);
+    if (maxRarity >= 2) triggerBeams(maxRarity);
+
+    updateStats();
+    addToRecent(results);
+
+    setTimeout(() => {
+      spinLock = false;
+      setButtonsDisabled(false);
+    }, 600);
+  }, 600);
+}
+
+// ===== 显示结果蛋 =====
+function showResultEgg(result, afterCrack) {
+  const egg = document.getElementById('resultEgg');
+  const r   = RARITIES[result.rarityIdx];
+  egg.className = 'result-egg ' + r.eggClass + ' show';
+  egg.style.display = 'block';
+
+  // 聚光灯
+  const tray = document.getElementById('tray');
+  tray.classList.add('spotlight');
+  setTimeout(() => tray.classList.remove('spotlight'), 1500);
+
+  // 闪烁
+  setTimeout(() => {
+    egg.classList.add('flashing');
+    setTimeout(() => {
+      egg.classList.remove('flashing');
+      // 破壳
+      egg.classList.add('cracking');
+      setTimeout(() => {
+        egg.style.display = 'none';
+        egg.className = 'result-egg';
+        afterCrack && afterCrack();
+      }, 400);
+    }, 1800); // 闪3次 × 600ms
+  }, 200);
+}
+
+// ===== 奖品浮出 =====
+function showPrizeReveal(result) {
+  const el   = document.getElementById('prizeReveal');
+  const icon = document.getElementById('prizeIcon');
+  const name = document.getElementById('prizeRevealName');
+  const rare = document.getElementById('prizeRevealRare');
+  const r    = RARITIES[result.rarityIdx];
+
+  icon.textContent = result.icon;
+  name.textContent = result.name;
+  rare.textContent = r.label;
+  rare.className   = 'prize-reveal-rare ' + r.rareClass;
+
+  el.classList.add('show');
+  el.style.display = 'flex';
+}
+
+// ===== 隐藏所有结果 =====
+function hideResults() {
+  const egg = document.getElementById('resultEgg');
+  egg.style.display = 'none';
+  egg.className = 'result-egg';
+
+  const pr = document.getElementById('prizeReveal');
+  pr.style.display = 'none';
+  pr.classList.remove('show');
+
+  const grid = document.getElementById('multiResult');
+  grid.style.display = 'none';
+  grid.classList.remove('show');
+  grid.innerHTML = '';
+}
+
+// ===== 背景光晕 =====
+function triggerGlow(rarityIdx) {
+  const glow = document.getElementById('bgGlow');
+  const glowClasses = ['glow-normal','glow-rare','glow-epic','glow-legend','glow-limited'];
+  glow.className = 'bg-glow ' + glowClasses[rarityIdx] + ' show';
+  setTimeout(() => glow.classList.remove('show'), 1200);
+}
+
+// ===== 光柱（史诗以上） =====
+function triggerBeams(rarityIdx) {
+  const container = document.getElementById('lightBeams');
+  container.innerHTML = '';
+  const beamCount = rarityIdx === 4 ? 5 : rarityIdx === 3 ? 4 : 3;
+  const colors = ['rgba(167,139,250,0.5)','rgba(245,200,66,0.6)','rgba(236,72,153,0.7)'];
+  const color  = colors[Math.min(rarityIdx-2, 2)];
+  const gameRect = document.getElementById('gameCenter').getBoundingClientRect();
+
+  for (let i = 0; i < beamCount; i++) {
+    const beam = document.createElement('div');
+    beam.className = 'light-beam show';
+    beam.style.left = (20 + i * (60 / beamCount)) + '%';
+    beam.style.background = `linear-gradient(to bottom, transparent, ${color}, transparent)`;
+    beam.style.animationDelay = (i * 0.1) + 's';
+    container.appendChild(beam);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 2000);
+}
+
+// ===== 添加到最近记录 =====
+function addToRecent(results) {
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  const items = results.map(r => ({ ...r, timeStr }));
+  renderRecentList(items);
+}
+
+// ===== 禁用/启用按钮 =====
+function setButtonsDisabled(disabled) {
+  document.getElementById('btnSpin1').disabled  = disabled;
+  document.getElementById('btnSpin10').disabled = disabled;
+}
+
+// ===== 模式切换 =====
+function setMode(m) {
+  mode = m;
+  document.getElementById('modeBtn1').classList.toggle('active',  m === 1);
+  document.getElementById('modeBtn10').classList.toggle('active', m === 10);
+}
+
+// ===== 保底开关 =====
+function toggleGuarantee() {
+  guaranteeOn = !guaranteeOn;
+  const btn = document.getElementById('guaranteeToggle');
+  btn.classList.toggle('on', guaranteeOn);
+}
+
+// ===== 更新保底参数 =====
+function updateGuarantee() {
+  guaranteeN     = parseInt(document.getElementById('guaranteeCount').value)    || 10;
+  guaranteeEpicN = parseInt(document.getElementById('guaranteeEpicCount').value) || 30;
+  updateGuaranteeUI();
+}
+
+// ===== 重置统计 =====
+function resetStats() {
+  stats        = { normal:0, rare:0, epic:0, legend:0, limited:0 };
+  totalSpins   = 0;
+  pityCount    = 0;
+  pityEpicCount= 0;
+  recentItems  = [];
+  renderDistRows();
+  renderRecentList([]);
+  updateStats();
+  hideResults();
+  document.getElementById('statTotal').textContent  = 0;
+  document.getElementById('statLegend').textContent = 0;
+}
+
+// ===== 概率变化时同步刷新奖品池显示 =====
+[0,1,2,3,4].forEach(i => {
+  document.getElementById('prob'+i).addEventListener('change', renderPrizePool);
+});
+
+// ===== 启动 =====
+init();
+</script>
+</body>
+</html>
