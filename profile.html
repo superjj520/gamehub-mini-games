@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 个人中心</title>
+<link rel="stylesheet" href="mobile.css">
+<style>
+  /* ─── CSS 变量 ───────────────────────────────────────────── */
+  :root {
+    --gold:    #F5C842;
+    --bg:      #0D0720;
+    --accent:  #7C3AED;
+    --accent2: #EC4899;
+    --deep:    #1A0A2E;
+    --card:    rgba(255,255,255,0.05);
+    --border:  rgba(255,255,255,0.1);
+    --text:    #F0EAF8;
+    --muted:   rgba(240,234,248,0.5);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── 导航栏 ──────────────────────────────────────────────── */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 0 24px;
+    height: 60px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    overflow: hidden;
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 800;
+    text-decoration: none;
+    color: var(--text);
+    flex-shrink: 0;
+    margin-right: 8px;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  /* 横向滚动标签区 */
+  .nav-tabs {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    flex: 1;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    transition: all 0.2s;
+    text-decoration: none;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  /* ─── 页面主体 ────────────────────────────────────────────── */
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  /* ─── 顶部用户卡片 ────────────────────────────────────────── */
+  .profile-card {
+    background: linear-gradient(135deg, rgba(124,58,237,0.18) 0%, rgba(236,72,153,0.12) 100%);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 36px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  /* 背景光晕 */
+  .profile-card::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%;
+    transform: translateX(-50%);
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* 头像 */
+  .profile-avatar-wrap {
+    position: relative;
+    cursor: pointer;
+  }
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(236,72,153,0.3));
+    border: 3px solid rgba(245,200,66,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    line-height: 1;
+    box-shadow: 0 0 40px rgba(124,58,237,0.4), 0 0 80px rgba(245,200,66,0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .profile-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 50px rgba(124,58,237,0.5), 0 0 100px rgba(245,200,66,0.2);
+  }
+  .profile-avatar-edit {
+    position: absolute;
+    bottom: 4px; right: 4px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    border: 2px solid var(--bg);
+  }
+
+  /* 昵称 */
+  .profile-nickname {
+    font-size: 22px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s;
+  }
+  .profile-nickname:hover { color: var(--gold); }
+  .profile-nickname-edit {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  /* 等级 + 经验条 */
+  .profile-level-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 400px;
+  }
+  .level-badge {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #F5C842, #F97316);
+    color: #1A0A2E;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .exp-bar-wrap {
+    flex: 1;
+  }
+  .exp-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .exp-bar-bg {
+    height: 7px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.1);
+    overflow: hidden;
+  }
+  .exp-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.6s ease;
+  }
+
+  /* 统计数据行 */
+  .profile-stats {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .stat-item {
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--gold);
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* ─── 区块通用样式 ────────────────────────────────────────── */
+  .section {
+    margin-bottom: 28px;
+  }
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title .count-badge {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .card-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+  }
+
+  /* ─── 编辑弹窗 ────────────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .modal-box {
+    background: var(--deep);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 24px;
+    width: min(420px, 92vw);
+    transform: scale(0.92) translateY(16px);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .modal-overlay.show .modal-box {
+    transform: scale(1) translateY(0);
+  }
+  .modal-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  /* 昵称输入框 */
+  .nickname-input {
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 15px;
+    color: var(--text);
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 20px;
+  }
+  .nickname-input:focus {
+    border-color: var(--accent);
+  }
+
+  /* 头像选择网格 */
+  .avatar-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .avatar-option {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .avatar-option:hover {
+    background: rgba(124,58,237,0.2);
+    border-color: rgba(124,58,237,0.4);
+    transform: scale(1.08);
+  }
+  .avatar-option.selected {
+    background: rgba(124,58,237,0.25);
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(124,58,237,0.4);
+  }
+
+  /* 弹窗按钮行 */
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+  }
+  .btn {
+    flex: 1;
+    padding: 11px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .btn:hover { opacity: 0.88; }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+  }
+  .btn-ghost {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  /* ─── 成就区 ──────────────────────────────────────────────── */
+  /* 分类标签 */
+  .cat-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .cat-tab {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .cat-tab.active {
+    background: rgba(124,58,237,0.25);
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  /* 成就网格 */
+  .achievement-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+  }
+  @media (max-width: 600px) {
+    .achievement-grid { grid-template-columns: repeat(5, 1fr); }
+  }
+  @media (max-width: 400px) {
+    .achievement-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .ach-item {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+    padding: 4px;
+  }
+  .ach-item:hover { transform: scale(1.06); }
+  /* 已解锁 */
+  .ach-item.unlocked {
+    background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(236,72,153,0.2));
+    border: 1px solid rgba(124,58,237,0.35);
+    box-shadow: 0 2px 12px rgba(124,58,237,0.2);
+  }
+  /* 未解锁 */
+  .ach-item.locked {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    filter: grayscale(0.6);
+    opacity: 0.6;
+  }
+  .ach-icon { font-size: 22px; line-height: 1; }
+  .ach-name {
+    font-size: 9px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.2;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    padding: 0 2px;
+  }
+  .ach-item.unlocked .ach-name { color: var(--text); }
+  /* 锁图标 */
+  .ach-lock {
+    position: absolute;
+    top: 4px; right: 5px;
+    font-size: 9px;
+    opacity: 0.4;
+  }
+
+  /* 成就详情弹窗 */
+  .ach-detail-box {
+    text-align: center;
+  }
+  .ach-detail-icon {
+    font-size: 52px;
+    margin-bottom: 12px;
+  }
+  .ach-detail-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .ach-detail-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+  .ach-detail-time {
+    font-size: 12px;
+    color: var(--gold);
+    background: rgba(245,200,66,0.12);
+    padding: 5px 14px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+  .ach-detail-locked {
+    font-size: 12px;
+    color: var(--muted);
+    background: rgba(255,255,255,0.05);
+    padding: 5px 14px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+
+  /* ─── 游戏记录 ────────────────────────────────────────────── */
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    transition: background 0.15s;
+  }
+  .history-item:hover { background: rgba(255,255,255,0.06); }
+  .history-game {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .history-result {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .result-win  { background: rgba(34,197,94,0.15);  color: #22C55E; }
+  .result-lose { background: rgba(239,68,68,0.15);  color: #EF4444; }
+  .result-done { background: rgba(124,58,237,0.15); color: #A78BFA; }
+  .history-score {
+    font-size: 13px;
+    color: var(--gold);
+    font-weight: 700;
+    min-width: 48px;
+    text-align: right;
+  }
+  .history-time {
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 64px;
+    text-align: right;
+  }
+  .history-empty {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    padding: 28px 0;
+  }
+
+  /* ─── 设置区 ──────────────────────────────────────────────── */
+  .settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-label {
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .setting-sub {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  /* 开关 */
+  .toggle {
+    width: 44px;
+    height: 24px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.12);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.25s;
+    flex-shrink: 0;
+    border: none;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: white;
+    top: 3px; left: 3px;
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .toggle.on::after { transform: translateX(20px); }
+
+  /* 主题选择 */
+  .theme-options {
+    display: flex;
+    gap: 8px;
+  }
+  .theme-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .theme-dot:hover { transform: scale(1.12); }
+  .theme-dot.selected { border-color: white; box-shadow: 0 0 10px rgba(255,255,255,0.4); }
+
+  /* 危险按钮 */
+  .btn-danger {
+    background: rgba(239,68,68,0.12);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: #EF4444;
+    padding: 8px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+  .btn-danger:hover { background: rgba(239,68,68,0.2); }
+
+  /* ─── Toast 通用（页面内用） ───────────────────────────────── */
+  #profile-toast {
+    position: fixed;
+    bottom: 32px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    opacity: 0;
+    background: rgba(30,20,50,0.95);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 11px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    pointer-events: none;
+    transition: all 0.3s;
+    z-index: 9999;
+    white-space: nowrap;
+  }
+  #profile-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── 导航栏 ────────────────────────────────────────────────── -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span>Game</span>Hub
+    <span class="nav-badge">MINI</span>
+  </a>
+  <div class="nav-tabs">
+    <a href="wheel.html"         class="nav-tab">大转盘</a>
+    <a href="nine-grid.html"     class="nav-tab">九宫格</a>
+    <a href="scratch-card.html"  class="nav-tab">刮刮乐</a>
+    <a href="shake-dice.html"    class="nav-tab">摇骰子</a>
+    <a href="smash-egg.html"     class="nav-tab">砸金蛋</a>
+    <a href="slot-machine.html"  class="nav-tab">老虎机</a>
+    <a href="lottery-ball.html"  class="nav-tab">抽签球</a>
+    <a href="lucky-number.html"  class="nav-tab">幸运数字</a>
+    <a href="flip-match.html"    class="nav-tab">翻牌配对</a>
+    <a href="puzzle.html"        class="nav-tab">拼图</a>
+    <a href="minesweeper.html"   class="nav-tab">扫雷</a>
+    <a href="sudoku.html"        class="nav-tab">数独</a>
+    <a href="snake.html"         class="nav-tab">贪吃蛇</a>
+    <a href="tetris.html"        class="nav-tab">俄罗斯方块</a>
+    <a href="profile.html"       class="nav-tab active">个人中心</a>
+  </div>
+</nav>
+
+<!-- ─── 主体内容 ─────────────────────────────────────────────── -->
+<main class="page">
+
+  <!-- 顶部用户卡片 -->
+  <div class="profile-card">
+    <!-- 头像 -->
+    <div class="profile-avatar-wrap" id="openEditBtn" title="点击编辑资料">
+      <div class="profile-avatar" id="profileAvatar">🎮</div>
+      <div class="profile-avatar-edit">✏️</div>
+    </div>
+
+    <!-- 昵称（点击编辑） -->
+    <div class="profile-nickname" id="openEditBtn2">
+      <span id="profileNickname">玩家</span>
+      <span class="profile-nickname-edit">✏️</span>
+    </div>
+
+    <!-- 等级 + 经验进度条 -->
+    <div class="profile-level-row">
+      <div class="level-badge" id="profileLevelBadge">Lv1 新手玩家</div>
+      <div class="exp-bar-wrap">
+        <div class="exp-bar-label">
+          <span id="expCurrent">0 exp</span>
+          <span id="expNext">距下一级 100 exp</span>
+        </div>
+        <div class="exp-bar-bg">
+          <div class="exp-bar-fill" id="expBarFill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 统计数据 -->
+    <div class="profile-stats">
+      <div class="stat-item">
+        <div class="stat-value" id="statJoin">--</div>
+        <div class="stat-label">加入时间</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="statPlays">0</div>
+        <div class="stat-label">累计游玩次数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="statGames">0</div>
+        <div class="stat-label">游玩游戏种数</div>
+      </div>
+    </div>
+  </div><!-- /profile-card -->
+
+
+  <!-- ─── 成就展示区 ──────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">
+      🏆 我的成就
+      <span class="count-badge" id="achCount">0/50</span>
+    </div>
+
+    <!-- 分类标签 -->
+    <div class="cat-tabs" id="catTabs">
+      <button class="cat-tab active" data-cat="all">全部</button>
+      <button class="cat-tab" data-cat="luck">抽奖</button>
+      <button class="cat-tab" data-cat="brain">益智</button>
+      <button class="cat-tab" data-cat="skill">技巧</button>
+      <button class="cat-tab" data-cat="retain">留存</button>
+      <button class="cat-tab" data-cat="social">社交</button>
+    </div>
+
+    <!-- 成就格子 -->
+    <div class="card-box">
+      <div class="achievement-grid" id="achGrid">
+        <!-- JS 动态生成 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 游戏记录 ──────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">🎮 游戏记录</div>
+    <div class="card-box">
+      <div class="history-list" id="historyList">
+        <div class="history-empty">暂无游戏记录</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 设置区 ────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">⚙️ 设置</div>
+    <div class="card-box">
+      <div class="settings-list">
+
+        <!-- 音效开关 -->
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">🔊 游戏音效</div>
+            <div class="setting-sub">开启/关闭全局音效</div>
+          </div>
+          <button class="toggle" id="soundToggle" title="切换音效"></button>
+        </div>
+
+        <!-- 主题选择 -->
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">🎨 页面主题</div>
+            <div class="setting-sub">当前：<span id="themeLabel">暗紫</span></div>
+          </div>
+          <div class="theme-options" id="themeOptions">
+            <div class="theme-dot selected" data-theme="dark-purple"
+              style="background:linear-gradient(135deg,#7C3AED,#EC4899)" title="暗紫"></div>
+            <div class="theme-dot" data-theme="ocean"
+              style="background:linear-gradient(135deg,#0EA5E9,#06B6D4)" title="海洋"></div>
+            <div class="theme-dot" data-theme="forest"
+              style="background:linear-gradient(135deg,#16A34A,#22C55E)" title="森林"></div>
+            <div class="theme-dot" data-theme="sunset"
+              style="background:linear-gradient(135deg,#F97316,#EF4444)" title="落日"></div>
+          </div>
+        </div>
+
+        <!-- 清空数据 -->
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">🗑️ 清空数据</div>
+            <div class="setting-sub">清空所有本地数据，不可恢复</div>
+          </div>
+          <button class="btn-danger" id="resetBtn">清空数据</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</main><!-- /page -->
+
+<!-- ─── 编辑弹窗 ─────────────────────────────────────────────── -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box">
+    <div class="modal-title">✏️ 编辑资料</div>
+
+    <!-- 昵称输入 -->
+    <input
+      type="text"
+      class="nickname-input"
+      id="nicknameInput"
+      placeholder="输入昵称（最多20字）"
+      maxlength="20"
+    >
+
+    <!-- 头像选择 -->
+    <div class="avatar-label">选择头像</div>
+    <div class="avatar-grid" id="avatarGrid">
+      <!-- JS 动态生成 -->
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="editCancelBtn">取消</button>
+      <button class="btn btn-primary" id="editSaveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 成就详情弹窗 ──────────────────────────────────────────── -->
+<div class="modal-overlay" id="achModal">
+  <div class="modal-box">
+    <div class="ach-detail-box" id="achDetailContent">
+      <!-- JS 动态填充 -->
+    </div>
+    <div class="modal-actions" style="margin-top:20px">
+      <button class="btn btn-ghost" id="achCloseBtn">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 页面内 Toast ───────────────────────────────────────────── -->
+<div id="profile-toast"></div>
+
+<!-- ─── 脚本 ─────────────────────────────────────────────────── -->
+<script src="user.js"></script>
+<script src="themes.js"></script>
+<script src="sound.js"></script>
+<script src="share.js"></script>
+<script>
+/**
+ * profile.html 页面逻辑
+ * 读取 GameUser 数据渲染页面，所有修改实时保存
+ */
+
+// ─── 成就数据定义（50个成就） ──────────────────────────────────
+const ACHIEVEMENTS = [
+  // 抽奖类 luck (10个)
+  { id:'luck_01', cat:'luck', icon:'🎡', name:'初次转动',    desc:'首次游玩大转盘' },
+  { id:'luck_02', cat:'luck', icon:'🎰', name:'老虎机手',    desc:'游玩老虎机10次' },
+  { id:'luck_03', cat:'luck', icon:'🃏', name:'刮刮乐达人',  desc:'刮出3次大奖' },
+  { id:'luck_04', cat:'luck', icon:'🥚', name:'砸蛋能手',    desc:'砸出5个金蛋' },
+  { id:'luck_05', cat:'luck', icon:'🎲', name:'骰子玩家',    desc:'摇骰子20次' },
+  { id:'luck_06', cat:'luck', icon:'🎁', name:'盲盒收藏家',  desc:'开启10个盲盒' },
+  { id:'luck_07', cat:'luck', icon:'💰', name:'红包达人',    desc:'收集红包100个' },
+  { id:'luck_08', cat:'luck', icon:'🔮', name:'九宫格专家',  desc:'九宫格连中3次' },
+  { id:'luck_09', cat:'luck', icon:'🎯', name:'神射手',      desc:'抽签球命中率90%' },
+  { id:'luck_10', cat:'luck', icon:'🌟', name:'锦鲤附体',    desc:'连续3次抽到一等奖' },
+
+  // 益智类 brain (10个)
+  { id:'brain_01', cat:'brain', icon:'💣', name:'扫雷初学者', desc:'完成一局扫雷' },
+  { id:'brain_02', cat:'brain', icon:'🧩', name:'拼图爱好者', desc:'完成一次拼图' },
+  { id:'brain_03', cat:'brain', icon:'🔢', name:'数独入门',   desc:'完成初级数独' },
+  { id:'brain_04', cat:'brain', icon:'2️⃣', name:'2048达人',   desc:'达到2048' },
+  { id:'brain_05', cat:'brain', icon:'🃏', name:'翻牌高手',   desc:'翻牌配对3次全清' },
+  { id:'brain_06', cat:'brain', icon:'🔗', name:'连连看神手', desc:'连连看无失误通关' },
+  { id:'brain_07', cat:'brain', icon:'🗺️', name:'迷宫探险家', desc:'走出5个迷宫' },
+  { id:'brain_08', cat:'brain', icon:'📦', name:'推箱子',     desc:'完成推箱子一关' },
+  { id:'brain_09', cat:'brain', icon:'🎯', name:'满分达人',   desc:'任意益智游戏满分' },
+  { id:'brain_10', cat:'brain', icon:'🧠', name:'智力王者',   desc:'所有益智游戏各完成一次' },
+
+  // 技巧类 skill (10个)
+  { id:'skill_01', cat:'skill', icon:'🐍', name:'贪吃蛇',     desc:'贪吃蛇存活60秒' },
+  { id:'skill_02', cat:'skill', icon:'🧱', name:'俄罗斯方块', desc:'消除10行' },
+  { id:'skill_03', cat:'skill', icon:'🍎', name:'水果大师',   desc:'切断50个水果' },
+  { id:'skill_04', cat:'skill', icon:'🏹', name:'弓箭手',     desc:'射箭命中100次' },
+  { id:'skill_05', cat:'skill', icon:'⚽', name:'钩爪达人',   desc:'抓娃娃成功10次' },
+  { id:'skill_06', cat:'skill', icon:'🐟', name:'钓鱼大师',   desc:'钓鱼成功20次' },
+  { id:'skill_07', cat:'skill', icon:'🦟', name:'打地鼠王',   desc:'打地鼠100只' },
+  { id:'skill_08', cat:'skill', icon:'💰', name:'接金币',     desc:'接金币500个' },
+  { id:'skill_09', cat:'skill', icon:'⚡', name:'弹球高手',   desc:'弹球得分5000' },
+  { id:'skill_10', cat:'skill', icon:'🎳', name:'弹弓手',     desc:'弹弓命中20次' },
+
+  // 留存类 retain (10个)
+  { id:'retain_01', cat:'retain', icon:'📅', name:'初次登录',  desc:'首次进入平台' },
+  { id:'retain_02', cat:'retain', icon:'🌅', name:'连续登录3天', desc:'连续登录3天' },
+  { id:'retain_03', cat:'retain', icon:'🔥', name:'七日连签',  desc:'连续签到7天' },
+  { id:'retain_04', cat:'retain', icon:'💎', name:'月度常客',  desc:'登录天数达30天' },
+  { id:'retain_05', cat:'retain', icon:'🎮', name:'游戏探索者', desc:'游玩5种不同游戏' },
+  { id:'retain_06', cat:'retain', icon:'🗺️', name:'全场景探索', desc:'游玩10种不同游戏' },
+  { id:'retain_07', cat:'retain', icon:'🏅', name:'百局老将',  desc:'累计游玩100次' },
+  { id:'retain_08', cat:'retain', icon:'⚡', name:'游戏狂热者', desc:'单日游玩10次' },
+  { id:'retain_09', cat:'retain', icon:'🌙', name:'深夜玩家',  desc:'深夜24点后游玩' },
+  { id:'retain_10', cat:'retain', icon:'☀️', name:'早起玩家',  desc:'早上7点前游玩' },
+
+  // 社交类 social (10个)
+  { id:'social_01', cat:'social', icon:'🔗', name:'分享达人',  desc:'分享游戏结果1次' },
+  { id:'social_02', cat:'social', icon:'📣', name:'传播者',    desc:'分享游戏结果10次' },
+  { id:'social_03', cat:'social', icon:'👑', name:'排行榜上榜', desc:'进入任意游戏排行榜前10' },
+  { id:'social_04', cat:'social', icon:'🥇', name:'排行榜第一', desc:'获得任意游戏排行第一' },
+  { id:'social_05', cat:'social', icon:'🎪', name:'活动参与者', desc:'参与1次限时活动' },
+  { id:'social_06', cat:'social', icon:'🏟️', name:'团队挑战',  desc:'参与组队挑战' },
+  { id:'social_07', cat:'social', icon:'💬', name:'留言达人',  desc:'发表游戏评论' },
+  { id:'social_08', cat:'social', icon:'🤝', name:'邀请好友',  desc:'成功邀请1位好友' },
+  { id:'social_09', cat:'social', icon:'🌐', name:'社区活跃者', desc:'累计社交互动50次' },
+  { id:'social_10', cat:'social', icon:'🏆', name:'传奇玩家',  desc:'解锁所有社交成就' },
+];
+
+// 成就解锁状态（从 localStorage 读取）
+function loadAchievements() {
+  try {
+    return JSON.parse(localStorage.getItem('gh_achievements') || '{}');
+  } catch (e) { return {}; }
+}
+
+// ─── 页面 Toast ────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('profile-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ─── 渲染用户卡片 ──────────────────────────────────────────────
+function renderProfile() {
+  const user = GameUser.getUser();
+  const levelInfo = GameUser.getLevelInfo(user.exp);
+  const { current, next } = levelInfo;
+
+  // 头像 + 昵称
+  document.getElementById('profileAvatar').textContent    = user.avatar;
+  document.getElementById('profileNickname').textContent  = user.nickname;
+  document.getElementById('profileLevelBadge').textContent = `Lv${user.level} ${current.title}`;
+
+  // 经验进度条
+  const expStart = current.exp;
+  const expEnd   = next ? next.exp : current.exp;
+  const expRange = expEnd - expStart;
+  const expGain  = user.exp - expStart;
+  const pct = next ? Math.min(100, (expGain / expRange) * 100) : 100;
+
+  document.getElementById('expCurrent').textContent = user.exp + ' exp';
+  document.getElementById('expNext').textContent    = next
+    ? `距下一级 ${next.exp - user.exp} exp`
+    : '已满级';
+  document.getElementById('expBarFill').style.width  = pct + '%';
+
+  // 统计
+  document.getElementById('statJoin').textContent   = user.joinDate || '--';
+  document.getElementById('statPlays').textContent  = user.totalPlays;
+  document.getElementById('statGames').textContent  = user.totalGames;
+
+  // 同步音效开关 UI
+  const sound = user.settings && user.settings.sound !== false;
+  const toggle = document.getElementById('soundToggle');
+  toggle.classList.toggle('on', sound);
+
+  // 同步主题
+  const theme = (user.settings && user.settings.theme) || 'dark-purple';
+  renderTheme(theme);
+}
+
+// ─── 渲染游戏记录 ──────────────────────────────────────────────
+function renderHistory() {
+  const user = GameUser.getUser();
+  const list = document.getElementById('historyList');
+
+  if (!user.gameHistory || user.gameHistory.length === 0) {
+    list.innerHTML = '<div class="history-empty">暂无游戏记录，快去玩几把吧 🎮</div>';
+    return;
+  }
+
+  // 结果标签样式映射
+  function resultClass(result) {
+    if (!result) return 'result-done';
+    if (['胜利','赢了','通关','成功'].includes(result)) return 'result-win';
+    if (['失败','输了','游戏结束'].includes(result)) return 'result-lose';
+    return 'result-done';
+  }
+
+  list.innerHTML = user.gameHistory.map(h => `
+    <div class="history-item">
+      <span class="history-game">${h.game || '未知游戏'}</span>
+      <span class="history-result ${resultClass(h.result)}">${h.result || '已完成'}</span>
+      <span class="history-score">${h.score != null ? h.score + '分' : '--'}</span>
+      <span class="history-time">${GameUser.formatTime(h.time)}</span>
+    </div>
+  `).join('');
+}
+
+// ─── 渲染成就 ──────────────────────────────────────────────────
+let currentCat = 'all';
+
+function renderAchievements(cat) {
+  currentCat = cat || currentCat;
+  const unlocked = loadAchievements();
+
+  // 过滤
+  const list = currentCat === 'all'
+    ? ACHIEVEMENTS
+    : ACHIEVEMENTS.filter(a => a.cat === currentCat);
+
+  // 统计总解锁数
+  const totalUnlocked = ACHIEVEMENTS.filter(a => unlocked[a.id]).length;
+  document.getElementById('achCount').textContent = totalUnlocked + '/50';
+
+  const grid = document.getElementById('achGrid');
+  grid.innerHTML = list.map(a => {
+    const isUnlocked = !!unlocked[a.id];
+    return `
+      <div class="ach-item ${isUnlocked ? 'unlocked' : 'locked'}"
+           data-id="${a.id}"
+           title="${a.name}">
+        ${!isUnlocked ? '<span class="ach-lock">🔒</span>' : ''}
+        <span class="ach-icon">${a.icon}</span>
+        <span class="ach-name">${a.name}</span>
+      </div>
+    `;
+  }).join('');
+
+  // 绑定点击
+  grid.querySelectorAll('.ach-item').forEach(el => {
+    el.addEventListener('click', () => showAchDetail(el.dataset.id));
+  });
+}
+
+// 显示成就详情弹窗
+function showAchDetail(id) {
+  const ach = ACHIEVEMENTS.find(a => a.id === id);
+  if (!ach) return;
+  const unlocked = loadAchievements();
+  const info = unlocked[id];
+
+  document.getElementById('achDetailContent').innerHTML = `
+    <div class="ach-detail-icon">${ach.icon}</div>
+    <div class="ach-detail-name">${ach.name}</div>
+    <div class="ach-detail-desc">${ach.desc}</div>
+    ${info
+      ? `<span class="ach-detail-time">🎉 解锁于 ${GameUser.formatTime(info.time)}</span>`
+      : `<span class="ach-detail-locked">🔒 尚未解锁</span>`
+    }
+  `;
+
+  document.getElementById('achModal').classList.add('show');
+}
+
+// ─── 分类标签切换 ──────────────────────────────────────────────
+document.getElementById('catTabs').addEventListener('click', e => {
+  const btn = e.target.closest('.cat-tab');
+  if (!btn) return;
+  document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAchievements(btn.dataset.cat);
+});
+
+// ─── 编辑弹窗 ─────────────────────────────────────────────────
+const editModal = document.getElementById('editModal');
+let selectedAvatar = '';
+
+// 填充头像选择器
+function buildAvatarGrid() {
+  const user = GameUser.getUser();
+  selectedAvatar = user.avatar;
+  const avList = GameUser.getAvatarList();
+  document.getElementById('avatarGrid').innerHTML = avList.map(a => `
+    <div class="avatar-option ${a === user.avatar ? 'selected' : ''}"
+         data-emoji="${a}">${a}</div>
+  `).join('');
+
+  document.querySelectorAll('.avatar-option').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.avatar-option').forEach(x => x.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedAvatar = el.dataset.emoji;
+    });
+  });
+}
+
+// 打开编辑弹窗
+function openEditModal() {
+  const user = GameUser.getUser();
+  document.getElementById('nicknameInput').value = user.nickname;
+  buildAvatarGrid();
+  editModal.classList.add('show');
+}
+
+// 关闭编辑弹窗
+function closeEditModal() {
+  editModal.classList.remove('show');
+}
+
+// 打开按钮
+document.getElementById('openEditBtn').addEventListener('click',  openEditModal);
+document.getElementById('openEditBtn2').addEventListener('click', openEditModal);
+document.getElementById('editCancelBtn').addEventListener('click', closeEditModal);
+
+// 点击遮罩关闭
+editModal.addEventListener('click', e => {
+  if (e.target === editModal) closeEditModal();
+});
+
+// 保存
+document.getElementById('editSaveBtn').addEventListener('click', () => {
+  const nickname = document.getElementById('nicknameInput').value.trim();
+  if (!nickname) { showToast('昵称不能为空'); return; }
+  GameUser.setNickname(nickname);
+  GameUser.setAvatar(selectedAvatar);
+  closeEditModal();
+  renderProfile();
+  showToast('资料已保存 ✓');
+});
+
+// ─── 成就弹窗关闭 ─────────────────────────────────────────────
+document.getElementById('achCloseBtn').addEventListener('click', () => {
+  document.getElementById('achModal').classList.remove('show');
+});
+document.getElementById('achModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('achModal')) {
+    document.getElementById('achModal').classList.remove('show');
+  }
+});
+
+// ─── 音效开关 ─────────────────────────────────────────────────
+document.getElementById('soundToggle').addEventListener('click', function() {
+  const user = GameUser.getUser();
+  const newVal = !(user.settings && user.settings.sound !== false);
+  user.settings = user.settings || {};
+  user.settings.sound = newVal;
+  GameUser.saveUser(user);
+  this.classList.toggle('on', newVal);
+
+  // 通知 sound.js（如果存在）
+  if (typeof GameSound !== 'undefined') {
+    GameSound.setEnabled(newVal);
+  }
+
+  showToast(newVal ? '音效已开启 🔊' : '音效已关闭 🔇');
+});
+
+// ─── 主题切换 ──────────────────────────────────────────────────
+const THEME_LABELS = {
+  'dark-purple': '暗紫',
+  'ocean':       '海洋',
+  'forest':      '森林',
+  'sunset':      '落日'
+};
+
+function renderTheme(theme) {
+  document.querySelectorAll('.theme-dot').forEach(d => {
+    d.classList.toggle('selected', d.dataset.theme === theme);
+  });
+  document.getElementById('themeLabel').textContent = THEME_LABELS[theme] || theme;
+}
+
+document.getElementById('themeOptions').addEventListener('click', e => {
+  const dot = e.target.closest('.theme-dot');
+  if (!dot) return;
+  const theme = dot.dataset.theme;
+  const user = GameUser.getUser();
+  user.settings = user.settings || {};
+  user.settings.theme = theme;
+  GameUser.saveUser(user);
+  renderTheme(theme);
+  showToast('主题已切换为：' + (THEME_LABELS[theme] || theme));
+});
+
+// ─── 清空数据 ──────────────────────────────────────────────────
+document.getElementById('resetBtn').addEventListener('click', () => {
+  // 二次确认
+  const confirm1 = window.confirm('确定要清空所有本地数据吗？\n此操作不可恢复！');
+  if (!confirm1) return;
+  const confirm2 = window.confirm('再次确认：将清空用户信息、游戏记录、成就数据。');
+  if (!confirm2) return;
+
+  // 清空用户数据
+  GameUser.resetUser();
+  // 清空成就数据
+  localStorage.removeItem('gh_achievements');
+
+  showToast('数据已清空，已重置为新用户');
+  // 延迟刷新页面
+  setTimeout(() => location.reload(), 1200);
+});
+
+// ─── 初始化页面 ────────────────────────────────────────────────
+renderProfile();
+renderHistory();
+renderAchievements('all');
+</script>
+
+</body>
+</html>
