@@ -339,15 +339,19 @@
 <nav class="nav">
   <div class="nav-logo">
     🎮 <span class="highlight">GameHub</span> 中台
-    <div class="nav-badge">v0.1 Demo</div>
+    <div class="nav-badge">v1.0</div>
+  </div>
+  <div style="display:flex;gap:4px;overflow-x:auto;scrollbar-width:none">
+    <a href="index.html"       style="padding:6px 12px;border-radius:20px;font-size:13px;color:var(--gold);background:rgba(245,200,66,0.1);text-decoration:none;white-space:nowrap">🏠 首页</a>
+    <a href="leaderboard.html" style="padding:6px 12px;border-radius:20px;font-size:13px;color:var(--muted);text-decoration:none;white-space:nowrap;transition:color 0.2s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">🏆 排行榜</a>
+    <a href="shop.html"        style="padding:6px 12px;border-radius:20px;font-size:13px;color:var(--muted);text-decoration:none;white-space:nowrap;transition:color 0.2s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">🪙 商城</a>
+    <a href="profile.html"     style="padding:6px 12px;border-radius:20px;font-size:13px;color:var(--muted);text-decoration:none;white-space:nowrap;transition:color 0.2s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">👤 我的</a>
   </div>
   <div class="nav-right">
     <div class="nav-status">
       <div class="status-dot"></div>
       <span>服务正常</span>
     </div>
-    <span style="color:var(--border)">|</span>
-    <span>Phase 1 · 5组件</span>
   </div>
 </nav>
 
@@ -378,6 +382,35 @@
     </div>
   </div>
 </div>
+
+<!-- 功能入口区 -->
+<div style="max-width:960px;margin:0 auto;padding:0 40px 48px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px" id="featureHub">
+  <a href="shop.html" style="text-decoration:none;background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(236,72,153,0.1));border:1px solid rgba(124,58,237,0.3);border-radius:16px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform 0.2s,border-color 0.2s" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(124,58,237,0.6)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(124,58,237,0.3)'">
+    <div style="font-size:32px">🪙</div>
+    <div style="font-size:14px;font-weight:700;color:var(--text)">积分商城</div>
+    <div style="font-size:11px;color:var(--muted);text-align:center">金币兑换奖励</div>
+  </a>
+  <a href="leaderboard.html" style="text-decoration:none;background:linear-gradient(135deg,rgba(245,200,66,0.1),rgba(249,115,22,0.08));border:1px solid rgba(245,200,66,0.2);border-radius:16px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform 0.2s,border-color 0.2s" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(245,200,66,0.5)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(245,200,66,0.2)'">
+    <div style="font-size:32px">🏆</div>
+    <div style="font-size:14px;font-weight:700;color:var(--text)">游戏排行</div>
+    <div style="font-size:11px;color:var(--muted);text-align:center">查看战绩榜单</div>
+  </a>
+  <a href="profile.html" style="text-decoration:none;background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(6,182,212,0.08));border:1px solid rgba(34,197,94,0.2);border-radius:16px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform 0.2s,border-color 0.2s" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(34,197,94,0.5)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(34,197,94,0.2)'">
+    <div style="font-size:32px">🎖️</div>
+    <div style="font-size:14px;font-weight:700;color:var(--text)">成就中心</div>
+    <div style="font-size:11px;color:var(--muted);text-align:center">50个成就等你解锁</div>
+  </a>
+  <a href="shop.html" onclick="event.preventDefault();if(typeof GameUser!=='undefined'){var u=GameUser.getUser();alert('🪙 当前金币：'+u.coins+'\n⚡ 当前经验：'+u.exp+'\n🎮 Lv'+u.level+' '+u.nickname)}" style="text-decoration:none;background:linear-gradient(135deg,rgba(239,68,68,0.1),rgba(236,72,153,0.08));border:1px solid rgba(239,68,68,0.2);border-radius:16px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform 0.2s,border-color 0.2s;cursor:pointer" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(239,68,68,0.5)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(239,68,68,0.2)'">
+    <div style="font-size:32px" id="heroUserAvatar">👤</div>
+    <div style="font-size:14px;font-weight:700;color:var(--text)" id="heroUserName">我的账号</div>
+    <div style="font-size:11px;color:var(--muted);text-align:center" id="heroUserCoins">点击查看详情</div>
+  </a>
+</div>
+<style>
+  @media(max-width:768px){
+    #featureHub{ grid-template-columns:repeat(2,1fr) !important; padding:0 16px 32px !important; }
+  }
+</style>
 
 <!-- Phase 1 -->
 <div class="section">
@@ -1200,17 +1233,25 @@
 
 <!-- 底部 -->
 <div class="footer">
-  <div>GameHub 小游戏中台 · Phase 1~9 · 全部 51 个组件已就绪</div>
-  <div class="footer-version">v0.9.0 · 纯前端演示版本 · 后端接入文档已出</div>
+  <div>GameHub 小游戏中台 · 51个游戏组件 · 金币/成就/排行榜/商城完整闭环</div>
+  <div class="footer-version">v1.0 · 纯前端演示版本 · <a href="shop.html" style="color:var(--gold);text-decoration:none">🪙 去商城</a> · <a href="leaderboard.html" style="color:var(--gold);text-decoration:none">🏆 排行榜</a></div>
 </div>
 
-<script>
-  // 大转盘跳转到 wheel.html（兜底，index.html 自身也是大转盘入口）
-  // 如果 wheel.html 不存在就跳回原来的 index.html
-  // 导航跳转链接已写在各卡片 href 上，无需额外 JS
-</script>
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script>
+  // 首页用户卡片动态填充
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof GameUser === 'undefined') return;
+    const u = GameUser.getUser();
+    const avatar = document.getElementById('heroUserAvatar');
+    const name   = document.getElementById('heroUserName');
+    const coins  = document.getElementById('heroUserCoins');
+    if (avatar) avatar.textContent = u.avatar || '👤';
+    if (name)   name.textContent   = u.nickname || '我的账号';
+    if (coins)  coins.textContent  = '🪙' + (u.coins || 0) + '  Lv' + (u.level || 1);
+  });
+</script>
 </body>
 </html>
