@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 投票PK</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* ─── CSS 变量 ─── */
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+    /* 蓝队红队专属色 */
+    --blue: #3B82F6;
+    --blue-glow: rgba(59,130,246,0.4);
+    --red: #EF4444;
+    --red-glow: rgba(239,68,68,0.4);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 导航栏 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 0 24px;
+    height: 56px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 17px; font-weight: 700;
+    text-decoration: none; color: var(--text);
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  /* 导航链接横向滚动容器 */
+  .nav-scroll {
+    display: flex; gap: 2px;
+    overflow-x: auto; flex: 1;
+    scrollbar-width: none;
+  }
+  .nav-scroll::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 6px 14px; border-radius: 7px;
+    font-size: 13px; cursor: pointer; white-space: nowrap;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    flex-shrink: 0;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  /* ─── 三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    flex: 1;
+    min-height: 0;
+    height: calc(100vh - 57px);
+  }
+
+  /* ─── 左侧配置面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-left::-webkit-scrollbar { width: 4px; }
+  .panel-left::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  .panel-title {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.2px; margin-bottom: 12px; margin-top: 20px;
+  }
+  .panel-title:first-child { margin-top: 0; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+
+  /* 模式切换 */
+  .mode-group {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .mode-btn {
+    padding: 12px 8px; border-radius: 10px; text-align: center; cursor: pointer;
+    border: 1.5px solid var(--border); background: transparent; color: var(--muted);
+    font-size: 13px; font-weight: 600; transition: all 0.2s;
+  }
+  .mode-btn .mode-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+  .mode-btn.active {
+    border-color: var(--accent); background: rgba(124,58,237,0.15); color: var(--text);
+    box-shadow: 0 0 12px rgba(124,58,237,0.25);
+  }
+  .mode-btn:hover:not(.active) { border-color: rgba(255,255,255,0.25); color: var(--text); }
+
+  /* 通用输入 */
+  .form-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+  }
+  .form-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .form-label { color: var(--muted); flex-shrink: 0; }
+  .f-input {
+    background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+    border-radius: 7px; padding: 5px 10px; color: var(--text);
+    font-size: 13px; outline: none; transition: border-color 0.2s;
+  }
+  .f-input:focus { border-color: var(--accent); }
+  .f-input-wide { width: 100%; }
+  .f-input-sm { width: 100px; text-align: center; }
+  .f-input-tiny { width: 68px; text-align: center; }
+
+  /* 切换开关 */
+  .toggle {
+    position: relative; width: 36px; height: 20px; flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute; inset: 0; border-radius: 20px;
+    background: rgba(255,255,255,0.1); cursor: pointer; transition: 0.2s;
+  }
+  .toggle-track::before {
+    content: ''; position: absolute;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--muted); top: 3px; left: 3px; transition: 0.2s;
+  }
+  .toggle input:checked + .toggle-track { background: var(--accent); }
+  .toggle input:checked + .toggle-track::before { transform: translateX(16px); background: white; }
+
+  /* PK选项配置 */
+  .pk-side-config {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .pk-cfg-box {
+    border-radius: 10px; padding: 12px;
+    border: 1.5px solid var(--border);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .pk-cfg-box.left-box { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.06); }
+  .pk-cfg-box.right-box { border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.06); }
+  .pk-cfg-label { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; color: var(--muted); text-align: center; }
+  .pk-cfg-box.left-box .pk-cfg-label { color: #93C5FD; }
+  .pk-cfg-box.right-box .pk-cfg-label { color: #FCA5A5; }
+  .emoji-input-row { display: flex; gap: 6px; }
+  .emoji-inp {
+    width: 44px; background: rgba(255,255,255,0.08); border: 1px solid var(--border);
+    border-radius: 7px; padding: 6px; color: var(--text); font-size: 18px; text-align: center; outline: none;
+  }
+
+  /* 多选选项编辑 */
+  .multi-option-row {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 8px;
+  }
+  .multi-option-row:last-child { margin-bottom: 0; }
+  .opt-emoji-inp {
+    width: 38px; background: rgba(255,255,255,0.08); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px; color: var(--text); font-size: 16px; text-align: center; outline: none;
+    flex-shrink: 0;
+  }
+  .opt-name-inp {
+    flex: 1; background: rgba(255,255,255,0.08); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 8px; color: var(--text); font-size: 13px; outline: none;
+  }
+  .opt-name-inp:focus { border-color: var(--accent); }
+  .opt-del-btn {
+    width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .opt-del-btn:hover { border-color: var(--red); color: var(--red); }
+
+  .add-opt-btn {
+    width: 100%; padding: 8px; border-radius: 8px; border: 1px dashed var(--border);
+    background: transparent; color: var(--muted); cursor: pointer; font-size: 13px;
+    transition: all 0.2s; margin-top: 8px;
+  }
+  .add-opt-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* 操作按钮 */
+  .action-btn {
+    width: 100%; padding: 12px; border-radius: 12px; border: none; cursor: pointer;
+    font-size: 15px; font-weight: 700; transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .action-btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+  }
+  .action-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(124,58,237,0.5); }
+  .action-btn-primary:active { transform: translateY(0); }
+  .action-btn-outline {
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .action-btn-outline:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+  .action-btn-danger {
+    background: rgba(239,68,68,0.15); color: #FCA5A5;
+    border: 1px solid rgba(239,68,68,0.3);
+    margin-top: 8px;
+  }
+  .action-btn-danger:hover { background: rgba(239,68,68,0.25); }
+
+  /* ─── 游戏中心 ─── */
+  .game-center {
+    display: flex; flex-direction: column;
+    padding: 28px 36px;
+    position: relative; overflow-y: auto;
+    align-items: stretch;
+  }
+  .game-center::before {
+    content: ''; position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%);
+    top: 40%; left: 50%; transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  /* 等待开始屏 */
+  .idle-screen {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; position: relative; z-index: 2;
+    min-height: 400px;
+  }
+  .idle-icon { font-size: 80px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  .idle-title {
+    font-size: 34px; font-weight: 800; letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .idle-sub { font-size: 15px; color: var(--muted); margin-bottom: 32px; line-height: 1.7; }
+  .idle-start-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 16px; padding: 16px 52px;
+    color: white; font-size: 18px; font-weight: 800; cursor: pointer;
+    box-shadow: 0 8px 32px rgba(124,58,237,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .idle-start-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124,58,237,0.5); }
+
+  /* 游戏运行区 */
+  .game-running { display: none; flex-direction: column; gap: 20px; position: relative; z-index: 2; }
+
+  /* 主题标题 */
+  .vote-topic {
+    text-align: center;
+  }
+  .vote-topic-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .vote-topic-title {
+    font-size: 26px; font-weight: 800;
+    background: linear-gradient(135deg, #F0EAF8, #C4B5FD);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.3px;
+  }
+
+  /* 倒计时 */
+  .countdown-bar {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+  }
+  .countdown-ring {
+    width: 56px; height: 56px; flex-shrink: 0; position: relative;
+  }
+  .countdown-ring svg { transform: rotate(-90deg); }
+  .countdown-ring circle { fill: none; stroke-width: 4; }
+  .countdown-ring .track { stroke: rgba(255,255,255,0.08); }
+  .countdown-ring .progress { stroke: var(--gold); stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+  .countdown-num {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 800; color: var(--gold);
+  }
+  .countdown-label { font-size: 13px; color: var(--muted); }
+  .countdown-label strong { color: var(--text); font-size: 15px; }
+
+  /* ─── PK模式 ─── */
+  .pk-arena {
+    display: grid; grid-template-columns: 1fr 120px 1fr; gap: 16px; align-items: center;
+  }
+
+  /* 队伍卡片 */
+  .team-card {
+    border-radius: 16px; padding: 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    border: 2px solid var(--border); transition: all 0.4s;
+    position: relative; overflow: hidden;
+    cursor: pointer;
+  }
+  .team-card.team-left {
+    border-color: rgba(59,130,246,0.35);
+    background: linear-gradient(145deg, rgba(59,130,246,0.08), rgba(59,130,246,0.03));
+  }
+  .team-card.team-right {
+    border-color: rgba(239,68,68,0.35);
+    background: linear-gradient(145deg, rgba(239,68,68,0.08), rgba(239,68,68,0.03));
+  }
+  /* 领先发光 */
+  .team-card.team-left.leading {
+    border-color: var(--blue);
+    box-shadow: 0 0 28px rgba(59,130,246,0.45), inset 0 0 20px rgba(59,130,246,0.05);
+  }
+  .team-card.team-right.leading {
+    border-color: var(--red);
+    box-shadow: 0 0 28px rgba(239,68,68,0.45), inset 0 0 20px rgba(239,68,68,0.05);
+  }
+  /* 失败灰化 */
+  .team-card.loser { filter: grayscale(0.7) opacity(0.55); }
+
+  .team-avatar {
+    font-size: 56px; line-height: 1;
+    animation: avatarFloat 3s ease-in-out infinite;
+  }
+  @keyframes avatarFloat { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-6px) scale(1.05)} }
+  .team-name { font-size: 18px; font-weight: 800; }
+  .team-card.team-left .team-name { color: #93C5FD; }
+  .team-card.team-right .team-name { color: #FCA5A5; }
+  .team-vote-count {
+    font-size: 40px; font-weight: 900; letter-spacing: -1.5px;
+    line-height: 1;
+    transition: transform 0.15s;
+  }
+  .team-card.team-left .team-vote-count { color: #60A5FA; }
+  .team-card.team-right .team-vote-count { color: #F87171; }
+  .team-vote-count.pop { transform: scale(1.3); }
+  .team-pct {
+    font-size: 14px; font-weight: 700; padding: 3px 12px; border-radius: 20px;
+  }
+  .team-card.team-left .team-pct { background: rgba(59,130,246,0.2); color: #93C5FD; }
+  .team-card.team-right .team-pct { background: rgba(239,68,68,0.2); color: #FCA5A5; }
+
+  .vote-btn {
+    width: 100%; padding: 10px; border-radius: 10px; border: none; cursor: pointer;
+    font-size: 14px; font-weight: 700; transition: all 0.2s;
+  }
+  .vote-btn-left {
+    background: rgba(59,130,246,0.2); color: #93C5FD;
+    border: 1.5px solid rgba(59,130,246,0.4);
+  }
+  .vote-btn-left:hover { background: rgba(59,130,246,0.35); border-color: var(--blue); }
+  .vote-btn-right {
+    background: rgba(239,68,68,0.2); color: #FCA5A5;
+    border: 1.5px solid rgba(239,68,68,0.4);
+  }
+  .vote-btn-right:hover { background: rgba(239,68,68,0.35); border-color: var(--red); }
+  .vote-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+  .vote-btn:not(:disabled):active { transform: scale(0.95); }
+
+  /* VS 中间区域 */
+  .vs-center {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .vs-text {
+    font-size: 32px; font-weight: 900;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+    animation: vsPulse 1.5s ease-in-out infinite;
+  }
+  @keyframes vsPulse { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:0.8; transform:scale(1.08)} }
+
+  /* 双向大进度条 */
+  .pk-progress-wrap {
+    border-radius: 16px; overflow: hidden;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+  }
+  .pk-progress-labels {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; font-weight: 700; margin-bottom: 10px;
+  }
+  .pk-bar-container {
+    height: 28px; border-radius: 14px;
+    background: rgba(255,255,255,0.06);
+    position: relative; overflow: hidden;
+    display: flex;
+  }
+  .pk-bar-left {
+    height: 100%;
+    background: linear-gradient(90deg, #1D4ED8, #3B82F6);
+    border-radius: 14px 0 0 14px;
+    transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+  }
+  .pk-bar-right {
+    height: 100%;
+    background: linear-gradient(270deg, #B91C1C, #EF4444);
+    border-radius: 0 14px 14px 0;
+    transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  /* 中间分割线 */
+  .pk-bar-divider {
+    position: absolute; left: 50%; top: 0; bottom: 0;
+    width: 3px; background: rgba(255,255,255,0.6);
+    transform: translateX(-50%);
+    z-index: 2; box-shadow: 0 0 6px rgba(255,255,255,0.5);
+  }
+  .pk-progress-pcts {
+    display: flex; justify-content: space-between;
+    font-size: 13px; font-weight: 800; margin-top: 8px;
+  }
+  .pk-pct-left { color: #60A5FA; }
+  .pk-pct-right { color: #F87171; }
+
+  /* ─── 多选投票模式 ─── */
+  .multi-options-list {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .multi-opt-item {
+    border-radius: 14px; padding: 14px 18px;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid var(--border);
+    cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden;
+  }
+  .multi-opt-item:hover { border-color: rgba(124,58,237,0.5); background: rgba(124,58,237,0.08); }
+  .multi-opt-item.voted { border-color: var(--accent); background: rgba(124,58,237,0.12); }
+  .multi-opt-item.voted::before {
+    content: '✓'; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--accent); font-size: 18px; font-weight: 800;
+  }
+  .multi-opt-item:disabled, .multi-opt-item[data-locked="1"] { cursor: default; }
+  .multi-opt-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .multi-opt-emoji { font-size: 28px; }
+  .multi-opt-name { font-size: 16px; font-weight: 700; flex: 1; }
+  .multi-opt-votes { font-size: 13px; color: var(--muted); flex-shrink: 0; }
+  /* 多选进度条 */
+  .multi-opt-bar-bg {
+    height: 8px; border-radius: 4px;
+    background: rgba(255,255,255,0.07);
+    overflow: hidden;
+  }
+  .multi-opt-bar-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    min-width: 4px;
+  }
+  .multi-opt-pct { font-size: 12px; font-weight: 700; color: var(--muted); margin-top: 4px; text-align: right; }
+
+  /* ─── 结果揭晓覆盖 ─── */
+  .result-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(13,7,32,0.9);
+    display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(8px);
+  }
+  .result-box {
+    background: var(--deep);
+    border: 1px solid var(--border);
+    border-radius: 24px; padding: 40px 48px;
+    text-align: center; max-width: 440px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  }
+  .result-crown { font-size: 64px; margin-bottom: 12px; animation: crownBounce 0.6s ease; }
+  @keyframes crownBounce { 0%{transform:scale(0) rotate(-20deg)} 70%{transform:scale(1.15) rotate(5deg)} 100%{transform:scale(1) rotate(0)} }
+  .result-title {
+    font-size: 13px; font-weight: 700; letter-spacing: 1.5px; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .result-winner-name {
+    font-size: 36px; font-weight: 900; letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  .result-stats { font-size: 15px; color: var(--muted); margin-bottom: 28px; line-height: 1.7; }
+  .result-stats strong { color: var(--text); }
+  .result-close-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 12px; padding: 12px 40px;
+    color: white; font-size: 15px; font-weight: 700; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .result-close-btn:hover { transform: translateY(-1px); }
+
+  /* 烟花粒子 */
+  .firework {
+    position: absolute; pointer-events: none;
+    width: 8px; height: 8px; border-radius: 50%;
+    animation: fw 1.2s ease-out forwards;
+  }
+  @keyframes fw {
+    0% { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--fx), var(--fy)) scale(0); }
+  }
+
+  /* ─── 右侧数据面板 ─── */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-right::-webkit-scrollbar { width: 4px; }
+  .panel-right::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  .stat-block {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 12px;
+  }
+  .stat-block-title { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; }
+  .stat-total {
+    font-size: 40px; font-weight: 900; letter-spacing: -1.5px;
+    background: linear-gradient(135deg, var(--gold), #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .stat-total-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* 各选项统计 */
+  .stat-item { margin-bottom: 10px; }
+  .stat-item:last-child { margin-bottom: 0; }
+  .stat-item-header {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; margin-bottom: 5px;
+  }
+  .stat-item-name { flex: 1; font-weight: 600; }
+  .stat-item-num { font-size: 12px; color: var(--muted); }
+  .stat-bar {
+    height: 6px; border-radius: 3px; background: rgba(255,255,255,0.07); overflow: hidden;
+  }
+  .stat-bar-fill {
+    height: 100%; border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  /* 投票时间线 */
+  .timeline { display: flex; flex-direction: column; gap: 8px; }
+  .timeline-item {
+    display: flex; align-items: center; gap: 8px; font-size: 12px;
+  }
+  .timeline-dot {
+    width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  }
+  .timeline-dot.blue { background: var(--blue); }
+  .timeline-dot.red { background: var(--red); }
+  .timeline-dot.accent { background: var(--accent); }
+  .timeline-content { flex: 1; color: var(--muted); }
+  .timeline-content strong { color: var(--text); }
+  .timeline-time { color: var(--muted); font-size: 11px; flex-shrink: 0; }
+
+  /* 分享模块 */
+  .share-block { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
+  .share-url {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 10px; font-size: 11px; color: var(--muted);
+    word-break: break-all; line-height: 1.5; margin-bottom: 10px;
+    cursor: text; user-select: all;
+  }
+  .share-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .share-btn {
+    padding: 7px; border-radius: 8px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); font-size: 12px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .share-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ─── 状态栏 ─── */
+  .statusbar {
+    border-top: 1px solid var(--border);
+    padding: 9px 24px;
+    display: flex; align-items: center; gap: 16px;
+    background: rgba(13,7,32,0.8);
+    font-size: 12px; color: var(--muted);
+    flex-shrink: 0;
+  }
+  .statusbar-dot { width: 6px; height: 6px; border-radius: 50%; background: #22C55E; flex-shrink: 0; }
+  .statusbar-sep { color: rgba(255,255,255,0.15); }
+  .status-mode-badge {
+    padding: 2px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  }
+  .badge-pk { background: rgba(124,58,237,0.2); color: #A78BFA; border: 1px solid rgba(124,58,237,0.3); }
+  .badge-multi { background: rgba(236,72,153,0.2); color: #F9A8D4; border: 1px solid rgba(236,72,153,0.3); }
+  .badge-ended { background: rgba(245,200,66,0.15); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
+
+  /* 隐藏工具类 */
+  .hidden { display: none !important; }
+
+  /* 滚动条整体 */
+  .game-center::-webkit-scrollbar { width: 4px; }
+  .game-center::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ─── 导航栏 ─── -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span>🎮</span> 游戏中台 <span class="nav-badge">DEMO</span>
+  </a>
+  <div class="nav-scroll">
+    <a href="index.html" class="nav-tab">首页</a>
+    <a href="wheel.html" class="nav-tab">大转盘</a>
+    <a href="nine-grid.html" class="nav-tab">九宫格</a>
+    <a href="scratch-card.html" class="nav-tab">刮刮乐</a>
+    <a href="shake-dice.html" class="nav-tab">摇骰子</a>
+    <a href="smash-egg.html" class="nav-tab">砸金蛋</a>
+    <a href="slot-machine.html" class="nav-tab">老虎机</a>
+    <a href="gift-box.html" class="nav-tab">礼盒开箱</a>
+    <a href="whack-mole.html" class="nav-tab">打地鼠</a>
+    <a href="cup-game.html" class="nav-tab">三杯游戏</a>
+    <a href="number-bomb.html" class="nav-tab">数字炸弹</a>
+    <a href="stamp-collect.html" class="nav-tab">集卡集章</a>
+    <a href="vote-pk.html" class="nav-tab active">投票PK</a>
+    <a href="flying-chess.html" class="nav-tab">飞行棋</a>
+    <a href="monopoly.html" class="nav-tab">大富翁</a>
+    <a href="red-packet-rain.html" class="nav-tab">红包雨</a>
+    <a href="claw-machine.html" class="nav-tab">夹娃娃机</a>
+    <a href="flip-match.html" class="nav-tab">翻牌配对</a>
+    <a href="shake.html" class="nav-tab">摇一摇</a>
+    <a href="quiz.html" class="nav-tab">问答闯关</a>
+    <a href="daily-checkin.html" class="nav-tab">每日签到</a>
+  </div>
+</nav>
+
+<!-- ─── 三列主区域 ─── -->
+<div class="main">
+
+  <!-- ===== 左侧配置面板 ===== -->
+  <aside class="panel-left">
+
+    <div class="panel-title">投票模式</div>
+    <div class="mode-group">
+      <div class="mode-btn active" id="modePK" onclick="switchMode('pk')">
+        <span class="mode-icon">⚔️</span>
+        PK对战
+      </div>
+      <div class="mode-btn" id="modeMulti" onclick="switchMode('multi')">
+        <span class="mode-icon">📊</span>
+        多选投票
+      </div>
+    </div>
+
+    <div class="panel-title">基本设置</div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>投票主题</div>
+      <input class="f-input f-input-wide" type="text" id="voteTopicInput"
+             placeholder="请输入投票主题…" value="你更喜欢哪种宠物？">
+    </div>
+
+    <!-- PK模式选项配置 -->
+    <div id="pkConfig">
+      <div class="panel-title">PK选项</div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:linear-gradient(135deg,#3B82F6,#EF4444)"></span>双方配置</div>
+        <div class="pk-side-config">
+          <div class="pk-cfg-box left-box">
+            <div class="pk-cfg-label">蓝队</div>
+            <div class="emoji-input-row">
+              <input class="emoji-inp" id="leftEmoji" type="text" value="🐱" maxlength="2">
+              <input class="f-input" id="leftName" type="text" value="猫咪派" placeholder="队名" style="flex:1">
+            </div>
+          </div>
+          <div class="pk-cfg-box right-box">
+            <div class="pk-cfg-label">红队</div>
+            <div class="emoji-input-row">
+              <input class="emoji-inp" id="rightEmoji" type="text" value="🐶" maxlength="2">
+              <input class="f-input" id="rightName" type="text" value="狗狗派" placeholder="队名" style="flex:1">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 多选模式选项配置 -->
+    <div id="multiConfig" class="hidden">
+      <div class="panel-title">投票选项（最多6个）</div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:#EC4899"></span>选项列表</div>
+        <div id="multiOptionsList">
+          <!-- 动态渲染 -->
+        </div>
+        <button class="add-opt-btn" id="addOptBtn" onclick="addMultiOption()">＋ 添加选项</button>
+      </div>
+    </div>
+
+    <div class="panel-title">投票规则</div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#A78BFA"></span>规则设置</div>
+      <div class="form-row">
+        <span class="form-label">投票时长</span>
+        <select class="f-input f-input-sm" id="durationSelect">
+          <option value="30">30 秒</option>
+          <option value="60" selected>60 秒</option>
+          <option value="120">2 分钟</option>
+          <option value="300">5 分钟</option>
+          <option value="600">10 分钟</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <span class="form-label">允许多次投票</span>
+        <label class="toggle">
+          <input type="checkbox" id="multiVoteToggle">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <div class="form-row">
+        <span class="form-label">实时显示票数</span>
+        <label class="toggle">
+          <input type="checkbox" id="showRealtimeToggle" checked>
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <div class="form-row" style="border-bottom:none">
+        <span class="form-label">模拟自动投票</span>
+        <label class="toggle">
+          <input type="checkbox" id="autoSimToggle" checked>
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="panel-title">操作</div>
+    <button class="action-btn action-btn-primary" onclick="startVote()">🚀 开始投票</button>
+    <button class="action-btn action-btn-outline" onclick="resetVote()">🔄 重置</button>
+    <button class="action-btn action-btn-danger" id="endBtn" style="display:none" onclick="endVoteNow()">🏁 立即结束</button>
+
+  </aside>
+
+  <!-- ===== 中间游戏区 ===== -->
+  <main class="game-center">
+
+    <!-- 等待开始 -->
+    <div class="idle-screen" id="idleScreen">
+      <div class="idle-icon">⚔️</div>
+      <div class="idle-title">投票 PK</div>
+      <div class="idle-sub">
+        设置主题与选项<br>开启一场激烈的投票对决
+      </div>
+      <button class="idle-start-btn" onclick="startVote()">开始投票</button>
+    </div>
+
+    <!-- 游戏运行中 -->
+    <div class="game-running" id="gameRunning">
+
+      <!-- 主题标题 -->
+      <div class="vote-topic">
+        <div class="vote-topic-label">本次投票主题</div>
+        <div class="vote-topic-title" id="topicDisplay">你更喜欢哪种宠物？</div>
+      </div>
+
+      <!-- 倒计时 -->
+      <div class="countdown-bar">
+        <div class="countdown-ring">
+          <svg width="56" height="56" viewBox="0 0 56 56">
+            <circle class="track" cx="28" cy="28" r="24" />
+            <circle class="progress" id="cdArc" cx="28" cy="28" r="24"
+                    stroke-dasharray="150.796" stroke-dashoffset="0" />
+          </svg>
+          <div class="countdown-num" id="cdNum">60</div>
+        </div>
+        <div class="countdown-label">
+          <strong id="cdStatusText">投票进行中</strong><br>
+          剩余时间
+        </div>
+      </div>
+
+      <!-- PK 对战区 -->
+      <div id="pkArenaWrap">
+        <!-- 队伍 -->
+        <div class="pk-arena" id="pkArena">
+          <!-- 左队 -->
+          <div class="team-card team-left" id="teamLeft" onclick="castVote('left')">
+            <div class="team-avatar" id="leftAvatarDisplay">🐱</div>
+            <div class="team-name" id="leftNameDisplay">猫咪派</div>
+            <div class="team-vote-count" id="leftCount">0</div>
+            <div class="team-pct" id="leftPct">0%</div>
+            <button class="vote-btn vote-btn-left" id="voteBtnLeft" onclick="event.stopPropagation();castVote('left')">
+              支持蓝队
+            </button>
+          </div>
+
+          <!-- 中间 VS -->
+          <div class="vs-center">
+            <div class="vs-text">VS</div>
+          </div>
+
+          <!-- 右队 -->
+          <div class="team-card team-right" id="teamRight" onclick="castVote('right')">
+            <div class="team-avatar" id="rightAvatarDisplay">🐶</div>
+            <div class="team-name" id="rightNameDisplay">狗狗派</div>
+            <div class="team-vote-count" id="rightCount">0</div>
+            <div class="team-pct" id="rightPct">0%</div>
+            <button class="vote-btn vote-btn-right" id="voteBtnRight" onclick="event.stopPropagation();castVote('right')">
+              支持红队
+            </button>
+          </div>
+        </div>
+
+        <!-- 大进度条 -->
+        <div class="pk-progress-wrap" style="margin-top:16px">
+          <div class="pk-progress-labels">
+            <span style="color:#60A5FA;font-weight:800" id="pkBarLeftLabel">🐱 猫咪派</span>
+            <span style="color:var(--muted);font-size:11px">进度对比</span>
+            <span style="color:#F87171;font-weight:800" id="pkBarRightLabel">🐶 狗狗派</span>
+          </div>
+          <div class="pk-bar-container">
+            <div class="pk-bar-left" id="pkBarLeft" style="width:50%"></div>
+            <div class="pk-bar-divider"></div>
+            <div class="pk-bar-right" id="pkBarRight" style="width:50%"></div>
+          </div>
+          <div class="pk-progress-pcts">
+            <span class="pk-pct-left" id="pkPctLeft">50.0%</span>
+            <span class="pk-pct-right" id="pkPctRight">50.0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 多选模式区 -->
+      <div id="multiArenaWrap" class="hidden">
+        <div class="multi-options-list" id="multiOptionsBtns">
+          <!-- 动态渲染 -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===== 右侧数据面板 ===== -->
+  <aside class="panel-right">
+
+    <div class="panel-title">实时数据</div>
+
+    <!-- 总投票数 -->
+    <div class="stat-block">
+      <div class="stat-block-title">总投票数</div>
+      <div class="stat-total" id="statTotal">0</div>
+      <div class="stat-total-label">票</div>
+    </div>
+
+    <!-- 各选项统计 -->
+    <div class="stat-block">
+      <div class="stat-block-title">投票分布</div>
+      <div id="statDistribution">
+        <!-- 动态渲染 -->
+        <div style="color:var(--muted);font-size:13px;text-align:center;padding:10px 0">
+          投票开始后显示
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-title">投票记录</div>
+
+    <!-- 时间线 -->
+    <div class="stat-block">
+      <div class="stat-block-title">最近投票</div>
+      <div class="timeline" id="timeline">
+        <div style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">
+          暂无记录
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-title">分享</div>
+
+    <!-- 分享链接 -->
+    <div class="share-block">
+      <div class="stat-block-title">分享链接</div>
+      <div class="share-url" id="shareUrl">https://gamehub.demo/vote/pk-001</div>
+      <div class="share-btns">
+        <button class="share-btn" onclick="copyShareLink()">📋 复制链接</button>
+        <button class="share-btn" onclick="genQRCode()">📲 生成二维码</button>
+        <button class="share-btn" onclick="shareWeChat()">💬 微信分享</button>
+        <button class="share-btn" onclick="shareWeibo()">🐦 微博分享</button>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- ─── 结果揭晓弹层 ─── -->
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-box" id="resultBox">
+    <div class="result-crown" id="resultCrown">🏆</div>
+    <div class="result-title">投票结果</div>
+    <div class="result-winner-name" id="resultWinnerName">猫咪派</div>
+    <div class="result-stats" id="resultStats">
+      获得 <strong>128 票</strong>，占比 <strong>64%</strong><br>
+      共 <strong>200 票</strong> 参与
+    </div>
+    <button class="result-close-btn" onclick="closeResult()">查看详情</button>
+  </div>
+</div>
+
+<!-- ─── 底部状态栏 ─── -->
+<footer class="statusbar">
+  <div class="statusbar-dot" id="statusDot"></div>
+  <span id="statusText">就绪 · 点击「开始投票」发起对决</span>
+  <span class="statusbar-sep">|</span>
+  <span class="status-mode-badge badge-pk" id="modeBadge">PK对战</span>
+  <span class="statusbar-sep">|</span>
+  <span>实时票数 · 动态进度条</span>
+  <span class="statusbar-sep">|</span>
+  <span>双模式支持</span>
+</footer>
+
+<script>
+/* ========================================================
+   投票PK · 全部逻辑
+======================================================== */
+
+/* ── 状态数据 ── */
+let state = {
+  mode: 'pk',              // 'pk' | 'multi'
+  running: false,
+  ended: false,
+  totalDuration: 60,       // 总时长（秒）
+  remaining: 60,
+  allowMulti: false,
+  showRealtime: true,
+  autoSim: true,
+  hasVoted: false,         // 本轮用户是否已投票
+
+  /* PK 模式数据 */
+  pk: {
+    leftVotes: 0,
+    rightVotes: 0,
+  },
+
+  /* 多选模式数据 */
+  multi: {
+    options: [],           // [{ emoji, name, votes }]
+    votedIdx: -1,          // 用户已投的选项索引
+  },
+
+  timers: [],              // 所有 setInterval/setTimeout id
+  timelineLog: [],         // 投票记录
+};
+
+/* ── 默认多选选项 ── */
+const defaultMultiOptions = [
+  { emoji: '🌸', name: '春天', votes: 0 },
+  { emoji: '☀️', name: '夏天', votes: 0 },
+  { emoji: '🍁', name: '秋天', votes: 0 },
+  { emoji: '❄️', name: '冬天', votes: 0 },
+];
+
+/* ── 初始化 ── */
+(function init() {
+  state.multi.options = defaultMultiOptions.map(o => ({ ...o }));
+  renderMultiConfigList();
+  updateModeBadge();
+})();
+
+/* ========================================================
+   模式切换
+======================================================== */
+function switchMode(m) {
+  if (state.running) return;
+  state.mode = m;
+  document.getElementById('modePK').classList.toggle('active', m === 'pk');
+  document.getElementById('modeMulti').classList.toggle('active', m === 'multi');
+  document.getElementById('pkConfig').classList.toggle('hidden', m !== 'pk');
+  document.getElementById('multiConfig').classList.toggle('hidden', m === 'pk');
+  updateModeBadge();
+}
+
+function updateModeBadge() {
+  const badge = document.getElementById('modeBadge');
+  if (state.mode === 'pk') {
+    badge.textContent = 'PK对战';
+    badge.className = 'status-mode-badge badge-pk';
+  } else {
+    badge.textContent = '多选投票';
+    badge.className = 'status-mode-badge badge-multi';
+  }
+}
+
+/* ========================================================
+   多选选项配置渲染
+======================================================== */
+function renderMultiConfigList() {
+  const container = document.getElementById('multiOptionsList');
+  container.innerHTML = '';
+  state.multi.options.forEach((opt, i) => {
+    const row = document.createElement('div');
+    row.className = 'multi-option-row';
+    row.innerHTML = `
+      <input class="opt-emoji-inp" type="text" value="${opt.emoji}" maxlength="2"
+             onchange="updateMultiOpt(${i},'emoji',this.value)">
+      <input class="opt-name-inp" type="text" value="${opt.name}" placeholder="选项名称"
+             oninput="updateMultiOpt(${i},'name',this.value)">
+      <button class="opt-del-btn" onclick="removeMultiOpt(${i})" title="删除">×</button>
+    `;
+    container.appendChild(row);
+  });
+  document.getElementById('addOptBtn').style.display =
+    state.multi.options.length >= 6 ? 'none' : '';
+}
+
+function updateMultiOpt(idx, key, val) {
+  state.multi.options[idx][key] = val;
+}
+
+function addMultiOption() {
+  if (state.multi.options.length >= 6) return;
+  const emojis = ['🎯','🎪','🎨','🎭','🎬','🎮'];
+  state.multi.options.push({
+    emoji: emojis[state.multi.options.length] || '⭐',
+    name: `选项${state.multi.options.length + 1}`,
+    votes: 0,
+  });
+  renderMultiConfigList();
+}
+
+function removeMultiOpt(idx) {
+  if (state.multi.options.length <= 2) {
+    alert('至少保留2个选项');
+    return;
+  }
+  state.multi.options.splice(idx, 1);
+  renderMultiConfigList();
+}
+
+/* ========================================================
+   开始投票
+======================================================== */
+function startVote() {
+  if (state.running) return;
+
+  /* 读取配置 */
+  state.totalDuration = parseInt(document.getElementById('durationSelect').value, 10);
+  state.remaining = state.totalDuration;
+  state.allowMulti = document.getElementById('multiVoteToggle').checked;
+  state.showRealtime = document.getElementById('showRealtimeToggle').checked;
+  state.autoSim = document.getElementById('autoSimToggle').checked;
+  state.hasVoted = false;
+  state.timelineLog = [];
+
+  /* 读取多选项名称（防止未blur的情况） */
+  document.querySelectorAll('.opt-name-inp').forEach((inp, i) => {
+    if (state.multi.options[i]) state.multi.options[i].name = inp.value;
+  });
+  document.querySelectorAll('.opt-emoji-inp').forEach((inp, i) => {
+    if (state.multi.options[i]) state.multi.options[i].emoji = inp.value;
+  });
+
+  /* 重置票数 */
+  state.pk.leftVotes = 0;
+  state.pk.rightVotes = 0;
+  state.multi.options.forEach(o => o.votes = 0);
+  state.multi.votedIdx = -1;
+  state.running = true;
+  state.ended = false;
+
+  /* 切换界面 */
+  document.getElementById('idleScreen').style.display = 'none';
+  document.getElementById('gameRunning').style.display = 'flex';
+  document.getElementById('endBtn').style.display = '';
+
+  /* 刷新主题 */
+  const topic = document.getElementById('voteTopicInput').value || '投票PK';
+  document.getElementById('topicDisplay').textContent = topic;
+  document.getElementById('shareUrl').textContent =
+    `https://gamehub.demo/vote/${encodeURIComponent(topic).slice(0,20)}-${Date.now().toString(36)}`;
+
+  /* 根据模式刷新 PK / 多选 UI */
+  if (state.mode === 'pk') {
+    initPKDisplay();
+    document.getElementById('pkArenaWrap').classList.remove('hidden');
+    document.getElementById('multiArenaWrap').classList.add('hidden');
+  } else {
+    initMultiDisplay();
+    document.getElementById('pkArenaWrap').classList.add('hidden');
+    document.getElementById('multiArenaWrap').classList.remove('hidden');
+  }
+
+  /* 更新右侧统计初始化 */
+  updateStatsPanel();
+  updateTimeline();
+
+  /* 状态栏 */
+  document.getElementById('statusText').textContent = '投票进行中…';
+
+  /* 启动倒计时 */
+  startCountdown();
+
+  /* 模拟自动投票 */
+  if (state.autoSim) startAutoSim();
+}
+
+/* ========================================================
+   PK 模式初始化
+======================================================== */
+function initPKDisplay() {
+  const le = document.getElementById('leftEmoji').value || '🐱';
+  const ln = document.getElementById('leftName').value || '蓝队';
+  const re = document.getElementById('rightEmoji').value || '🐶';
+  const rn = document.getElementById('rightName').value || '红队';
+
+  document.getElementById('leftAvatarDisplay').textContent = le;
+  document.getElementById('leftNameDisplay').textContent = ln;
+  document.getElementById('rightAvatarDisplay').textContent = re;
+  document.getElementById('rightNameDisplay').textContent = rn;
+  document.getElementById('voteBtnLeft').textContent = `支持 ${ln}`;
+  document.getElementById('voteBtnRight').textContent = `支持 ${rn}`;
+  document.getElementById('pkBarLeftLabel').textContent = `${le} ${ln}`;
+  document.getElementById('pkBarRightLabel').textContent = `${re} ${rn}`;
+
+  refreshPKDisplay(false);
+  enableVoteButtons();
+}
+
+/* ========================================================
+   多选模式初始化
+======================================================== */
+function initMultiDisplay() {
+  const container = document.getElementById('multiOptionsBtns');
+  container.innerHTML = '';
+  state.multi.options.forEach((opt, i) => {
+    const item = document.createElement('div');
+    item.className = 'multi-opt-item';
+    item.id = `multiOptBtn_${i}`;
+    item.onclick = () => castMultiVote(i);
+    item.innerHTML = `
+      <div class="multi-opt-header">
+        <div class="multi-opt-emoji">${opt.emoji}</div>
+        <div class="multi-opt-name">${opt.name}</div>
+        <div class="multi-opt-votes" id="multiOptVote_${i}">0 票</div>
+      </div>
+      <div class="multi-opt-bar-bg">
+        <div class="multi-opt-bar-fill" id="multiOptBar_${i}" style="width:0%"></div>
+      </div>
+      <div class="multi-opt-pct" id="multiOptPct_${i}">0%</div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+/* ========================================================
+   倒计时
+======================================================== */
+function startCountdown() {
+  const circumference = 150.796; /* 2π×24 */
+  const arc = document.getElementById('cdArc');
+  const numEl = document.getElementById('cdNum');
+  const total = state.totalDuration;
+
+  function tick() {
+    if (!state.running) return;
+    const r = state.remaining;
+    numEl.textContent = r;
+    const offset = circumference * (1 - r / total);
+    arc.style.strokeDashoffset = offset;
+
+    /* 低于10秒变红 */
+    arc.style.stroke = r <= 10 ? '#EF4444' : 'var(--gold)';
+
+    if (r <= 0) {
+      endVote();
+      return;
+    }
+    state.remaining--;
+  }
+
+  tick(); /* 立即执行一次 */
+  const id = setInterval(tick, 1000);
+  state.timers.push(id);
+}
+
+/* ========================================================
+   投票逻辑 · PK模式
+======================================================== */
+function castVote(side) {
+  if (!state.running || state.ended) return;
+  if (!state.allowMulti && state.hasVoted) return;
+
+  if (side === 'left') state.pk.leftVotes++;
+  else state.pk.rightVotes++;
+
+  state.hasVoted = true;
+  refreshPKDisplay(true);
+  addTimelineEntry(side === 'left'
+    ? `支持了 ${document.getElementById('leftNameDisplay').textContent}`
+    : `支持了 ${document.getElementById('rightNameDisplay').textContent}`,
+    side === 'left' ? 'blue' : 'red');
+
+  updateStatsPanel();
+
+  /* 单次投票禁用按钮 */
+  if (!state.allowMulti) {
+    document.getElementById('voteBtnLeft').disabled = true;
+    document.getElementById('voteBtnRight').disabled = true;
+  }
+
+  /* 投票弹跳动画 */
+  const countEl = document.getElementById(side === 'left' ? 'leftCount' : 'rightCount');
+  countEl.classList.remove('pop');
+  void countEl.offsetWidth; /* 重排触发 */
+  countEl.classList.add('pop');
+  setTimeout(() => countEl.classList.remove('pop'), 200);
+}
+
+/* 刷新PK显示 */
+function refreshPKDisplay(animated) {
+  const l = state.pk.leftVotes;
+  const r = state.pk.rightVotes;
+  const total = l + r;
+
+  const lPct = total === 0 ? 50 : Math.round(l / total * 1000) / 10;
+  const rPct = total === 0 ? 50 : Math.round(r / total * 1000) / 10;
+
+  /* 票数 */
+  if (state.showRealtime || state.ended) {
+    document.getElementById('leftCount').textContent = l;
+    document.getElementById('rightCount').textContent = r;
+    document.getElementById('leftPct').textContent = `${lPct}%`;
+    document.getElementById('rightPct').textContent = `${rPct}%`;
+  } else {
+    document.getElementById('leftCount').textContent = '?';
+    document.getElementById('rightCount').textContent = '?';
+    document.getElementById('leftPct').textContent = '?';
+    document.getElementById('rightPct').textContent = '?';
+  }
+
+  /* 进度条 */
+  document.getElementById('pkBarLeft').style.width = lPct + '%';
+  document.getElementById('pkBarRight').style.width = rPct + '%';
+  document.getElementById('pkPctLeft').textContent = lPct.toFixed(1) + '%';
+  document.getElementById('pkPctRight').textContent = rPct.toFixed(1) + '%';
+
+  /* 领先发光 */
+  const cardL = document.getElementById('teamLeft');
+  const cardR = document.getElementById('teamRight');
+  cardL.classList.remove('leading');
+  cardR.classList.remove('leading');
+  if (l > r) cardL.classList.add('leading');
+  else if (r > l) cardR.classList.add('leading');
+}
+
+/* ========================================================
+   投票逻辑 · 多选模式
+======================================================== */
+function castMultiVote(idx) {
+  if (!state.running || state.ended) return;
+  if (!state.allowMulti && state.multi.votedIdx >= 0) return;
+
+  state.multi.options[idx].votes++;
+  state.multi.votedIdx = idx;
+  state.hasVoted = true;
+
+  refreshMultiDisplay();
+  addTimelineEntry(`投票给了 ${state.multi.options[idx].emoji} ${state.multi.options[idx].name}`, 'accent');
+  updateStatsPanel();
+
+  /* 标记已投 */
+  document.querySelectorAll('.multi-opt-item').forEach((el, i) => {
+    el.classList.toggle('voted', i === idx);
+  });
+
+  if (!state.allowMulti) {
+    document.querySelectorAll('.multi-opt-item').forEach(el => {
+      el.style.pointerEvents = 'none';
+    });
+  }
+}
+
+/* 刷新多选显示 */
+function refreshMultiDisplay() {
+  const opts = state.multi.options;
+  const total = opts.reduce((s, o) => s + o.votes, 0);
+  opts.forEach((opt, i) => {
+    const pct = total === 0 ? 0 : Math.round(opt.votes / total * 1000) / 10;
+    if (state.showRealtime || state.ended) {
+      const vEl = document.getElementById(`multiOptVote_${i}`);
+      const bEl = document.getElementById(`multiOptBar_${i}`);
+      const pEl = document.getElementById(`multiOptPct_${i}`);
+      if (vEl) vEl.textContent = `${opt.votes} 票`;
+      if (bEl) bEl.style.width = pct + '%';
+      if (pEl) pEl.textContent = pct.toFixed(1) + '%';
+    }
+  });
+}
+
+/* ========================================================
+   模拟自动投票
+======================================================== */
+function startAutoSim() {
+  /* 每 800ms 随机给某一方加票 */
+  const id = setInterval(() => {
+    if (!state.running || state.ended) { clearInterval(id); return; }
+
+    if (state.mode === 'pk') {
+      /* PK：随机偏向一方，营造拉锯感 */
+      const r = Math.random();
+      if (r < 0.48) state.pk.leftVotes += Math.floor(Math.random() * 3) + 1;
+      else if (r < 0.96) state.pk.rightVotes += Math.floor(Math.random() * 3) + 1;
+      /* 偶尔双方都加 */
+      else { state.pk.leftVotes += 1; state.pk.rightVotes += 1; }
+      refreshPKDisplay(true);
+      updateStatsPanel();
+
+      /* 偶尔加时间线记录 */
+      if (Math.random() < 0.3) {
+        const side = Math.random() < 0.5 ? 'left' : 'right';
+        const name = side === 'left'
+          ? document.getElementById('leftNameDisplay').textContent
+          : document.getElementById('rightNameDisplay').textContent;
+        const nicknames = ['小明','小红','张三','李四','用户888','小宝','游客001','VIP用户'];
+        const nick = nicknames[Math.floor(Math.random() * nicknames.length)];
+        addTimelineEntry(`${nick} 支持了 ${name}`, side === 'left' ? 'blue' : 'red');
+      }
+    } else {
+      /* 多选：随机给选项加票 */
+      const idx = Math.floor(Math.random() * state.multi.options.length);
+      state.multi.options[idx].votes += Math.floor(Math.random() * 2) + 1;
+      refreshMultiDisplay();
+      updateStatsPanel();
+
+      if (Math.random() < 0.3) {
+        const opt = state.multi.options[idx];
+        const nicks = ['小明','用户999','小花','游客','VIP888','匿名用户'];
+        const nick = nicks[Math.floor(Math.random() * nicks.length)];
+        addTimelineEntry(`${nick} 投票给了 ${opt.emoji} ${opt.name}`, 'accent');
+      }
+    }
+  }, 800);
+  state.timers.push(id);
+}
+
+/* ========================================================
+   结束投票
+======================================================== */
+function endVote() {
+  if (state.ended) return;
+  state.running = false;
+  state.ended = true;
+  clearAllTimers();
+
+  /* 禁用投票按钮 */
+  document.getElementById('voteBtnLeft').disabled = true;
+  document.getElementById('voteBtnRight').disabled = true;
+  document.querySelectorAll('.multi-opt-item').forEach(el => el.style.pointerEvents = 'none');
+
+  /* 强制显示最终票数 */
+  if (state.mode === 'pk') refreshPKDisplay(false);
+  else refreshMultiDisplay();
+  updateStatsPanel();
+
+  document.getElementById('cdStatusText').textContent = '投票已结束';
+  document.getElementById('cdNum').textContent = '0';
+  document.getElementById('statusText').textContent = '投票结束 · 结果揭晓';
+  document.getElementById('endBtn').style.display = 'none';
+
+  const badge = document.getElementById('modeBadge');
+  badge.textContent = '已结束';
+  badge.className = 'status-mode-badge badge-ended';
+
+  /* 短暂延迟后弹出结果 */
+  setTimeout(showResult, 1200);
+}
+
+function endVoteNow() {
+  if (!state.running) return;
+  state.remaining = 0;
+}
+
+/* ========================================================
+   结果揭晓
+======================================================== */
+function showResult() {
+  const overlay = document.getElementById('resultOverlay');
+  const crownEl = document.getElementById('resultCrown');
+  const winnerEl = document.getElementById('resultWinnerName');
+  const statsEl = document.getElementById('resultStats');
+
+  let winnerName, winnerVotes, totalVotes, winnerPct, winnerEmoji;
+
+  if (state.mode === 'pk') {
+    const l = state.pk.leftVotes;
+    const r = state.pk.rightVotes;
+    totalVotes = l + r;
+    const tie = l === r;
+
+    if (tie) {
+      crownEl.textContent = '🤝';
+      winnerEl.textContent = '势均力敌！平局';
+      statsEl.innerHTML = `双方各得 <strong>${l} 票</strong>，打成平手！`;
+    } else {
+      const isLeft = l > r;
+      winnerVotes = isLeft ? l : r;
+      winnerPct = totalVotes > 0 ? Math.round(winnerVotes / totalVotes * 100) : 0;
+      winnerName = isLeft
+        ? document.getElementById('leftNameDisplay').textContent
+        : document.getElementById('rightNameDisplay').textContent;
+      winnerEmoji = isLeft
+        ? document.getElementById('leftAvatarDisplay').textContent
+        : document.getElementById('rightAvatarDisplay').textContent;
+      crownEl.textContent = '🏆';
+      winnerEl.textContent = `${winnerEmoji} ${winnerName}`;
+      statsEl.innerHTML = `
+        获得 <strong>${winnerVotes} 票</strong>，占比 <strong>${winnerPct}%</strong><br>
+        共 <strong>${totalVotes} 票</strong> 参与投票
+      `;
+
+      /* 失败方灰化 */
+      if (isLeft) document.getElementById('teamRight').classList.add('loser');
+      else document.getElementById('teamLeft').classList.add('loser');
+    }
+  } else {
+    const opts = state.multi.options;
+    totalVotes = opts.reduce((s, o) => s + o.votes, 0);
+    const winner = opts.reduce((a, b) => a.votes >= b.votes ? a : b);
+    winnerVotes = winner.votes;
+    winnerPct = totalVotes > 0 ? Math.round(winnerVotes / totalVotes * 100) : 0;
+    crownEl.textContent = winner.emoji;
+    winnerEl.textContent = winner.name;
+    statsEl.innerHTML = `
+      获得 <strong>${winnerVotes} 票</strong>，占比 <strong>${winnerPct}%</strong><br>
+      共 <strong>${totalVotes} 票</strong> 参与投票
+    `;
+  }
+
+  overlay.style.display = 'flex';
+
+  /* 烟花效果 */
+  spawnFireworks();
+}
+
+function closeResult() {
+  document.getElementById('resultOverlay').style.display = 'none';
+}
+
+/* ========================================================
+   烟花粒子
+======================================================== */
+function spawnFireworks() {
+  const box = document.getElementById('resultBox');
+  const colors = ['#F5C842','#EC4899','#7C3AED','#3B82F6','#22C55E','#F97316'];
+  for (let i = 0; i < 36; i++) {
+    const fw = document.createElement('div');
+    fw.className = 'firework';
+    fw.style.background = colors[Math.floor(Math.random() * colors.length)];
+    fw.style.left = (30 + Math.random() * 40) + '%';
+    fw.style.top = (20 + Math.random() * 30) + '%';
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 60 + Math.random() * 100;
+    fw.style.setProperty('--fx', Math.cos(angle) * dist + 'px');
+    fw.style.setProperty('--fy', Math.sin(angle) * dist + 'px');
+    fw.style.animationDelay = (Math.random() * 0.5) + 's';
+    fw.style.animationDuration = (0.8 + Math.random() * 0.6) + 's';
+    box.appendChild(fw);
+    setTimeout(() => fw.remove(), 1600);
+  }
+}
+
+/* ========================================================
+   重置
+======================================================== */
+function resetVote() {
+  clearAllTimers();
+  state.running = false;
+  state.ended = false;
+  state.remaining = state.totalDuration;
+  state.pk.leftVotes = 0;
+  state.pk.rightVotes = 0;
+  state.multi.options.forEach(o => o.votes = 0);
+  state.multi.votedIdx = -1;
+  state.hasVoted = false;
+  state.timelineLog = [];
+
+  /* 恢复初始 UI */
+  document.getElementById('gameRunning').style.display = 'none';
+  document.getElementById('idleScreen').style.display = 'flex';
+  document.getElementById('endBtn').style.display = 'none';
+  document.getElementById('resultOverlay').style.display = 'none';
+
+  /* 清除灰化 */
+  document.getElementById('teamLeft').classList.remove('leading', 'loser');
+  document.getElementById('teamRight').classList.remove('leading', 'loser');
+
+  /* 恢复按钮 */
+  enableVoteButtons();
+
+  /* 恢复状态栏 */
+  document.getElementById('statusText').textContent = '就绪 · 点击「开始投票」发起对决';
+  document.getElementById('cdNum').textContent = '60';
+  document.getElementById('cdArc').style.strokeDashoffset = '0';
+  document.getElementById('cdArc').style.stroke = 'var(--gold)';
+  document.getElementById('cdStatusText').textContent = '投票进行中';
+  updateModeBadge();
+
+  /* 右侧面板重置 */
+  document.getElementById('statTotal').textContent = '0';
+  document.getElementById('statDistribution').innerHTML =
+    '<div style="color:var(--muted);font-size:13px;text-align:center;padding:10px 0">投票开始后显示</div>';
+  document.getElementById('timeline').innerHTML =
+    '<div style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">暂无记录</div>';
+}
+
+function enableVoteButtons() {
+  document.getElementById('voteBtnLeft').disabled = false;
+  document.getElementById('voteBtnRight').disabled = false;
+}
+
+/* ========================================================
+   右侧数据面板更新
+======================================================== */
+function updateStatsPanel() {
+  let total = 0;
+  const items = [];
+
+  if (state.mode === 'pk') {
+    const l = state.pk.leftVotes;
+    const r = state.pk.rightVotes;
+    total = l + r;
+    const ln = document.getElementById('leftNameDisplay').textContent;
+    const rn = document.getElementById('rightNameDisplay').textContent;
+    items.push({ name: ln, votes: l, color: '#3B82F6' });
+    items.push({ name: rn, votes: r, color: '#EF4444' });
+  } else {
+    const opts = state.multi.options;
+    total = opts.reduce((s, o) => s + o.votes, 0);
+    const gradients = ['#7C3AED','#EC4899','#3B82F6','#22C55E','#F97316','#F5C842'];
+    opts.forEach((o, i) => {
+      items.push({ name: `${o.emoji} ${o.name}`, votes: o.votes, color: gradients[i % gradients.length] });
+    });
+  }
+
+  document.getElementById('statTotal').textContent = total;
+
+  /* 分布 */
+  const distEl = document.getElementById('statDistribution');
+  distEl.innerHTML = '';
+  items.forEach(item => {
+    const pct = total === 0 ? 0 : Math.round(item.votes / total * 100);
+    const div = document.createElement('div');
+    div.className = 'stat-item';
+    div.innerHTML = `
+      <div class="stat-item-header">
+        <span class="stat-item-name">${item.name}</span>
+        <span class="stat-item-num">${item.votes} 票</span>
+      </div>
+      <div class="stat-bar">
+        <div class="stat-bar-fill" style="width:${pct}%;background:${item.color}"></div>
+      </div>
+    `;
+    distEl.appendChild(div);
+  });
+}
+
+/* ========================================================
+   时间线日志
+======================================================== */
+function addTimelineEntry(text, type) {
+  const now = new Date();
+  const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  state.timelineLog.unshift({ text, type, time: timeStr });
+  if (state.timelineLog.length > 8) state.timelineLog.pop();
+  updateTimeline();
+}
+
+function updateTimeline() {
+  const el = document.getElementById('timeline');
+  if (state.timelineLog.length === 0) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">暂无记录</div>';
+    return;
+  }
+  el.innerHTML = '';
+  state.timelineLog.forEach(entry => {
+    const div = document.createElement('div');
+    div.className = 'timeline-item';
+    div.innerHTML = `
+      <div class="timeline-dot ${entry.type}"></div>
+      <div class="timeline-content">${entry.text}</div>
+      <div class="timeline-time">${entry.time}</div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+/* ========================================================
+   清理所有定时器
+======================================================== */
+function clearAllTimers() {
+  state.timers.forEach(id => clearInterval(id));
+  state.timers = [];
+}
+
+/* ========================================================
+   分享按钮（模拟）
+======================================================== */
+function copyShareLink() {
+  const url = document.getElementById('shareUrl').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    alert('链接已复制到剪贴板：\n' + url);
+  }).catch(() => {
+    alert('链接：' + url);
+  });
+}
+function genQRCode() {
+  alert('📲 二维码生成功能\n（正式版接入二维码 API）');
+}
+function shareWeChat() {
+  alert('💬 分享到微信\n（正式版需接入微信 JS-SDK）');
+}
+function shareWeibo() {
+  alert('🐦 分享到微博\n（正式版跳转微博分享页）');
+}
+</script>
+</body>
+</html>
