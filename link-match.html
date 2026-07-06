@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 连连看</title>
+<style>
+  /* ============================
+     全局重置 & CSS变量
+  ============================ */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold:   #F5C842;
+    --bg:     #0D0720;
+    --accent: #7C3AED;
+    --accent2:#EC4899;
+    --deep:   #1A0A2E;
+    --card:   rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text:   #F0EAF8;
+    --muted:  rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ============================
+     导航栏
+  ============================ */
+  .nav {
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    height: 56px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.96);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 17px; font-weight: 700;
+    text-decoration: none; color: var(--text);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 8px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  /* 横向滚动导航链接区 */
+  .nav-scroll {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    flex: 1;
+    scrollbar-width: none;
+  }
+  .nav-scroll::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 6px 13px; border-radius: 7px;
+    font-size: 13px; cursor: pointer; white-space: nowrap;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    flex-shrink: 0;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  /* ============================
+     三列主布局
+  ============================ */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    flex: 1;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+  }
+
+  /* ============================
+     左侧配置面板
+  ============================ */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .panel-section-title {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.2px; margin-bottom: 4px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold); flex-shrink: 0;
+  }
+  /* 单选按钮组 */
+  .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .btn-opt {
+    flex: 1; padding: 8px 4px; border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent; color: var(--muted);
+    font-size: 13px; cursor: pointer;
+    transition: all 0.2s; text-align: center;
+    min-width: 60px;
+  }
+  .btn-opt.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-color: transparent; color: #fff; font-weight: 600;
+  }
+  .btn-opt:hover:not(.active) { border-color: var(--accent); color: var(--text); }
+  /* 奖品配置行 */
+  .prize-row {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  }
+  .prize-row:last-child { margin-bottom: 0; }
+  .prize-num-input {
+    width: 72px; padding: 7px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+    color: var(--gold); font-size: 14px; font-weight: 700;
+    text-align: center;
+  }
+  .prize-name-input {
+    flex: 1; padding: 7px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+    color: var(--text); font-size: 13px;
+  }
+  .prize-num-input:focus, .prize-name-input:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .prize-badge {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; flex-shrink: 0;
+  }
+  .prize-badge.b1 { background: rgba(124,58,237,0.3); }
+  .prize-badge.b2 { background: rgba(245,200,66,0.3); }
+  .prize-badge.b3 { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+  /* 主次按钮 */
+  .btn-primary {
+    width: 100%; padding: 11px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 10px;
+    color: #fff; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-secondary {
+    flex: 1; padding: 9px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--gold); }
+  /* label + input 行 */
+  .field-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .field-row:last-child { margin-bottom: 0; }
+  .field-label { font-size: 13px; color: var(--muted); }
+  .field-input {
+    width: 88px; padding: 6px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+    color: var(--gold); font-size: 14px; font-weight: 700;
+    text-align: center;
+  }
+  .field-input:focus { outline: none; border-color: var(--accent); }
+  /* 提示文字 */
+  .hint-text {
+    font-size: 11px; color: var(--muted);
+    line-height: 1.5; margin-top: 4px;
+  }
+
+  /* ============================
+     中间游戏区
+  ============================ */
+  .panel-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 24px 20px;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  /* 顶部状态栏 */
+  .game-status-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 640px;
+    margin-bottom: 16px;
+  }
+  .status-block {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 2px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    min-width: 80px;
+  }
+  .status-block .s-label { font-size: 11px; color: var(--muted); }
+  .status-block .s-value { font-size: 20px; font-weight: 700; color: var(--gold); }
+  /* 倒计时特殊样式 */
+  .status-block.timer .s-value { color: var(--accent2); }
+  .status-block.timer.urgent .s-value {
+    color: #ff4444;
+    animation: blink 0.5s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+  }
+  /* 进度条 */
+  .progress-bar-wrap {
+    flex: 1; height: 8px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.4s ease;
+  }
+  /* 提示按钮 */
+  .btn-hint {
+    padding: 8px 18px;
+    background: rgba(245,200,66,0.15);
+    border: 1px solid rgba(245,200,66,0.4);
+    border-radius: 10px;
+    color: var(--gold); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-hint:hover { background: rgba(245,200,66,0.25); }
+  .btn-hint:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* ============================
+     棋盘区域
+  ============================ */
+  .board-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+  }
+  /* SVG连线层叠加在棋盘上 */
+  .board-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 10;
+  }
+  /* 棋盘格子容器 */
+  .board-grid {
+    display: grid;
+    /* 列数由JS动态设置 */
+    gap: 5px;
+    padding: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    width: 100%;
+  }
+  /* 单个格子 */
+  .cell {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    border: 1.5px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(18px, 3vw, 32px);
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s, border-color 0.15s;
+    user-select: none;
+    position: relative;
+  }
+  .cell:hover:not(.empty):not(.selected) {
+    background: rgba(124,58,237,0.2);
+    border-color: var(--accent);
+    transform: scale(1.06);
+  }
+  /* 选中状态 */
+  .cell.selected {
+    background: rgba(124,58,237,0.35);
+    border-color: var(--accent);
+    transform: scale(1.08);
+    box-shadow: 0 0 12px rgba(124,58,237,0.6);
+  }
+  /* 提示高亮 */
+  .cell.hint-highlight {
+    animation: hintPulse 0.6s ease-in-out 3;
+  }
+  @keyframes hintPulse {
+    0%,100% { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+    50% { background: rgba(245,200,66,0.3); border-color: var(--gold); box-shadow: 0 0 14px rgba(245,200,66,0.5); }
+  }
+  /* 消除时的消失动画 */
+  .cell.removing {
+    animation: cellRemove 0.35s ease forwards;
+  }
+  @keyframes cellRemove {
+    0% { transform: scale(1.1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.6; }
+    100% { transform: scale(0); opacity: 0; }
+  }
+  /* 空格子 */
+  .cell.empty {
+    background: transparent;
+    border-color: transparent;
+    cursor: default;
+  }
+
+  /* SVG连线样式 */
+  .link-path {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    animation: drawLine 0.3s ease forwards;
+    filter: drop-shadow(0 0 6px rgba(245,200,66,0.8));
+  }
+  @keyframes drawLine {
+    to { stroke-dashoffset: 0; }
+  }
+
+  /* 连消奖励提示 */
+  .combo-toast {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; font-size: 22px; font-weight: 800;
+    padding: 14px 28px; border-radius: 14px;
+    z-index: 200;
+    pointer-events: none;
+    animation: toastPop 1.4s ease forwards;
+  }
+  @keyframes toastPop {
+    0% { opacity: 0; transform: translate(-50%,-60%) scale(0.7); }
+    15% { opacity: 1; transform: translate(-50%,-50%) scale(1.08); }
+    70% { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%,-44%) scale(0.95); }
+  }
+
+  /* 游戏结束遮罩 */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(13,7,32,0.85);
+    backdrop-filter: blur(6px);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px;
+    border-radius: 14px;
+    z-index: 50;
+  }
+  .overlay-icon { font-size: 52px; }
+  .overlay-title { font-size: 26px; font-weight: 800; color: var(--gold); }
+  .overlay-sub { font-size: 14px; color: var(--muted); text-align: center; }
+  .overlay-prize {
+    font-size: 18px; font-weight: 700;
+    color: var(--accent2);
+    background: rgba(236,72,153,0.15);
+    padding: 8px 20px; border-radius: 10px;
+    border: 1px solid rgba(236,72,153,0.3);
+  }
+  .overlay-btns { display: flex; gap: 10px; margin-top: 4px; }
+
+  /* ============================
+     右侧数据面板
+  ============================ */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.01);
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .stat-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { font-size: 13px; color: var(--muted); }
+  .stat-value { font-size: 18px; font-weight: 700; color: var(--gold); }
+  .stat-value.accent { color: var(--accent2); }
+  /* 图标图例区 */
+  .legend-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+  }
+  .legend-item {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    transition: all 0.2s;
+  }
+  .legend-item.used {
+    opacity: 0.25;
+    background: transparent;
+  }
+  /* 历史记录列表 */
+  .history-list { display: flex; flex-direction: column; gap: 7px; }
+  .history-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 9px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .history-rank {
+    width: 18px; height: 18px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+  .history-rank.r1 { background: var(--gold); color: #000; }
+  .history-rank.r2 { background: #aaa; color: #000; }
+  .history-rank.r3 { background: #cd7f32; color: #fff; }
+  .history-rank.rn { background: rgba(255,255,255,0.1); color: var(--muted); }
+  .history-time { font-weight: 700; color: var(--accent2); }
+  .history-score { margin-left: auto; color: var(--gold); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ============================
+     导航栏
+============================ -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    🎮 <span>小游戏</span>中台 <em class="nav-badge">PRO</em>
+  </a>
+  <div class="nav-scroll">
+    <a href="index.html" class="nav-tab">首页</a>
+    <a href="wheel.html" class="nav-tab">大转盘</a>
+    <a href="nine-grid.html" class="nav-tab">九宫格</a>
+    <a href="scratch-card.html" class="nav-tab">刮刮乐</a>
+    <a href="shake-dice.html" class="nav-tab">摇骰子</a>
+    <a href="smash-egg.html" class="nav-tab">砸金蛋</a>
+    <a href="slot-machine.html" class="nav-tab">老虎机</a>
+    <a href="gift-box.html" class="nav-tab">礼盒开箱</a>
+    <a href="whack-mole.html" class="nav-tab">打地鼠</a>
+    <a href="cup-game.html" class="nav-tab">三杯游戏</a>
+    <a href="number-bomb.html" class="nav-tab">数字炸弹</a>
+    <a href="stamp-collect.html" class="nav-tab">集卡集章</a>
+    <a href="vote-pk.html" class="nav-tab">投票PK</a>
+    <a href="gashapon.html" class="nav-tab">扭蛋机</a>
+    <a href="blind-box.html" class="nav-tab">盲盒抽卡</a>
+    <a href="game-2048.html" class="nav-tab">2048</a>
+    <a href="match3.html" class="nav-tab">消消乐</a>
+    <a href="catch-coins.html" class="nav-tab">接金币</a>
+    <a href="grow-tree.html" class="nav-tab">成长树</a>
+    <a href="pinball.html" class="nav-tab">弹珠机</a>
+    <a href="snake.html" class="nav-tab">贪吃蛇</a>
+    <a href="slingshot.html" class="nav-tab">弹弓射击</a>
+    <a href="fruit-cut.html" class="nav-tab">切水果</a>
+    <a href="progress-unlock.html" class="nav-tab">进度解锁</a>
+    <a href="energy-collect.html" class="nav-tab">能量收集</a>
+    <a href="ring-toss.html" class="nav-tab">套圈圈</a>
+    <a href="sudoku.html" class="nav-tab">数独</a>
+    <a href="tetris.html" class="nav-tab">俄罗斯方块</a>
+    <a href="puzzle.html" class="nav-tab">拼图</a>
+    <a href="sliding-puzzle.html" class="nav-tab">华容道</a>
+    <a href="minesweeper.html" class="nav-tab">扫雷</a>
+    <a href="link-match.html" class="nav-tab active">连连看</a>
+    <a href="lucky-number.html" class="nav-tab">幸运数字</a>
+    <a href="emoji-maker.html" class="nav-tab">表情包</a>
+    <a href="personality-test.html" class="nav-tab">性格测试</a>
+    <a href="fishing.html" class="nav-tab">钓鱼</a>
+    <a href="jump-game.html" class="nav-tab">跳一跳</a>
+    <a href="flying-chess.html" class="nav-tab">飞行棋</a>
+    <a href="monopoly.html" class="nav-tab">大富翁</a>
+    <a href="red-packet-rain.html" class="nav-tab">红包雨</a>
+    <a href="claw-machine.html" class="nav-tab">夹娃娃机</a>
+    <a href="flip-match.html" class="nav-tab">翻牌配对</a>
+    <a href="shake.html" class="nav-tab">摇一摇</a>
+    <a href="quiz.html" class="nav-tab">问答闯关</a>
+    <a href="daily-checkin.html" class="nav-tab">每日签到</a>
+  </div>
+</nav>
+
+<!-- ============================
+     三列主布局
+============================ -->
+<div class="main">
+
+  <!-- ========== 左侧配置面板 ========== -->
+  <aside class="panel-left">
+    <div class="panel-section-title">游戏配置</div>
+
+    <!-- 限时设置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>限时设置</div>
+      <div class="field-row">
+        <span class="field-label">游戏时长（秒）</span>
+        <input id="cfgTime" class="field-input" type="number" value="60" min="30" max="300" step="10">
+      </div>
+      <div class="field-row">
+        <span class="field-label">提示次数</span>
+        <input id="cfgHint" class="field-input" type="number" value="3" min="0" max="10">
+      </div>
+      <div class="hint-text">连续消除 3 对及以上可获得额外 +5 秒奖励时间</div>
+    </div>
+
+    <!-- 棋盘 & 图标数量 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>棋盘设置</div>
+      <div class="field-row">
+        <span class="field-label">棋盘尺寸</span>
+      </div>
+      <div class="btn-group" id="sizeGroup">
+        <button class="btn-opt" data-size="6">6×6</button>
+        <button class="btn-opt active" data-size="8">8×8</button>
+        <button class="btn-opt" data-size="10">10×10</button>
+      </div>
+      <div style="margin-top:12px;" class="field-row">
+        <span class="field-label">图标种类数</span>
+        <input id="cfgIcons" class="field-input" type="number" value="18" min="6" max="18">
+      </div>
+      <div class="hint-text">棋盘总格数须为图标种类×2 的整数倍，自动补齐</div>
+    </div>
+
+    <!-- 奖品配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品配置</div>
+      <!-- 全消奖励 -->
+      <div class="prize-row">
+        <div class="prize-badge b3">🏆</div>
+        <input class="prize-name-input" id="prizeAll" type="text" value="全消大奖：iPhone 15" placeholder="全消奖品名称">
+      </div>
+      <!-- 限时全消 -->
+      <div class="prize-row">
+        <div class="prize-badge b1">⚡</div>
+        <input class="prize-name-input" id="prizeFast" type="text" value="限时全消：AirPods Pro" placeholder="限时全消奖品">
+      </div>
+      <!-- 普通完成 -->
+      <div class="prize-row">
+        <div class="prize-badge b2">🎁</div>
+        <input class="prize-name-input" id="prizeNormal" type="text" value="完成奖励：10积分" placeholder="普通完成奖品">
+      </div>
+      <div style="margin-top:10px;">
+        <div class="field-row">
+          <span class="field-label">限时全消阈值（秒）</span>
+          <input id="cfgFastThreshold" class="field-input" type="number" value="30" min="5" max="120">
+        </div>
+      </div>
+      <div class="hint-text">限时全消：剩余时间超过阈值时清空棋盘触发</div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <button class="btn-primary" onclick="startGame()">▶ 开始游戏</button>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-secondary" onclick="resetGame()">重置</button>
+      <button class="btn-secondary" onclick="shuffleBoard()">洗牌</button>
+    </div>
+  </aside>
+
+  <!-- ========== 中间游戏区 ========== -->
+  <main class="panel-center" id="panelCenter">
+
+    <!-- 状态栏：分数 / 倒计时 / 进度 / 提示按钮 -->
+    <div class="game-status-bar">
+      <div class="status-block">
+        <span class="s-label">得分</span>
+        <span class="s-value" id="scoreDisplay">0</span>
+      </div>
+      <div class="status-block timer" id="timerBlock">
+        <span class="s-label">剩余时间</span>
+        <span class="s-value" id="timerDisplay">--</span>
+      </div>
+      <div class="progress-bar-wrap" title="消除进度">
+        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <button class="btn-hint" id="hintBtn" onclick="useHint()" disabled>
+        💡 提示 <span id="hintCount">3</span>
+      </button>
+    </div>
+
+    <!-- 棋盘 -->
+    <div class="board-wrap" id="boardWrap">
+      <!-- SVG 连线层 -->
+      <svg class="board-svg" id="boardSvg"></svg>
+      <!-- 棋盘格子 -->
+      <div class="board-grid" id="boardGrid"></div>
+      <!-- 游戏结束遮罩（默认显示"未开始"状态） -->
+      <div class="overlay" id="gameOverlay">
+        <div class="overlay-icon">🔗</div>
+        <div class="overlay-title">连连看</div>
+        <div class="overlay-sub">点击「开始游戏」进行挑战<br>消除所有配对图标即可获奖</div>
+        <div class="overlay-btns">
+          <button class="btn-primary" style="min-width:120px;" onclick="startGame()">开始游戏</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========== 右侧数据面板 ========== -->
+  <aside class="panel-right">
+    <div class="panel-section-title">实时数据</div>
+
+    <!-- 核心指标 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>本局统计</div>
+      <div class="stat-row">
+        <span class="stat-label">已消除对数</span>
+        <span class="stat-value" id="statEliminated">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">剩余对数</span>
+        <span class="stat-value accent" id="statRemaining">--</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">连消最高</span>
+        <span class="stat-value" id="statCombo">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">已用提示</span>
+        <span class="stat-value" id="statHintUsed">0</span>
+      </div>
+    </div>
+
+    <!-- 图标图例 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>图标图例</div>
+      <div class="legend-grid" id="legendGrid"></div>
+    </div>
+
+    <!-- 历史最佳 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>历史最快</div>
+      <div class="history-list" id="historyList">
+        <div style="text-align:center;color:var(--muted);font-size:13px;padding:10px 0;">暂无记录</div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<script>
+/* ============================================================
+   连连看核心逻辑
+   - 8×8（可配置6×6/10×10）二维数组存储棋盘
+   - BFS 路径搜索，最多 2 个拐角
+   - 棋盘外围一圈视为可通行（扩展1格）
+   - SVG 路径动画可视化连线
+   - 连消3对+奖励+5秒
+============================================================ */
+
+// ---- 全局状态 ----
+let board = [];          // 二维数组，0=空，>0=图标ID
+let boardSize = 8;       // 当前棋盘尺寸
+let iconCount = 18;      // 图标种类数
+let totalPairs = 0;      // 总对数
+let eliminatedPairs = 0; // 已消除对数
+let score = 0;
+let timeLeft = 60;
+let timerInterval = null;
+let gameRunning = false;
+let selected = null;     // 当前选中的格子 {r, c}
+let hintRemain = 3;
+let hintUsed = 0;
+let comboCount = 0;      // 连消计数
+let maxCombo = 0;
+let lastElimTime = 0;    // 上次消除时间戳（ms），用于判断连消间隔
+
+// 18种图标（emoji）
+const ICONS = ['🎁','🎈','🎯','🎪','🎨','🎬','🎮','🎰','🏆','🌟','💎','🎵','🍎','🍕','🚀','🌈','🦋','🦁'];
+
+// ---- 配置读取 ----
+function getConfig() {
+  return {
+    time:          parseInt(document.getElementById('cfgTime').value) || 60,
+    hintCount:     parseInt(document.getElementById('cfgHint').value) || 3,
+    iconCount:     Math.min(18, Math.max(6, parseInt(document.getElementById('cfgIcons').value) || 18)),
+    fastThreshold: parseInt(document.getElementById('cfgFastThreshold').value) || 30,
+    prizeAll:      document.getElementById('prizeAll').value.trim() || '全消大奖',
+    prizeFast:     document.getElementById('prizeFast').value.trim() || '限时全消奖品',
+    prizeNormal:   document.getElementById('prizeNormal').value.trim() || '完成奖励',
+  };
+}
+
+// ---- 棋盘尺寸选择 ----
+document.getElementById('sizeGroup').addEventListener('click', e => {
+  const btn = e.target.closest('.btn-opt');
+  if (!btn) return;
+  document.querySelectorAll('#sizeGroup .btn-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  boardSize = parseInt(btn.dataset.size);
+});
+
+// ---- 开始游戏 ----
+function startGame() {
+  if (timerInterval) clearInterval(timerInterval);
+  const cfg = getConfig();
+  boardSize   = parseInt(document.querySelector('#sizeGroup .btn-opt.active').dataset.size);
+  iconCount   = cfg.iconCount;
+  timeLeft    = cfg.time;
+  hintRemain  = cfg.hintCount;
+  hintUsed    = 0;
+  score       = 0;
+  comboCount  = 0;
+  maxCombo    = 0;
+  lastElimTime = 0;
+  eliminatedPairs = 0;
+  selected    = null;
+  gameRunning = true;
+
+  // 生成棋盘
+  board = generateBoard(boardSize, iconCount);
+  totalPairs = countPairsOnBoard();
+
+  // 渲染
+  renderBoard();
+  renderLegend();
+  updateUI();
+  hideOverlay();
+
+  // 启用提示按钮
+  document.getElementById('hintBtn').disabled = false;
+  document.getElementById('hintCount').textContent = hintRemain;
+
+  // 启动计时器
+  timerInterval = setInterval(timerTick, 1000);
+}
+
+// ---- 重置（停止当前局、回到初始界面）----
+function resetGame() {
+  if (timerInterval) clearInterval(timerInterval);
+  gameRunning = false;
+  selected = null;
+  board = [];
+  document.getElementById('boardGrid').innerHTML = '';
+  document.getElementById('boardSvg').innerHTML = '';
+  document.getElementById('hintBtn').disabled = true;
+  showOverlay('🔗', '连连看', '点击「开始游戏」进行挑战<br>消除所有配对图标即可获奖', null, [
+    { text: '开始游戏', fn: 'startGame()' }
+  ]);
+  score = 0; eliminatedPairs = 0; comboCount = 0; maxCombo = 0; hintUsed = 0;
+  updateUI();
+}
+
+// ---- 生成棋盘（随机排列，保证每种图标出现偶数次）----
+function generateBoard(size, numIcons) {
+  const total = size * size;
+  // 每种图标出现 total/numIcons 次（向下取偶，最少2次）
+  const pairsPerIcon = Math.max(1, Math.floor(total / numIcons / 2));
+  let tiles = [];
+  for (let i = 0; i < numIcons; i++) {
+    const count = pairsPerIcon * 2;
+    for (let k = 0; k < count; k++) tiles.push(i + 1); // icon id = index+1
+  }
+  // 如果 tiles 少于 total，用前几种图标补齐（保证偶数）
+  while (tiles.length < total) {
+    const extra = Math.min(2, total - tiles.length);
+    for (let e = 0; e < extra; e++) tiles.push(1);
+  }
+  // 如果超出，截断（保证总数=size²）
+  tiles = tiles.slice(0, total);
+  // 确保每种图标出现偶数次（截断可能打破奇偶）
+  // 简单处理：补充/移除末尾
+  shuffle(tiles);
+  // 填入二维数组
+  const b = [];
+  for (let r = 0; r < size; r++) {
+    b.push(tiles.slice(r * size, (r + 1) * size));
+  }
+  return b;
+}
+
+// Fisher-Yates 洗牌
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// 统计棋盘上的对数
+function countPairsOnBoard() {
+  const cnt = {};
+  for (let r = 0; r < boardSize; r++)
+    for (let c = 0; c < boardSize; c++)
+      if (board[r][c] > 0) cnt[board[r][c]] = (cnt[board[r][c]] || 0) + 1;
+  let pairs = 0;
+  for (const v of Object.values(cnt)) pairs += Math.floor(v / 2);
+  return pairs;
+}
+
+// ---- 渲染棋盘 ----
+function renderBoard() {
+  const grid = document.getElementById('boardGrid');
+  grid.style.gridTemplateColumns = `repeat(${boardSize}, 1fr)`;
+  grid.innerHTML = '';
+  for (let r = 0; r < boardSize; r++) {
+    for (let c = 0; c < boardSize; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.r = r;
+      cell.dataset.c = c;
+      const iconId = board[r][c];
+      if (iconId > 0) {
+        cell.textContent = ICONS[iconId - 1];
+      } else {
+        cell.classList.add('empty');
+      }
+      cell.addEventListener('click', onCellClick);
+      grid.appendChild(cell);
+    }
+  }
+}
+
+// 渲染图标图例（右侧）
+function renderLegend() {
+  const grid = document.getElementById('legendGrid');
+  grid.innerHTML = '';
+  for (let i = 0; i < iconCount; i++) {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.id = `legend-${i + 1}`;
+    item.textContent = ICONS[i];
+    item.title = `图标 ${i + 1}`;
+    grid.appendChild(item);
+  }
+}
+
+// ---- 格子点击事件 ----
+function onCellClick(e) {
+  if (!gameRunning) return;
+  const r = parseInt(e.currentTarget.dataset.r);
+  const c = parseInt(e.currentTarget.dataset.c);
+  if (board[r][c] === 0) return; // 空格子忽略
+
+  if (!selected) {
+    // 第一次选择
+    selected = { r, c };
+    getCellEl(r, c).classList.add('selected');
+  } else {
+    if (selected.r === r && selected.c === c) {
+      // 取消选择
+      getCellEl(r, c).classList.remove('selected');
+      selected = null;
+      return;
+    }
+    const r1 = selected.r, c1 = selected.c;
+    const r2 = r, c2 = c;
+    // 必须相同图标
+    if (board[r1][c1] !== board[r2][c2]) {
+      // 换选
+      getCellEl(r1, c1).classList.remove('selected');
+      selected = { r, c };
+      getCellEl(r, c).classList.add('selected');
+      return;
+    }
+    // 查找路径
+    const path = findPath(r1, c1, r2, c2);
+    if (path) {
+      // 可消除
+      getCellEl(r1, c1).classList.remove('selected');
+      selected = null;
+      eliminatePair(r1, c1, r2, c2, path);
+    } else {
+      // 不可连
+      getCellEl(r1, c1).classList.remove('selected');
+      selected = null;
+      // 闪烁提示不可连
+      const el1 = getCellEl(r1, c1);
+      const el2 = getCellEl(r2, c2);
+      [el1, el2].forEach(el => {
+        el.style.transition = 'background 0.15s';
+        el.style.background = 'rgba(255,50,50,0.25)';
+        setTimeout(() => { el.style.background = ''; }, 300);
+      });
+    }
+  }
+}
+
+// 获取格子DOM元素
+function getCellEl(r, c) {
+  return document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+}
+
+// ---- 消除一对 ----
+function eliminatePair(r1, c1, r2, c2, path) {
+  const iconId = board[r1][c1];
+  // 画连线
+  drawPath(path, () => {
+    // 连线动画结束后消除
+    const el1 = getCellEl(r1, c1);
+    const el2 = getCellEl(r2, c2);
+    [el1, el2].forEach(el => {
+      el.classList.add('removing');
+      el.classList.remove('selected');
+    });
+    setTimeout(() => {
+      board[r1][c1] = 0;
+      board[r2][c2] = 0;
+      if (el1) { el1.textContent = ''; el1.className = 'cell empty'; el1.addEventListener('click', onCellClick); }
+      if (el2) { el2.textContent = ''; el2.className = 'cell empty'; el2.addEventListener('click', onCellClick); }
+
+      eliminatedPairs++;
+      score += 100;
+
+      // 连消判断（2秒内连续消除算连消）
+      const now = Date.now();
+      if (lastElimTime && now - lastElimTime < 2000) {
+        comboCount++;
+        if (comboCount > maxCombo) maxCombo = comboCount;
+        if (comboCount >= 2) { // 第3对起提示（comboCount从1开始计）
+          showComboToast(comboCount + 1);
+          // 奖励时间
+          if (comboCount >= 2) {
+            timeLeft = Math.min(timeLeft + 5, parseInt(document.getElementById('cfgTime').value) + 30);
+          }
+        }
+      } else {
+        comboCount = 0;
+      }
+      lastElimTime = now;
+
+      // 图例标记已消除（若该图标全部消完）
+      checkLegend(iconId);
+      updateUI();
+
+      // 检查是否全消
+      const remaining = countPairsOnBoard();
+      if (remaining === 0) {
+        gameOver(true);
+      } else if (!hasAnyValidPair()) {
+        // 死局，自动洗牌
+        shuffleBoard(true);
+      }
+    }, 350);
+  });
+}
+
+// 检查图例（某图标全部消完则变灰）
+function checkLegend(iconId) {
+  let found = false;
+  for (let r = 0; r < boardSize; r++)
+    for (let c = 0; c < boardSize; c++)
+      if (board[r][c] === iconId) { found = true; break; }
+  if (!found) {
+    const legend = document.getElementById(`legend-${iconId}`);
+    if (legend) legend.classList.add('used');
+  }
+}
+
+// ---- 画SVG连线 ----
+function drawPath(path, onDone) {
+  const svg = document.getElementById('boardSvg');
+  const grid = document.getElementById('boardGrid');
+  const gridRect = grid.getBoundingClientRect();
+  const svgRect = svg.getBoundingClientRect();
+
+  // 计算每个格子的中心坐标（相对于SVG）
+  function cellCenter(r, c) {
+    // r, c 可以是 -1 或 boardSize（棋盘外围）
+    const gap = 5;
+    const pad = 10;
+    const cellW = (gridRect.width - pad * 2 - gap * (boardSize - 1)) / boardSize;
+    const cellH = (gridRect.height - pad * 2 - gap * (boardSize - 1)) / boardSize;
+    // 棋盘外围点：r=-1 → y = pad - cellH/2; r=boardSize → y = pad + boardSize*(cellH+gap) - gap - cellH/2 + cellH
+    const x = (gridRect.left - svgRect.left) + pad + c * (cellW + gap) + cellW / 2;
+    const y = (gridRect.top  - svgRect.top ) + pad + r * (cellH + gap) + cellH / 2;
+    return { x, y };
+  }
+
+  // 构建折线点
+  const points = path.map(([r, c]) => {
+    const { x, y } = cellCenter(r, c);
+    return `${x},${y}`;
+  });
+
+  const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+  polyline.setAttribute('points', points.join(' '));
+  polyline.setAttribute('class', 'link-path');
+  // 计算总路径长度用于动画
+  const totalLen = estimatePolylineLen(path, cellCenter);
+  polyline.style.strokeDasharray = totalLen;
+  polyline.style.strokeDashoffset = totalLen;
+  polyline.style.animation = `drawLine 0.28s ease forwards`;
+  svg.appendChild(polyline);
+
+  setTimeout(() => {
+    svg.innerHTML = ''; // 清空连线
+    if (onDone) onDone();
+  }, 340);
+}
+
+// 估算折线总长度
+function estimatePolylineLen(path, cellCenterFn) {
+  let len = 0;
+  for (let i = 1; i < path.length; i++) {
+    const a = cellCenterFn(path[i-1][0], path[i-1][1]);
+    const b = cellCenterFn(path[i][0], path[i][1]);
+    len += Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2);
+  }
+  return Math.max(len, 20);
+}
+
+// ---- 路径检测：BFS，最多2个拐角，棋盘外围可绕行 ----
+/*
+  扩展棋盘为 (boardSize+2) × (boardSize+2)，
+  原始坐标 (r,c) 映射为 (r+1, c+1)，
+  外围一圈 (0行/列、boardSize+1行/列) 视为空格。
+  BFS 状态：(r, c, dir, turns)
+    dir: 0=未设定, 1=水平, 2=垂直
+    turns: 已拐弯次数（0~2）
+*/
+function findPath(r1, c1, r2, c2) {
+  const N = boardSize + 2; // 扩展后尺寸
+  const sr = r1 + 1, sc = c1 + 1;
+  const er = r2 + 1, ec = c2 + 1;
+
+  // 判断扩展棋盘中 (r,c) 是否可通行
+  // 注意：起点和终点本身可通行（消除路径端点允许）
+  function isWalkable(r, c) {
+    if (r < 0 || r >= N || c < 0 || c >= N) return false;
+    if (r === sr && c === sc) return true; // 起点
+    if (r === er && c === ec) return true; // 终点
+    // 外围一圈
+    if (r === 0 || r === N - 1 || c === 0 || c === N - 1) return true;
+    // 内部格子：对应原始棋盘 (r-1, c-1) 为空则可通行
+    return board[r - 1][c - 1] === 0;
+  }
+
+  // 方向：右/左/下/上
+  const dirs = [[0,1],[0,-1],[1,0],[-1,0]];
+  // dir分组：水平=0，垂直=1
+  function dirGroup(dr, dc) { return dc !== 0 ? 0 : 1; }
+
+  // BFS 队列元素：[r, c, lastDirGroup, turns, path]
+  // 用 visited[r][c][lastDirGroup][turns] 剪枝
+  const INF = 9999;
+  const visited = Array.from({length: N}, () =>
+    Array.from({length: N}, () => [INF, INF, INF]) // [无方向, 水平, 垂直]
+  );
+
+  const queue = [[sr, sc, -1, 0, [[sr, sc]]]];
+  visited[sr][sc][-1 + 1] = [0, 0, 0]; // 初始：0转弯
+
+  // 简化visited为：visited[r][c][dir2][turns]
+  // dir2: 0=无方向, 1=水平, 2=垂直
+  const vis = Array.from({length: N}, () =>
+    Array.from({length: N}, () => ({
+      '-1': INF, 0: INF, 1: INF
+    }))
+  );
+  vis[sr][sc][-1] = 0;
+
+  let head = 0;
+  while (head < queue.length) {
+    const [r, c, lastDir, turns, path] = queue[head++];
+    if (turns > 2) continue;
+    if (r === er && c === ec) {
+      // 将路径从扩展坐标转回原始坐标（-1还原），注意外围点保留以供SVG画线
+      return path.map(([pr, pc]) => [pr - 1, pc - 1]);
+    }
+    for (const [dr, dc] of dirs) {
+      const nr = r + dr, nc = c + dc;
+      if (!isWalkable(nr, nc)) continue;
+      const newDir = dirGroup(dr, dc);
+      const newTurns = (lastDir === -1 || newDir === lastDir) ? turns : turns + 1;
+      if (newTurns > 2) continue;
+      if (vis[nr][nc][newDir] <= newTurns) continue;
+      vis[nr][nc][newDir] = newTurns;
+      queue.push([nr, nc, newDir, newTurns, [...path, [nr, nc]]]);
+    }
+  }
+  return null; // 无路径
+}
+
+// ---- 判断是否还有可消的对 ----
+function hasAnyValidPair() {
+  // 收集所有非空格子，按图标分组
+  const iconCells = {};
+  for (let r = 0; r < boardSize; r++)
+    for (let c = 0; c < boardSize; c++)
+      if (board[r][c] > 0) {
+        if (!iconCells[board[r][c]]) iconCells[board[r][c]] = [];
+        iconCells[board[r][c]].push([r, c]);
+      }
+  for (const cells of Object.values(iconCells)) {
+    for (let i = 0; i < cells.length; i++) {
+      for (let j = i + 1; j < cells.length; j++) {
+        if (findPath(cells[i][0], cells[i][1], cells[j][0], cells[j][1])) return true;
+      }
+    }
+  }
+  return false;
+}
+
+// ---- 提示功能：找一对可消的并高亮 ----
+function useHint() {
+  if (!gameRunning || hintRemain <= 0) return;
+  // 先清除已有选中
+  if (selected) {
+    getCellEl(selected.r, selected.c)?.classList.remove('selected');
+    selected = null;
+  }
+  // 寻找第一对可消
+  const iconCells = {};
+  for (let r = 0; r < boardSize; r++)
+    for (let c = 0; c < boardSize; c++)
+      if (board[r][c] > 0) {
+        if (!iconCells[board[r][c]]) iconCells[board[r][c]] = [];
+        iconCells[board[r][c]].push([r, c]);
+      }
+  let found = null;
+  outer: for (const cells of Object.values(iconCells)) {
+    for (let i = 0; i < cells.length; i++) {
+      for (let j = i + 1; j < cells.length; j++) {
+        if (findPath(cells[i][0], cells[i][1], cells[j][0], cells[j][1])) {
+          found = [cells[i], cells[j]];
+          break outer;
+        }
+      }
+    }
+  }
+  if (!found) { shuffleBoard(true); return; }
+  // 高亮
+  hintRemain--;
+  hintUsed++;
+  document.getElementById('hintCount').textContent = hintRemain;
+  document.getElementById('statHintUsed').textContent = hintUsed;
+  document.getElementById('hintBtn').disabled = hintRemain <= 0;
+  const [a, b] = found;
+  const elA = getCellEl(a[0], a[1]);
+  const elB = getCellEl(b[0], b[1]);
+  elA?.classList.add('hint-highlight');
+  elB?.classList.add('hint-highlight');
+  setTimeout(() => {
+    elA?.classList.remove('hint-highlight');
+    elB?.classList.remove('hint-highlight');
+  }, 2000);
+}
+
+// ---- 洗牌（保留当前所有图标，重新随机分布）----
+function shuffleBoard(auto = false) {
+  if (!gameRunning && !auto) { alert('请先开始游戏'); return; }
+  // 收集当前所有非空图标
+  const tiles = [];
+  for (let r = 0; r < boardSize; r++)
+    for (let c = 0; c < boardSize; c++)
+      if (board[r][c] > 0) tiles.push(board[r][c]);
+  if (tiles.length === 0) return;
+  shuffle(tiles);
+  let idx = 0;
+  for (let r = 0; r < boardSize; r++)
+    for (let c = 0; c < boardSize; c++)
+      if (board[r][c] > 0) board[r][c] = tiles[idx++];
+  renderBoard();
+  if (auto) showComboToast('🔀 死局，已自动洗牌！');
+}
+
+// ---- 计时器 ----
+function timerTick() {
+  timeLeft--;
+  const timerBlock = document.getElementById('timerBlock');
+  if (timeLeft <= 10) timerBlock.classList.add('urgent');
+  else timerBlock.classList.remove('urgent');
+  document.getElementById('timerDisplay').textContent = timeLeft;
+  if (timeLeft <= 0) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    gameRunning = false;
+    // 超时失败
+    gameOver(false);
+  }
+}
+
+// ---- 游戏结束 ----
+function gameOver(win) {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  gameRunning = false;
+  document.getElementById('hintBtn').disabled = true;
+
+  const cfg = getConfig();
+  const remaining = countPairsOnBoard();
+  const usedTime = cfg.time - timeLeft;
+
+  if (win) {
+    // 判断奖励类型
+    const isFast = timeLeft >= cfg.fastThreshold;
+    let prize = isFast ? cfg.prizeFast : (remaining === 0 ? cfg.prizeAll : cfg.prizeNormal);
+    const icon = isFast ? '⚡' : '🏆';
+    const title = isFast ? '极速全消！' : '全消成功！';
+    const sub = `用时 ${usedTime} 秒 · 得分 ${score}`;
+    showOverlay(icon, title, sub, prize, [
+      { text: '再玩一局', fn: 'startGame()' },
+      { text: '重置', fn: 'resetGame()' }
+    ]);
+    // 记录历史
+    addHistory(usedTime, score);
+  } else {
+    showOverlay('⏰', '时间到！', `已消除 ${eliminatedPairs} 对，剩余 ${remaining} 对<br>得分：${score}`, null, [
+      { text: '再试一次', fn: 'startGame()' },
+      { text: '重置', fn: 'resetGame()' }
+    ]);
+  }
+}
+
+// ---- 遮罩显示/隐藏 ----
+function showOverlay(icon, title, sub, prize, buttons) {
+  const overlay = document.getElementById('gameOverlay');
+  overlay.innerHTML = `
+    <div class="overlay-icon">${icon}</div>
+    <div class="overlay-title">${title}</div>
+    <div class="overlay-sub">${sub}</div>
+    ${prize ? `<div class="overlay-prize">🎉 ${prize}</div>` : ''}
+    <div class="overlay-btns">
+      ${buttons.map(b => `<button class="btn-primary" style="min-width:110px;" onclick="${b.fn}">${b.text}</button>`).join('')}
+    </div>
+  `;
+  overlay.style.display = 'flex';
+}
+function hideOverlay() {
+  document.getElementById('gameOverlay').style.display = 'none';
+}
+
+// ---- 连消 Toast ----
+function showComboToast(msg) {
+  const toast = document.createElement('div');
+  toast.className = 'combo-toast';
+  if (typeof msg === 'number') {
+    toast.textContent = `🔥 ${msg} 连消！+5秒`;
+  } else {
+    toast.textContent = msg;
+  }
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 1500);
+}
+
+// ---- 更新UI ----
+function updateUI() {
+  document.getElementById('scoreDisplay').textContent = score;
+  document.getElementById('timerDisplay').textContent = gameRunning ? timeLeft : (timeLeft > 0 ? timeLeft : '--');
+  const total = totalPairs;
+  const remaining = total - eliminatedPairs;
+  document.getElementById('statEliminated').textContent = eliminatedPairs;
+  document.getElementById('statRemaining').textContent  = gameRunning ? remaining : '--';
+  document.getElementById('statCombo').textContent      = maxCombo;
+  document.getElementById('statHintUsed').textContent   = hintUsed;
+  // 进度条
+  const pct = total > 0 ? (eliminatedPairs / total) * 100 : 0;
+  document.getElementById('progressFill').style.width  = pct + '%';
+}
+
+// ---- 历史记录 ----
+const historyData = [];
+function addHistory(usedTime, sc) {
+  historyData.push({ time: usedTime, score: sc });
+  historyData.sort((a, b) => a.time - b.time); // 用时越少越好
+  const list = document.getElementById('historyList');
+  list.innerHTML = historyData.slice(0, 5).map((h, i) => {
+    const rankClass = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : 'rn';
+    return `
+      <div class="history-item">
+        <div class="history-rank ${rankClass}">${i + 1}</div>
+        <span>用时 <b class="history-time">${h.time}s</b></span>
+        <span class="history-score">${h.score}分</span>
+      </div>
+    `;
+  }).join('');
+}
+
+// ---- 初始化 ----
+updateUI();
+</script>
+</body>
+</html>
