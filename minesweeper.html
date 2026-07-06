@@ -522,6 +522,7 @@
     transform: translateX(-50%) translateY(0);
   }
 </style>
+<link rel="stylesheet" href="mobile.css">
 </head>
 <body>
 
@@ -579,12 +580,19 @@
 <div class="notify-bubble" id="notifyBubble"></div>
 
 <!-- ─── 主体三列布局 ─── -->
+<!-- 移动端底部标签栏 -->
+<div class="mobile-tabs">
+  <button class="mobile-tab active" id="tab-game" onclick="mobileSwitchTab('game')"><span class="mobile-tab-icon">🎮</span>游戏</button>
+  <button class="mobile-tab" id="tab-config" onclick="mobileSwitchTab('config')"><span class="mobile-tab-icon">⚙️</span>配置</button>
+  <button class="mobile-tab" id="tab-data" onclick="mobileSwitchTab('data')"><span class="mobile-tab-icon">📊</span>数据</button>
+  <button class="mobile-tab" id="tab-sound" onclick="toggleSound()"><span class="mobile-tab-icon" id="sound-icon">🔊</span>音效</button>
+</div>
 <div class="main">
 
   <!-- ══════════════════════════════
        左侧配置面板
   ══════════════════════════════ -->
-  <div class="panel-left">
+  <div class="panel-left" id="panel-left">
     <div class="panel-title">⚙ 游戏配置</div>
 
     <!-- 难度选择 -->
@@ -730,7 +738,7 @@
   <!-- ══════════════════════════════
        右侧数据面板
   ══════════════════════════════ -->
-  <div class="panel-right">
+  <div class="panel-right" id="panel-right">
     <div class="panel-title">📊 游戏数据</div>
 
     <!-- 最佳记录 -->
@@ -1423,5 +1431,31 @@ function updateSlider(sliderId, valId, val, unit) {
   log.innerHTML = '<div data-empty style="color:var(--muted);font-size:12px;padding:4px 0">暂无礼物收集记录</div>';
 })();
 </script>
+
+function mobileSwitchTab(tab) {
+  var left = document.getElementById('panel-left');
+  var right = document.getElementById('panel-right');
+  document.querySelectorAll('.mobile-tab').forEach(function(b){b.classList.remove('active');});
+  var btn = document.getElementById('tab-' + tab);
+  if (btn) btn.classList.add('active');
+  if (tab === 'config') {
+    if (left) left.classList.toggle('expanded');
+    if (right) right.classList.remove('expanded');
+  } else if (tab === 'data') {
+    if (right) right.classList.toggle('expanded');
+    if (left) left.classList.remove('expanded');
+  } else {
+    if (left) left.classList.remove('expanded');
+    if (right) right.classList.remove('expanded');
+  }
+}
+function toggleSound() {
+  var on = GameSound.toggle();
+  var icon = document.getElementById('sound-icon');
+  if (icon) icon.textContent = on ? '🔊' : '🔇';
+}
+
+<script src="sound.js"></script>
+<script src="share.js"></script>
 </body>
 </html>
