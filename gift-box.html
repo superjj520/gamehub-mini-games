@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 礼盒开箱 Demo</title>
+<style>
+  /* ─── 全局重置与变量 ─── */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --bg: #0D0720;
+    --accent: #7C3AED;
+    --accent2: #EC4899;
+    --deep: #1A0A2E;
+    --card: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.1);
+    --text: #F0EAF8;
+    --muted: rgba(240,234,248,0.5);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
+    white-space: nowrap;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+  }
+  .nav-tabs {
+    display: flex; gap: 2px;
+    overflow-x: auto; flex: 1;
+    margin: 0 20px;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 7px 12px; border-radius: 8px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s;
+    text-decoration: none; display: inline-flex; align-items: center;
+    white-space: nowrap;
+  }
+  .nav-tab.active, .nav-tab:hover {
+    background: var(--card); color: var(--text);
+  }
+  .nav-tab.active { color: var(--gold); }
+
+  /* ─── 主体三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    height: calc(100vh - 61px - 41px);
+    overflow: hidden;
+  }
+
+  /* ─── 左侧配置面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-title {
+    font-size: 13px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* 奖品列表 */
+  .prize-list { display: flex; flex-direction: column; gap: 8px; }
+  .prize-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+  }
+  .prize-color {
+    width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
+  }
+  .prize-info { flex: 1; min-width: 0; }
+  .prize-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prize-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .prize-prob { font-size: 12px; font-weight: 700; color: var(--gold); }
+
+  /* 礼盒皮肤选择 */
+  .skin-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .skin-item {
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    padding: 12px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    background: rgba(255,255,255,0.02);
+  }
+  .skin-item:hover { border-color: rgba(245,200,66,0.4); }
+  .skin-item.active { border-color: var(--gold); background: rgba(245,200,66,0.08); }
+  /* 皮肤缩略图礼盒 */
+  .skin-thumb {
+    width: 48px; height: 48px;
+    margin: 0 auto 8px;
+    position: relative;
+  }
+  .skin-thumb-box {
+    width: 48px; height: 36px;
+    border-radius: 4px;
+    position: absolute;
+    bottom: 0; left: 0;
+  }
+  .skin-thumb-lid {
+    width: 52px; height: 14px;
+    border-radius: 3px;
+    position: absolute;
+    top: 0; left: -2px;
+  }
+  .skin-thumb-ribbon-h {
+    position: absolute;
+    height: 100%; width: 6px;
+    left: 50%; transform: translateX(-50%);
+    bottom: 0; border-radius: 2px;
+    opacity: 0.8;
+  }
+  .skin-thumb-ribbon-v {
+    position: absolute;
+    width: 100%; height: 6px;
+    top: 30%; left: 0;
+    border-radius: 2px;
+    opacity: 0.8;
+  }
+  .skin-name { font-size: 12px; color: var(--muted); }
+  .skin-item.active .skin-name { color: var(--gold); }
+
+  /* 规则配置 */
+  .rule-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-label { color: var(--muted); }
+  .rule-input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: var(--text);
+    font-size: 13px;
+    width: 80px; text-align: center;
+    outline: none;
+  }
+  .rule-input:focus { border-color: var(--accent); }
+  .toggle {
+    width: 40px; height: 22px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 11px;
+    position: relative; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    background: white; border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: left 0.2s;
+  }
+  .toggle.on::after { left: 21px; }
+
+  /* 重置按钮 */
+  .reset-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 10px;
+    color: white; font-size: 14px; font-weight: 700;
+    cursor: pointer; margin-top: 4px;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .reset-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .reset-btn:active { transform: scale(0.98); }
+
+  /* ─── 中间游戏区 ─── */
+  .game-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  /* 背景光晕 */
+  .game-center::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .game-title-area {
+    text-align: center; margin-bottom: 28px; position: relative; z-index: 2;
+  }
+  .game-name {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .game-subtitle { color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+  /* ─── 礼盒主体容器 ─── */
+  .gift-scene {
+    width: 300px; height: 380px;
+    position: relative;
+    perspective: 800px;
+    z-index: 2;
+    margin-bottom: 28px;
+  }
+
+  /* 浮动动画 */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+  }
+  /* 摇晃期待动画 */
+  @keyframes shake {
+    0%, 100% { transform: rotate(0deg) translateY(0); }
+    15% { transform: rotate(-5deg) translateY(-2px); }
+    30% { transform: rotate(5deg) translateY(-4px); }
+    45% { transform: rotate(-4deg) translateY(-2px); }
+    60% { transform: rotate(4deg) translateY(-5px); }
+    75% { transform: rotate(-3deg) translateY(-3px); }
+    90% { transform: rotate(2deg) translateY(-1px); }
+  }
+
+  .gift-wrapper {
+    width: 100%; height: 100%;
+    position: relative;
+    animation: float 3s ease-in-out infinite;
+    transform-style: preserve-3d;
+  }
+  .gift-wrapper.shaking {
+    animation: shake 0.5s ease-in-out;
+  }
+  .gift-wrapper.opened {
+    animation: none;
+  }
+
+  /* 礼盒身体 */
+  .box-body {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 160px;
+    border-radius: 8px 8px 12px 12px;
+    /* 颜色由皮肤控制 */
+    transition: transform 0.3s ease;
+    z-index: 2;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+
+  /* 礼盒盖子 */
+  .box-lid {
+    position: absolute;
+    bottom: 195px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px;
+    height: 48px;
+    border-radius: 10px;
+    transform-origin: center bottom;
+    transform: translateX(-50%);
+    z-index: 3;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    transition: none;
+  }
+
+  /* 盖子飞起动画 */
+  @keyframes lidFlyUp {
+    0%   { transform: translateX(-50%) rotateX(0deg) translateY(0px); opacity: 1; }
+    40%  { transform: translateX(-50%) rotateX(-80deg) translateY(-40px); opacity: 1; }
+    100% { transform: translateX(-50%) rotateX(-120deg) translateY(-180px) scale(0.6); opacity: 0; }
+  }
+  .box-lid.flying {
+    transform-origin: center bottom;
+    animation: lidFlyUp 0.4s ease-in forwards;
+  }
+
+  /* 礼盒丝带（水平） */
+  .ribbon-h {
+    position: absolute;
+    width: 100%; height: 24px;
+    top: 50%; transform: translateY(-50%);
+    z-index: 4; border-radius: 2px;
+    opacity: 0.85;
+  }
+  /* 礼盒丝带（垂直） */
+  .ribbon-v {
+    position: absolute;
+    height: 100%; width: 24px;
+    left: 50%; transform: translateX(-50%);
+    z-index: 4; border-radius: 2px;
+    opacity: 0.85;
+  }
+  /* 盖子上的丝带 */
+  .lid-ribbon-h {
+    position: absolute;
+    width: 100%; height: 14px;
+    top: 50%; transform: translateY(-50%);
+    z-index: 4; border-radius: 2px;
+    opacity: 0.85;
+  }
+  .lid-ribbon-v {
+    position: absolute;
+    height: 100%; width: 14px;
+    left: 50%; transform: translateX(-50%);
+    z-index: 4; border-radius: 2px;
+    opacity: 0.85;
+  }
+
+  /* 蝴蝶结 */
+  .bow {
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px; height: 44px;
+    z-index: 5;
+  }
+  .bow-left, .bow-right {
+    position: absolute;
+    width: 32px; height: 22px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    top: 0;
+  }
+  .bow-left {
+    left: 0;
+    transform: rotate(-30deg);
+    transform-origin: right center;
+  }
+  .bow-right {
+    right: 0;
+    transform: rotate(30deg);
+    transform-origin: left center;
+  }
+  .bow-center {
+    position: absolute;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 6;
+  }
+  /* 蝴蝶结尾带 */
+  .bow-tail-left, .bow-tail-right {
+    position: absolute;
+    width: 16px; height: 20px;
+    bottom: -12px;
+    border-radius: 0 0 8px 0;
+  }
+  .bow-tail-left {
+    left: 28px;
+    transform: rotate(10deg);
+    border-radius: 0 0 0 8px;
+  }
+  .bow-tail-right {
+    right: 28px;
+    transform: rotate(-10deg);
+    border-radius: 0 0 8px 0;
+  }
+
+  /* 奖品从盒中升起 */
+  .prize-popup {
+    position: absolute;
+    bottom: 160px;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    transition: none;
+    pointer-events: none;
+  }
+  @keyframes prizeRise {
+    0%   { transform: translateX(-50%) scale(0) translateY(40px); opacity: 0; }
+    50%  { transform: translateX(-50%) scale(1.15) translateY(-20px); opacity: 1; }
+    100% { transform: translateX(-50%) scale(1) translateY(0px); opacity: 1; }
+  }
+  .prize-popup.rising {
+    animation: prizeRise 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  .prize-icon-big {
+    font-size: 64px;
+    filter: drop-shadow(0 0 20px rgba(245,200,66,0.8));
+    line-height: 1;
+  }
+  .prize-label-big {
+    margin-top: 8px;
+    font-size: 18px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .prize-sub-big {
+    font-size: 13px; color: var(--muted);
+    margin-top: 4px; text-align: center;
+  }
+
+  /* 光圈放大动画 */
+  @keyframes glowPulse {
+    0%   { transform: translateX(-50%) scale(0); opacity: 0.8; }
+    100% { transform: translateX(-50%) scale(2.5); opacity: 0; }
+  }
+  .prize-glow {
+    position: absolute;
+    bottom: 180px;
+    left: 50%;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,200,66,0.6) 0%, transparent 70%);
+    pointer-events: none;
+    opacity: 0;
+  }
+  .prize-glow.active {
+    animation: glowPulse 1s ease-out forwards;
+  }
+
+  /* 粒子画布 */
+  #particleCanvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  /* 开箱按钮 */
+  .open-btn {
+    position: relative; z-index: 5;
+    padding: 16px 52px;
+    background: linear-gradient(135deg, var(--gold), #E8A020);
+    border: none; border-radius: 14px;
+    font-size: 18px; font-weight: 800;
+    color: #1A0A2E;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 8px 32px rgba(245,200,66,0.35);
+    letter-spacing: 0.5px;
+  }
+  .open-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(245,200,66,0.5);
+  }
+  .open-btn:active:not(:disabled) { transform: scale(0.97); }
+  .open-btn:disabled {
+    background: rgba(255,255,255,0.1);
+    color: var(--muted);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* 状态文字 */
+  .status-text {
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--muted);
+    min-height: 20px;
+    text-align: center;
+    position: relative; z-index: 5;
+  }
+  .status-text.highlight { color: var(--gold); font-weight: 600; }
+
+  /* 次数展示 */
+  .count-badge {
+    position: relative; z-index: 5;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .count-badge .label { color: var(--muted); }
+  .count-badge .value { color: var(--gold); font-weight: 700; }
+
+  /* ─── 右侧数据面板 ─── */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+
+  /* 统计数字 */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+  .stat-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 22px; font-weight: 800; color: var(--gold);
+    line-height: 1;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* 奖品中奖详情 */
+  .prize-stat-list { display: flex; flex-direction: column; gap: 6px; }
+  .prize-stat-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  .ps-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .ps-name { flex: 1; color: var(--text); }
+  .ps-count { color: var(--gold); font-weight: 700; }
+  .ps-rate { color: var(--muted); font-size: 11px; }
+
+  /* 进度条 */
+  .stock-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    margin-top: 4px;
+    overflow: hidden;
+  }
+  .stock-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* 最近记录 */
+  .record-list {
+    display: flex; flex-direction: column; gap: 6px;
+    max-height: 220px; overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+  }
+  .record-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    font-size: 12px;
+    animation: recordIn 0.3s ease;
+  }
+  @keyframes recordIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .record-icon { font-size: 18px; line-height: 1; }
+  .record-info { flex: 1; }
+  .record-name { color: var(--text); font-weight: 600; }
+  .record-time { color: var(--muted); font-size: 11px; margin-top: 1px; }
+
+  /* 库存状态 */
+  .stock-list { display: flex; flex-direction: column; gap: 8px; }
+  .stock-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px;
+  }
+  .stock-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .stock-name { flex: 1; color: var(--muted); }
+  .stock-num { color: var(--text); font-weight: 600; }
+
+  /* ─── 底部状态栏 ─── */
+  .statusbar {
+    height: 41px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    gap: 24px;
+    font-size: 12px;
+    color: var(--muted);
+    background: rgba(13,7,32,0.6);
+    flex-shrink: 0;
+  }
+  .statusbar-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #10B981;
+    box-shadow: 0 0 6px #10B981;
+  }
+  .statusbar-item { display: flex; align-items: center; gap: 6px; }
+  .statusbar-sep { color: var(--border); }
+
+  /* ─── 皮肤色彩变量（通过class切换） ─── */
+  /* 经典红金 */
+  .skin-classic .box-body { background: linear-gradient(160deg, #C0392B, #922B21); }
+  .skin-classic .box-lid  { background: linear-gradient(160deg, #E74C3C, #C0392B); }
+  .skin-classic .ribbon-h, .skin-classic .ribbon-v,
+  .skin-classic .lid-ribbon-h, .skin-classic .lid-ribbon-v { background: var(--gold); }
+  .skin-classic .bow-left, .skin-classic .bow-right { background: var(--gold); }
+  .skin-classic .bow-center { background: #E8A020; }
+  .skin-classic .bow-tail-left, .skin-classic .bow-tail-right { background: var(--gold); }
+
+  /* 神秘紫 */
+  .skin-purple .box-body { background: linear-gradient(160deg, #6B21A8, #4C1D95); }
+  .skin-purple .box-lid  { background: linear-gradient(160deg, #7C3AED, #6B21A8); }
+  .skin-purple .ribbon-h, .skin-purple .ribbon-v,
+  .skin-purple .lid-ribbon-h, .skin-purple .lid-ribbon-v { background: #EC4899; }
+  .skin-purple .bow-left, .skin-purple .bow-right { background: #EC4899; }
+  .skin-purple .bow-center { background: #F472B6; }
+  .skin-purple .bow-tail-left, .skin-purple .bow-tail-right { background: #EC4899; }
+
+  /* 圣诞绿 */
+  .skin-green .box-body { background: linear-gradient(160deg, #166534, #14532D); }
+  .skin-green .box-lid  { background: linear-gradient(160deg, #16A34A, #166534); }
+  .skin-green .ribbon-h, .skin-green .ribbon-v,
+  .skin-green .lid-ribbon-h, .skin-green .lid-ribbon-v { background: #DC2626; }
+  .skin-green .bow-left, .skin-green .bow-right { background: #DC2626; }
+  .skin-green .bow-center { background: #F87171; }
+  .skin-green .bow-tail-left, .skin-green .bow-tail-right { background: #DC2626; }
+
+  /* 简约白 */
+  .skin-white .box-body { background: linear-gradient(160deg, rgba(255,255,255,0.18), rgba(255,255,255,0.10)); border: 1px solid rgba(255,255,255,0.25); }
+  .skin-white .box-lid  { background: linear-gradient(160deg, rgba(255,255,255,0.25), rgba(255,255,255,0.15)); border: 1px solid rgba(255,255,255,0.3); }
+  .skin-white .ribbon-h, .skin-white .ribbon-v,
+  .skin-white .lid-ribbon-h, .skin-white .lid-ribbon-v { background: rgba(245,200,66,0.7); }
+  .skin-white .bow-left, .skin-white .bow-right { background: rgba(245,200,66,0.8); }
+  .skin-white .bow-center { background: var(--gold); }
+  .skin-white .bow-tail-left, .skin-white .bow-tail-right { background: rgba(245,200,66,0.7); }
+
+  /* ─── 胜利遮罩 ─── */
+  .win-overlay {
+    position: fixed; inset: 0;
+    background: rgba(13,7,32,0.85);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .win-overlay.active { opacity: 1; pointer-events: all; }
+  .win-card {
+    background: linear-gradient(160deg, var(--deep), #2D1562);
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 24px;
+    padding: 40px 48px;
+    text-align: center;
+    box-shadow: 0 0 80px rgba(124,58,237,0.4);
+    transform: scale(0.85);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .win-overlay.active .win-card { transform: scale(1); }
+  .win-emoji { font-size: 72px; line-height: 1; margin-bottom: 16px; display: block; }
+  .win-title {
+    font-size: 26px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .win-desc { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
+  .win-close {
+    padding: 12px 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 12px;
+    color: white; font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .win-close:hover { opacity: 0.9; transform: translateY(-1px); }
+</style>
+</head>
+<body>
+
+<!-- ─── 顶部导航栏 ─── -->
+<nav class="nav">
+  <div class="nav-logo">
+    🎮 游戏<span>中台</span>
+    <span class="nav-badge">DEMO</span>
+  </div>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="index.html">首页</a>
+    <a class="nav-tab" href="wheel.html">大转盘</a>
+    <a class="nav-tab" href="nine-grid.html">九宫格</a>
+    <a class="nav-tab" href="scratch-card.html">刮刮乐</a>
+    <a class="nav-tab" href="shake-dice.html">摇骰子</a>
+    <a class="nav-tab" href="smash-egg.html">砸金蛋</a>
+    <a class="nav-tab" href="slot-machine.html">老虎机</a>
+    <a class="nav-tab active" href="gift-box.html">礼盒开箱</a>
+    <a class="nav-tab" href="whack-mole.html">打地鼠</a>
+    <a class="nav-tab" href="cup-game.html">三杯游戏</a>
+    <a class="nav-tab" href="number-bomb.html">数字炸弹</a>
+    <a class="nav-tab" href="stamp-collect.html">集卡集章</a>
+    <a class="nav-tab" href="vote-pk.html">投票PK</a>
+    <a class="nav-tab" href="flying-chess.html">飞行棋</a>
+    <a class="nav-tab" href="monopoly.html">大富翁</a>
+    <a class="nav-tab" href="red-packet-rain.html">红包雨</a>
+    <a class="nav-tab" href="claw-machine.html">夹娃娃机</a>
+    <a class="nav-tab" href="flip-match.html">翻牌配对</a>
+    <a class="nav-tab" href="shake.html">摇一摇</a>
+    <a class="nav-tab" href="quiz.html">问答闯关</a>
+    <a class="nav-tab" href="daily-checkin.html">每日签到</a>
+  </div>
+</nav>
+
+<!-- ─── 主体三列区域 ─── -->
+<div class="main">
+
+  <!-- ══════════ 左侧配置面板 ══════════ -->
+  <aside class="panel-left">
+    <p class="panel-title">配置面板</p>
+
+    <!-- 奖品池 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品池配置</div>
+      <div class="prize-list" id="prizeList">
+        <!-- JS动态渲染 -->
+      </div>
+    </div>
+
+    <!-- 礼盒皮肤 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>礼盒皮肤</div>
+      <div class="skin-grid" id="skinGrid">
+        <!-- JS动态渲染 -->
+      </div>
+    </div>
+
+    <!-- 游戏规则 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>游戏规则</div>
+      <div class="rule-row">
+        <span class="rule-label">每人最多抽奖次数</span>
+        <input class="rule-input" type="number" id="maxTimes" value="3" min="1" max="99">
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">需要实名认证</span>
+        <div class="toggle" id="realNameToggle" onclick="toggleRealName()"></div>
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">中奖后继续抽</span>
+        <div class="toggle on" id="continueToggle" onclick="toggleContinue()"></div>
+      </div>
+    </div>
+
+    <!-- 重置 -->
+    <button class="reset-btn" onclick="resetGame()">🔄 重置游戏数据</button>
+  </aside>
+
+  <!-- ══════════ 中间游戏区 ══════════ -->
+  <section class="game-center" id="gameCenter">
+    <!-- 粒子画布 -->
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="game-title-area">
+      <div class="game-name">礼盒开箱</div>
+      <div class="game-subtitle">点击礼盒，开启你的专属惊喜</div>
+    </div>
+
+    <!-- 已开箱次数 -->
+    <div class="count-badge">
+      <span class="label">本次已开箱</span>
+      <span class="value" id="openCount">0</span>
+      <span class="label">次</span>
+      <span style="color:var(--border)">｜</span>
+      <span class="label">剩余</span>
+      <span class="value" id="remainCount">3</span>
+      <span class="label">次</span>
+    </div>
+
+    <!-- 礼盒场景 -->
+    <div class="gift-scene" id="giftScene">
+      <!-- 奖品弹出层 -->
+      <div class="prize-popup" id="prizePopup">
+        <div class="prize-icon-big" id="prizeIconBig">🎁</div>
+        <div class="prize-label-big" id="prizeLabelBig">奖品名称</div>
+        <div class="prize-sub-big" id="prizeSubBig">恭喜获得</div>
+      </div>
+      <!-- 光圈 -->
+      <div class="prize-glow" id="prizeGlow"></div>
+
+      <!-- 礼盒外层包装（皮肤class绑定在这里） -->
+      <div class="gift-wrapper skin-classic" id="giftWrapper">
+        <!-- 盖子（含蝴蝶结） -->
+        <div class="box-lid" id="boxLid">
+          <div class="lid-ribbon-h"></div>
+          <div class="lid-ribbon-v"></div>
+          <!-- 蝴蝶结 -->
+          <div class="bow">
+            <div class="bow-left"></div>
+            <div class="bow-right"></div>
+            <div class="bow-center"></div>
+            <div class="bow-tail-left"></div>
+            <div class="bow-tail-right"></div>
+          </div>
+        </div>
+        <!-- 盒体 -->
+        <div class="box-body" id="boxBody">
+          <div class="ribbon-h"></div>
+          <div class="ribbon-v"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 开箱按钮 -->
+    <button class="open-btn" id="openBtn" onclick="startOpen()">点击开箱</button>
+    <div class="status-text" id="statusText">选好你要开的礼盒，点击按钮开始！</div>
+  </section>
+
+  <!-- ══════════ 右侧数据面板 ══════════ -->
+  <aside class="panel-right">
+    <p class="panel-title">活动数据</p>
+
+    <!-- 汇总统计 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>本次汇总</div>
+      <div class="stat-grid">
+        <div class="stat-item">
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-label">总开箱次数</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statWinners">0</div>
+          <div class="stat-label">中奖人次</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statRate">0%</div>
+          <div class="stat-label">综合中奖率</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statBest">—</div>
+          <div class="stat-label">最高奖项</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 各奖品中奖详情 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品中奖详情</div>
+      <div class="prize-stat-list" id="prizeStatList">
+        <!-- JS渲染 -->
+      </div>
+    </div>
+
+    <!-- 最近中奖记录 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>最近中奖记录</div>
+      <div class="record-list" id="recordList">
+        <div style="text-align:center;color:var(--muted);font-size:13px;padding:16px 0;">
+          暂无记录
+        </div>
+      </div>
+    </div>
+
+    <!-- 奖品库存 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖品库存状态</div>
+      <div class="stock-list" id="stockList">
+        <!-- JS渲染 -->
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- ─── 底部状态栏 ─── -->
+<footer class="statusbar">
+  <div class="statusbar-item">
+    <div class="statusbar-dot"></div>
+    <span>RNG引擎 · 权重抽样</span>
+  </div>
+  <span class="statusbar-sep">|</span>
+  <span>配置热更新</span>
+  <span class="statusbar-sep">|</span>
+  <span>礼盒开箱 v1.0</span>
+  <span class="statusbar-sep">|</span>
+  <span id="sbTime">—</span>
+</footer>
+
+<!-- ─── 中奖弹窗遮罩 ─── -->
+<div class="win-overlay" id="winOverlay">
+  <div class="win-card">
+    <span class="win-emoji" id="winEmoji">🎉</span>
+    <div class="win-title" id="winTitle">恭喜中奖！</div>
+    <div class="win-desc" id="winDesc">您获得了 iPhone 15 Pro</div>
+    <button class="win-close" onclick="closeWin()">太棒了！</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   礼盒开箱 — 核心逻辑
+═══════════════════════════════════════════════ */
+
+/* ─── 奖品数据配置 ─── */
+const PRIZES = [
+  { id: 1, name: 'iPhone 15 Pro', sub: '价值 7999 元', icon: '📱', prob: 5,  color: '#F5C842', tier: 1 },
+  { id: 2, name: 'AirPods Pro',   sub: '价值 1899 元', icon: '🎧', prob: 10, color: '#A855F7', tier: 2 },
+  { id: 3, name: '京东购物卡',    sub: '面值 200 元',  icon: '💳', prob: 20, color: '#3B82F6', tier: 3 },
+  { id: 4, name: '专属优惠券',    sub: '满100减30',   icon: '🏷️', prob: 30, color: '#6B7280', tier: 4 },
+  { id: 5, name: '谢谢参与',      sub: '感谢您的参与', icon: '🌸', prob: 35, color: '#374151', tier: 5 },
+];
+
+/* ─── 礼盒皮肤配置 ─── */
+const SKINS = [
+  {
+    id: 'classic', name: '经典红金',
+    boxColor: '#C0392B', lidColor: '#E74C3C', ribbonColor: '#F5C842'
+  },
+  {
+    id: 'purple', name: '神秘紫',
+    boxColor: '#6B21A8', lidColor: '#7C3AED', ribbonColor: '#EC4899'
+  },
+  {
+    id: 'green', name: '圣诞绿',
+    boxColor: '#166534', lidColor: '#16A34A', ribbonColor: '#DC2626'
+  },
+  {
+    id: 'white', name: '简约白',
+    boxColor: 'rgba(255,255,255,0.15)', lidColor: 'rgba(255,255,255,0.22)', ribbonColor: 'rgba(245,200,66,0.7)'
+  },
+];
+
+/* ─── 全局状态 ─── */
+let currentSkin = 'classic';   // 当前皮肤
+let isAnimating  = false;       // 是否正在播放动画
+let openCount    = 0;           // 已开箱次数
+let maxTimes     = 3;           // 最大次数限制
+let realName     = false;       // 是否实名
+let canContinue  = true;        // 中奖后可否继续
+
+/* ─── 统计数据 ─── */
+let stats = {
+  total: 0,
+  winners: 0,         // 中奖（tier < 5）次数
+  prizeCount: {},     // { prizeId: count }
+  best: null,         // 最高奖品
+};
+// 初始化 prizeCount
+PRIZES.forEach(p => { stats.prizeCount[p.id] = 0; });
+
+/* ─── 库存（初始设置，可根据配置扩展） ─── */
+let stock = { 1: 5, 2: 20, 3: 100, 4: 500, 5: 9999 };
+
+/* ─── 最近记录 ─── */
+let records = [];
+
+/* ══════════════════════════════
+   初始化渲染
+══════════════════════════════ */
+function init() {
+  renderPrizeList();
+  renderSkinGrid();
+  renderPrizeStatList();
+  renderStockList();
+  updateCounts();
+  updateStatusBar();
+  setInterval(updateStatusBar, 1000);
+  resizeCanvas();
+}
+
+/* 奖品列表渲染 */
+function renderPrizeList() {
+  const el = document.getElementById('prizeList');
+  el.innerHTML = PRIZES.map(p => `
+    <div class="prize-item">
+      <div class="prize-color" style="background:${p.color}"></div>
+      <div class="prize-info">
+        <div class="prize-name">${p.icon} ${p.name}</div>
+        <div class="prize-meta">${p.sub}</div>
+      </div>
+      <div class="prize-prob">${p.prob}%</div>
+    </div>
+  `).join('');
+}
+
+/* 皮肤网格渲染 */
+function renderSkinGrid() {
+  const el = document.getElementById('skinGrid');
+  el.innerHTML = SKINS.map(s => `
+    <div class="skin-item ${s.id === currentSkin ? 'active' : ''}"
+         onclick="changeSkin('${s.id}')">
+      <div class="skin-thumb">
+        <div class="skin-thumb-lid"   style="background:${s.lidColor}; position:absolute; top:0; left:-2px; width:52px; height:16px; border-radius:3px;"></div>
+        <div class="skin-thumb-box"   style="background:${s.boxColor}; position:absolute; bottom:0; left:0; width:48px; height:32px; border-radius:4px;"></div>
+        <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:6px;height:32px;background:${s.ribbonColor};opacity:0.8;border-radius:2px;"></div>
+        <div style="position:absolute;bottom:30%;left:0;width:48px;height:6px;background:${s.ribbonColor};opacity:0.8;border-radius:2px;"></div>
+      </div>
+      <div class="skin-name">${s.name}</div>
+    </div>
+  `).join('');
+}
+
+/* 奖品统计列表渲染 */
+function renderPrizeStatList() {
+  const el = document.getElementById('prizeStatList');
+  el.innerHTML = PRIZES.map(p => {
+    const cnt  = stats.prizeCount[p.id] || 0;
+    const rate = stats.total > 0 ? ((cnt / stats.total) * 100).toFixed(1) : '0.0';
+    const pct  = stats.total > 0 ? (cnt / stats.total) * 100 : 0;
+    return `
+      <div class="prize-stat-row">
+        <div class="ps-dot" style="background:${p.color}"></div>
+        <div class="ps-name">${p.name}</div>
+        <span class="ps-count">${cnt}</span>
+        <span class="ps-rate">${rate}%</span>
+      </div>
+      <div class="stock-bar"><div class="stock-fill" style="width:${pct}%;background:${p.color}"></div></div>
+    `;
+  }).join('');
+}
+
+/* 库存列表渲染 */
+function renderStockList() {
+  const el = document.getElementById('stockList');
+  el.innerHTML = PRIZES.map(p => {
+    const s = stock[p.id];
+    const low = s < 10;
+    return `
+      <div class="stock-row">
+        <div class="stock-dot" style="background:${low ? '#EF4444' : p.color}"></div>
+        <span class="stock-name">${p.name}</span>
+        <span class="stock-num" style="color:${low ? '#EF4444' : 'var(--text)'}">${s === 9999 ? '∞' : s}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+/* 更新次数展示 */
+function updateCounts() {
+  maxTimes = parseInt(document.getElementById('maxTimes').value) || 3;
+  document.getElementById('openCount').textContent  = openCount;
+  document.getElementById('remainCount').textContent = Math.max(0, maxTimes - openCount);
+
+  const btn = document.getElementById('openBtn');
+  if (openCount >= maxTimes) {
+    btn.disabled = true;
+    setStatus('今日抽奖次数已用完，明天再来吧～', false);
+  }
+}
+
+/* 更新顶部统计数字 */
+function updateStats() {
+  document.getElementById('statTotal').textContent   = stats.total;
+  document.getElementById('statWinners').textContent  = stats.winners;
+  const rate = stats.total > 0 ? Math.round((stats.winners / stats.total) * 100) : 0;
+  document.getElementById('statRate').textContent    = rate + '%';
+  document.getElementById('statBest').textContent    = stats.best ? stats.best.icon : '—';
+  renderPrizeStatList();
+  renderStockList();
+}
+
+/* 状态文字 */
+function setStatus(text, highlight = false) {
+  const el = document.getElementById('statusText');
+  el.textContent = text;
+  el.className = 'status-text' + (highlight ? ' highlight' : '');
+}
+
+/* 底部时间 */
+function updateStatusBar() {
+  const now = new Date();
+  const s = now.toLocaleTimeString('zh-CN', { hour12: false });
+  document.getElementById('sbTime').textContent = s;
+}
+
+/* ══════════════════════════════
+   皮肤切换
+══════════════════════════════ */
+function changeSkin(skinId) {
+  if (isAnimating) return;
+  currentSkin = skinId;
+  const wrapper = document.getElementById('giftWrapper');
+  // 移除所有皮肤class，添加新的
+  wrapper.className = `gift-wrapper skin-${skinId}`;
+  renderSkinGrid();
+}
+
+/* ══════════════════════════════
+   规则 toggle
+══════════════════════════════ */
+function toggleRealName() {
+  realName = !realName;
+  document.getElementById('realNameToggle').classList.toggle('on', realName);
+}
+function toggleContinue() {
+  canContinue = !canContinue;
+  document.getElementById('continueToggle').classList.toggle('on', canContinue);
+}
+
+/* ══════════════════════════════
+   RNG 抽奖：权重随机
+══════════════════════════════ */
+function drawPrize() {
+  const total = PRIZES.reduce((s, p) => s + p.prob, 0);
+  let rand = Math.random() * total;
+  for (const p of PRIZES) {
+    rand -= p.prob;
+    if (rand <= 0) return p;
+  }
+  return PRIZES[PRIZES.length - 1];
+}
+
+/* ══════════════════════════════
+   开箱主流程
+══════════════════════════════ */
+function startOpen() {
+  if (isAnimating) return;
+  maxTimes = parseInt(document.getElementById('maxTimes').value) || 3;
+  if (openCount >= maxTimes) return;
+
+  isAnimating = true;
+  const btn = document.getElementById('openBtn');
+  btn.disabled = true;
+  setStatus('摇一摇……');
+
+  // 先重置礼盒到初始状态（以防上一次未复位）
+  resetGiftBox(false);
+
+  const wrapper  = document.getElementById('giftWrapper');
+  const lid      = document.getElementById('boxLid');
+  const popup    = document.getElementById('prizePopup');
+  const glow     = document.getElementById('prizeGlow');
+
+  // 阶段①：摇晃期待感 (0.5s)
+  wrapper.classList.add('shaking');
+
+  setTimeout(() => {
+    wrapper.classList.remove('shaking');
+
+    // 阶段②：盖子飞起 (0.4s)
+    lid.classList.add('flying');
+    setStatus('开箱中……');
+
+    setTimeout(() => {
+      // 抽奖
+      const prize = drawPrize();
+
+      // 扣减库存
+      if (stock[prize.id] > 0 && stock[prize.id] !== 9999) stock[prize.id]--;
+
+      // 记录统计
+      stats.total++;
+      stats.prizeCount[prize.id]++;
+      openCount++;
+      if (prize.tier < 5) {
+        stats.winners++;
+        if (!stats.best || prize.tier < stats.best.tier) stats.best = prize;
+      }
+
+      // 阶段③：奖品升起 + 粒子爆炸 (0.8s)
+      document.getElementById('prizeIconBig').textContent  = prize.icon;
+      document.getElementById('prizeLabelBig').textContent = prize.name;
+      document.getElementById('prizeSubBig').textContent   = prize.sub;
+
+      // 光圈爆炸
+      glow.className = 'prize-glow';
+      void glow.offsetWidth; // 强制重排触发动画
+      glow.classList.add('active');
+
+      // 奖品升起
+      popup.className = 'prize-popup';
+      void popup.offsetWidth;
+      popup.classList.add('rising');
+
+      // 粒子爆炸
+      const sceneRect = document.getElementById('giftScene').getBoundingClientRect();
+      const centerX   = sceneRect.width  / 2;
+      const centerY   = sceneRect.height * 0.55;
+      spawnParticles(centerX, centerY, prize.tier);
+
+      setStatus(`恭喜获得：${prize.name}！`, true);
+
+      // 更新UI
+      updateStats();
+      updateCounts();
+      addRecord(prize);
+
+      // 延迟0.9s弹出胜利弹窗（仅一等/二等奖）
+      const delay = prize.tier <= 2 ? 900 : 1200;
+      setTimeout(() => {
+        isAnimating = false;
+        if (prize.tier <= 2) {
+          showWin(prize);
+        }
+        // 未达上限则恢复按钮
+        if (openCount < maxTimes && (prize.tier >= 3 || canContinue)) {
+          btn.disabled = false;
+        }
+      }, delay);
+
+    }, 400); // 盖子飞起结束
+  }, 500); // 摇晃结束
+}
+
+/* ══════════════════════════════
+   礼盒复位
+══════════════════════════════ */
+function resetGiftBox(showDefault = true) {
+  const lid    = document.getElementById('boxLid');
+  const popup  = document.getElementById('prizePopup');
+  const glow   = document.getElementById('prizeGlow');
+  const wrapper = document.getElementById('giftWrapper');
+
+  lid.classList.remove('flying');
+  popup.classList.remove('rising');
+  glow.classList.remove('active');
+  wrapper.classList.remove('shaking', 'opened');
+
+  if (showDefault) {
+    setStatus('选好你要开的礼盒，点击按钮开始！', false);
+  }
+}
+
+/* ══════════════════════════════
+   中奖弹窗
+══════════════════════════════ */
+function showWin(prize) {
+  document.getElementById('winEmoji').textContent = prize.icon;
+  document.getElementById('winTitle').textContent = prize.tier === 1 ? '🎊 恭喜获得一等奖！' : '🎉 恭喜中奖！';
+  document.getElementById('winDesc').textContent  = `您获得了「${prize.name}」—— ${prize.sub}`;
+  document.getElementById('winOverlay').classList.add('active');
+}
+function closeWin() {
+  document.getElementById('winOverlay').classList.remove('active');
+  // 关闭弹窗后，如未达上限，允许继续
+  maxTimes = parseInt(document.getElementById('maxTimes').value) || 3;
+  if (openCount < maxTimes) {
+    document.getElementById('openBtn').disabled = false;
+    // 延迟一会复位礼盒
+    setTimeout(() => resetGiftBox(true), 300);
+  }
+}
+
+/* ══════════════════════════════
+   添加中奖记录
+══════════════════════════════ */
+function addRecord(prize) {
+  const now  = new Date();
+  const time = now.toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  records.unshift({ prize, time });
+  if (records.length > 20) records.pop();
+  renderRecords();
+}
+
+function renderRecords() {
+  const el = document.getElementById('recordList');
+  if (records.length === 0) {
+    el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:16px 0;">暂无记录</div>';
+    return;
+  }
+  el.innerHTML = records.map(r => `
+    <div class="record-item">
+      <div class="record-icon">${r.prize.icon}</div>
+      <div class="record-info">
+        <div class="record-name">${r.prize.name}</div>
+        <div class="record-time">${r.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ══════════════════════════════
+   粒子爆炸（Canvas）
+══════════════════════════════ */
+const canvas  = document.getElementById('particleCanvas');
+const ctx     = canvas.getContext('2d');
+let particles = [];
+let animFrame = null;
+
+function resizeCanvas() {
+  const scene = document.getElementById('giftScene');
+  canvas.width  = scene.offsetWidth;
+  canvas.height = scene.offsetHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+
+/* 粒子类 */
+class Particle {
+  constructor(x, y, tier) {
+    this.x = x;
+    this.y = y;
+    // 依据奖品层级决定粒子颜色和数量
+    const colors = {
+      1: ['#F5C842','#FFD700','#FFF8DC','#EC4899','#FFFFFF'],
+      2: ['#A855F7','#C084FC','#EC4899','#F5C842','#FFFFFF'],
+      3: ['#3B82F6','#60A5FA','#93C5FD','#F5C842','#FFFFFF'],
+      4: ['#6B7280','#9CA3AF','#D1D5DB','#F5C842'],
+      5: ['#6B7280','#4B5563','#374151'],
+    };
+    const palette = colors[tier] || colors[5];
+    this.color = palette[Math.floor(Math.random() * palette.length)];
+
+    const angle  = Math.random() * Math.PI * 2;
+    const speed  = (tier <= 2 ? 5 : 3) + Math.random() * (tier <= 2 ? 6 : 3);
+    this.vx      = Math.cos(angle) * speed;
+    this.vy      = Math.sin(angle) * speed - (tier <= 3 ? 3 : 1);
+    this.alpha   = 1;
+    this.decay   = 0.015 + Math.random() * 0.02;
+    this.size    = (tier <= 2 ? 6 : 4) + Math.random() * (tier <= 2 ? 6 : 3);
+    this.shape   = Math.random() > 0.5 ? 'circle' : 'rect';
+    this.gravity = 0.18;
+    this.rot     = Math.random() * Math.PI * 2;
+    this.rotV    = (Math.random() - 0.5) * 0.2;
+  }
+  update() {
+    this.x   += this.vx;
+    this.y   += this.vy;
+    this.vy  += this.gravity;
+    this.alpha -= this.decay;
+    this.rot   += this.rotV;
+    this.vx  *= 0.99;
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.alpha);
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rot);
+    ctx.fillStyle = this.color;
+    if (this.shape === 'circle') {
+      ctx.beginPath();
+      ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.fillRect(-this.size / 2, -this.size / 4, this.size, this.size / 2);
+    }
+    ctx.restore();
+  }
+}
+
+function spawnParticles(cx, cy, tier) {
+  const count = tier <= 2 ? 80 : tier <= 3 ? 50 : 30;
+  for (let i = 0; i < count; i++) {
+    particles.push(new Particle(cx, cy, tier));
+  }
+  if (!animFrame) animateParticles();
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles = particles.filter(p => p.alpha > 0);
+  particles.forEach(p => { p.update(); p.draw(ctx); });
+  if (particles.length > 0) {
+    animFrame = requestAnimationFrame(animateParticles);
+  } else {
+    animFrame = null;
+  }
+}
+
+/* ══════════════════════════════
+   重置游戏
+══════════════════════════════ */
+function resetGame() {
+  if (isAnimating) return;
+  openCount = 0;
+  stats = { total: 0, winners: 0, prizeCount: {}, best: null };
+  PRIZES.forEach(p => { stats.prizeCount[p.id] = 0; });
+  stock = { 1: 5, 2: 20, 3: 100, 4: 500, 5: 9999 };
+  records = [];
+
+  document.getElementById('openBtn').disabled = false;
+  document.getElementById('statBest').textContent = '—';
+
+  resetGiftBox(true);
+  updateStats();
+  updateCounts();
+  renderRecords();
+  renderStockList();
+
+  // 粒子清空
+  particles = [];
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+/* ══════════════════════════════
+   启动
+══════════════════════════════ */
+window.addEventListener('load', () => {
+  init();
+  // 监听次数输入变化
+  document.getElementById('maxTimes').addEventListener('change', updateCounts);
+});
+</script>
+</body>
+</html>
