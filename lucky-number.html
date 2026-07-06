@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 幸运数字</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold:    #F5C842;
+    --bg:      #0D0720;
+    --accent:  #7C3AED;
+    --accent2: #EC4899;
+    --deep:    #1A0A2E;
+    --card:    rgba(255,255,255,0.05);
+    --border:  rgba(255,255,255,0.1);
+    --text:    #F0EAF8;
+    --muted:   rgba(240,234,248,0.5);
+    /* 彩票球专属颜色 */
+    --red-ball:  #E53935;
+    --blue-ball: #1565C0;
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 顶部导航 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    height: 56px;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 17px; font-weight: 700; letter-spacing: -0.3px;
+    text-decoration: none; color: var(--text);
+    white-space: nowrap;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  /* 横向滚动导航标签 */
+  .nav-scroll {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin: 0 16px;
+    scrollbar-width: none;
+  }
+  .nav-scroll::-webkit-scrollbar { display: none; }
+  .nav-tabs {
+    display: flex; gap: 2px;
+    padding: 0 4px;
+    white-space: nowrap;
+  }
+  .nav-tab {
+    padding: 6px 13px; border-radius: 7px;
+    font-size: 13px; cursor: pointer;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  /* ─── 三列主布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    gap: 0;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* ─── 左侧配置面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.2px; margin-bottom: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold); flex-shrink: 0;
+  }
+
+  /* 规则行 */
+  .rule-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-label { color: var(--muted); }
+  .rule-input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: var(--text);
+    font-size: 13px;
+    width: 80px; text-align: center;
+    outline: none;
+  }
+  .rule-input:focus { border-color: var(--accent); }
+
+  /* 开关 */
+  .toggle {
+    width: 36px; height: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px; position: relative; cursor: pointer;
+    transition: background 0.2s; flex-shrink: 0;
+    border: none;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle::after {
+    content: ''; position: absolute;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: white; top: 2px; left: 2px;
+    transition: transform 0.2s;
+  }
+  .toggle.on::after { transform: translateX(16px); }
+
+  /* 速度选择 */
+  .speed-group { display: flex; gap: 6px; }
+  .speed-btn {
+    flex: 1; padding: 7px 0;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    border-radius: 7px; color: var(--muted); font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .speed-btn.active {
+    background: rgba(124,58,237,0.2);
+    border-color: var(--accent); color: var(--gold);
+  }
+
+  /* 奖级配置表 */
+  .prize-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .prize-table th {
+    color: var(--muted); font-weight: 600;
+    padding: 5px 6px; text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px; letter-spacing: 0.5px;
+  }
+  .prize-table td {
+    padding: 7px 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    vertical-align: middle;
+  }
+  .prize-table tr:last-child td { border-bottom: none; }
+  .prize-name-input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 6px;
+    color: var(--text); font-size: 12px;
+    width: 72px; outline: none;
+  }
+  .prize-name-input:focus { border-color: var(--accent); }
+  .level-tag {
+    display: inline-block; padding: 2px 7px; border-radius: 4px;
+    font-size: 10px; font-weight: 700;
+  }
+  .level-tag.s { background: rgba(245,200,66,0.2); color: var(--gold); }
+  .level-tag.a { background: rgba(236,72,153,0.15); color: #F472B6; }
+  .level-tag.b { background: rgba(124,58,237,0.2); color: #A78BFA; }
+  .level-tag.c { background: rgba(34,197,94,0.12); color: #4ADE80; }
+  .level-tag.d { background: rgba(255,255,255,0.07); color: var(--muted); }
+
+  /* ─── 中间游戏区 ─── */
+  .game-center {
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 20px 24px;
+    overflow-y: auto;
+    position: relative;
+  }
+  .game-center::before {
+    content: ''; position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%);
+    top: 40%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  /* 标题区 */
+  .game-title-area { text-align: center; margin-bottom: 18px; }
+  .game-name {
+    font-size: 26px; font-weight: 800;
+    background: linear-gradient(135deg, #F5C842, #EC4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .game-subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+  /* ─── 选号区 ─── */
+  .pick-area {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    width: 100%;
+    max-width: 640px;
+    margin-bottom: 16px;
+  }
+  .pick-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .pick-label {
+    font-size: 13px; font-weight: 600; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .pick-count {
+    font-size: 12px; color: var(--muted);
+    background: rgba(255,255,255,0.06);
+    padding: 3px 10px; border-radius: 12px;
+  }
+  .pick-count .cur { color: var(--gold); font-weight: 700; }
+
+  /* 彩票球网格 */
+  .ball-grid {
+    display: flex; flex-wrap: wrap; gap: 7px;
+  }
+
+  /* 通用球样式 */
+  .ball {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  /* 红球：未选中 */
+  .ball.red {
+    background: rgba(229,57,53,0.12);
+    border: 1.5px solid rgba(229,57,53,0.35);
+    color: rgba(229,57,53,0.8);
+  }
+  .ball.red:hover {
+    background: rgba(229,57,53,0.22);
+    border-color: rgba(229,57,53,0.7);
+    color: #E53935;
+    transform: scale(1.08);
+  }
+  /* 红球：已选中 */
+  .ball.red.selected {
+    background: radial-gradient(circle at 35% 35%, #FF6B6B, #C62828);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 3px 12px rgba(229,57,53,0.5), inset 0 1px 2px rgba(255,255,255,0.3);
+    transform: scale(1.05);
+  }
+
+  /* 蓝球：未选中 */
+  .ball.blue {
+    background: rgba(21,101,192,0.12);
+    border: 1.5px solid rgba(21,101,192,0.35);
+    color: rgba(21,101,192,0.9);
+  }
+  .ball.blue:hover {
+    background: rgba(21,101,192,0.25);
+    border-color: rgba(21,101,192,0.7);
+    color: #42A5F5;
+    transform: scale(1.08);
+  }
+  /* 蓝球：已选中 */
+  .ball.blue.selected {
+    background: radial-gradient(circle at 35% 35%, #64B5F6, #0D47A1);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 3px 12px rgba(21,101,192,0.5), inset 0 1px 2px rgba(255,255,255,0.3);
+    transform: scale(1.05);
+  }
+
+  /* 分割线 */
+  .pick-divider {
+    height: 1px; background: var(--border);
+    margin: 14px 0;
+  }
+
+  /* 操作按钮 */
+  .pick-actions {
+    display: flex; gap: 8px; margin-top: 14px;
+  }
+  .btn-quick {
+    flex: 1; padding: 10px;
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.4);
+    border-radius: 8px; color: #A78BFA;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-quick:hover {
+    background: rgba(124,58,237,0.28);
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .btn-clear {
+    padding: 10px 18px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 8px; color: var(--muted);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-clear:hover {
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+  }
+
+  /* 已选号码展示条 */
+  .selected-ticket {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px;
+    margin-top: 12px; flex-wrap: wrap;
+  }
+  .ticket-label { font-size: 11px; color: var(--muted); margin-right: 2px; }
+  .ticket-ball {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .ticket-ball.red-fill {
+    background: radial-gradient(circle at 35% 35%, #FF6B6B, #C62828);
+    color: white;
+    box-shadow: 0 2px 8px rgba(229,57,53,0.4);
+  }
+  .ticket-ball.blue-fill {
+    background: radial-gradient(circle at 35% 35%, #64B5F6, #0D47A1);
+    color: white;
+    box-shadow: 0 2px 8px rgba(21,101,192,0.4);
+  }
+  .ticket-ball.empty {
+    background: rgba(255,255,255,0.06);
+    border: 1.5px dashed rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.2);
+    font-size: 16px;
+  }
+  .ticket-sep {
+    width: 1px; height: 20px; background: var(--border);
+    margin: 0 4px;
+  }
+
+  /* ─── 开奖按钮 ─── */
+  .draw-btn-wrap { width: 100%; max-width: 640px; margin-bottom: 16px; }
+  .btn-draw {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 12px;
+    color: white; font-size: 16px; font-weight: 800;
+    cursor: pointer; letter-spacing: 1px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+    position: relative; overflow: hidden;
+  }
+  .btn-draw:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 28px rgba(124,58,237,0.5);
+  }
+  .btn-draw:active:not(:disabled) { transform: translateY(0); }
+  .btn-draw:disabled {
+    opacity: 0.4; cursor: not-allowed; transform: none;
+  }
+  .btn-draw::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+    pointer-events: none;
+  }
+
+  /* ─── 开奖舞台 ─── */
+  .draw-stage {
+    width: 100%; max-width: 640px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .draw-stage-title {
+    font-size: 12px; color: var(--muted);
+    text-align: center; margin-bottom: 16px;
+    letter-spacing: 1px;
+  }
+
+  /* 开奖球排列 */
+  .draw-balls {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; flex-wrap: wrap;
+  }
+
+  /* 开奖球 */
+  .draw-ball {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 800;
+    position: relative;
+    /* 初始灰色等待状态 */
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.25);
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  /* 光泽层 */
+  .draw-ball::before {
+    content: ''; position: absolute;
+    width: 60%; height: 40%;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    top: 10%; left: 20%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  /* 滚动中状态 */
+  .draw-ball.rolling {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.7);
+    animation: ballShake 0.08s infinite alternate;
+  }
+
+  /* 红球停止 */
+  .draw-ball.stopped-red {
+    background: radial-gradient(circle at 35% 35%, #FF6B6B, #C62828);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 16px rgba(229,57,53,0.5);
+    animation: ballBounce 0.4s cubic-bezier(0.36,0.07,0.19,0.97);
+  }
+  .draw-ball.stopped-red::before { opacity: 1; }
+
+  /* 蓝球停止 */
+  .draw-ball.stopped-blue {
+    background: radial-gradient(circle at 35% 35%, #64B5F6, #0D47A1);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 16px rgba(21,101,192,0.5);
+    animation: ballBounce 0.4s cubic-bezier(0.36,0.07,0.19,0.97);
+  }
+  .draw-ball.stopped-blue::before { opacity: 1; }
+
+  /* 中奖高亮：金色发光 */
+  .draw-ball.matched {
+    box-shadow: 0 0 0 3px var(--gold), 0 4px 24px rgba(245,200,66,0.6) !important;
+    animation: goldPulse 1.2s ease-in-out infinite !important;
+  }
+  .draw-ball.matched::after {
+    content: '★'; position: absolute;
+    top: -8px; right: -4px;
+    font-size: 14px; color: var(--gold);
+    text-shadow: 0 0 8px var(--gold);
+    animation: starSpin 1s ease-in-out infinite;
+  }
+
+  /* 蓝球与红球之间的分隔符 */
+  .draw-sep {
+    font-size: 22px; color: var(--muted);
+    font-weight: 300; margin: 0 2px;
+  }
+
+  @keyframes ballShake {
+    0%   { transform: translateY(0) scale(1); }
+    100% { transform: translateY(-2px) scale(1.03); }
+  }
+  @keyframes ballBounce {
+    0%   { transform: translateY(-16px) scale(0.85); opacity: 0.7; }
+    40%  { transform: translateY(4px) scale(1.08); opacity: 1; }
+    70%  { transform: translateY(-4px) scale(0.97); }
+    100% { transform: translateY(0) scale(1); }
+  }
+  @keyframes goldPulse {
+    0%,100% { box-shadow: 0 0 0 3px var(--gold), 0 4px 24px rgba(245,200,66,0.6); }
+    50%      { box-shadow: 0 0 0 5px var(--gold), 0 4px 32px rgba(245,200,66,0.9); }
+  }
+  @keyframes starSpin {
+    0%,100% { transform: scale(1) rotate(0deg); }
+    50%      { transform: scale(1.3) rotate(20deg); }
+  }
+
+  /* 中奖结果 Banner */
+  .result-banner {
+    margin-top: 14px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 15px; font-weight: 700;
+    display: none;
+  }
+  .result-banner.win {
+    display: block;
+    background: rgba(245,200,66,0.15);
+    border: 1px solid rgba(245,200,66,0.4);
+    color: var(--gold);
+    animation: fadeInUp 0.4s ease;
+  }
+  .result-banner.lose {
+    display: block;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    animation: fadeInUp 0.4s ease;
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── 右侧数据面板 ─── */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 18px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+    display: flex; flex-direction: column; gap: 14px;
+  }
+
+  /* 本次结果卡 */
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+  }
+  .result-card-title {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 12px;
+  }
+  .result-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .result-item:last-child { border-bottom: none; }
+  .result-item .label { color: var(--muted); }
+  .result-item .value { font-weight: 700; color: var(--text); }
+  .result-item .value.gold { color: var(--gold); }
+  .result-item .value.red  { color: #FF6B6B; }
+  .result-item .value.blue { color: #64B5F6; }
+
+  /* 中奖统计 */
+  .stat-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--muted); }
+  .stat-count {
+    font-weight: 700;
+    padding: 2px 9px; border-radius: 10px;
+    font-size: 12px;
+  }
+  .stat-count.zero  { background: rgba(255,255,255,0.06); color: var(--muted); }
+  .stat-count.hits  { background: rgba(245,200,66,0.15); color: var(--gold); }
+
+  /* 历史记录列表 */
+  .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .history-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 9px;
+    padding: 10px 12px;
+  }
+  .history-item-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 7px;
+  }
+  .history-round { font-size: 11px; color: var(--muted); }
+  .history-prize {
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 8px;
+  }
+  .history-prize.none { background: rgba(255,255,255,0.06); color: var(--muted); }
+  .history-prize.win  { background: rgba(245,200,66,0.15); color: var(--gold); }
+  .history-balls {
+    display: flex; align-items: center; gap: 5px; flex-wrap: wrap;
+  }
+  .hist-ball {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+  }
+  .hist-ball.r { background: radial-gradient(circle at 35% 35%, #FF6B6B, #C62828); color: white; }
+  .hist-ball.b { background: radial-gradient(circle at 35% 35%, #64B5F6, #0D47A1); color: white; }
+  .hist-sep { font-size: 12px; color: var(--muted); }
+
+  /* 空状态 */
+  .empty-state {
+    text-align: center; padding: 28px 0;
+    color: var(--muted); font-size: 13px;
+  }
+  .empty-state .icon { font-size: 32px; margin-bottom: 8px; }
+
+  /* 底部标签页栏 */
+  .tab-bar {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 10;
+    flex-shrink: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab-item {
+    padding: 10px 16px;
+    font-size: 13px; cursor: pointer;
+    color: var(--muted); white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab-item.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .tab-item:hover:not(.active) { color: var(--text); }
+
+  /* 滚动数字动画 */
+  .rolling-num {
+    display: inline-block;
+    animation: numRoll 0.1s steps(1) infinite;
+  }
+  @keyframes numRoll {
+    0%  { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* 开奖机动画容器 */
+  .machine-anim {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 10px;
+    min-height: 36px;
+    color: var(--muted);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .machine-anim.active { color: var(--gold); }
+  .machine-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold);
+    animation: machinePulse 0.5s ease-in-out infinite;
+    display: none;
+  }
+  .machine-anim.active .machine-dot { display: block; }
+  .machine-dot:nth-child(2) { animation-delay: 0.15s; }
+  .machine-dot:nth-child(3) { animation-delay: 0.30s; }
+  @keyframes machinePulse {
+    0%,100% { transform: scale(0.8); opacity: 0.5; }
+    50%     { transform: scale(1.3); opacity: 1; }
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ─── 顶部导航 ─── -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span>🎮</span>Game<span>Hub</span>
+    <span class="nav-badge">DEMO</span>
+  </a>
+  <div class="nav-scroll">
+    <div class="nav-tabs" id="navTabs">
+      <!-- JS 动态渲染 -->
+    </div>
+  </div>
+</nav>
+
+<!-- ─── 三列主布局 ─── -->
+<div class="main">
+
+  <!-- ═══ 左侧：配置面板 ═══ -->
+  <div class="panel-left">
+    <div class="panel-title">游戏配置</div>
+
+    <!-- 奖级名称配置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>奖级配置</div>
+      <table class="prize-table">
+        <thead>
+          <tr>
+            <th>奖级</th>
+            <th>条件</th>
+            <th>名称</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="level-tag s">特等</span></td>
+            <td style="color:var(--muted);font-size:11px;">6红+1蓝</td>
+            <td><input class="prize-name-input" id="prize0" value="特等奖"></td>
+          </tr>
+          <tr>
+            <td><span class="level-tag a">一等</span></td>
+            <td style="color:var(--muted);font-size:11px;">6红+0蓝</td>
+            <td><input class="prize-name-input" id="prize1" value="一等奖"></td>
+          </tr>
+          <tr>
+            <td><span class="level-tag b">二等</span></td>
+            <td style="color:var(--muted);font-size:11px;">5红+1蓝</td>
+            <td><input class="prize-name-input" id="prize2" value="二等奖"></td>
+          </tr>
+          <tr>
+            <td><span class="level-tag c">三等</span></td>
+            <td style="color:var(--muted);font-size:11px;">5红+0蓝</td>
+            <td><input class="prize-name-input" id="prize3" value="三等奖"></td>
+          </tr>
+          <tr>
+            <td><span class="level-tag c">四等</span></td>
+            <td style="color:var(--muted);font-size:11px;">4红+1蓝</td>
+            <td><input class="prize-name-input" id="prize4" value="四等奖"></td>
+          </tr>
+          <tr>
+            <td><span class="level-tag d">五等</span></td>
+            <td style="color:var(--muted);font-size:11px;">4红+0蓝</td>
+            <td><input class="prize-name-input" id="prize5" value="五等奖"></td>
+          </tr>
+          <tr>
+            <td><span class="level-tag d">六等</span></td>
+            <td style="color:var(--muted);font-size:11px;">3红+1蓝</td>
+            <td><input class="prize-name-input" id="prize6" value="幸运奖"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 开奖速度 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>开奖速度</div>
+      <div class="speed-group" id="speedGroup">
+        <button class="speed-btn" data-speed="slow">慢速</button>
+        <button class="speed-btn active" data-speed="normal">标准</button>
+        <button class="speed-btn" data-speed="fast">快速</button>
+        <button class="speed-btn" data-speed="instant">秒出</button>
+      </div>
+    </div>
+
+    <!-- 其他设置 -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>玩法设置</div>
+      <div class="rule-row">
+        <span class="rule-label">允许多注投注</span>
+        <button class="toggle on" id="toggleMulti"></button>
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">开奖音效</span>
+        <button class="toggle on" id="toggleSound"></button>
+      </div>
+      <div class="rule-row">
+        <span class="rule-label">显示中奖概率</span>
+        <button class="toggle" id="toggleProb"></button>
+      </div>
+    </div>
+
+    <!-- 概率说明（收折） -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>中奖概率参考</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.7;">
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span>特等奖（6+1）</span><span style="color:var(--gold);">1/17,720,000</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span>一等奖（6+0）</span><span style="color:#F472B6;">1/1,477,000</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span>二等奖（5+1）</span><span style="color:#A78BFA;">1/118,000</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span>三等奖（5+0）</span><span style="color:#4ADE80;">1/9,900</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;">
+          <span>六等（3+1）</span><span style="color:var(--muted);">1/96</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 中间：游戏主区 ═══ -->
+  <div class="game-center">
+
+    <!-- 标题 -->
+    <div class="game-title-area">
+      <div class="game-name">🎱 幸运数字</div>
+      <div class="game-subtitle">彩票风格选号游戏 · 选6+1号码 · 等待开奖</div>
+    </div>
+
+    <!-- 选号区 -->
+    <div class="pick-area">
+
+      <!-- 红球区 -->
+      <div class="pick-header">
+        <div class="pick-label">
+          <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#E53935;"></span>
+          红球区（1–35，选6个）
+        </div>
+        <div class="pick-count">已选 <span class="cur" id="redCount">0</span>/6</div>
+      </div>
+      <div class="ball-grid" id="redBallGrid">
+        <!-- JS 渲染 1–35 红球 -->
+      </div>
+
+      <div class="pick-divider"></div>
+
+      <!-- 蓝球区 -->
+      <div class="pick-header">
+        <div class="pick-label">
+          <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#1565C0;"></span>
+          蓝球区（1–12，选1个）
+        </div>
+        <div class="pick-count">已选 <span class="cur" id="blueCount">0</span>/1</div>
+      </div>
+      <div class="ball-grid" id="blueBallGrid">
+        <!-- JS 渲染 1–12 蓝球 -->
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="pick-actions">
+        <button class="btn-quick" id="btnQuick">⚡ 机选一注</button>
+        <button class="btn-quick" id="btnAddNote" style="display:none;">+ 再加一注</button>
+        <button class="btn-clear" id="btnClear">清除</button>
+      </div>
+
+      <!-- 已选号码展示 -->
+      <div class="selected-ticket" id="selectedTicket">
+        <span class="ticket-label">当前选号：</span>
+        <span id="ticketDisplay" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+          <span style="color:var(--muted);font-size:12px;">尚未选号，请从上方选择或点击机选</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- 开奖按钮 -->
+    <div class="draw-btn-wrap">
+      <button class="btn-draw" id="btnDraw" disabled>
+        🎰 开始开奖
+      </button>
+    </div>
+
+    <!-- 开奖舞台 -->
+    <div class="draw-stage">
+      <div class="draw-stage-title" id="drawStageTitle">等待开奖中…</div>
+      <!-- 开奖机动画指示 -->
+      <div class="machine-anim" id="machineAnim">
+        <span style="font-size:16px;color:var(--muted);">摇号机待机</span>
+      </div>
+      <!-- 开奖球 -->
+      <div class="draw-balls" id="drawBalls">
+        <!-- 6个红球 + 分隔 + 1个蓝球，JS 渲染 -->
+      </div>
+      <!-- 结果 Banner -->
+      <div class="result-banner" id="resultBanner"></div>
+    </div>
+
+  </div>
+
+  <!-- ═══ 右侧：数据面板 ═══ -->
+  <div class="panel-right">
+
+    <!-- 本次结果 -->
+    <div class="result-card">
+      <div class="result-card-title">本次开奖</div>
+      <div class="result-item">
+        <span class="label">第</span>
+        <span class="value gold" id="statRound">–</span>
+      </div>
+      <div class="result-item">
+        <span class="label">红球匹配</span>
+        <span class="value red" id="statRedMatch">–</span>
+      </div>
+      <div class="result-item">
+        <span class="label">蓝球匹配</span>
+        <span class="value blue" id="statBlueMatch">–</span>
+      </div>
+      <div class="result-item">
+        <span class="label">中奖结果</span>
+        <span class="value gold" id="statResult">–</span>
+      </div>
+    </div>
+
+    <!-- 中奖统计 -->
+    <div class="result-card">
+      <div class="result-card-title">累计中奖统计</div>
+      <div class="stat-row">
+        <span class="stat-label">总开奖次数</span>
+        <span class="stat-count hits" id="statTotal">0</span>
+      </div>
+      <div id="prizeStats">
+        <!-- JS 渲染各奖级统计 -->
+      </div>
+    </div>
+
+    <!-- 历史记录 -->
+    <div class="result-card">
+      <div class="result-card-title">历史开奖记录</div>
+      <div class="history-list" id="historyList">
+        <div class="empty-state">
+          <div class="icon">🎱</div>
+          <div>暂无开奖记录</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  幸运数字 · 核心逻辑
+// ═══════════════════════════════════════════════
+
+/* ─── 全部导航标签（与其他组件保持一致） ─── */
+const NAV_ITEMS = [
+  { label: '首页',     href: 'index.html' },
+  { label: '老虎机',   href: 'slot-machine.html' },
+  { label: '摇骰子',   href: 'shake-dice.html' },
+  { label: '大转盘',   href: 'wheel.html' },
+  { label: '九宫格',   href: 'nine-grid.html' },
+  { label: '刮刮乐',   href: 'scratch-card.html' },
+  { label: '扭蛋机',   href: 'gashapon.html' },
+  { label: '盲盒',     href: 'blind-box.html' },
+  { label: '礼盒',     href: 'gift-box.html' },
+  { label: '数字炸弹', href: 'number-bomb.html' },
+  { label: '翻翻乐',   href: 'flip-match.html' },
+  { label: '打地鼠',   href: 'whack-mole.html' },
+  { label: '红包雨',   href: 'red-packet-rain.html' },
+  { label: '签到',     href: 'daily-checkin.html' },
+  { label: '投票PK',   href: 'vote-pk.html' },
+  { label: '答题',     href: 'quiz.html' },
+  { label: '幸运数字', href: 'lucky-number.html' },
+  { label: '飞行棋',   href: 'flying-chess.html' },
+  { label: '弹珠',     href: 'pinball.html' },
+  { label: '水果切',   href: 'fruit-cut.html' },
+  { label: '贪吃蛇',   href: 'snake.html' },
+  { label: '2048',     href: 'game-2048.html' },
+  { label: '消消乐',   href: 'match3.html' },
+  { label: '扫雷',     href: 'minesweeper.html' },
+  { label: '数独',     href: 'sudoku.html' },
+  { label: '拼图',     href: 'puzzle.html' },
+  { label: '成就系统', href: 'stamp-collect.html' },
+  { label: '进度解锁', href: 'progress-unlock.html' },
+  { label: '种树',     href: 'grow-tree.html' },
+  { label: '能量收集', href: 'energy-collect.html' },
+  { label: '抓娃娃',   href: 'claw-machine.html' },
+  { label: '弹弓',     href: 'slingshot.html' },
+  { label: '套圈',     href: 'ring-toss.html' },
+  { label: '抛硬币',   href: 'shake.html' },
+  { label: '掷骰子',   href: 'cup-game.html' },
+  { label: '砸彩蛋',   href: 'smash-egg.html' },
+  { label: '魔方',     href: 'sliding-puzzle.html' },
+  { label: '大富翁',   href: 'monopoly.html' },
+  { label: '抓金币',   href: 'catch-coins.html' },
+  { label: '俄罗斯方块', href: 'tetris.html' },
+];
+
+// 渲染导航
+(function renderNav() {
+  const container = document.getElementById('navTabs');
+  NAV_ITEMS.forEach(item => {
+    const a = document.createElement('a');
+    a.className = 'nav-tab' + (item.href === 'lucky-number.html' ? ' active' : '');
+    a.href = item.href;
+    a.textContent = item.label;
+    container.appendChild(a);
+  });
+  // 滚动到 active
+  setTimeout(() => {
+    const active = container.querySelector('.active');
+    if (active) active.scrollIntoView({ inline: 'center', behavior: 'smooth' });
+  }, 100);
+})();
+
+// ─── 开奖速度配置（每球滚动时长 ms） ─────────────────
+const SPEED_CFG = {
+  slow:    { roll: 2000, interval: 80,  delay: 500 },
+  normal:  { roll: 1200, interval: 60,  delay: 350 },
+  fast:    { roll: 700,  interval: 40,  delay: 250 },
+  instant: { roll: 80,   interval: 20,  delay: 100 },
+};
+let currentSpeed = 'normal';
+
+// ─── 状态 ────────────────────────────────────────────
+let selectedRed  = new Set(); // 已选红球
+let selectedBlue = null;       // 已选蓝球（数字 or null）
+let isDrawing    = false;
+let roundCount   = 0;
+// 奖级统计：index 0-6 对应 特/一/二/三/四/五/六 等奖，index 7 未中奖
+let prizeCount   = new Array(8).fill(0);
+let historyData  = [];
+
+// 奖级定义
+const PRIZE_DEFS = [
+  { id: 0, red: 6, blue: true,  tagClass: 's' },
+  { id: 1, red: 6, blue: false, tagClass: 'a' },
+  { id: 2, red: 5, blue: true,  tagClass: 'b' },
+  { id: 3, red: 5, blue: false, tagClass: 'c' },
+  { id: 4, red: 4, blue: true,  tagClass: 'c' },
+  { id: 5, red: 4, blue: false, tagClass: 'd' },
+  { id: 6, red: 3, blue: true,  tagClass: 'd' },
+];
+
+// ─── 初始化球网格 ──────────────────────────────────────
+function initBallGrids() {
+  const redGrid  = document.getElementById('redBallGrid');
+  const blueGrid = document.getElementById('blueBallGrid');
+
+  // 红球 1–35
+  for (let i = 1; i <= 35; i++) {
+    const b = document.createElement('button');
+    b.className = 'ball red';
+    b.textContent = String(i).padStart(2, '0');
+    b.dataset.num = i;
+    b.addEventListener('click', () => toggleRed(i, b));
+    redGrid.appendChild(b);
+  }
+
+  // 蓝球 1–12
+  for (let i = 1; i <= 12; i++) {
+    const b = document.createElement('button');
+    b.className = 'ball blue';
+    b.textContent = String(i).padStart(2, '0');
+    b.dataset.num = i;
+    b.addEventListener('click', () => toggleBlue(i, b));
+    blueGrid.appendChild(b);
+  }
+
+  // 初始化开奖球位
+  initDrawBalls();
+  // 初始化奖级统计
+  renderPrizeStats();
+}
+
+// ─── 开奖球位初始化 ────────────────────────────────────
+function initDrawBalls() {
+  const container = document.getElementById('drawBalls');
+  container.innerHTML = '';
+  // 6个红球位
+  for (let i = 0; i < 6; i++) {
+    const b = document.createElement('div');
+    b.className = 'draw-ball';
+    b.id = `dball-${i}`;
+    b.textContent = '?';
+    container.appendChild(b);
+  }
+  // 分隔
+  const sep = document.createElement('span');
+  sep.className = 'draw-sep';
+  sep.textContent = '+';
+  container.appendChild(sep);
+  // 1个蓝球位
+  const bb = document.createElement('div');
+  bb.className = 'draw-ball';
+  bb.id = 'dball-6';
+  bb.textContent = '?';
+  container.appendChild(bb);
+}
+
+// ─── 选号：红球 ──────────────────────────────────────
+function toggleRed(num, el) {
+  if (isDrawing) return;
+  if (selectedRed.has(num)) {
+    selectedRed.delete(num);
+    el.classList.remove('selected');
+  } else {
+    if (selectedRed.size >= 6) {
+      // 已满6个，给按钮轻微震动提示
+      el.style.animation = 'ballShake 0.3s ease';
+      setTimeout(() => el.style.animation = '', 300);
+      return;
+    }
+    selectedRed.add(num);
+    el.classList.add('selected');
+  }
+  updateUI();
+}
+
+// ─── 选号：蓝球 ──────────────────────────────────────
+function toggleBlue(num, el) {
+  if (isDrawing) return;
+  // 取消之前选中的蓝球
+  document.querySelectorAll('#blueBallGrid .ball').forEach(b => b.classList.remove('selected'));
+  if (selectedBlue === num) {
+    selectedBlue = null;
+  } else {
+    selectedBlue = num;
+    el.classList.add('selected');
+  }
+  updateUI();
+}
+
+// ─── 更新 UI 状态 ─────────────────────────────────────
+function updateUI() {
+  // 计数
+  document.getElementById('redCount').textContent  = selectedRed.size;
+  document.getElementById('blueCount').textContent = selectedBlue !== null ? 1 : 0;
+
+  // 更新已选号码展示
+  updateTicketDisplay();
+
+  // 开奖按钮状态：需要选满 6红+1蓝
+  const canDraw = selectedRed.size === 6 && selectedBlue !== null;
+  document.getElementById('btnDraw').disabled = !canDraw || isDrawing;
+}
+
+// ─── 更新票面展示 ─────────────────────────────────────
+function updateTicketDisplay() {
+  const container = document.getElementById('ticketDisplay');
+  const redArr = Array.from(selectedRed).sort((a, b) => a - b);
+
+  if (redArr.length === 0 && selectedBlue === null) {
+    container.innerHTML = '<span style="color:var(--muted);font-size:12px;">尚未选号，请从上方选择或点击机选</span>';
+    return;
+  }
+
+  let html = '';
+  // 红球（不足6个时显示占位）
+  for (let i = 0; i < 6; i++) {
+    if (i < redArr.length) {
+      html += `<div class="ticket-ball red-fill">${String(redArr[i]).padStart(2,'0')}</div>`;
+    } else {
+      html += `<div class="ticket-ball empty">+</div>`;
+    }
+  }
+  // 分隔
+  html += '<div class="ticket-sep"></div>';
+  // 蓝球
+  if (selectedBlue !== null) {
+    html += `<div class="ticket-ball blue-fill">${String(selectedBlue).padStart(2,'0')}</div>`;
+  } else {
+    html += `<div class="ticket-ball empty">+</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// ─── 机选 ─────────────────────────────────────────────
+function quickPick() {
+  if (isDrawing) return;
+  // 清除当前选号
+  clearSelection();
+  // 随机选 6 个红球（1-35 不重复）
+  const redPool = Array.from({ length: 35 }, (_, i) => i + 1);
+  shuffle(redPool);
+  redPool.slice(0, 6).forEach(n => {
+    selectedRed.add(n);
+    const btn = document.querySelector(`#redBallGrid .ball[data-num="${n}"]`);
+    if (btn) btn.classList.add('selected');
+  });
+  // 随机选 1 个蓝球（1-12）
+  const blueNum = Math.floor(Math.random() * 12) + 1;
+  selectedBlue = blueNum;
+  const blueBtn = document.querySelector(`#blueBallGrid .ball[data-num="${blueNum}"]`);
+  if (blueBtn) blueBtn.classList.add('selected');
+  updateUI();
+}
+
+// ─── 清除选号 ─────────────────────────────────────────
+function clearSelection() {
+  selectedRed.clear();
+  selectedBlue = null;
+  document.querySelectorAll('.ball.selected').forEach(b => b.classList.remove('selected'));
+  updateUI();
+}
+
+// ─── 工具：Fisher-Yates 洗牌 ─────────────────────────
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ─── 主开奖流程 ──────────────────────────────────────
+async function startDraw() {
+  if (isDrawing) return;
+  if (selectedRed.size !== 6 || selectedBlue === null) return;
+
+  isDrawing = true;
+  roundCount++;
+
+  // 保存本注选号
+  const myRed  = Array.from(selectedRed).sort((a, b) => a - b);
+  const myBlue = selectedBlue;
+
+  // 禁用开奖按钮
+  const btnDraw = document.getElementById('btnDraw');
+  btnDraw.disabled = true;
+  btnDraw.textContent = '🎰 开奖中…';
+
+  // 重置开奖球位
+  initDrawBalls();
+  document.getElementById('resultBanner').style.display = 'none';
+  document.getElementById('drawStageTitle').textContent = `第 ${roundCount} 期 · 摇号进行中`;
+
+  // 机器动画激活
+  const machineAnim = document.getElementById('machineAnim');
+  machineAnim.className = 'machine-anim active';
+  machineAnim.innerHTML = '<div class="machine-dot"></div><div class="machine-dot"></div><div class="machine-dot"></div>';
+
+  // 随机生成开奖号码
+  const drawRed  = generateDrawRed();   // 6个红球 1-35 不重复
+  const drawBlue = Math.floor(Math.random() * 12) + 1; // 1个蓝球
+
+  const cfg = SPEED_CFG[currentSpeed];
+
+  // 依次滚动每个球停止
+  for (let i = 0; i < 7; i++) {
+    const ballEl = document.getElementById(`dball-${i}`);
+    const isBlue  = i === 6;
+    const finalNum = isBlue ? drawBlue : drawRed[i];
+    const maxNum   = isBlue ? 12 : 35;
+
+    // 等待前一个球的延迟（从第2个球开始）
+    if (i > 0) {
+      await sleep(cfg.delay);
+    }
+
+    // 开始滚动
+    await rollBall(ballEl, finalNum, maxNum, cfg);
+
+    // 球停下后标记颜色
+    if (isBlue) {
+      ballEl.classList.add('stopped-blue');
+    } else {
+      ballEl.classList.add('stopped-red');
+    }
+    ballEl.classList.remove('rolling');
+  }
+
+  // 关闭摇号机动画
+  machineAnim.className = 'machine-anim';
+  machineAnim.innerHTML = '<span style="font-size:16px;color:var(--muted);">摇号完成</span>';
+
+  // ─ 计算中奖 ─
+  const redMatchSet = new Set(myRed.filter(n => drawRed.includes(n)));
+  const blueMatch   = myBlue === drawBlue;
+  const redMatchCount = redMatchSet.size;
+
+  // 高亮匹配的开奖球
+  // 红球：比对
+  drawRed.forEach((n, i) => {
+    if (redMatchSet.has(n)) {
+      const el = document.getElementById(`dball-${i}`);
+      el.classList.add('matched');
+    }
+  });
+  // 蓝球
+  if (blueMatch) {
+    document.getElementById('dball-6').classList.add('matched');
+  }
+
+  // 判断奖级
+  const prizeIdx = calcPrize(redMatchCount, blueMatch);
+  const prizeName = getPrizeName(prizeIdx);
+
+  // 更新奖级统计
+  if (prizeIdx >= 0) {
+    prizeCount[prizeIdx]++;
+  } else {
+    prizeCount[7]++;
+  }
+
+  // 显示结果 Banner
+  const banner = document.getElementById('resultBanner');
+  if (prizeIdx >= 0) {
+    banner.className = 'result-banner win';
+    banner.textContent = `🎉 恭喜！命中 ${redMatchCount} 红球 + ${blueMatch ? 1 : 0} 蓝球 → ${prizeName}！`;
+  } else {
+    banner.className = 'result-banner lose';
+    banner.textContent = `命中 ${redMatchCount} 红球 + ${blueMatch ? 1 : 0} 蓝球 · 未中奖，下次加油～`;
+  }
+
+  // 更新开奖标题
+  document.getElementById('drawStageTitle').textContent = `第 ${roundCount} 期开奖结果`;
+
+  // 右侧面板更新
+  updateResultPanel(roundCount, redMatchCount, blueMatch, prizeIdx, prizeName);
+  addHistory(roundCount, drawRed, drawBlue, prizeIdx, prizeName);
+  renderPrizeStats();
+
+  // 恢复
+  isDrawing = false;
+  btnDraw.disabled = false;
+  btnDraw.textContent = '🎰 再开一次';
+}
+
+// ─── 单个球的滚动动画（Promise 封装） ────────────────
+function rollBall(el, finalNum, maxNum, cfg) {
+  return new Promise(resolve => {
+    el.classList.add('rolling');
+    const startTime = Date.now();
+    const duration  = cfg.roll;
+
+    const timer = setInterval(() => {
+      // 快速随机数字滚动
+      const fake = Math.floor(Math.random() * maxNum) + 1;
+      el.textContent = String(fake).padStart(2, '0');
+
+      // 时间到了就停止
+      if (Date.now() - startTime >= duration) {
+        clearInterval(timer);
+        el.textContent = String(finalNum).padStart(2, '0');
+        resolve();
+      }
+    }, cfg.interval);
+  });
+}
+
+// ─── 工具：sleep ─────────────────────────────────────
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+// ─── 生成开奖红球号码 ─────────────────────────────────
+function generateDrawRed() {
+  const pool = Array.from({ length: 35 }, (_, i) => i + 1);
+  shuffle(pool);
+  return pool.slice(0, 6).sort((a, b) => a - b);
+}
+
+// ─── 判断奖级 ─────────────────────────────────────────
+// 返回 0-6 对应 特/一/二/三/四/五/六等奖，-1 未中奖
+function calcPrize(redCount, blueMatch) {
+  for (const def of PRIZE_DEFS) {
+    if (redCount === def.red && blueMatch === def.blue) return def.id;
+  }
+  return -1;
+}
+
+// ─── 获取奖级名称 ─────────────────────────────────────
+function getPrizeName(idx) {
+  if (idx < 0) return '未中奖';
+  const el = document.getElementById(`prize${idx}`);
+  return el ? el.value || `${['特','一','二','三','四','五','六'][idx]}等奖` : `${idx+1}等奖`;
+}
+
+// ─── 更新右侧本次结果面板 ────────────────────────────
+function updateResultPanel(round, redMatch, blueMatch, prizeIdx, prizeName) {
+  document.getElementById('statRound').textContent     = `${round} 期`;
+  document.getElementById('statRedMatch').textContent  = `${redMatch}/6`;
+  document.getElementById('statBlueMatch').textContent = blueMatch ? '1/1 ✓' : '0/1';
+  const resultEl = document.getElementById('statResult');
+  resultEl.textContent = prizeName;
+  resultEl.style.color = prizeIdx >= 0 ? 'var(--gold)' : 'var(--muted)';
+  document.getElementById('statTotal').textContent = roundCount;
+}
+
+// ─── 渲染奖级统计 ─────────────────────────────────────
+function renderPrizeStats() {
+  const container = document.getElementById('prizeStats');
+  const names = ['特等奖','一等奖','二等奖','三等奖','四等奖','五等奖','幸运奖','未中奖'];
+  let html = '';
+  for (let i = 0; i < 8; i++) {
+    const cnt = prizeCount[i];
+    // 7=未中奖
+    const realName = i < 7 ? getPrizeName(i) : '未中奖';
+    html += `
+      <div class="stat-row">
+        <span class="stat-label">${realName}</span>
+        <span class="stat-count ${cnt > 0 ? 'hits' : 'zero'}">${cnt}</span>
+      </div>`;
+  }
+  container.innerHTML = html;
+}
+
+// ─── 添加历史记录 ─────────────────────────────────────
+function addHistory(round, drawRed, drawBlue, prizeIdx, prizeName) {
+  historyData.unshift({ round, drawRed, drawBlue, prizeIdx, prizeName });
+  // 最多保留 20 条
+  if (historyData.length > 20) historyData.pop();
+  renderHistory();
+}
+
+// ─── 渲染历史记录 ─────────────────────────────────────
+function renderHistory() {
+  const container = document.getElementById('historyList');
+  if (historyData.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">🎱</div><div>暂无开奖记录</div></div>';
+    return;
+  }
+  let html = '';
+  historyData.forEach(item => {
+    const prizeClass = item.prizeIdx >= 0 ? 'win' : 'none';
+    let balls = '';
+    item.drawRed.forEach(n => {
+      balls += `<div class="hist-ball r">${String(n).padStart(2,'0')}</div>`;
+    });
+    balls += `<span class="hist-sep">+</span>`;
+    balls += `<div class="hist-ball b">${String(item.drawBlue).padStart(2,'0')}</div>`;
+
+    html += `
+      <div class="history-item">
+        <div class="history-item-header">
+          <span class="history-round">第 ${item.round} 期</span>
+          <span class="history-prize ${prizeClass}">${item.prizeName}</span>
+        </div>
+        <div class="history-balls">${balls}</div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+// ─── 速度切换 ─────────────────────────────────────────
+document.getElementById('speedGroup').addEventListener('click', e => {
+  const btn = e.target.closest('[data-speed]');
+  if (!btn) return;
+  currentSpeed = btn.dataset.speed;
+  document.querySelectorAll('.speed-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.speed === currentSpeed);
+  });
+});
+
+// ─── 开关按钮交互 ─────────────────────────────────────
+document.querySelectorAll('.toggle').forEach(toggle => {
+  toggle.addEventListener('click', () => {
+    toggle.classList.toggle('on');
+  });
+});
+
+// ─── 绑定事件 ─────────────────────────────────────────
+document.getElementById('btnQuick').addEventListener('click', quickPick);
+document.getElementById('btnClear').addEventListener('click', clearSelection);
+document.getElementById('btnDraw').addEventListener('click', startDraw);
+
+// ─── 初始化 ──────────────────────────────────────────
+initBallGrids();
+updateUI();
+</script>
+</body>
+</html>
