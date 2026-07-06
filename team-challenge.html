@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小游戏中台 · 组队挑战</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* ─── CSS 变量 ─── */
+  :root {
+    --gold:    #F5C842;
+    --bg:      #0D0720;
+    --accent:  #7C3AED;
+    --accent2: #EC4899;
+    --deep:    #1A0A2E;
+    --card:    rgba(255,255,255,0.05);
+    --border:  rgba(255,255,255,0.1);
+    --text:    #F0EAF8;
+    --muted:   rgba(240,234,248,0.5);
+    /* 四队颜色 */
+    --team0: #EF4444;  /* 红队 */
+    --team1: #3B82F6;  /* 蓝队 */
+    --team2: #F5C842;  /* 黄队 */
+    --team3: #22C55E;  /* 绿队 */
+    --team0-glow: rgba(239,68,68,0.3);
+    --team1-glow: rgba(59,130,246,0.3);
+    --team2-glow: rgba(245,200,66,0.3);
+    --team3-glow: rgba(34,197,94,0.3);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── 导航栏 ─── */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 0 24px;
+    height: 56px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,7,32,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 17px; font-weight: 700;
+    text-decoration: none; color: var(--text);
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  /* 导航链接横向滚动容器 */
+  .nav-scroll {
+    display: flex; gap: 2px;
+    overflow-x: auto; flex: 1;
+    scrollbar-width: none;
+  }
+  .nav-scroll::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 6px 14px; border-radius: 7px;
+    font-size: 13px; cursor: pointer; white-space: nowrap;
+    background: transparent; border: none; color: var(--muted);
+    transition: all 0.2s; text-decoration: none;
+    display: inline-flex; align-items: center;
+    flex-shrink: 0;
+  }
+  .nav-tab.active { background: var(--card); color: var(--gold); }
+  .nav-tab:hover:not(.active) { background: var(--card); color: var(--text); }
+
+  /* ─── 三列布局 ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 380px 1fr 280px;
+    flex: 1;
+    min-height: 0;
+    height: calc(100vh - 57px);
+  }
+
+  /* ─── 左侧配置面板 ─── */
+  .panel-left {
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-left::-webkit-scrollbar { width: 4px; }
+  .panel-left::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  .panel-title {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.2px; margin-bottom: 12px; margin-top: 20px;
+  }
+  .panel-title:first-child { margin-top: 0; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+
+  /* 模式切换按钮 */
+  .mode-group {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    margin-bottom: 14px;
+  }
+  .mode-btn {
+    padding: 14px 8px; border-radius: 10px; text-align: center; cursor: pointer;
+    border: 1.5px solid var(--border); background: transparent; color: var(--muted);
+    font-size: 13px; font-weight: 600; transition: all 0.2s;
+  }
+  .mode-btn .mode-icon { font-size: 26px; display: block; margin-bottom: 6px; }
+  .mode-btn.active {
+    border-color: var(--accent); background: rgba(124,58,237,0.15); color: var(--text);
+    box-shadow: 0 0 14px rgba(124,58,237,0.3);
+  }
+  .mode-btn:hover:not(.active) { border-color: rgba(255,255,255,0.25); color: var(--text); }
+
+  /* 通用输入控件 */
+  .form-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+  }
+  .form-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .form-label { color: var(--muted); flex-shrink: 0; }
+  .f-input {
+    background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+    border-radius: 7px; padding: 5px 10px; color: var(--text);
+    font-size: 13px; outline: none; transition: border-color 0.2s;
+  }
+  .f-input:focus { border-color: var(--accent); }
+  .f-input-wide { width: 100%; margin-top: 8px; }
+  .f-input-sm  { width: 110px; text-align: right; }
+  .f-input-xs  { width: 72px; text-align: center; }
+
+  /* 切换开关 */
+  .toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute; inset: 0; border-radius: 20px;
+    background: rgba(255,255,255,0.1); cursor: pointer; transition: 0.2s;
+  }
+  .toggle-track::before {
+    content: ''; position: absolute;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--muted); top: 3px; left: 3px; transition: 0.2s;
+  }
+  .toggle input:checked + .toggle-track { background: var(--accent); }
+  .toggle input:checked + .toggle-track::before { transform: translateX(16px); background: white; }
+
+  /* 队伍数量选择 */
+  .team-count-group { display: flex; gap: 8px; }
+  .tc-btn {
+    flex: 1; padding: 8px 4px; border-radius: 8px; text-align: center; cursor: pointer;
+    border: 1.5px solid var(--border); background: transparent; color: var(--muted);
+    font-size: 14px; font-weight: 700; transition: all 0.2s;
+  }
+  .tc-btn.active { border-color: var(--gold); background: rgba(245,200,66,0.12); color: var(--gold); }
+  .tc-btn:hover:not(.active) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+  /* 队伍配置行 */
+  .team-config-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .team-config-row:last-child { border-bottom: none; }
+  .team-emoji-badge {
+    width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0; border: 2px solid transparent;
+  }
+  .team-config-row input.team-name-inp {
+    flex: 1; background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+    border-radius: 7px; padding: 5px 9px; color: var(--text); font-size: 13px; outline: none;
+  }
+  .team-config-row input.team-name-inp:focus { border-color: var(--accent); }
+  .team-score-badge {
+    font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
+    background: rgba(255,255,255,0.08); color: var(--muted); white-space: nowrap;
+  }
+
+  /* 贡献行为配置 */
+  .contrib-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+  }
+  .contrib-row:last-child { border-bottom: none; }
+  .contrib-icon { font-size: 18px; flex-shrink: 0; }
+  .contrib-label { flex: 1; color: var(--muted); }
+  .contrib-val {
+    background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+    border-radius: 7px; padding: 4px 8px; color: var(--text);
+    font-size: 13px; outline: none; width: 62px; text-align: center;
+  }
+  .contrib-val:focus { border-color: var(--accent); }
+
+  /* 奖品配置 */
+  .prize-row {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+  }
+  .prize-row:last-child { border-bottom: none; }
+  .prize-tag {
+    font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 4px;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .prize-tag.gold  { background: rgba(245,200,66,0.15); color: var(--gold); }
+  .prize-tag.green { background: rgba(34,197,94,0.15);  color: #4ADE80; }
+  .prize-tag.pink  { background: rgba(236,72,153,0.15); color: var(--accent2); }
+  .prize-inp {
+    flex: 1; background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+    border-radius: 7px; padding: 5px 9px; color: var(--text); font-size: 12px; outline: none;
+  }
+  .prize-inp:focus { border-color: var(--accent); }
+
+  /* 应用按钮 */
+  .apply-btn {
+    width: 100%; padding: 11px; border-radius: 10px; font-size: 14px; font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: white; cursor: pointer; margin-top: 4px;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .apply-btn:hover { opacity: 0.9; }
+  .apply-btn:active { transform: scale(0.98); }
+
+  /* ─── 中间游戏区 ─── */
+  .panel-center {
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+  }
+  .panel-center::-webkit-scrollbar { width: 4px; }
+  .panel-center::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  /* 顶部状态栏 */
+  .center-header {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .activity-title {
+    font-size: 20px; font-weight: 800;
+    background: linear-gradient(135deg, #fff 30%, var(--gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .mode-tag {
+    font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px;
+    letter-spacing: 0.8px;
+  }
+  .mode-tag.battle { background: rgba(236,72,153,0.2); color: var(--accent2); border: 1px solid rgba(236,72,153,0.3); }
+  .mode-tag.joint  { background: rgba(34,197,94,0.15); color: #4ADE80; border: 1px solid rgba(34,197,94,0.3); }
+
+  /* 倒计时 */
+  .countdown-bar {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px;
+    flex-shrink: 0;
+  }
+  .cd-icon { font-size: 22px; }
+  .cd-label { font-size: 12px; color: var(--muted); margin-bottom: 3px; }
+  .cd-time { font-size: 26px; font-weight: 800; letter-spacing: 2px; color: var(--gold); font-variant-numeric: tabular-nums; }
+  .cd-sep { width: 1px; height: 36px; background: var(--border); }
+  .cd-stat { text-align: center; }
+  .cd-stat .val { font-size: 20px; font-weight: 700; color: var(--text); }
+  .cd-stat .lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* ── 对战模式：各队进度条区 ── */
+  .battle-arena {
+    display: flex; flex-direction: column; gap: 14px;
+    background: var(--deep); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px;
+  }
+  .arena-title { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 1px; margin-bottom: 6px; }
+
+  .team-row {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .team-badge {
+    width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 22px; flex-shrink: 0;
+    border: 2px solid transparent; position: relative;
+  }
+  .team-badge.winner::after {
+    content: '👑'; position: absolute; top: -10px; right: -6px; font-size: 14px;
+  }
+  .team-info { flex-shrink: 0; min-width: 90px; }
+  .team-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .team-members { font-size: 11px; color: var(--muted); }
+  .progress-wrap { flex: 1; position: relative; }
+  .progress-track {
+    height: 26px; background: rgba(255,255,255,0.05); border-radius: 13px;
+    overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.06);
+  }
+  .progress-fill {
+    height: 100%; border-radius: 13px;
+    transition: width 0.6s cubic-bezier(0.25,0.8,0.25,1);
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: flex-end; padding-right: 8px;
+  }
+  /* 进度条光泽动画 */
+  .progress-fill::after {
+    content: '';
+    position: absolute; top: 0; left: -60%;
+    width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    animation: shimmer 2s infinite;
+  }
+  @keyframes shimmer { to { left: 120%; } }
+  .progress-pct { font-size: 11px; font-weight: 700; color: white; white-space: nowrap; position: relative; z-index: 1; }
+  .progress-score { font-size: 13px; font-weight: 700; flex-shrink: 0; min-width: 80px; text-align: right; }
+
+  /* 目标线 */
+  .target-line {
+    position: absolute; top: 0; bottom: 0; width: 2px;
+    background: rgba(245,200,66,0.6);
+    z-index: 2; pointer-events: none;
+  }
+  .target-label {
+    position: absolute; top: -18px; transform: translateX(-50%);
+    font-size: 10px; color: var(--gold); white-space: nowrap; font-weight: 600;
+  }
+
+  /* 已完成标记 */
+  .team-row .done-badge {
+    font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
+    background: rgba(34,197,94,0.2); color: #4ADE80; flex-shrink: 0; border: 1px solid rgba(34,197,94,0.3);
+  }
+
+  /* ── 共同挑战模式：大进度条 ── */
+  .joint-arena {
+    background: var(--deep); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px;
+  }
+  .joint-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; }
+  .joint-total-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .joint-total-val { font-size: 32px; font-weight: 800; color: var(--gold); }
+  .joint-target-info { font-size: 13px; color: var(--muted); text-align: right; }
+  .joint-target-info span { color: var(--text); font-weight: 600; }
+
+  /* 大进度条 */
+  .joint-track {
+    height: 36px; background: rgba(255,255,255,0.05); border-radius: 18px;
+    overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.07);
+    margin-bottom: 10px;
+  }
+  .joint-fill {
+    height: 100%; border-radius: 18px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold));
+    background-size: 200% 100%;
+    animation: gradientShift 3s linear infinite;
+    transition: width 0.7s cubic-bezier(0.25,0.8,0.25,1);
+    display: flex; align-items: center; justify-content: flex-end; padding-right: 12px;
+  }
+  @keyframes gradientShift { to { background-position: 200% 0; } }
+  .joint-fill-pct { font-size: 13px; font-weight: 700; color: white; position: relative; z-index: 1; }
+
+  /* 里程碑节点 */
+  .milestones {
+    display: flex; position: relative; padding-top: 24px; margin-top: 4px;
+  }
+  .milestone-node {
+    position: absolute; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;
+  }
+  .milestone-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--border); border: 2px solid rgba(255,255,255,0.15);
+    transition: all 0.4s; margin-bottom: 6px;
+  }
+  .milestone-dot.reached {
+    background: var(--gold); border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(245,200,66,0.6);
+  }
+  .milestone-label { font-size: 10px; color: var(--muted); white-space: nowrap; text-align: center; }
+  .milestone-label.reached { color: var(--gold); font-weight: 600; }
+
+  /* 团队贡献色块分段 */
+  .team-contrib-segments {
+    display: flex; height: 6px; border-radius: 3px; overflow: hidden; gap: 1px;
+    margin-top: 8px;
+  }
+  .seg-item { height: 100%; border-radius: 2px; transition: flex 0.6s ease; }
+
+  /* ── 实时贡献流 ── */
+  .feed-section {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden; flex-shrink: 0;
+  }
+  .feed-header {
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; font-weight: 600;
+  }
+  .feed-live-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #4ADE80;
+    animation: blink 1.2s infinite; margin-right: 6px;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .feed-list {
+    max-height: 200px; overflow-y: auto; padding: 6px 0;
+  }
+  .feed-list::-webkit-scrollbar { width: 3px; }
+  .feed-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+  .feed-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 16px; font-size: 13px;
+    animation: feedIn 0.3s ease;
+    transition: background 0.2s;
+  }
+  .feed-item:hover { background: rgba(255,255,255,0.03); }
+  @keyframes feedIn {
+    from { opacity: 0; transform: translateX(-12px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .feed-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .feed-name { flex: 1; color: var(--text); }
+  .feed-action { color: var(--muted); font-size: 12px; }
+  .feed-contrib { font-weight: 700; font-size: 13px; }
+  .feed-time { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+
+  /* 提交贡献按钮 */
+  .submit-area {
+    display: flex; gap: 10px; flex-shrink: 0;
+  }
+  .submit-btn {
+    flex: 1; padding: 13px; border-radius: 12px; font-size: 14px; font-weight: 700;
+    border: none; cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .submit-btn.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white; box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+  }
+  .submit-btn.primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .submit-btn.primary:active { transform: scale(0.97); }
+  .submit-btn.secondary {
+    background: var(--card); border: 1px solid var(--border); color: var(--text);
+  }
+  .submit-btn.secondary:hover { border-color: rgba(255,255,255,0.25); }
+
+  /* ─── 右侧数据面板 ─── */
+  .panel-right {
+    border-left: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.01);
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .panel-right::-webkit-scrollbar { width: 4px; }
+  .panel-right::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+  /* 个人数据卡 */
+  .my-card {
+    background: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(236,72,153,0.12));
+    border: 1px solid rgba(124,58,237,0.3); border-radius: 14px; padding: 16px;
+  }
+  .my-card-title {
+    font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 1px; margin-bottom: 12px;
+  }
+  .my-contrib-val { font-size: 36px; font-weight: 800; color: var(--gold); line-height: 1; }
+  .my-contrib-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .my-rank-row {
+    display: flex; gap: 10px; margin-top: 12px;
+  }
+  .my-rank-item {
+    flex: 1; background: rgba(255,255,255,0.06); border-radius: 8px; padding: 8px 10px; text-align: center;
+  }
+  .my-rank-item .rv { font-size: 18px; font-weight: 700; }
+  .my-rank-item .rl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* 队伍总分 */
+  .team-score-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px;
+  }
+  .ts-title { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 1px; margin-bottom: 10px; }
+  .ts-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+  }
+  .ts-row:last-child { border-bottom: none; }
+  .ts-emoji { font-size: 18px; }
+  .ts-name { flex: 1; font-weight: 600; }
+  .ts-score { font-weight: 700; color: var(--gold); }
+  .ts-rank-no { font-size: 11px; font-weight: 700; width: 20px; text-align: center; flex-shrink: 0; }
+  .rank1 { color: #FFD700; }
+  .rank2 { color: #C0C0C0; }
+  .rank3 { color: #CD7F32; }
+
+  /* 个人贡献排行 */
+  .rank-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px;
+    flex: 1;
+  }
+  .rank-card-title { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 1px; margin-bottom: 10px; }
+  .rank-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+  }
+  .rank-item:last-child { border-bottom: none; }
+  .rank-no { font-size: 12px; font-weight: 800; width: 20px; text-align: center; flex-shrink: 0; }
+  .rank-avatar { font-size: 18px; flex-shrink: 0; }
+  .rank-name { flex: 1; font-weight: 500; }
+  .rank-score-val { font-weight: 700; font-size: 13px; }
+  .rank-team-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  /* 奖品解锁状态 */
+  .prize-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px;
+  }
+  .prize-card-title { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 1px; margin-bottom: 10px; }
+  .prize-status-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+  }
+  .prize-status-row:last-child { border-bottom: none; }
+  .prize-status-icon { font-size: 20px; flex-shrink: 0; }
+  .prize-status-name { flex: 1; }
+  .prize-status-name .pname { font-weight: 600; font-size: 13px; }
+  .prize-status-name .pdesc { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .prize-unlock-btn {
+    font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+    border: none; cursor: pointer; white-space: nowrap;
+  }
+  .prize-unlock-btn.locked  { background: rgba(255,255,255,0.08); color: var(--muted); cursor: not-allowed; }
+  .prize-unlock-btn.unlocked { background: rgba(34,197,94,0.2); color: #4ADE80; border: 1px solid rgba(34,197,94,0.3); }
+  .prize-unlock-btn.claimed  { background: rgba(245,200,66,0.15); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
+
+  /* ─── 浮动贡献飘字 ─── */
+  .fly-text {
+    position: fixed; pointer-events: none; font-size: 16px; font-weight: 800;
+    z-index: 999; animation: flyUp 1.4s ease-out forwards; white-space: nowrap;
+  }
+  @keyframes flyUp {
+    0%   { opacity: 1; transform: translateY(0) scale(1); }
+    60%  { opacity: 1; transform: translateY(-50px) scale(1.2); }
+    100% { opacity: 0; transform: translateY(-100px) scale(0.8); }
+  }
+
+  /* ─── 胜利弹窗 ─── */
+  .win-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+    z-index: 500; display: flex; align-items: center; justify-content: center;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  .win-modal {
+    background: var(--deep); border: 1px solid rgba(245,200,66,0.4);
+    border-radius: 20px; padding: 36px 40px; text-align: center;
+    box-shadow: 0 0 60px rgba(245,200,66,0.2); max-width: 400px; width: 90%;
+    animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes popIn { from{transform:scale(0.7);opacity:0} to{transform:scale(1);opacity:1} }
+  .win-emoji { font-size: 64px; margin-bottom: 12px; display: block; }
+  .win-title  { font-size: 26px; font-weight: 800; color: var(--gold); margin-bottom: 8px; }
+  .win-desc   { font-size: 14px; color: var(--muted); line-height: 1.6; }
+  .win-close-btn {
+    margin-top: 20px; padding: 10px 30px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; color: white; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── 导航栏 ─── -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <span>🎮</span>小游戏<span>中台</span>
+    <em class="nav-badge">DEMO</em>
+  </a>
+  <div class="nav-scroll">
+    <a href="index.html"          class="nav-tab">首页</a>
+    <a href="wheel.html"          class="nav-tab">大转盘</a>
+    <a href="nine-grid.html"      class="nav-tab">九宫格</a>
+    <a href="scratch-card.html"   class="nav-tab">刮刮乐</a>
+    <a href="shake-dice.html"     class="nav-tab">摇骰子</a>
+    <a href="smash-egg.html"      class="nav-tab">砸金蛋</a>
+    <a href="slot-machine.html"   class="nav-tab">老虎机</a>
+    <a href="gift-box.html"       class="nav-tab">礼盒开箱</a>
+    <a href="whack-mole.html"     class="nav-tab">打地鼠</a>
+    <a href="cup-game.html"       class="nav-tab">三杯游戏</a>
+    <a href="number-bomb.html"    class="nav-tab">数字炸弹</a>
+    <a href="stamp-collect.html"  class="nav-tab">集卡集章</a>
+    <a href="vote-pk.html"        class="nav-tab">投票PK</a>
+    <a href="flying-chess.html"   class="nav-tab">飞行棋</a>
+    <a href="monopoly.html"       class="nav-tab">大富翁</a>
+    <a href="red-packet-rain.html" class="nav-tab">红包雨</a>
+    <a href="claw-machine.html"   class="nav-tab">夹娃娃机</a>
+    <a href="flip-match.html"     class="nav-tab">翻牌配对</a>
+    <a href="shake.html"          class="nav-tab">摇一摇</a>
+    <a href="quiz.html"           class="nav-tab">问答闯关</a>
+    <a href="daily-checkin.html"  class="nav-tab">每日签到</a>
+    <a href="team-challenge.html" class="nav-tab active">组队挑战</a>
+  </div>
+</nav>
+
+<!-- ─── 三列主区域 ─── -->
+<div class="main">
+
+  <!-- ===== 左侧配置面板 ===== -->
+  <aside class="panel-left">
+
+    <div class="panel-title">挑战模式</div>
+    <div class="mode-group">
+      <div class="mode-btn active" id="modeBattle" onclick="switchMode('battle')">
+        <span class="mode-icon">⚔️</span>
+        对战模式
+      </div>
+      <div class="mode-btn" id="modeJoint" onclick="switchMode('joint')">
+        <span class="mode-icon">🤝</span>
+        共同挑战
+      </div>
+    </div>
+
+    <div class="panel-title">基本设置</div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>活动名称</div>
+      <input class="f-input f-input-wide" id="activityName" type="text"
+             placeholder="请输入活动名称…" value="Q3营销战役·团队冲刺">
+      <div class="form-row" style="margin-top:10px;">
+        <span class="form-label">目标总分</span>
+        <input class="f-input f-input-sm" id="targetScore" type="number" value="5000" min="100" step="100">
+      </div>
+      <div class="form-row">
+        <span class="form-label">活动时长</span>
+        <input class="f-input f-input-sm" id="activityDuration" type="number" value="72" min="1"> <span style="font-size:12px;color:var(--muted);margin-left:4px;">小时</span>
+      </div>
+    </div>
+
+    <div class="panel-title">队伍设置</div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent2)"></span>队伍数量</div>
+      <div class="team-count-group" id="teamCountGroup">
+        <div class="tc-btn active" onclick="setTeamCount(2)">2支</div>
+        <div class="tc-btn"        onclick="setTeamCount(3)">3支</div>
+        <div class="tc-btn"        onclick="setTeamCount(4)">4支</div>
+      </div>
+
+      <div style="margin-top:14px;" id="teamConfigList">
+        <!-- 队伍配置行由JS动态渲染 -->
+      </div>
+    </div>
+
+    <div class="panel-title">贡献行为配置</div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#4ADE80"></span>行为加分</div>
+      <div class="contrib-row">
+        <span class="contrib-icon">📅</span>
+        <span class="contrib-label">每日签到</span>
+        <input class="contrib-val" id="cv-checkin" type="number" value="10">
+        <span style="font-size:11px;color:var(--muted)">分</span>
+      </div>
+      <div class="contrib-row">
+        <span class="contrib-icon">💰</span>
+        <span class="contrib-label">消费（每元）</span>
+        <input class="contrib-val" id="cv-consume" type="number" value="1">
+        <span style="font-size:11px;color:var(--muted)">分</span>
+      </div>
+      <div class="contrib-row">
+        <span class="contrib-icon">👥</span>
+        <span class="contrib-label">邀请好友</span>
+        <input class="contrib-val" id="cv-invite" type="number" value="30">
+        <span style="font-size:11px;color:var(--muted)">分</span>
+      </div>
+      <div class="contrib-row">
+        <span class="contrib-icon">✅</span>
+        <span class="contrib-label">完成任务</span>
+        <input class="contrib-val" id="cv-task" type="number" value="20">
+        <span style="font-size:11px;color:var(--muted)">分</span>
+      </div>
+    </div>
+
+    <div class="panel-title">奖品配置</div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--gold)"></span>奖励设定</div>
+      <div class="prize-row">
+        <span class="prize-tag gold">达标奖</span>
+        <input class="prize-inp" id="prize-reach" type="text" placeholder="如：88元优惠券" value="88元满减券 × 1">
+      </div>
+      <div class="prize-row">
+        <span class="prize-tag green">完美通关</span>
+        <input class="prize-inp" id="prize-perfect" type="text" placeholder="如：神秘礼盒" value="定制礼盒 + 双倍积分">
+      </div>
+      <div class="prize-row">
+        <span class="prize-tag pink">MVP奖</span>
+        <input class="prize-inp" id="prize-mvp" type="text" placeholder="如：百元红包" value="100元现金红包">
+      </div>
+    </div>
+
+    <button class="apply-btn" onclick="applyConfig()">✓ 应用配置并重置</button>
+
+  </aside>
+
+  <!-- ===== 中间游戏区 ===== -->
+  <section class="panel-center" id="panelCenter">
+
+    <!-- 顶部标题行 -->
+    <div class="center-header">
+      <div>
+        <div class="activity-title" id="displayTitle">Q3营销战役·团队冲刺</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;" id="displaySubtitle">目标：5000分 · 对战模式</div>
+      </div>
+      <span class="mode-tag battle" id="modeTag">⚔️ 对战模式</span>
+    </div>
+
+    <!-- 倒计时 -->
+    <div class="countdown-bar">
+      <div class="cd-icon">⏱️</div>
+      <div>
+        <div class="cd-label">剩余时间</div>
+        <div class="cd-time" id="cdTime">71:59:42</div>
+      </div>
+      <div class="cd-sep"></div>
+      <div class="cd-stat">
+        <div class="val" id="statTeams">2</div>
+        <div class="lbl">参赛队伍</div>
+      </div>
+      <div class="cd-sep"></div>
+      <div class="cd-stat">
+        <div class="val" id="statMembers">24</div>
+        <div class="lbl">参与人数</div>
+      </div>
+      <div class="cd-sep"></div>
+      <div class="cd-stat">
+        <div class="val" id="statContribs">0</div>
+        <div class="lbl">贡献次数</div>
+      </div>
+    </div>
+
+    <!-- 对战模式进度区（默认显示） -->
+    <div class="battle-arena" id="battleArena">
+      <div class="arena-title">⚔️ 队伍进度竞赛 · 先达目标者胜</div>
+      <div id="teamProgressList">
+        <!-- 由 JS 渲染队伍进度条 -->
+      </div>
+    </div>
+
+    <!-- 共同挑战进度区（默认隐藏） -->
+    <div class="joint-arena" id="jointArena" style="display:none;">
+      <div class="joint-header">
+        <div>
+          <div class="joint-total-label">🏆 全体总贡献</div>
+          <div class="joint-total-val" id="jointTotalVal">0</div>
+        </div>
+        <div class="joint-target-info">
+          目标 <span id="jointTargetDisplay">5000</span> 分<br>
+          <span id="jointProgressPct" style="font-size:20px;font-weight:800;color:var(--gold);">0%</span>
+        </div>
+      </div>
+      <!-- 大进度条 -->
+      <div class="joint-track">
+        <div class="joint-fill" id="jointFill" style="width:0%">
+          <span class="joint-fill-pct" id="jointFillPct"></span>
+        </div>
+      </div>
+      <!-- 里程碑 -->
+      <div class="milestones" id="milestonesRow">
+        <!-- 由JS渲染 -->
+      </div>
+      <!-- 各队色块分段 -->
+      <div style="margin-top:20px;font-size:11px;color:var(--muted);margin-bottom:6px;">各队贡献占比</div>
+      <div class="team-contrib-segments" id="contribSegments"></div>
+      <div id="contribSegLegend" style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;"></div>
+    </div>
+
+    <!-- 实时贡献流 -->
+    <div class="feed-section">
+      <div class="feed-header">
+        <div style="display:flex;align-items:center;">
+          <div class="feed-live-dot"></div>
+          实时贡献流
+        </div>
+        <span style="font-size:11px;color:var(--muted);" id="feedCount">0 条记录</span>
+      </div>
+      <div class="feed-list" id="feedList">
+        <!-- 由JS动态插入 -->
+      </div>
+    </div>
+
+    <!-- 底部操作区 -->
+    <div class="submit-area">
+      <button class="submit-btn primary" onclick="manualContrib()">
+        🚀 提交贡献 (+随机)
+      </button>
+      <button class="submit-btn secondary" onclick="toggleAutoSim()" id="simToggleBtn">
+        ⏸️ 暂停模拟
+      </button>
+      <button class="submit-btn secondary" onclick="resetGame()" style="flex:0.5;">
+        🔄 重置
+      </button>
+    </div>
+
+  </section>
+
+  <!-- ===== 右侧数据面板 ===== -->
+  <aside class="panel-right">
+
+    <!-- 我的贡献 -->
+    <div class="my-card">
+      <div class="my-card-title">MY CONTRIBUTION</div>
+      <div class="my-contrib-val" id="myContribVal">0</div>
+      <div class="my-contrib-sub">我的总贡献分</div>
+      <div class="my-rank-row">
+        <div class="my-rank-item">
+          <div class="rv" id="myPersonalRank">—</div>
+          <div class="rl">个人排名</div>
+        </div>
+        <div class="my-rank-item">
+          <div class="rv" id="myTeamName" style="font-size:14px;">—</div>
+          <div class="rl">所在队伍</div>
+        </div>
+        <div class="my-rank-item">
+          <div class="rv" id="myContribTimes">0</div>
+          <div class="rl">贡献次数</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 队伍总分排行 -->
+    <div class="team-score-card">
+      <div class="ts-title">TEAM RANKING</div>
+      <div id="teamRankList">
+        <!-- 由JS渲染 -->
+      </div>
+    </div>
+
+    <!-- 个人贡献排行 -->
+    <div class="rank-card">
+      <div class="rank-card-title">TOP CONTRIBUTORS</div>
+      <div id="personalRankList">
+        <!-- 由JS渲染 -->
+      </div>
+    </div>
+
+    <!-- 奖品解锁状态 -->
+    <div class="prize-card">
+      <div class="prize-card-title">PRIZE STATUS</div>
+      <div id="prizeStatusList">
+        <!-- 由JS渲染 -->
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- 胜利弹窗 -->
+<div class="win-overlay" id="winOverlay" style="display:none;">
+  <div class="win-modal">
+    <span class="win-emoji" id="winEmoji">🏆</span>
+    <div class="win-title" id="winTitle">挑战成功！</div>
+    <div class="win-desc" id="winDesc">恭喜完成本次挑战</div>
+    <button class="win-close-btn" onclick="closeWin()">🎉 领取奖励</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   全局状态
+═══════════════════════════════════════════════════ */
+let gameMode = 'battle';       // 'battle' | 'joint'
+let teamCount = 2;
+let targetScore = 5000;
+let activityHours = 72;
+let autoSimRunning = true;
+let simInterval = null;
+let countdownInterval = null;
+let contribCount = 0;
+let totalSeconds = 72 * 3600;
+let winShown = false;
+
+/* 四队预设 */
+const TEAM_DEFAULTS = [
+  { emoji: '🔴', name: '赤焰战队', color: '#EF4444', glow: 'rgba(239,68,68,0.4)' },
+  { emoji: '🔵', name: '青龙战队', color: '#3B82F6', glow: 'rgba(59,130,246,0.4)' },
+  { emoji: '🟡', name: '金鹰战队', color: '#F5C842', glow: 'rgba(245,200,66,0.4)' },
+  { emoji: '🟢', name: '翠玉战队', color: '#22C55E', glow: 'rgba(34,197,94,0.4)' },
+];
+
+/* 虚拟成员名字库 */
+const MEMBER_NAMES = [
+  '张伟','李娜','王芳','刘洋','陈静','杨光','赵磊','黄敏',
+  '周婷','吴浩','郑莉','孙强','朱燕','徐刚','何梅','马超',
+  '胡军','林萍','高鑫','梁丽','郭涛','谢欣','韩冬','唐婷',
+];
+
+/* 贡献动作库 */
+const CONTRIB_ACTIONS = [
+  { label: '完成签到',  points: () => parseInt(document.getElementById('cv-checkin').value)||10 },
+  { label: '购物消费',  points: () => (Math.floor(Math.random()*80)+20) * (parseInt(document.getElementById('cv-consume').value)||1) },
+  { label: '邀请好友',  points: () => parseInt(document.getElementById('cv-invite').value)||30 },
+  { label: '完成任务',  points: () => parseInt(document.getElementById('cv-task').value)||20 },
+];
+
+/* 当前队伍数据 */
+let teams = [];
+/* 成员数据（虚拟） */
+let members = [];
+/* 贡献记录 */
+let feedRecords = [];
+/* 当前我的队伍索引（固定为队伍0的首位成员） */
+const MY_MEMBER_IDX = 0;
+
+/* 里程碑百分比 */
+const MILESTONES = [25, 50, 75, 100];
+
+/* ═══════════════════════════════════════════════════
+   初始化
+═══════════════════════════════════════════════════ */
+function init() {
+  winShown = false;
+  buildTeamsData();
+  renderTeamConfigLeft();
+  renderBattleProgress();
+  renderJointArena();
+  renderTeamRank();
+  renderPersonalRank();
+  renderPrizeStatus();
+  updateMyCard();
+  updateHeader();
+  startCountdown();
+  startAutoSim();
+}
+
+/* 构建队伍与成员数据 */
+function buildTeamsData() {
+  teams = [];
+  members = [];
+  for (let i = 0; i < teamCount; i++) {
+    teams.push({
+      idx: i,
+      emoji:   TEAM_DEFAULTS[i].emoji,
+      name:    TEAM_DEFAULTS[i].name,
+      color:   TEAM_DEFAULTS[i].color,
+      glow:    TEAM_DEFAULTS[i].glow,
+      score:   Math.floor(Math.random() * 400),  // 初始随机分数，增加趣味性
+      done:    false,
+      rank:    0,
+    });
+  }
+  /* 每队随机6名成员 */
+  let memberPool = [...MEMBER_NAMES].sort(() => Math.random()-0.5);
+  let pi = 0;
+  for (let i = 0; i < teamCount; i++) {
+    for (let j = 0; j < 6; j++) {
+      members.push({
+        name:    memberPool[pi++ % memberPool.length],
+        teamIdx: i,
+        score:   Math.floor(Math.random() * 200),
+        contribs: Math.floor(Math.random()*8),
+        avatar:  ['😎','🤩','💪','🔥','⚡','🌟','🎯','🚀','💡','🏆'][Math.floor(Math.random()*10)],
+      });
+    }
+  }
+  /* 把"我"设为第0队第0名成员 */
+  members[0].name = '我';
+  members[0].avatar = '😸';
+}
+
+/* ═══════════════════════════════════════════════════
+   左侧：渲染队伍配置行
+═══════════════════════════════════════════════════ */
+function renderTeamConfigLeft() {
+  const list = document.getElementById('teamConfigList');
+  list.innerHTML = '';
+  for (let i = 0; i < teamCount; i++) {
+    const t = teams[i];
+    list.innerHTML += `
+      <div class="team-config-row" id="teamCfgRow${i}">
+        <div class="team-emoji-badge" style="background:${t.color}22;border-color:${t.color}66;color:${t.color};">
+          ${t.emoji}
+        </div>
+        <input class="team-name-inp" id="teamNameInp${i}" type="text" value="${t.name}" placeholder="队伍名称"
+               onchange="onTeamNameChange(${i}, this.value)">
+        <div class="team-score-badge" id="teamCfgScore${i}">${t.score}分</div>
+      </div>
+    `;
+  }
+  /* 高亮队伍数量选择 */
+  document.querySelectorAll('.tc-btn').forEach((btn, idx) => {
+    btn.classList.toggle('active', idx + 2 === teamCount);
+  });
+}
+
+/* 队伍名称修改 */
+function onTeamNameChange(idx, val) {
+  teams[idx].name = val.trim() || TEAM_DEFAULTS[idx].name;
+  renderBattleProgress();
+  renderTeamRank();
+}
+
+/* ═══════════════════════════════════════════════════
+   模式切换
+═══════════════════════════════════════════════════ */
+function switchMode(mode) {
+  gameMode = mode;
+  document.getElementById('modeBattle').classList.toggle('active', mode === 'battle');
+  document.getElementById('modeJoint').classList.toggle('active', mode === 'joint');
+  document.getElementById('battleArena').style.display = mode === 'battle' ? '' : 'none';
+  document.getElementById('jointArena').style.display  = mode === 'joint'  ? '' : 'none';
+  const tag = document.getElementById('modeTag');
+  if (mode === 'battle') {
+    tag.textContent = '⚔️ 对战模式';
+    tag.className = 'mode-tag battle';
+  } else {
+    tag.textContent = '🤝 共同挑战';
+    tag.className = 'mode-tag joint';
+  }
+  updateHeader();
+}
+
+/* ═══════════════════════════════════════════════════
+   队伍数量切换
+═══════════════════════════════════════════════════ */
+function setTeamCount(n) {
+  teamCount = n;
+  buildTeamsData();
+  renderTeamConfigLeft();
+  renderBattleProgress();
+  renderJointArena();
+  renderTeamRank();
+  renderPersonalRank();
+  renderPrizeStatus();
+  updateMyCard();
+  updateHeader();
+}
+
+/* ═══════════════════════════════════════════════════
+   应用配置
+═══════════════════════════════════════════════════ */
+function applyConfig() {
+  const nameVal = document.getElementById('activityName').value.trim();
+  targetScore   = parseInt(document.getElementById('targetScore').value) || 5000;
+  activityHours = parseInt(document.getElementById('activityDuration').value) || 72;
+  totalSeconds  = activityHours * 3600;
+  winShown      = false;
+
+  /* 同步队伍名称 */
+  for (let i = 0; i < teamCount; i++) {
+    const inp = document.getElementById(`teamNameInp${i}`);
+    if (inp) teams[i].name = inp.value.trim() || TEAM_DEFAULTS[i].name;
+  }
+
+  /* 重置分数 */
+  teams.forEach(t => { t.score = 0; t.done = false; });
+  members.forEach(m => { m.score = 0; m.contribs = 0; });
+  feedRecords = [];
+  contribCount = 0;
+
+  document.getElementById('activityTitle') && (document.getElementById('activityTitle').textContent = nameVal);
+  document.querySelector('.activity-title').textContent = nameVal || 'Q3营销战役·团队冲刺';
+
+  updateHeader();
+  renderBattleProgress();
+  renderJointArena();
+  renderTeamRank();
+  renderPersonalRank();
+  renderPrizeStatus();
+  updateMyCard();
+  renderFeed();
+  document.getElementById('statContribs').textContent = '0';
+
+  /* 重启倒计时 */
+  clearInterval(countdownInterval);
+  startCountdown();
+
+  showToast('配置已应用 ✓');
+}
+
+/* ═══════════════════════════════════════════════════
+   更新顶部标题/副标题
+═══════════════════════════════════════════════════ */
+function updateHeader() {
+  const subtitle = gameMode === 'battle'
+    ? `目标：${targetScore}分 · 对战模式 · 先达目标者胜`
+    : `总目标：${targetScore}分 · 共同挑战 · 全员达成解锁大奖`;
+  document.getElementById('displaySubtitle').textContent = subtitle;
+  document.getElementById('statTeams').textContent   = teamCount;
+  document.getElementById('statMembers').textContent = teamCount * 6;
+  document.getElementById('jointTargetDisplay').textContent = targetScore;
+}
+
+/* ═══════════════════════════════════════════════════
+   渲染对战模式进度条
+═══════════════════════════════════════════════════ */
+function renderBattleProgress() {
+  const container = document.getElementById('teamProgressList');
+  container.innerHTML = '';
+
+  /* 按分数排名 */
+  const sorted = [...teams].sort((a,b) => b.score - a.score);
+  sorted.forEach((t, rank) => { teams[t.idx].rank = rank + 1; });
+
+  teams.slice(0, teamCount).forEach(t => {
+    const pct = Math.min(100, Math.round(t.score / targetScore * 100));
+    const isWinner = t.done && t.rank === 1;
+    container.innerHTML += `
+      <div class="team-row" id="teamRow${t.idx}">
+        <div class="team-badge ${isWinner?'winner':''}"
+             style="background:${t.color}22;border-color:${t.color}66;">${t.emoji}</div>
+        <div class="team-info">
+          <div class="team-name" style="color:${t.color};">${t.name}</div>
+          <div class="team-members">6名成员</div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-track">
+            <div class="progress-fill" id="fill${t.idx}"
+                 style="width:${pct}%;background:linear-gradient(90deg,${t.color}99,${t.color});">
+              <span class="progress-pct">${pct>8?pct+'%':''}</span>
+            </div>
+            <!-- 目标线 -->
+            <div class="target-line" style="left:100%;">
+              <div class="target-label">目标</div>
+            </div>
+          </div>
+        </div>
+        <div class="progress-score" style="color:${t.color};">${t.score.toLocaleString()}</div>
+        ${t.done ? '<div class="done-badge">✓ 达标</div>' : ''}
+      </div>
+    `;
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   渲染共同挑战区
+═══════════════════════════════════════════════════ */
+function renderJointArena() {
+  const total = teams.slice(0, teamCount).reduce((s, t) => s + t.score, 0);
+  const pct   = Math.min(100, Math.round(total / targetScore * 100));
+
+  document.getElementById('jointTotalVal').textContent    = total.toLocaleString();
+  document.getElementById('jointProgressPct').textContent = pct + '%';
+  document.getElementById('jointFill').style.width        = pct + '%';
+  document.getElementById('jointFillPct').textContent     = pct >= 10 ? pct + '%' : '';
+
+  /* 里程碑 */
+  const msRow = document.getElementById('milestonesRow');
+  msRow.innerHTML = '';
+  msRow.style.height = '40px';
+  MILESTONES.forEach(mp => {
+    const reached = pct >= mp;
+    const node = document.createElement('div');
+    node.className = 'milestone-node';
+    node.style.left = mp + '%';
+    node.innerHTML = `
+      <div class="milestone-dot ${reached ? 'reached' : ''}"></div>
+      <div class="milestone-label ${reached ? 'reached' : ''}">${mp}%<br>${Math.round(targetScore*mp/100).toLocaleString()}</div>
+    `;
+    msRow.appendChild(node);
+  });
+
+  /* 各队色块分段 */
+  const segs = document.getElementById('contribSegments');
+  const legend = document.getElementById('contribSegLegend');
+  segs.innerHTML = '';
+  legend.innerHTML = '';
+  teams.slice(0, teamCount).forEach(t => {
+    const seg = document.createElement('div');
+    seg.className = 'seg-item';
+    seg.style.flex = t.score;
+    seg.style.background = t.color;
+    seg.title = `${t.name}：${t.score}分`;
+    segs.appendChild(seg);
+
+    legend.innerHTML += `
+      <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);">
+        <div style="width:8px;height:8px;border-radius:2px;background:${t.color};flex-shrink:0;"></div>
+        ${t.emoji} ${t.name}
+      </div>
+    `;
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   渲染队伍排名（右侧）
+═══════════════════════════════════════════════════ */
+function renderTeamRank() {
+  const sorted = [...teams].slice(0, teamCount).sort((a,b) => b.score - a.score);
+  const rankColors = ['rank1','rank2','rank3',''];
+  const medals = ['🥇','🥈','🥉','4️⃣'];
+  document.getElementById('teamRankList').innerHTML = sorted.map((t, i) => `
+    <div class="ts-row">
+      <span class="ts-rank-no ${rankColors[i]}">${medals[i]}</span>
+      <span class="ts-emoji">${t.emoji}</span>
+      <span class="ts-name" style="color:${t.color};">${t.name}</span>
+      <span class="ts-score">${t.score.toLocaleString()}</span>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════════════════════════════════════════
+   渲染个人贡献排行（右侧）
+═══════════════════════════════════════════════════ */
+function renderPersonalRank() {
+  const sorted = [...members].sort((a,b) => b.score - a.score).slice(0, 8);
+  const medals = ['🥇','🥈','🥉'];
+  document.getElementById('personalRankList').innerHTML = sorted.map((m, i) => {
+    const t = teams[m.teamIdx];
+    return `
+      <div class="rank-item">
+        <span class="rank-no ${i<3?['rank1','rank2','rank3'][i]:''}">${i<3?medals[i]:i+1}</span>
+        <span class="rank-avatar">${m.avatar}</span>
+        <span class="rank-name">${m.name}</span>
+        <div class="rank-team-dot" style="background:${t?t.color:'#888'};"></div>
+        <span class="rank-score-val" style="color:${t?t.color:'var(--text)'};">${m.score}</span>
+      </div>
+    `;
+  }).join('');
+
+  /* 同步更新我的排名 */
+  const myRank = sorted.findIndex(m => m === members[MY_MEMBER_IDX]);
+  document.getElementById('myPersonalRank').textContent = myRank >= 0 ? `#${myRank+1}` : '—';
+}
+
+/* ═══════════════════════════════════════════════════
+   渲染奖品解锁（右侧）
+═══════════════════════════════════════════════════ */
+function renderPrizeStatus() {
+  const total = teams.slice(0, teamCount).reduce((s,t) => s+t.score, 0);
+  const myTeam = teams[members[MY_MEMBER_IDX].teamIdx];
+  const teamReached = myTeam && myTeam.score >= targetScore;
+  const allReached  = teams.slice(0, teamCount).every(t => t.score >= targetScore);
+  const isMVP = members[MY_MEMBER_IDX] === [...members].sort((a,b)=>b.score-a.score)[0];
+
+  const prizes = [
+    { icon: '🎁', name: '达标奖',  desc: document.getElementById('prize-reach').value,
+      state: teamReached ? (myTeam.done === 'claimed' ? 'claimed' : 'unlocked') : 'locked' },
+    { icon: '🏆', name: '完美通关', desc: document.getElementById('prize-perfect').value,
+      state: allReached ? 'unlocked' : 'locked' },
+    { icon: '👑', name: 'MVP奖',    desc: document.getElementById('prize-mvp').value,
+      state: isMVP ? 'unlocked' : 'locked' },
+  ];
+  document.getElementById('prizeStatusList').innerHTML = prizes.map(p => `
+    <div class="prize-status-row">
+      <span class="prize-status-icon">${p.icon}</span>
+      <div class="prize-status-name">
+        <div class="pname">${p.name}</div>
+        <div class="pdesc">${p.desc}</div>
+      </div>
+      <button class="prize-unlock-btn ${p.state}"
+              onclick="claimPrize('${p.name}','${p.state}')">
+        ${ p.state==='locked' ? '🔒 待解锁' : p.state==='claimed' ? '✓ 已领取' : '🎉 领取' }
+      </button>
+    </div>
+  `).join('');
+}
+
+/* 领取奖品 */
+function claimPrize(name, state) {
+  if (state === 'locked')  { showToast('条件未达成，继续努力！'); return; }
+  if (state === 'claimed') { showToast('已经领取过了 ~');         return; }
+  showToast(`🎉 ${name} 领取成功！`);
+  renderPrizeStatus();
+}
+
+/* ═══════════════════════════════════════════════════
+   我的卡片更新
+═══════════════════════════════════════════════════ */
+function updateMyCard() {
+  const me = members[MY_MEMBER_IDX];
+  document.getElementById('myContribVal').textContent   = me.score;
+  document.getElementById('myContribTimes').textContent = me.contribs;
+  const myTeam = teams[me.teamIdx];
+  document.getElementById('myTeamName').textContent = myTeam ? myTeam.emoji + ' ' + myTeam.name : '—';
+}
+
+/* ═══════════════════════════════════════════════════
+   贡献流渲染
+═══════════════════════════════════════════════════ */
+function renderFeed() {
+  const feedList  = document.getElementById('feedList');
+  const feedCount = document.getElementById('feedCount');
+  feedList.innerHTML = feedRecords.slice(-30).reverse().map(r => {
+    const t = teams[r.teamIdx];
+    return `
+      <div class="feed-item">
+        <div class="feed-avatar" style="background:${t?t.color+'22':'rgba(255,255,255,0.08)'};">${r.avatar}</div>
+        <span class="feed-name">${r.name}</span>
+        <span class="feed-action">${r.action}</span>
+        <span class="feed-contrib" style="color:${t?t.color:'var(--gold)'};">+${r.points}</span>
+        <span class="feed-time">${r.time}</span>
+      </div>
+    `;
+  }).join('');
+  feedCount.textContent = `${feedRecords.length} 条记录`;
+}
+
+/* ═══════════════════════════════════════════════════
+   添加一次贡献
+═══════════════════════════════════════════════════ */
+function addContrib(memberIdx, actionIdx, el) {
+  const m      = members[memberIdx];
+  const t      = teams[m.teamIdx];
+  if (!t || t.done) return;
+
+  const action  = CONTRIB_ACTIONS[actionIdx];
+  const pts     = Math.max(5, Math.min(200, action.points() + Math.floor(Math.random()*10)-5));
+
+  m.score   += pts;
+  m.contribs++;
+  t.score   += pts;
+  contribCount++;
+
+  const now  = new Date();
+  const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  feedRecords.push({ name: m.name, avatar: m.avatar, teamIdx: m.teamIdx, action: action.label, points: pts, time });
+
+  /* 飘字动画 */
+  spawnFlyText(`+${pts}`, t.color, el);
+
+  /* 更新分数角标 */
+  const cfgScore = document.getElementById(`teamCfgScore${t.idx}`);
+  if (cfgScore) cfgScore.textContent = t.score + '分';
+
+  /* 检查达标 */
+  if (t.score >= targetScore && !t.done) {
+    t.done = true;
+    if (gameMode === 'battle') {
+      const isFirst = !teams.slice(0,teamCount).some(tt => tt !== t && tt.done);
+      if (isFirst) triggerWin('battle', t);
+    }
+  }
+  if (gameMode === 'joint') {
+    const total = teams.slice(0,teamCount).reduce((s,tt)=>s+tt.score,0);
+    if (total >= targetScore && !winShown) triggerWin('joint', null);
+  }
+
+  document.getElementById('statContribs').textContent = contribCount;
+  updateMyCard();
+  renderBattleProgress();
+  renderJointArena();
+  renderTeamRank();
+  renderPersonalRank();
+  renderPrizeStatus();
+  renderFeed();
+}
+
+/* ═══════════════════════════════════════════════════
+   飘字效果
+═══════════════════════════════════════════════════ */
+function spawnFlyText(text, color, refEl) {
+  const el = document.createElement('div');
+  el.className = 'fly-text';
+  el.textContent = text;
+  el.style.color = color || 'var(--gold)';
+  /* 随机落点在游戏区中央附近 */
+  const center = document.getElementById('panelCenter').getBoundingClientRect();
+  el.style.left = (center.left + center.width  * (0.3 + Math.random()*0.4)) + 'px';
+  el.style.top  = (center.top  + center.height * (0.3 + Math.random()*0.4)) + 'px';
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+
+/* ═══════════════════════════════════════════════════
+   手动提交贡献
+═══════════════════════════════════════════════════ */
+function manualContrib() {
+  /* 我（队伍0成员0）提交一次随机贡献 */
+  const actionIdx = Math.floor(Math.random() * CONTRIB_ACTIONS.length);
+  addContrib(MY_MEMBER_IDX, actionIdx);
+}
+
+/* ═══════════════════════════════════════════════════
+   自动模拟：每2秒随机一个成员贡献
+═══════════════════════════════════════════════════ */
+function startAutoSim() {
+  clearInterval(simInterval);
+  simInterval = setInterval(() => {
+    if (!autoSimRunning) return;
+    /* 随机成员（非我）贡献 */
+    const others = members.map((_,i)=>i).filter(i=>i!==MY_MEMBER_IDX);
+    const mIdx   = others[Math.floor(Math.random()*others.length)];
+    const aIdx   = Math.floor(Math.random()*CONTRIB_ACTIONS.length);
+    addContrib(mIdx, aIdx);
+  }, 2000);
+}
+
+/* 暂停/继续模拟 */
+function toggleAutoSim() {
+  autoSimRunning = !autoSimRunning;
+  const btn = document.getElementById('simToggleBtn');
+  btn.textContent = autoSimRunning ? '⏸️ 暂停模拟' : '▶️ 继续模拟';
+}
+
+/* ═══════════════════════════════════════════════════
+   倒计时
+═══════════════════════════════════════════════════ */
+function startCountdown() {
+  let remaining = totalSeconds;
+  updateCdDisplay(remaining);
+  countdownInterval = setInterval(() => {
+    remaining = Math.max(0, remaining - 1);
+    updateCdDisplay(remaining);
+    if (remaining === 0) {
+      clearInterval(countdownInterval);
+      clearInterval(simInterval);
+      if (!winShown) {
+        /* 时间到，显示结算 */
+        const winner = [...teams].slice(0,teamCount).sort((a,b)=>b.score-a.score)[0];
+        triggerWin('timeout', winner);
+      }
+    }
+  }, 1000);
+}
+
+function updateCdDisplay(sec) {
+  const h = Math.floor(sec/3600);
+  const m = Math.floor((sec%3600)/60);
+  const s = sec % 60;
+  document.getElementById('cdTime').textContent =
+    `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  /* 最后10分钟变红 */
+  document.getElementById('cdTime').style.color = sec < 600 ? 'var(--accent2)' : 'var(--gold)';
+}
+
+/* ═══════════════════════════════════════════════════
+   胜利弹窗
+═══════════════════════════════════════════════════ */
+function triggerWin(type, team) {
+  if (winShown) return;
+  winShown = true;
+  clearInterval(simInterval);
+
+  const overlay = document.getElementById('winOverlay');
+  const emoji   = document.getElementById('winEmoji');
+  const title   = document.getElementById('winTitle');
+  const desc    = document.getElementById('winDesc');
+
+  if (type === 'battle' && team) {
+    emoji.textContent = team.emoji;
+    title.textContent = `${team.name} 率先达标！`;
+    desc.innerHTML    = `🎉 恭喜 <strong style="color:${team.color}">${team.name}</strong> 以 <strong>${team.score}</strong> 分率先完成目标，荣获本次挑战冠军！<br><br>全队成员均可领取达标奖励。`;
+  } else if (type === 'joint') {
+    emoji.textContent = '🏆';
+    title.textContent = '全员挑战成功！';
+    const total = teams.slice(0,teamCount).reduce((s,t)=>s+t.score,0);
+    desc.innerHTML    = `🎊 太棒了！全体团队齐心协力，累计贡献 <strong style="color:var(--gold)">${total.toLocaleString()} 分</strong>，超额完成目标！<br><br>完美通关大奖已解锁，快去领取吧！`;
+  } else if (type === 'timeout') {
+    emoji.textContent = team ? team.emoji : '⏰';
+    title.textContent = '活动结束！';
+    desc.innerHTML    = team
+      ? `⏰ 活动时间结束。<strong style="color:${team.color}">${team.name}</strong> 以 <strong>${team.score}</strong> 分领跑排行，获得最终胜利！`
+      : '⏰ 活动时间已结束，感谢所有参与者的努力！';
+  }
+  overlay.style.display = 'flex';
+}
+
+function closeWin() {
+  document.getElementById('winOverlay').style.display = 'none';
+}
+
+/* ═══════════════════════════════════════════════════
+   重置游戏
+═══════════════════════════════════════════════════ */
+function resetGame() {
+  clearInterval(simInterval);
+  clearInterval(countdownInterval);
+  winShown = false;
+  autoSimRunning = true;
+  contribCount = 0;
+  feedRecords = [];
+  totalSeconds = activityHours * 3600;
+  document.getElementById('simToggleBtn').textContent = '⏸️ 暂停模拟';
+  document.getElementById('winOverlay').style.display = 'none';
+  buildTeamsData();
+  renderTeamConfigLeft();
+  renderBattleProgress();
+  renderJointArena();
+  renderTeamRank();
+  renderPersonalRank();
+  renderPrizeStatus();
+  updateMyCard();
+  renderFeed();
+  document.getElementById('statContribs').textContent = '0';
+  startCountdown();
+  startAutoSim();
+  showToast('🔄 游戏已重置');
+}
+
+/* ═══════════════════════════════════════════════════
+   Toast 提示
+═══════════════════════════════════════════════════ */
+function showToast(msg) {
+  const el = document.createElement('div');
+  el.textContent = msg;
+  Object.assign(el.style, {
+    position: 'fixed', bottom: '30px', left: '50%', transform: 'translateX(-50%)',
+    background: 'rgba(26,10,46,0.95)', border: '1px solid var(--border)',
+    color: 'var(--text)', padding: '10px 20px', borderRadius: '20px',
+    fontSize: '13px', fontWeight: '600', zIndex: '9999',
+    animation: 'feedIn 0.25s ease', backdropFilter: 'blur(8px)',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+  });
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2200);
+}
+
+/* ═══════════════════════════════════════════════════
+   启动
+═══════════════════════════════════════════════════ */
+init();
+</script>
+</body>
+</html>
