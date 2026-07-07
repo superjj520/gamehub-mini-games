@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameHub · 游戏配置化地图</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --gold:#F5C842; --bg:#0D0720; --accent:#7C3AED; --accent2:#EC4899;
+  --deep:#1A0A2E; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1);
+  --text:#F0EAF8; --muted:rgba(240,234,248,0.55); --green:#22C55E; --blue:#3B82F6;
+}
+body { font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif; background:var(--bg); color:var(--text); }
+
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:0 32px; height:56px; border-bottom:1px solid var(--border); background:rgba(13,7,32,0.97); position:sticky; top:0; z-index:100; }
+.topbar-logo { font-size:17px; font-weight:800; }
+.topbar-logo span { color:var(--gold); }
+.topbar-nav a { padding:5px 13px; border-radius:20px; font-size:13px; color:var(--muted); text-decoration:none; border:1px solid transparent; margin-left:4px; transition:all 0.2s; }
+.topbar-nav a:hover { color:var(--text); border-color:var(--border); }
+
+.page { max-width:1100px; margin:0 auto; padding:36px 32px 80px; }
+.page-title { font-size:26px; font-weight:800; margin-bottom:6px; }
+.page-sub { font-size:14px; color:var(--muted); margin-bottom:32px; }
+
+/* 筛选栏 */
+.filter-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
+.filter-btn { padding:6px 16px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); transition:all 0.2s; }
+.filter-btn:hover, .filter-btn.active { border-color:var(--accent); background:rgba(124,58,237,0.15); color:var(--text); }
+.filter-btn.active { color:var(--gold); border-color:var(--gold); background:rgba(245,200,66,0.08); }
+
+/* 游戏卡片网格 */
+.games-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:14px; }
+
+/* 游戏卡片 */
+.game-card {
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  overflow:hidden; transition:border-color 0.2s, transform 0.2s;
+}
+.game-card:hover { border-color:rgba(124,58,237,0.4); transform:translateY(-2px); }
+.game-card.url-supported { border-color:rgba(34,197,94,0.25); }
+.game-card.url-supported:hover { border-color:rgba(34,197,94,0.6); }
+
+.gc-head { padding:14px 16px 10px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--border); }
+.gc-icon { font-size:24px; flex-shrink:0; }
+.gc-info { flex:1; min-width:0; }
+.gc-name { font-size:15px; font-weight:700; }
+.gc-file { font-size:11px; color:var(--muted); font-family:monospace; margin-top:1px; }
+.gc-badges { display:flex; gap:5px; flex-wrap:wrap; }
+.badge { display:inline-block; padding:2px 7px; border-radius:5px; font-size:10px; font-weight:700; }
+.badge-green  { background:rgba(34,197,94,0.15);  color:var(--green); border:1px solid rgba(34,197,94,0.3); }
+.badge-gold   { background:rgba(245,200,66,0.12); color:var(--gold);  border:1px solid rgba(245,200,66,0.25); }
+.badge-purple { background:rgba(124,58,237,0.15); color:#a78bfa;     border:1px solid rgba(124,58,237,0.25); }
+.badge-gray   { background:rgba(255,255,255,0.06); color:var(--muted);border:1px solid var(--border); }
+.badge-blue   { background:rgba(59,130,246,0.12); color:#93c5fd;     border:1px solid rgba(59,130,246,0.25); }
+.badge-pink   { background:rgba(236,72,153,0.12); color:#f472b6;     border:1px solid rgba(236,72,153,0.25); }
+
+.gc-body { padding:12px 16px; }
+
+/* 配置项列表 */
+.config-section { margin-bottom:10px; }
+.config-section-title { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+.config-items { display:flex; flex-wrap:wrap; gap:4px; }
+.config-item {
+  display:flex; align-items:center; gap:4px;
+  padding:3px 8px; border-radius:6px; font-size:11px; font-weight:600;
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+  color:var(--text);
+}
+.config-item .ci-icon { font-size:11px; opacity:0.7; }
+.config-item.highlight { background:rgba(124,58,237,0.1); border-color:rgba(124,58,237,0.25); color:#c4b5fd; }
+.config-item.url-ready { background:rgba(34,197,94,0.08); border-color:rgba(34,197,94,0.25); color:rgba(34,197,94,0.9); }
+
+/* 功能行 */
+.feature-row { display:flex; gap:5px; flex-wrap:wrap; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.05); }
+
+/* TODO提示 */
+.todo-hint { font-size:11px; color:rgba(245,200,66,0.7); background:rgba(245,200,66,0.06); border:1px solid rgba(245,200,66,0.15); border-radius:6px; padding:5px 10px; margin-top:8px; line-height:1.6; }
+
+/* 统计区 */
+.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:28px; }
+.stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; text-align:center; }
+.stat-num { font-size:28px; font-weight:800; color:var(--gold); }
+.stat-label { font-size:11px; color:var(--muted); margin-top:4px; }
+
+/* 说明框 */
+.info-box { border-radius:12px; padding:14px 18px; margin-bottom:24px; font-size:13px; line-height:1.8; }
+.info-purple { background:rgba(124,58,237,0.08); border:1px solid rgba(124,58,237,0.2); }
+.code { font-family:monospace; background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:4px; font-size:12px; color:#a78bfa; }
+
+@media(max-width:700px) {
+  .stats-row { grid-template-columns:repeat(2,1fr); }
+  .games-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">🎮 <span>GameHub</span> 配置化地图</div>
+  <nav class="topbar-nav">
+    <a href="index.html">← 首页</a>
+    <a href="builder.html">🚀 生成器</a>
+    <a href="docs-framework.html">📖 框架文档</a>
+  </nav>
+</div>
+
+<div class="page">
+  <div class="page-title">51个游戏 · 配置化全景地图</div>
+  <div class="page-sub">每个游戏有哪些配置项、现在支持什么、还需要做什么</div>
+
+  <!-- 统计 -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num">51</div>
+      <div class="stat-label">游戏总数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--green)">6</div>
+      <div class="stat-label">支持 URL 配置化</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:#a78bfa">45</div>
+      <div class="stat-label">有左侧配置面板</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--accent2)">45</div>
+      <div class="stat-label">待接入 URL 配置</div>
+    </div>
+  </div>
+
+  <!-- 说明 -->
+  <div class="info-box info-purple">
+    <strong>配置化分两层</strong>：①「左侧面板配置」——用户在游戏页内手动调参，刷新后重置；②「URL配置（?c=）」——配置编码进链接，发给任何人打开即生效，是对外开放的关键。<br>
+    <span style="color:var(--green)">绿色边框</span>= 已支持URL配置。<span style="color:var(--gold)">金色标签</span>= 核心可配项。后续优先把高价值游戏的左侧面板配置项搬进URL参数。
+  </div>
+
+  <!-- 筛选 -->
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCards('all',this)">全部 (51)</button>
+    <button class="filter-btn" onclick="filterCards('url',this)">✓ 已URL配置 (6)</button>
+    <button class="filter-btn" onclick="filterCards('lottery',this)">🎰 抽奖类 (12)</button>
+    <button class="filter-btn" onclick="filterCards('action',this)">🕹️ 操作类 (11)</button>
+    <button class="filter-btn" onclick="filterCards('puzzle',this)">🧩 益智类 (13)</button>
+    <button class="filter-btn" onclick="filterCards('social',this)">💬 社交互动 (8)</button>
+    <button class="filter-btn" onclick="filterCards('board',this)">🎲 棋盘养成 (5)</button>
+    <button class="filter-btn" onclick="filterCards('tool',this)">✨ 工具类 (2)</button>
+  </div>
+
+  <!-- 游戏卡片 -->
+  <div class="games-grid" id="gamesGrid">
+
+    <!-- ═══ 抽奖类 ═══ -->
+    <div class="game-card url-supported" data-cat="lottery" data-url="1">
+      <div class="gc-head">
+        <div class="gc-icon">🎡</div>
+        <div class="gc-info">
+          <div class="gc-name">大转盘</div>
+          <div class="gc-file">wheel.html</div>
+        </div>
+        <div class="gc-badges">
+          <span class="badge badge-green">✓ URL配置</span>
+          <span class="badge badge-gold">重点</span>
+        </div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight"><span class="ci-icon">🎁</span>奖品池（名称/概率/颜色）</div>
+            <div class="config-item highlight"><span class="ci-icon">🔢</span>每日次数上限</div>
+            <div class="config-item highlight"><span class="ci-icon">🛡️</span>保底机制（第N次必中）</div>
+            <div class="config-item highlight"><span class="ci-icon">🎨</span>4套皮肤切换</div>
+            <div class="config-item"><span class="ci-icon">📊</span>实时数据看板</div>
+            <div class="config-item"><span class="ci-icon">📋</span>中奖记录</div>
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">🔗 URL ?c= 已支持</div>
+          <div class="config-items">
+            <div class="config-item url-ready">标题/副标题</div>
+            <div class="config-item url-ready">奖品名称/emoji/概率/颜色</div>
+            <div class="config-item url-ready">每日次数</div>
+            <div class="config-item url-ready">皮肤</div>
+            <div class="config-item url-ready">embed嵌入模式</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 可补充：保底N次配置、活动截止时间、中奖通知文案</div>
+      </div>
+    </div>
+
+    <div class="game-card url-supported" data-cat="lottery" data-url="1">
+      <div class="gc-head">
+        <div class="gc-icon">🔲</div>
+        <div class="gc-info">
+          <div class="gc-name">九宫格</div>
+          <div class="gc-file">nine-grid.html</div>
+        </div>
+        <div class="gc-badges">
+          <span class="badge badge-green">✓ URL配置</span>
+        </div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">8个格子奖品（名称/概率/颜色）</div>
+            <div class="config-item highlight">每日次数上限</div>
+            <div class="config-item highlight">保底机制</div>
+            <div class="config-item">实时数据</div>
+            <div class="config-item">中奖记录</div>
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">🔗 URL ?c= 已支持</div>
+          <div class="config-items">
+            <div class="config-item url-ready">标题</div>
+            <div class="config-item url-ready">8个奖品配置</div>
+            <div class="config-item url-ready">每日次数</div>
+            <div class="config-item url-ready">embed模式</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 可补充：保底配置、背景图/主题色</div>
+      </div>
+    </div>
+
+    <div class="game-card url-supported" data-cat="lottery" data-url="1">
+      <div class="gc-head">
+        <div class="gc-icon">🎟</div>
+        <div class="gc-info">
+          <div class="gc-name">刮刮乐</div>
+          <div class="gc-file">scratch-card.html</div>
+        </div>
+        <div class="gc-badges">
+          <span class="badge badge-green">✓ URL配置</span>
+        </div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">奖品池（名称/概率/颜色）</div>
+            <div class="config-item highlight">每日次数上限</div>
+            <div class="config-item highlight">笔触粗细（px）</div>
+            <div class="config-item highlight">自动揭示阈值（刮开%触发）</div>
+            <div class="config-item">今日已用次数</div>
+            <div class="config-item">数据统计</div>
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">🔗 URL ?c= 已支持</div>
+          <div class="config-items">
+            <div class="config-item url-ready">标题</div>
+            <div class="config-item url-ready">奖品配置（概率自动归一化）</div>
+            <div class="config-item url-ready">embed模式</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 可补充：涂层颜色/图案、卡片背景图、活动文案、每日次数URL支持</div>
+      </div>
+    </div>
+
+    <div class="game-card url-supported" data-cat="lottery" data-url="1">
+      <div class="gc-head">
+        <div class="gc-icon">🥚</div>
+        <div class="gc-info">
+          <div class="gc-name">砸金蛋</div>
+          <div class="gc-file">smash-egg.html</div>
+        </div>
+        <div class="gc-badges">
+          <span class="badge badge-green">✓ URL配置</span>
+        </div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">奖品池（名称/概率/颜色/描述）</div>
+            <div class="config-item highlight">每日砸蛋次数（=蛋的数量）</div>
+            <div class="config-item">实时数据</div>
+            <div class="config-item">砸蛋记录</div>
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">🔗 URL ?c= 已支持</div>
+          <div class="config-items">
+            <div class="config-item url-ready">标题</div>
+            <div class="config-item url-ready">奖品配置</div>
+            <div class="config-item url-ready">每日次数</div>
+            <div class="config-item url-ready">embed模式</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 可补充：蛋的外观配置、背景主题</div>
+      </div>
+    </div>
+
+    <div class="game-card url-supported" data-cat="lottery" data-url="1">
+      <div class="gc-head">
+        <div class="gc-icon">🎰</div>
+        <div class="gc-info">
+          <div class="gc-name">老虎机</div>
+          <div class="gc-file">slot-machine.html</div>
+        </div>
+        <div class="gc-badges">
+          <span class="badge badge-green">✓ URL配置</span>
+        </div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">符号配置（emoji/名称/权重/赔率倍数）</div>
+            <div class="config-item highlight">押注金额设置</div>
+            <div class="config-item">赔率表</div>
+            <div class="config-item">数据统计</div>
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">🔗 URL ?c= 已支持</div>
+          <div class="config-items">
+            <div class="config-item url-ready">标题</div>
+            <div class="config-item url-ready">符号/权重/赔率</div>
+            <div class="config-item url-ready">embed模式</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 可补充：初始金币数、每日次数、Jackpot大奖金额</div>
+      </div>
+    </div>
+
+    <div class="game-card url-supported" data-cat="lottery" data-url="1">
+      <div class="gc-head">
+        <div class="gc-icon">📦</div>
+        <div class="gc-info">
+          <div class="gc-name">盲盒抽卡</div>
+          <div class="gc-file">blind-box.html</div>
+        </div>
+        <div class="gc-badges">
+          <span class="badge badge-green">✓ URL配置</span>
+        </div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">卡池（名称/emoji/稀有度/概率）</div>
+            <div class="config-item highlight">系列名称/副标题</div>
+            <div class="config-item highlight">盲盒图案emoji</div>
+            <div class="config-item highlight">保底设置（N次必出SSR）</div>
+            <div class="config-item highlight">单抽/五连抽模式</div>
+            <div class="config-item">稀有度统计</div>
+            <div class="config-item">图鉴收集</div>
+          </div>
+        </div>
+        <div class="config-section">
+          <div class="config-section-title">🔗 URL ?c= 已支持</div>
+          <div class="config-items">
+            <div class="config-item url-ready">标题/系列名</div>
+            <div class="config-item url-ready">卡池配置</div>
+            <div class="config-item url-ready">embed模式</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 可补充：保底次数URL支持、卡片图片URL、稀有度自定义命名</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="lottery">
+      <div class="gc-head">
+        <div class="gc-icon">🎲</div>
+        <div class="gc-info">
+          <div class="gc-name">摇骰子</div>
+          <div class="gc-file">shake-dice.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">骰子模式（单/双/三粒）</div>
+            <div class="config-item highlight">点数规则配置（各点数→奖品映射）</div>
+            <div class="config-item highlight">每日次数上限</div>
+            <div class="config-item highlight">保底机制</div>
+            <div class="config-item">点数分布统计</div>
+            <div class="config-item">摇骰记录</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化优先级：高——骰子模式+点数奖品规则+每日次数</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="lottery">
+      <div class="gc-head">
+        <div class="gc-icon">🎁</div>
+        <div class="gc-info">
+          <div class="gc-name">礼盒开箱</div>
+          <div class="gc-file">gift-box.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">奖品池（名称/概率/等级/颜色）</div>
+            <div class="config-item highlight">每人最多抽奖次数</div>
+            <div class="config-item highlight">中奖后继续抽（开关）</div>
+            <div class="config-item highlight">需要实名认证（开关）</div>
+            <div class="config-item">4套皮肤主题</div>
+            <div class="config-item">活动数据</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化优先级：高——奖品+次数+皮肤+实名开关</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="lottery">
+      <div class="gc-head">
+        <div class="gc-icon">🎪</div>
+        <div class="gc-info">
+          <div class="gc-name">扭蛋机</div>
+          <div class="gc-file">gashapon.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">奖品池配置</div>
+            <div class="config-item highlight">保底设置</div>
+            <div class="config-item">扭蛋机外观</div>
+            <div class="config-item">概率分布图</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化优先级：中</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="lottery">
+      <div class="gc-head">
+        <div class="gc-icon">🎱</div>
+        <div class="gc-info">
+          <div class="gc-name">号码球抽奖</div>
+          <div class="gc-file">lottery-ball.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">号码范围（1-N）</div>
+            <div class="config-item highlight">抽取个数</div>
+            <div class="config-item highlight">特别号码（红球数）</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化优先级：中——号码范围+抽取数</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="lottery">
+      <div class="gc-head">
+        <div class="gc-icon">🍀</div>
+        <div class="gc-info">
+          <div class="gc-name">幸运数字</div>
+          <div class="gc-file">lucky-number.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">数字范围</div>
+            <div class="config-item highlight">每日猜测次数</div>
+            <div class="config-item">提示开关（大/小）</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化优先级：低</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="lottery">
+      <div class="gc-head">
+        <div class="gc-icon">🎩</div>
+        <div class="gc-info">
+          <div class="gc-name">三杯游戏</div>
+          <div class="gc-file">cup-game.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">每日机会次数（默认5）</div>
+            <div class="config-item highlight">洗牌次数（默认800）</div>
+            <div class="config-item highlight">动画速度（普通/快速/极快）</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化优先级：中——难度配置（洗牌次数+速度）</div>
+      </div>
+    </div>
+
+    <!-- ═══ 社交互动类 ═══ -->
+    <div class="game-card" data-cat="social">
+      <div class="gc-head">
+        <div class="gc-icon">❓</div>
+        <div class="gc-info">
+          <div class="gc-name">问答闯关</div>
+          <div class="gc-file">quiz.html</div>
+        </div>
+        <div class="gc-badges">
+          <span class="badge badge-gold">高价值</span>
+          <span class="badge badge-gray">待URL化</span>
+        </div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">题库选择（多套题库切换）</div>
+            <div class="config-item highlight">每题限时（秒）</div>
+            <div class="config-item highlight">总题数</div>
+            <div class="config-item highlight">连对加成倍率</div>
+            <div class="config-item highlight">奖励配置（答对/完成得分）</div>
+            <div class="config-item">答题速度统计</div>
+            <div class="config-item">历史记录</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化优先级：🔥极高——可传入自定义题库JSON，实现品牌知识测试/培训/产品介绍等场景</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="social">
+      <div class="gc-head">
+        <div class="gc-icon">🗳️</div>
+        <div class="gc-info">
+          <div class="gc-name">投票PK</div>
+          <div class="gc-file">vote-pk.html</div>
+        </div>
+        <div class="gc-badges">
+          <span class="badge badge-gold">高价值</span>
+          <span class="badge badge-gray">待URL化</span>
+        </div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">投票模式（双选PK / 多选投票）</div>
+            <div class="config-item highlight">投票主题文案</div>
+            <div class="config-item highlight">选项内容（emoji+名称+描述）</div>
+            <div class="config-item highlight">倒计时时长（30/60/120/300/600秒）</div>
+            <div class="config-item highlight">多选开关</div>
+            <div class="config-item highlight">实时显示结果（开关）</div>
+            <div class="config-item">自动模拟投票</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化优先级：🔥极高——主题+选项+时长通过URL配置，可做选品/活动造势/品牌选择</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="social">
+      <div class="gc-head">
+        <div class="gc-icon">💣</div>
+        <div class="gc-info">
+          <div class="gc-name">数字炸弹</div>
+          <div class="gc-file">number-bomb.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待配置化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 现有可配项（无面板，代码内配置）</div>
+          <div class="config-items">
+            <div class="config-item">数字范围（1-100）</div>
+            <div class="config-item">人数上限</div>
+            <div class="config-item">惩罚文案</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 需新建左侧面板 + URL化：数字范围、最大数、惩罚说明、参与人数</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="social">
+      <div class="gc-head">
+        <div class="gc-icon">🃏</div>
+        <div class="gc-info">
+          <div class="gc-name">集卡集章</div>
+          <div class="gc-file">stamp-collect.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">展示模式（集章/集卡）</div>
+            <div class="config-item highlight">活动名称</div>
+            <div class="config-item highlight">卡片/章节组（名称/图标/稀有度）</div>
+            <div class="config-item highlight">兑换奖品配置</div>
+            <div class="config-item highlight">卡片获取方式说明</div>
+            <div class="config-item">好友赠送模拟</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化优先级：高——活动名+卡片组+奖品，适合积分兑换/品牌集章活动</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="social">
+      <div class="gc-head">
+        <div class="gc-icon">🤝</div>
+        <div class="gc-info">
+          <div class="gc-name">组队挑战</div>
+          <div class="gc-file">team-challenge.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">挑战模式（积分/排名/目标值）</div>
+            <div class="config-item highlight">活动名称/目标说明</div>
+            <div class="config-item highlight">队伍数量+队伍名称</div>
+            <div class="config-item highlight">贡献行为配置（行为→积分）</div>
+            <div class="config-item highlight">奖品配置（名次→奖励）</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化优先级：中——队伍设置+目标值</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="social">
+      <div class="gc-head">
+        <div class="gc-icon">📅</div>
+        <div class="gc-info">
+          <div class="gc-name">每日签到</div>
+          <div class="gc-file">daily-checkin.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">7天奖励配置（每天的奖品描述+金币）</div>
+            <div class="config-item highlight">断签补签（开关）</div>
+            <div class="config-item highlight">签到提醒（开关）</div>
+            <div class="config-item">签到统计（各天领取率）</div>
+            <div class="config-item">奖励发放记录</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化优先级：中——奖励文案+金币数</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="social">
+      <div class="gc-head">
+        <div class="gc-icon">🧠</div>
+        <div class="gc-info">
+          <div class="gc-name">性格测试</div>
+          <div class="gc-file">personality-test.html</div>
+        </div>
+        <div class="gc-badges">
+          <span class="badge badge-gold">高价值</span>
+          <span class="badge badge-gray">待URL化</span>
+        </div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">测试主题（多套预设）</div>
+            <div class="config-item highlight">题目数量</div>
+            <div class="config-item highlight">奖品配置（结果→对应奖励）</div>
+            <div class="config-item highlight">结果卡主题色</div>
+            <div class="config-item">参与数据</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化优先级：高——主题+题库JSON，可做品牌测试/用户画像/测试营销</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="social">
+      <div class="gc-head">
+        <div class="gc-icon">🤝</div>
+        <div class="gc-info">
+          <div class="gc-name">摇一摇</div>
+          <div class="gc-file">shake.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">奖品配置（名称/概率/颜色）</div>
+            <div class="config-item highlight">每日次数上限</div>
+            <div class="config-item highlight">冷却时间（秒）</div>
+            <div class="config-item highlight">阈值（加速度灵敏度）</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化优先级：高——奖品+次数，线下活动场景强</div>
+      </div>
+    </div>
+
+    <!-- ═══ 操作技巧类 ═══ -->
+    <div class="game-card" data-cat="action">
+      <div class="gc-head">
+        <div class="gc-icon">🦔</div>
+        <div class="gc-info">
+          <div class="gc-name">打地鼠</div>
+          <div class="gc-file">whack-mole.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">游戏时长</div>
+            <div class="config-item highlight">地鼠速度/难度</div>
+            <div class="config-item highlight">特殊地鼠（炸弹/金色）出现频率</div>
+            <div class="config-item">本局数据</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：时长+难度，配合奖品可做营销活动</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="action">
+      <div class="gc-head">
+        <div class="gc-icon">🧸</div>
+        <div class="gc-info">
+          <div class="gc-name">夹娃娃机</div>
+          <div class="gc-file">claw-machine.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">每日机会次数</div>
+            <div class="config-item highlight">抓手速度</div>
+            <div class="config-item highlight">成功率配置</div>
+            <div class="config-item">今日已用次数</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：次数+成功率+奖品内容</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="action">
+      <div class="gc-head">
+        <div class="gc-icon">🃏</div>
+        <div class="gc-info">
+          <div class="gc-name">翻牌配对</div>
+          <div class="gc-file">flip-match.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">游戏模式（限时/计步）</div>
+            <div class="config-item highlight">翻牌速度</div>
+            <div class="config-item highlight">难度（4x4/6x6/8x8）</div>
+            <div class="config-item">实时数据</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：难度+时间限制+自定义卡片图案</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="action">
+      <div class="gc-head">
+        <div class="gc-icon">🧧</div>
+        <div class="gc-info">
+          <div class="gc-name">红包雨</div>
+          <div class="gc-file">red-packet-rain.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">游戏时长（秒）</div>
+            <div class="config-item highlight">红包掉落速度</div>
+            <div class="config-item highlight">稀有红包概率（金/银/普通）</div>
+            <div class="config-item highlight">各类红包对应金额</div>
+            <div class="config-item">历史最高分</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化优先级：高——时长+金额配置，可做营销发券活动</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="action">
+      <div class="gc-head">
+        <div class="gc-icon">🪙</div>
+        <div class="gc-info">
+          <div class="gc-name">接金币</div>
+          <div class="gc-file">catch-coins.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">游戏时长</div>
+            <div class="config-item highlight">金币下落速度</div>
+            <div class="config-item highlight">炸弹出现频率</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：时长+难度</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="action">
+      <div class="gc-head">
+        <div class="gc-icon">🎯</div>
+        <div class="gc-info">
+          <div class="gc-name">射箭</div>
+          <div class="gc-file">archery.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">箭数限制</div>
+            <div class="config-item highlight">靶心移动速度</div>
+            <div class="config-item highlight">风速干扰</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：箭数+奖品分数门槛</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="action">
+      <div class="gc-head">
+        <div class="gc-icon">🎣</div>
+        <div class="gc-info">
+          <div class="gc-name">钓鱼</div>
+          <div class="gc-file">fishing.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">鱼的种类和概率</div>
+            <div class="config-item highlight">每日钓鱼次数</div>
+            <div class="config-item highlight">稀有鱼出现率</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：鱼种+次数，可配合奖品做活动</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="action">
+      <div class="gc-head">
+        <div class="gc-icon">🍉</div>
+        <div class="gc-info">
+          <div class="gc-name">切水果</div>
+          <div class="gc-file">fruit-cut.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">游戏时长</div>
+            <div class="config-item highlight">水果下落速度/数量</div>
+            <div class="config-item highlight">炸弹频率</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：时长+难度</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="action">
+      <div class="gc-head">
+        <div class="gc-icon">🏹</div>
+        <div class="gc-info">
+          <div class="gc-name">弹弓射击</div>
+          <div class="gc-file">slingshot.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">弹药数量</div>
+            <div class="config-item highlight">目标数量/移动速度</div>
+            <div class="config-item highlight">关卡难度</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：弹药+目标配置</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="action">
+      <div class="gc-head">
+        <div class="gc-icon">⭕</div>
+        <div class="gc-info">
+          <div class="gc-name">套圈圈</div>
+          <div class="gc-file">ring-toss.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">圈数限制</div>
+            <div class="config-item highlight">目标移动速度</div>
+            <div class="config-item highlight">奖品分数门槛</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：圈数+奖品门槛</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="action">
+      <div class="gc-head">
+        <div class="gc-icon">🐍</div>
+        <div class="gc-info">
+          <div class="gc-name">贪吃蛇闯关</div>
+          <div class="gc-file">snake.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待配置化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 现有可配项（代码内）</div>
+          <div class="config-items">
+            <div class="config-item">关卡数量</div>
+            <div class="config-item">蛇的初始速度</div>
+            <div class="config-item">障碍物密度</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 需建左侧面板：速度+关卡设计</div>
+      </div>
+    </div>
+
+    <!-- ═══ 益智类 ═══ -->
+    <div class="game-card" data-cat="puzzle">
+      <div class="gc-head">
+        <div class="gc-icon">🔢</div>
+        <div class="gc-info">
+          <div class="gc-name">2048</div>
+          <div class="gc-file">game-2048.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">纯游戏</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 可配项</div>
+          <div class="config-items">
+            <div class="config-item">棋盘尺寸（4x4/5x5）</div>
+            <div class="config-item">目标数值（2048/4096）</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 配置化价值低，留存靠排行榜驱动即可</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="puzzle">
+      <div class="gc-head">
+        <div class="gc-icon">💎</div>
+        <div class="gc-info">
+          <div class="gc-name">消消乐</div>
+          <div class="gc-file">match3.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">游戏时长</div>
+            <div class="config-item highlight">目标分数</div>
+            <div class="config-item highlight">道具种类</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：时长+目标分+奖品门槛</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="puzzle">
+      <div class="gc-head">
+        <div class="gc-icon">🀄</div>
+        <div class="gc-info">
+          <div class="gc-name">连连看</div>
+          <div class="gc-file">link-match.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">游戏时长（默认60秒）</div>
+            <div class="config-item highlight">图标种类数（默认3种）</div>
+            <div class="config-item highlight">完成奖励积分（默认30）</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：时长+图标数+奖励</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="puzzle">
+      <div class="gc-head">
+        <div class="gc-icon">💣</div>
+        <div class="gc-info">
+          <div class="gc-name">扫雷</div>
+          <div class="gc-file">minesweeper.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">纯游戏</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 可配项</div>
+          <div class="config-items">
+            <div class="config-item">难度（简单/普通/困难）</div>
+            <div class="config-item">地雷数量</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 配置化价值低，竞技导向</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="puzzle">
+      <div class="gc-head">
+        <div class="gc-icon">🎲</div>
+        <div class="gc-info">
+          <div class="gc-name">数独</div>
+          <div class="gc-file">sudoku.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">纯游戏</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 可配项</div>
+          <div class="config-items">
+            <div class="config-item">难度级别</div>
+            <div class="config-item">提示次数</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 配置化价值低</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="puzzle">
+      <div class="gc-head">
+        <div class="gc-icon">🎴</div>
+        <div class="gc-info">
+          <div class="gc-name">华容道</div>
+          <div class="gc-file">sliding-puzzle.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">纯游戏</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 可配项</div>
+          <div class="config-items">
+            <div class="config-item">关卡难度</div>
+            <div class="config-item">图片自定义</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 可做品牌图片拼图，有营销价值</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="puzzle">
+      <div class="gc-head">
+        <div class="gc-icon">🖼️</div>
+        <div class="gc-info">
+          <div class="gc-name">拼图</div>
+          <div class="gc-file">puzzle.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 可配项</div>
+          <div class="config-items">
+            <div class="config-item highlight">图片来源（内置/自定义URL）</div>
+            <div class="config-item highlight">碎片数量（3x3/4x4/5x5）</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：图片URL+碎片数，可配品牌图片做营销</div>
+      </div>
+    </div>
+
+    <!-- ═══ 棋盘养成类 ═══ -->
+    <div class="game-card" data-cat="board">
+      <div class="gc-head">
+        <div class="gc-icon">✈️</div>
+        <div class="gc-info">
+          <div class="gc-name">飞行棋</div>
+          <div class="gc-file">flying-chess.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">每日投骰上限</div>
+            <div class="config-item highlight">骰子面数（默认6）</div>
+            <div class="config-item highlight">总格数</div>
+            <div class="config-item highlight">格子事件配置</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：格子数+事件+每日次数，可做主题活动地图</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="board">
+      <div class="gc-head">
+        <div class="gc-icon">🏙️</div>
+        <div class="gc-info">
+          <div class="gc-name">大富翁</div>
+          <div class="gc-file">monopoly.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 左侧面板配置项</div>
+          <div class="config-items">
+            <div class="config-item highlight">圈数上限</div>
+            <div class="config-item highlight">AI速度（ms）</div>
+            <div class="config-item highlight">经过起点积分</div>
+            <div class="config-item highlight">地块名称/地租</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：地图主题+积分规则</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="board">
+      <div class="gc-head">
+        <div class="gc-icon">🌳</div>
+        <div class="gc-info">
+          <div class="gc-name">成长树养成</div>
+          <div class="gc-file">grow-tree.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待配置化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 可配项</div>
+          <div class="config-items">
+            <div class="config-item highlight">成长阶段数量</div>
+            <div class="config-item highlight">各阶段解锁奖励</div>
+            <div class="config-item">树的外观主题</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 需建左侧面板：阶段奖励配置</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="board">
+      <div class="gc-head">
+        <div class="gc-icon">⚡</div>
+        <div class="gc-info">
+          <div class="gc-name">能量收集</div>
+          <div class="gc-file">energy-collect.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待配置化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 可配项</div>
+          <div class="config-items">
+            <div class="config-item highlight">目标能量值</div>
+            <div class="config-item highlight">奖励内容</div>
+            <div class="config-item">任务列表</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 需建面板：目标能量+任务行为映射</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="board">
+      <div class="gc-head">
+        <div class="gc-icon">🏅</div>
+        <div class="gc-info">
+          <div class="gc-name">进度解锁</div>
+          <div class="gc-file">progress-unlock.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 可配项</div>
+          <div class="config-items">
+            <div class="config-item highlight">里程碑节点数</div>
+            <div class="config-item highlight">各节点奖励</div>
+            <div class="config-item highlight">进度条主题色</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：节点+奖励，可做活动进度条</div>
+      </div>
+    </div>
+
+    <!-- ═══ 工具类 ═══ -->
+    <div class="game-card" data-cat="tool">
+      <div class="gc-head">
+        <div class="gc-icon">😄</div>
+        <div class="gc-info">
+          <div class="gc-name">表情包生成</div>
+          <div class="gc-file">emoji-maker.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待配置化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 可配项</div>
+          <div class="config-items">
+            <div class="config-item highlight">预设模板（品牌风格）</div>
+            <div class="config-item highlight">logo/水印注入</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：默认模板+品牌logo URL，做裂变传播</div>
+      </div>
+    </div>
+
+    <div class="game-card" data-cat="tool">
+      <div class="gc-head">
+        <div class="gc-icon">✨</div>
+        <div class="gc-info">
+          <div class="gc-name">名字生成器</div>
+          <div class="gc-file">name-generator.html</div>
+        </div>
+        <div class="gc-badges"><span class="badge badge-gray">待URL化</span></div>
+      </div>
+      <div class="gc-body">
+        <div class="config-section">
+          <div class="config-section-title">🔧 可配项</div>
+          <div class="config-items">
+            <div class="config-item highlight">生成风格（古风/现代/英文）</div>
+            <div class="config-item highlight">自定义词库</div>
+          </div>
+        </div>
+        <div class="todo-hint">💡 URL化：风格+词库，可做品牌起名活动</div>
+      </div>
+    </div>
+
+  </div><!-- /games-grid -->
+</div><!-- /page -->
+
+<script>
+function filterCards(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  document.querySelectorAll('.game-card').forEach(card => {
+    if (cat === 'all') {
+      card.style.display = '';
+    } else if (cat === 'url') {
+      card.style.display = card.dataset.url === '1' ? '' : 'none';
+    } else {
+      card.style.display = card.dataset.cat === cat ? '' : 'none';
+    }
+  });
+}
+</script>
+</body>
+</html>
