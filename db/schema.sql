@@ -1,0 +1,115 @@
+-- ═══════════════════════════════════════════
+-- GameHub 数据库 Schema
+-- ═══════════════════════════════════════════
+
+-- 1. clients（客户）
+create table if not exists clients (
+  id          uuid primary key default gen_random_uuid(),
+  name        text not null,
+  email       text not null unique,
+  plan        text not null default 'free' check (plan in ('free','pro')),
+  created_at  timestamptz not null default now()
+);
+
+-- 2. campaigns（活动）
+create table if not exists campaigns (
+  id          uuid primary key default gen_random_uuid(),
+  client_id   uuid references clients(id) on delete cascade,
+  game_type   text not null,
+  config      jsonb not null default '{}',
+  title       text not null,
+  status      text not null default 'draft' check (status in ('draft','active','ended')),
+  starts_at   timestamptz,
+  ends_at     timestamptz,
+  created_at  timestamptz not null default now()
+);
+
+-- 3. players（玩家）
+create table if not exists players (
+  id          uuid primary key default gen_random_uuid(),
+  phone       text not null unique,
+  created_at  timestamptz not null default now()
+);
+
+-- 4. play_sessions（游戏流水，90天保留）
+create table if not exists play_sessions (
+  id           uuid primary key default gen_random_uuid(),
+  campaign_id  uuid not null references campaigns(id) on delete cascade,
+  player_id    uuid not null references players(id) on delete cascade,
+  score        integer not null default 0,
+  result       text not null default '',
+  played_at    timestamptz not null default now()
+);
+
+-- 5. campaign_stats（汇总统计，永久保留）
+create table if not exists campaign_stats (
+  campaign_id     uuid not null references campaigns(id) on delete cascade,
+  date            date not null,
+  plays           integer not null default 0,
+  winners         integer not null default 0,
+  unique_players  integer not null default 0,
+  primary key (campaign_id, date)
+);
+
+-- ═══════════════════════════════════════════
+-- Row Level Security
+-- ═══════════════════════════════════════════
+
+alter table clients         enable row level security;
+alter table campaigns       enable row level security;
+alter table players         enable row level security;
+alter table play_sessions   enable row level security;
+alter table campaign_stats  enable row level security;
+
+-- clients：只有 service_role 能操作
+create policy "service_role 管理客户" on clients
+  for all using (auth.role() = 'service_role');
+
+-- campaigns：客户只能看/改自己的（通过邮箱匹配 client_id）
+create policy "客户读自己的活动" on campaigns
+  for select using (
+    auth.role() = 'service_role'
+    or client_id in (select id from clients where email = auth.email())
+  );
+
+create policy "客户改自己的活动" on campaigns
+  for all using (
+    auth.role() = 'service_role'
+    or client_id in (select id from clients where email = auth.email())
+  );
+
+-- players：任何请求都可以 upsert（验证码验证通过后由 Workers 写入）
+create policy "玩家数据开放写入" on players
+  for all using (true);
+
+-- play_sessions：任何已认证用户可以插入
+create policy "玩家插入流水" on play_sessions
+  for insert with check (true);
+
+create policy "玩家查自己的流水" on play_sessions
+  for select using (
+    auth.role() = 'service_role'
+    or player_id in (select id from players where phone = (auth.jwt()->>'phone'))
+  );
+
+-- campaign_stats：service_role 写，客户读自己活动的统计
+create policy "客户读统计" on campaign_stats
+  for select using (
+    auth.role() = 'service_role'
+    or campaign_id in (
+      select c.id from campaigns c
+      join clients cl on cl.id = c.client_id
+      where cl.email = auth.email()
+    )
+  );
+
+create policy "写统计" on campaign_stats
+  for all using (auth.role() = 'service_role');
+
+-- ═══════════════════════════════════════════
+-- 90天自动清理 play_sessions
+-- 在 Supabase Dashboard → Database → Extensions 开启 pg_cron 后执行：
+-- select cron.schedule('清理90天流水', '0 3 * * *',
+--   $$ delete from play_sessions where played_at < now() - interval '90 days' $$
+-- );
+-- ═══════════════════════════════════════════
