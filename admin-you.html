@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameHub · 管理后台</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root { --bg:#0D0720; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1); --text:#F0EAF8; --muted:rgba(240,234,248,0.55); --gold:#F5C842; --accent:#7C3AED; --green:#22C55E; }
+body { font-family:-apple-system,'PingFang SC',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+/* 登录页 */
+#login-page { display:flex; align-items:center; justify-content:center; min-height:100vh; }
+.login-box { background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:20px; padding:40px 36px; width:min(380px,92vw); text-align:center; }
+.login-box h1 { font-size:22px; font-weight:800; margin-bottom:6px; }
+.login-box p { font-size:13px; color:var(--muted); margin-bottom:28px; }
+.input { width:100%; padding:11px 14px; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--text); font-size:14px; outline:none; margin-bottom:12px; box-sizing:border-box; font-family:inherit; }
+.input:focus { border-color:var(--accent); }
+.btn-primary { width:100%; padding:13px; border-radius:10px; border:none; background:linear-gradient(135deg,var(--accent),#EC4899); color:white; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; }
+.err-msg { font-size:12px; color:#F87171; min-height:18px; margin-bottom:8px; }
+
+/* 主界面 */
+#admin-page { display:none; }
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:0 28px; height:56px; border-bottom:1px solid var(--border); background:rgba(13,7,32,0.97); }
+.topbar-logo { font-size:17px; font-weight:800; }
+.topbar-logo span { color:var(--gold); }
+.main { max-width:1100px; margin:0 auto; padding:28px; }
+.tabs { display:flex; gap:4px; margin-bottom:24px; }
+.tab-btn { padding:8px 18px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); font-family:inherit; }
+.tab-btn.active { background:rgba(124,58,237,0.15); border-color:var(--accent); color:var(--text); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+/* 卡片 */
+.stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+.stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; text-align:center; }
+.stat-num { font-size:28px; font-weight:800; color:var(--gold); }
+.stat-lbl { font-size:11px; color:var(--muted); margin-top:4px; }
+
+/* 表格 */
+.table-wrap { overflow-x:auto; border-radius:12px; border:1px solid var(--border); }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { background:rgba(255,255,255,0.04); padding:10px 14px; text-align:left; font-size:11px; color:var(--muted); font-weight:700; border-bottom:1px solid var(--border); }
+td { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.04); }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:rgba(255,255,255,0.02); }
+
+/* 操作按钮 */
+.action-btn { padding:5px 12px; border-radius:7px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); font-family:inherit; margin-right:4px; }
+.action-btn:hover { color:var(--text); border-color:rgba(124,58,237,0.5); }
+.action-btn.danger { color:#F87171; border-color:rgba(239,68,68,0.3); }
+
+/* 新建客户表单 */
+.form-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:20px; }
+.form-row { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:10px; align-items:end; }
+.field label { display:block; font-size:11px; color:var(--muted); margin-bottom:5px; font-weight:600; }
+.pill { display:inline-block; padding:2px 8px; border-radius:5px; font-size:11px; font-weight:700; }
+.pill-green { background:rgba(34,197,94,0.15); color:var(--green); border:1px solid rgba(34,197,94,0.3); }
+.pill-gray  { background:rgba(255,255,255,0.06); color:var(--muted); border:1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<!-- 登录页 -->
+<div id="login-page">
+  <div class="login-box">
+    <h1>🎮 GameHub</h1>
+    <p>管理员后台，仅限内部使用</p>
+    <input id="admin-email" class="input" type="email" placeholder="管理员邮箱">
+    <input id="admin-pwd"   class="input" type="password" placeholder="密码">
+    <div id="login-err" class="err-msg"></div>
+    <button class="btn-primary" onclick="doLogin()">登录</button>
+  </div>
+</div>
+
+<!-- 主界面 -->
+<div id="admin-page">
+  <div class="topbar">
+    <div class="topbar-logo">🎮 <span>GameHub</span> 管理后台</div>
+    <button class="action-btn" onclick="doLogout()">退出登录</button>
+  </div>
+  <div class="main">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('overview',this)">📊 总览</button>
+      <button class="tab-btn" onclick="switchTab('clients',this)">👥 客户管理</button>
+      <button class="tab-btn" onclick="switchTab('campaigns',this)">🎯 活动列表</button>
+    </div>
+
+    <!-- 总览 -->
+    <div id="tab-overview" class="tab-panel active">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-num" id="st-clients">-</div><div class="stat-lbl">客户总数</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-campaigns">-</div><div class="stat-lbl">活动总数</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-players">-</div><div class="stat-lbl">玩家总数</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-plays">-</div><div class="stat-lbl">今日游戏次数</div></div>
+      </div>
+    </div>
+
+    <!-- 客户管理 -->
+    <div id="tab-clients" class="tab-panel">
+      <div class="form-card">
+        <div style="font-size:13px;font-weight:700;margin-bottom:14px">➕ 新建客户</div>
+        <div class="form-row">
+          <div class="field"><label>公司名</label><input id="new-name" class="input" placeholder="如：某某品牌" style="margin:0"></div>
+          <div class="field"><label>登录邮箱</label><input id="new-email" class="input" type="email" placeholder="client@example.com" style="margin:0"></div>
+          <div class="field"><label>套餐</label>
+            <select id="new-plan" class="input" style="margin:0">
+              <option value="free">Free</option>
+              <option value="pro">Pro</option>
+            </select>
+          </div>
+          <button class="btn-primary" style="padding:11px 20px;width:auto" onclick="createClient()">创建</button>
+        </div>
+        <div id="create-msg" style="font-size:12px;margin-top:8px;min-height:16px"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>公司名</th><th>邮箱</th><th>套餐</th><th>创建时间</th><th>操作</th></tr></thead>
+          <tbody id="clients-tbody"><tr><td colspan="5" style="text-align:center;color:var(--muted)">加载中…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 活动列表 -->
+    <div id="tab-campaigns" class="tab-panel">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>活动名</th><th>客户</th><th>游戏类型</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead>
+          <tbody id="campaigns-tbody"><tr><td colspan="6" style="text-align:center;color:var(--muted)">加载中…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentSession = null;
+
+// ─── 登录 ───
+async function doLogin() {
+  const email = document.getElementById('admin-email').value.trim();
+  const pwd   = document.getElementById('admin-pwd').value;
+  document.getElementById('login-err').textContent = '';
+
+  const { data, error } = await GHSupabase.auth.signInWithPassword({ email, password: pwd });
+  if (error) { document.getElementById('login-err').textContent = '邮箱或密码错误'; return; }
+
+  currentSession = data.session;
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('admin-page').style.display  = 'block';
+  loadOverview();
+  loadClients();
+  loadCampaigns();
+}
+
+function doLogout() {
+  GHSupabase.auth.signOut();
+  location.reload();
+}
+
+// ─── Tab 切换 ───
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── 加载总览 ───
+async function loadOverview() {
+  const [c, ca, p] = await Promise.all([
+    GHSupabase.from('clients').select('id', { count: 'exact', head: true }),
+    GHSupabase.from('campaigns').select('id', { count: 'exact', head: true }),
+    GHSupabase.from('players').select('id', { count: 'exact', head: true }),
+  ]);
+  document.getElementById('st-clients').textContent   = c.count ?? '-';
+  document.getElementById('st-campaigns').textContent = ca.count ?? '-';
+  document.getElementById('st-players').textContent   = p.count ?? '-';
+
+  // 今日游戏次数
+  const today = new Date().toISOString().slice(0,10);
+  const { data: stats } = await GHSupabase.from('campaign_stats').select('plays').eq('date', today);
+  const todayPlays = (stats || []).reduce((s, r) => s + r.plays, 0);
+  document.getElementById('st-plays').textContent = todayPlays;
+}
+
+// ─── 加载客户列表 ───
+async function loadClients() {
+  const { data } = await GHSupabase.from('clients').select('*').order('created_at', { ascending: false });
+  const tbody = document.getElementById('clients-tbody');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted)">暂无客户</td></tr>'; return; }
+  tbody.innerHTML = data.map(c => `
+    <tr>
+      <td>${c.name}</td>
+      <td>${c.email}</td>
+      <td><span class="pill ${c.plan==='pro'?'pill-green':'pill-gray'}">${c.plan}</span></td>
+      <td>${c.created_at.slice(0,10)}</td>
+      <td>
+        <button class="action-btn" onclick="copyEmail('${c.email}')">复制邮箱</button>
+        <button class="action-btn danger" onclick="deleteClient('${c.id}')">删除</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ─── 新建客户 ───
+async function createClient() {
+  const name  = document.getElementById('new-name').value.trim();
+  const email = document.getElementById('new-email').value.trim();
+  const plan  = document.getElementById('new-plan').value;
+  const msg   = document.getElementById('create-msg');
+
+  if (!name || !email) { msg.textContent = '请填写公司名和邮箱'; msg.style.color='#F87171'; return; }
+
+  // 写 clients 表
+  const { error } = await GHSupabase.from('clients').insert({ name, email, plan });
+  if (error) { msg.textContent = '创建失败：' + error.message; msg.style.color='#F87171'; return; }
+
+  msg.textContent = '✓ 客户已创建，请在 Supabase Dashboard → Authentication → Users 创建登录账号，密码发给客户';
+  msg.style.color = '#34D399';
+  loadClients();
+}
+
+async function deleteClient(id) {
+  if (!confirm('确认删除？关联的活动和数据也会删除')) return;
+  await GHSupabase.from('clients').delete().eq('id', id);
+  loadClients();
+}
+
+function copyEmail(email) {
+  navigator.clipboard?.writeText(email).then(() => alert('已复制：' + email));
+}
+
+// ─── 加载活动列表 ───
+async function loadCampaigns() {
+  const { data } = await GHSupabase
+    .from('campaigns')
+    .select('*, clients(name)')
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  const tbody = document.getElementById('campaigns-tbody');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted)">暂无活动</td></tr>'; return; }
+
+  const statusMap = { draft:'草稿', active:'进行中', ended:'已结束' };
+  tbody.innerHTML = data.map(c => `
+    <tr>
+      <td>${c.title}</td>
+      <td>${c.clients?.name || '-'}</td>
+      <td>${c.game_type}</td>
+      <td>${statusMap[c.status] || c.status}</td>
+      <td>${c.created_at.slice(0,10)}</td>
+      <td>
+        <button class="action-btn" onclick="copyCampaignLink('${c.id}','${c.game_type}')">复制链接</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function copyCampaignLink(id, gameType) {
+  const fileMap = { wheel:'wheel.html', scratch:'scratch-card.html', nine:'nine-grid.html', smash:'smash-egg.html', slot:'slot-machine.html', blind:'blind-box.html' };
+  const file = fileMap[gameType] || gameType + '.html';
+  const url  = 'https://games.jydigtal.com/' + file + '?cid=' + id;
+  navigator.clipboard?.writeText(url).then(() => alert('链接已复制：\n' + url));
+}
+</script>
+</body>
+</html>
