@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameHub · 活动数据后台</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root { --bg:#0D0720; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1); --text:#F0EAF8; --muted:rgba(240,234,248,0.55); --gold:#F5C842; --accent:#7C3AED; --green:#22C55E; }
+body { font-family:-apple-system,'PingFang SC',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+#login-page { display:flex; align-items:center; justify-content:center; min-height:100vh; }
+.login-box { background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:20px; padding:40px 36px; width:min(380px,92vw); text-align:center; }
+.login-box h1 { font-size:22px; font-weight:800; margin-bottom:6px; }
+.login-box p { font-size:13px; color:var(--muted); margin-bottom:28px; }
+.input { width:100%; padding:11px 14px; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--text); font-size:14px; outline:none; margin-bottom:12px; box-sizing:border-box; font-family:inherit; }
+.input:focus { border-color:var(--accent); }
+.btn-primary { width:100%; padding:13px; border-radius:10px; border:none; background:linear-gradient(135deg,var(--accent),#EC4899); color:white; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; }
+.err-msg { font-size:12px; color:#F87171; min-height:18px; margin-bottom:8px; }
+#client-page { display:none; }
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:0 28px; height:56px; border-bottom:1px solid var(--border); background:rgba(13,7,32,0.97); }
+.topbar-logo { font-size:17px; font-weight:800; }
+.topbar-logo span { color:var(--gold); }
+.main { max-width:900px; margin:0 auto; padding:28px; }
+.section-title { font-size:18px; font-weight:800; margin-bottom:16px; }
+.campaign-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:14px; cursor:pointer; transition:border-color 0.2s; }
+.campaign-card:hover { border-color:rgba(124,58,237,0.5); }
+.campaign-card.active { border-color:var(--accent); }
+.campaign-name { font-size:16px; font-weight:700; margin-bottom:4px; }
+.campaign-meta { font-size:12px; color:var(--muted); }
+.stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:20px 0; }
+.stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; text-align:center; }
+.stat-num { font-size:26px; font-weight:800; color:var(--gold); }
+.stat-lbl { font-size:11px; color:var(--muted); margin-top:3px; }
+.table-wrap { overflow-x:auto; border-radius:12px; border:1px solid var(--border); margin-top:16px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { background:rgba(255,255,255,0.04); padding:9px 12px; text-align:left; font-size:11px; color:var(--muted); font-weight:700; border-bottom:1px solid var(--border); }
+td { padding:9px 12px; border-bottom:1px solid rgba(255,255,255,0.04); }
+tr:last-child td { border-bottom:none; }
+.link-box { background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:10px; padding:12px 16px; font-family:monospace; font-size:12px; color:var(--gold); word-break:break-all; margin:12px 0; }
+.action-btn { padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:1px solid var(--border); background:rgba(124,58,237,0.1); color:var(--text); font-family:inherit; margin-right:6px; }
+.action-btn:hover { border-color:rgba(124,58,237,0.5); }
+</style>
+</head>
+<body>
+
+<div id="login-page">
+  <div class="login-box">
+    <h1>🎯 活动数据后台</h1>
+    <p>请用您的账号登录查看活动数据</p>
+    <input id="client-email" class="input" type="email" placeholder="登录邮箱">
+    <input id="client-pwd"   class="input" type="password" placeholder="密码">
+    <div id="login-err" class="err-msg"></div>
+    <button class="btn-primary" onclick="doLogin()">登录</button>
+  </div>
+</div>
+
+<div id="client-page">
+  <div class="topbar">
+    <div class="topbar-logo">🎯 <span>活动数据后台</span></div>
+    <button class="action-btn" onclick="doLogout()">退出</button>
+  </div>
+  <div class="main">
+    <div class="section-title">我的活动</div>
+    <div id="campaigns-list">加载中…</div>
+
+    <div id="detail-section" style="display:none;margin-top:28px">
+      <div class="section-title" id="detail-title">活动详情</div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-num" id="d-plays">-</div><div class="stat-lbl">总参与次数</div></div>
+        <div class="stat-card"><div class="stat-num" id="d-winners">-</div><div class="stat-lbl">中奖次数</div></div>
+        <div class="stat-card"><div class="stat-num" id="d-rate">-</div><div class="stat-lbl">中奖率</div></div>
+      </div>
+
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px">🔗 游戏链接</div>
+      <div class="link-box" id="d-link">-</div>
+      <button class="action-btn" onclick="copyLink()">📋 复制链接</button>
+      <button class="action-btn" onclick="openLink()">🔗 打开游戏</button>
+
+      <div style="font-size:13px;font-weight:700;margin:20px 0 8px">📅 近7天数据</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>日期</th><th>参与次数</th><th>中奖次数</th><th>独立玩家</th></tr></thead>
+          <tbody id="stats-tbody"></tbody>
+        </table>
+      </div>
+
+      <div style="font-size:13px;font-weight:700;margin:20px 0 8px">🏆 最近中奖记录</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>时间</th><th>奖品</th><th>得分</th></tr></thead>
+          <tbody id="winners-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentCampaign = null;
+
+async function doLogin() {
+  const email = document.getElementById('client-email').value.trim();
+  const pwd   = document.getElementById('client-pwd').value;
+  const errEl = document.getElementById('login-err');
+  errEl.textContent = '';
+
+  const { error } = await GHSupabase.auth.signInWithPassword({ email, password: pwd });
+  if (error) { errEl.textContent = '邮箱或密码错误'; return; }
+
+  document.getElementById('login-page').style.display  = 'none';
+  document.getElementById('client-page').style.display = 'block';
+  loadCampaigns();
+}
+
+function doLogout() {
+  GHSupabase.auth.signOut();
+  location.reload();
+}
+
+async function loadCampaigns() {
+  const { data } = await GHSupabase
+    .from('campaigns')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  const el = document.getElementById('campaigns-list');
+  if (!data?.length) { el.innerHTML = '<p style="color:var(--muted)">暂无活动，请联系管理员创建</p>'; return; }
+
+  el.innerHTML = data.map(c => `
+    <div class="campaign-card" id="cc-${c.id}" onclick="selectCampaign(${JSON.stringify(c).replace(/"/g,'&quot;')})">
+      <div class="campaign-name">${c.title}</div>
+      <div class="campaign-meta">${c.game_type} · ${c.status} · 创建于${c.created_at.slice(0,10)}</div>
+    </div>
+  `).join('');
+}
+
+const FILE_MAP = {
+  wheel:'wheel.html', scratch:'scratch-card.html', nine:'nine-grid.html',
+  smash:'smash-egg.html', slot:'slot-machine.html', blind:'blind-box.html'
+};
+
+async function selectCampaign(campaign) {
+  currentCampaign = campaign;
+  document.querySelectorAll('.campaign-card').forEach(el => el.classList.remove('active'));
+  document.getElementById('cc-' + campaign.id)?.classList.add('active');
+
+  document.getElementById('detail-section').style.display = 'block';
+  document.getElementById('detail-title').textContent = campaign.title + ' — 数据详情';
+
+  // 游戏链接
+  const file = FILE_MAP[campaign.game_type] || campaign.game_type + '.html';
+  const cfg  = campaign.config && Object.keys(campaign.config).length
+    ? ('?c=' + btoa(unescape(encodeURIComponent(JSON.stringify(campaign.config)))))
+    : '?';
+  const sep  = cfg.includes('?') ? '&' : '?';
+  const link = 'https://games.jydigtal.com/' + file + cfg + sep + 'cid=' + campaign.id;
+  document.getElementById('d-link').textContent = link;
+
+  // 统计
+  const { data: stats } = await GHSupabase
+    .from('campaign_stats')
+    .select('*')
+    .eq('campaign_id', campaign.id)
+    .order('date', { ascending: false })
+    .limit(7);
+
+  const totalPlays   = (stats||[]).reduce((s,r) => s+r.plays, 0);
+  const totalWinners = (stats||[]).reduce((s,r) => s+r.winners, 0);
+  document.getElementById('d-plays').textContent   = totalPlays;
+  document.getElementById('d-winners').textContent = totalWinners;
+  document.getElementById('d-rate').textContent    = totalPlays ? Math.round(totalWinners/totalPlays*100)+'%' : '-';
+
+  document.getElementById('stats-tbody').innerHTML = (stats||[]).length
+    ? stats.map(s => `<tr><td>${s.date}</td><td>${s.plays}</td><td>${s.winners}</td><td>${s.unique_players}</td></tr>`).join('')
+    : '<tr><td colspan="4" style="text-align:center;color:var(--muted)">暂无数据</td></tr>';
+
+  // 中奖记录
+  const { data: sessions } = await GHSupabase
+    .from('play_sessions')
+    .select('played_at, result, score')
+    .eq('campaign_id', campaign.id)
+    .not('result', 'eq', '谢谢参与')
+    .not('result', 'eq', '未中')
+    .not('result', 'eq', '')
+    .order('played_at', { ascending: false })
+    .limit(20);
+
+  document.getElementById('winners-tbody').innerHTML = (sessions||[]).length
+    ? sessions.map(s => `<tr><td>${s.played_at.slice(0,16).replace('T',' ')}</td><td>${s.result}</td><td>${s.score}</td></tr>`).join('')
+    : '<tr><td colspan="3" style="text-align:center;color:var(--muted)">暂无中奖记录</td></tr>';
+}
+
+function copyLink() {
+  const link = document.getElementById('d-link').textContent;
+  navigator.clipboard?.writeText(link).then(() => alert('链接已复制'));
+}
+function openLink() {
+  const link = document.getElementById('d-link').textContent;
+  window.open(link, '_blank');
+}
+</script>
+</body>
+</html>
