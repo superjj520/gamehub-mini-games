@@ -169,6 +169,8 @@ body { font-family: -apple-system,'PingFang SC','Microsoft YaHei',sans-serif; ba
   .game-types { grid-template-columns:repeat(3,1fr); }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.js"></script>
 </head>
 <body>
 
@@ -611,13 +613,36 @@ function buildURL(cfg) {
   return location.origin + location.pathname.replace('builder.html', '') + gameFile + '?c=' + base64;
 }
 
-function generateLink() {
+async function generateLink() {
   const total = prizes.reduce((s, p) => s + (Number(p.prob)||0), 0);
   if (total === 0) { showToast('请先配置奖品'); return; }
   if (prizes.length < 2) { showToast('至少需要2个奖品'); return; }
 
   const cfg = buildConfig();
   generatedUrl = buildURL(cfg);
+
+  // 如果客户已登录，保存到 campaigns 表并附加 cid 参数
+  try {
+    const { data: { session } } = await GHSupabase.auth.getSession();
+    if (session) {
+      const { data: campaign, error } = await GHSupabase
+        .from('campaigns')
+        .insert({
+          game_type: currentGameType,
+          config:    cfg,
+          title:     cfg.title || '未命名活动',
+          status:    'active',
+        })
+        .select('id')
+        .single();
+
+      if (!error && campaign) {
+        generatedUrl = generatedUrl + '&cid=' + campaign.id;
+      }
+    }
+  } catch (e) {
+    // 未配置 Supabase 或网络错误时静默跳过，不影响正常使用
+  }
 
   document.getElementById('generatedUrl').textContent = generatedUrl;
   document.getElementById('resultBox').style.display = '';
