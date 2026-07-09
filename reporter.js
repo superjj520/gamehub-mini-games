@@ -84,7 +84,44 @@ const GameReporter = (() => {
     }
   }
 
-  return { report };
+  // ─── 中奖反馈弹窗 ───
+  function showWinModal(result) {
+    // 避免重复创建
+    let overlay = document.getElementById('gh-win-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'gh-win-overlay';
+      overlay.style.cssText = `
+        position:fixed;inset:0;z-index:99999;
+        display:flex;align-items:center;justify-content:center;
+        background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);
+        font-family:-apple-system,'PingFang SC',sans-serif;
+      `;
+      overlay.innerHTML = `
+        <div style="background:linear-gradient(135deg,#1a0a2e,#2d1054);border:1px solid rgba(245,200,66,0.4);
+          border-radius:20px;padding:32px 28px;width:min(320px,88vw);text-align:center;
+          box-shadow:0 8px 40px rgba(0,0,0,0.6);">
+          <div style="font-size:48px;margin-bottom:12px">🎉</div>
+          <div style="font-size:20px;font-weight:800;color:#F5C842;margin-bottom:8px">恭喜中奖！</div>
+          <div id="gh-win-prize" style="font-size:16px;color:#F0EAF8;margin-bottom:20px;font-weight:600"></div>
+          <div style="font-size:12px;color:rgba(240,234,248,0.6);margin-bottom:20px;line-height:1.6">
+            请截图保存此页面，<br>联系活动方核对身份后领取奖品
+          </div>
+          <button id="gh-win-close" style="width:100%;padding:12px;border-radius:10px;border:none;
+            background:linear-gradient(135deg,#7C3AED,#EC4899);color:white;font-size:15px;
+            font-weight:700;cursor:pointer;font-family:inherit">
+            好的，我知道了
+          </button>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      document.getElementById('gh-win-close').onclick = () => { overlay.style.display = 'none'; };
+    }
+    document.getElementById('gh-win-prize').textContent = result;
+    overlay.style.display = 'flex';
+  }
+
+  return { report, showWinModal };
 })();
 
 // ─── 拦截 GameLeaderboard.submitAndNotify ───
@@ -94,11 +131,17 @@ const GameReporter = (() => {
     const original = GameLeaderboard.submitAndNotify.bind(GameLeaderboard);
     GameLeaderboard.submitAndNotify = function(opts) {
       const result = original(opts);
+      const res = opts.result || '';
+      const isWin = res && res !== '谢谢参与' && res !== '未中' && res !== '';
       GameReporter.report({
-        game:   opts.game   || '',
-        score:  opts.score  || 0,
-        result: opts.result || '',
+        game:   opts.game  || '',
+        score:  opts.score || 0,
+        result: res,
       }).catch(() => {});
+      // 有活动 ID 且中奖时，显示领奖引导弹窗
+      if (isWin && GameSupabase && GameSupabase.getCampaignId()) {
+        setTimeout(() => GameReporter.showWinModal(res), 800);
+      }
       return result;
     };
   }
