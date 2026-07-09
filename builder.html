@@ -180,7 +180,8 @@ body { font-family: -apple-system,'PingFang SC','Microsoft YaHei',sans-serif; ba
     <span>GameHub</span>
     <div class="nav-badge">游戏生成器</div>
   </a>
-  <div style="display:flex;gap:8px">
+  <div style="display:flex;gap:8px;align-items:center">
+    <div id="builder-auth-status" style="font-size:12px;color:var(--muted);padding:4px 10px;border-radius:6px;border:1px solid var(--border);display:none"></div>
     <a href="index.html" style="padding:6px 14px;border-radius:20px;font-size:13px;color:var(--muted);text-decoration:none;border:1px solid var(--border)">← 返回首页</a>
     <a href="shop.html" style="padding:6px 14px;border-radius:20px;font-size:13px;color:var(--muted);text-decoration:none;border:1px solid var(--border)">🪙 商城</a>
   </div>
@@ -442,17 +443,74 @@ let prizes = [];
 let currentGameType = 'wheel';
 let emojiTargetIdx = -1;
 let generatedUrl = '';
+let editingCampaignId = null; // 编辑模式：已有活动的 cid
 
 /* ═══════════════════════════════════════════════════════
    初始化
 ═══════════════════════════════════════════════════════ */
-function init() {
+async function init() {
   buildEmojiGrid();
-  applyTemplate('marketing');
-  // 触发初始游戏类型逻辑（显示提示等）
-  const activeCard = document.querySelector('.game-type-card.active');
-  if (activeCard) selectGameType('wheel', activeCard);
-  else refreshPreview();
+
+  // 检测登录状态并显示
+  try {
+    const { data: { session } } = await GHSupabase.auth.getSession();
+    const statusEl = document.getElementById('builder-auth-status');
+    if (session?.user?.email) {
+      statusEl.style.display = 'inline-block';
+      statusEl.style.borderColor = 'rgba(34,197,94,0.3)';
+      statusEl.style.color = '#22C55E';
+      statusEl.textContent = '✓ ' + session.user.email;
+    } else {
+      statusEl.style.display = 'inline-block';
+      statusEl.textContent = '未登录';
+      statusEl.onclick = () => { showToast('请使用客户账号在 admin-client.html 登录后再打开本页'); };
+    }
+  } catch(e) {}
+
+  // 检测编辑模式：URL 带 ?cid= 则加载已有活动配置
+  const cid = new URLSearchParams(location.search).get('cid');
+  if (cid) {
+    editingCampaignId = cid;
+    await loadCampaignForEdit(cid);
+  } else {
+    applyTemplate('marketing');
+    const activeCard = document.querySelector('.game-type-card.active');
+    if (activeCard) selectGameType('wheel', activeCard);
+    else refreshPreview();
+  }
+}
+
+async function loadCampaignForEdit(cid) {
+  const { data: campaign, error } = await GHSupabase
+    .from('campaigns').select('*').eq('id', cid).single();
+
+  if (error || !campaign) {
+    showToast('活动加载失败，将以新建模式打开');
+    applyTemplate('marketing');
+    const activeCard = document.querySelector('.game-type-card.active');
+    if (activeCard) selectGameType('wheel', activeCard);
+    return;
+  }
+
+  // 显示编辑提示
+  const banner = document.createElement('div');
+  banner.style.cssText = 'background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.3);border-radius:10px;padding:10px 16px;margin-bottom:16px;font-size:13px;color:#C4B5FD;';
+  banner.textContent = '✏️ 编辑模式：' + campaign.title + '（保存将更新已有活动）';
+  document.querySelector('.panel-left').prepend(banner);
+
+  // 切换游戏类型
+  const gameCard = document.querySelector('[data-type="' + campaign.game_type + '"]');
+  if (gameCard) selectGameType(campaign.game_type, gameCard);
+
+  // 填入配置
+  const cfg = campaign.config || {};
+  if (cfg.title)      document.getElementById('cfgTitle').value      = cfg.title;
+  if (cfg.subtitle)   document.getElementById('cfgSubtitle').value   = cfg.subtitle;
+  if (cfg.dailyLimit) document.getElementById('cfgDailyLimit').value = cfg.dailyLimit;
+  if (cfg.skin)       document.getElementById('cfgSkin').value       = cfg.skin;
+  if (cfg.prizes)     { prizes = cfg.prizes; renderPrizes(); }
+
+  refreshPreview();
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -625,27 +683,36 @@ async function generateLink() {
   try {
     const { data: { session } } = await GHSupabase.auth.getSession();
     if (session) {
-      // 查 clients 表获取当前登录用户的 client_id
-      const { data: client } = await GHSupabase
-        .from('clients')
-        .select('id')
-        .eq('email', session.user.email)
-        .single();
+      let campaignId = editingCampaignId;
 
-      const { data: campaign, error } = await GHSupabase
-        .from('campaigns')
-        .insert({
+      if (editingCampaignId) {
+        // 编辑模式：更新已有活动
+        await GHSupabase.from('campaigns').update({
+          config: cfg,
+          title:  cfg.title || '未命名活动',
           game_type: currentGameType,
-          config:    cfg,
-          title:     cfg.title || '未命名活动',
-          status:    'active',
-          client_id: client?.id || null,
-        })
-        .select('id')
-        .single();
+        }).eq('id', editingCampaignId);
+      } else {
+        // 新建模式：查 client_id 并插入
+        const { data: client } = await GHSupabase
+          .from('clients').select('id').eq('email', session.user.email).single();
 
-      if (!error && campaign) {
-        generatedUrl = generatedUrl + '&cid=' + campaign.id;
+        const { data: campaign, error } = await GHSupabase
+          .from('campaigns')
+          .insert({
+            game_type: currentGameType,
+            config:    cfg,
+            title:     cfg.title || '未命名活动',
+            status:    'active',
+            client_id: client?.id || null,
+          })
+          .select('id').single();
+
+        if (!error && campaign) campaignId = campaign.id;
+      }
+
+      if (campaignId) {
+        generatedUrl = generatedUrl + '&cid=' + campaignId;
       }
     }
   } catch (e) {
