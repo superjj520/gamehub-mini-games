@@ -80,6 +80,8 @@ tr:last-child td { border-bottom:none; }
       <div class="link-box" id="d-link">-</div>
       <button class="action-btn" onclick="copyLink()">📋 复制链接</button>
       <button class="action-btn" onclick="openLink()">🔗 打开游戏</button>
+      <button class="action-btn" onclick="editCampaign()" id="btn-edit">✏️ 编辑配置</button>
+      <button class="action-btn" id="btn-toggle-status" onclick="toggleStatus()">⏸ 结束活动</button>
 
       <div style="font-size:13px;font-weight:700;margin:20px 0 8px">📅 近7天数据</div>
       <div class="table-wrap">
@@ -151,6 +153,7 @@ async function selectCampaign(campaign) {
 
   document.getElementById('detail-section').style.display = 'block';
   document.getElementById('detail-title').textContent = campaign.title + ' — 数据详情';
+  document.getElementById('btn-toggle-status').textContent = campaign.status === 'active' ? '⏸ 结束活动' : '▶ 激活活动';
 
   // 游戏链接
   const file = FILE_MAP[campaign.game_type] || campaign.game_type + '.html';
@@ -202,6 +205,29 @@ function copyLink() {
 function openLink() {
   const link = document.getElementById('d-link').textContent;
   window.open(link, '_blank');
+}
+
+function editCampaign() {
+  if (!currentCampaign) return;
+  const win = window.open('builder.html?cid=' + currentCampaign.id, '_blank');
+  const timer = setInterval(() => {
+    if (win && win.closed) {
+      clearInterval(timer);
+      loadCampaigns();
+    }
+  }, 1000);
+}
+
+async function toggleStatus() {
+  if (!currentCampaign) return;
+  const newStatus = currentCampaign.status === 'active' ? 'ended' : 'active';
+  const label = newStatus === 'ended' ? '结束' : '重新激活';
+  if (!confirm(`确认${label}此活动？`)) return;
+  const { error } = await GHSupabase.from('campaigns').update({ status: newStatus }).eq('id', currentCampaign.id);
+  if (error) { alert('更新失败：' + error.message); return; }
+  currentCampaign.status = newStatus;
+  document.getElementById('btn-toggle-status').textContent = newStatus === 'active' ? '⏸ 结束活动' : '▶ 激活活动';
+  loadCampaigns();
 }
 
 function goCreateGame() {
