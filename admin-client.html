@@ -62,7 +62,10 @@ tr:last-child td { border-bottom:none; }
     <button class="action-btn" onclick="doLogout()">退出</button>
   </div>
   <div class="main">
-    <div class="section-title">我的活动</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="section-title" style="margin:0">我的活动</div>
+      <button class="action-btn" style="background:linear-gradient(135deg,#7C3AED,#EC4899);color:white;border:none;padding:10px 20px;font-size:13px" onclick="goCreateGame()">➕ 创建游戏</button>
+    </div>
     <div id="campaigns-list">加载中…</div>
 
     <div id="detail-section" style="display:none;margin-top:28px">
@@ -199,6 +202,10 @@ function copyLink() {
 function openLink() {
   const link = document.getElementById('d-link').textContent;
   window.open(link, '_blank');
+}
+
+function goCreateGame() {
+  window.location.href = 'builder.html';
 }
 </script>
 </body>

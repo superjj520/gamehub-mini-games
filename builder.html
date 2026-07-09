@@ -625,6 +625,13 @@ async function generateLink() {
   try {
     const { data: { session } } = await GHSupabase.auth.getSession();
     if (session) {
+      // 查 clients 表获取当前登录用户的 client_id
+      const { data: client } = await GHSupabase
+        .from('clients')
+        .select('id')
+        .eq('email', session.user.email)
+        .single();
+
       const { data: campaign, error } = await GHSupabase
         .from('campaigns')
         .insert({
@@ -632,6 +639,7 @@ async function generateLink() {
           config:    cfg,
           title:     cfg.title || '未命名活动',
           status:    'active',
+          client_id: client?.id || null,
         })
         .select('id')
         .single();
