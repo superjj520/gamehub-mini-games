@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════
--- GameHub 数据库 Schema
+-- GameHub 数据库 Schema（最终版）
 -- ═══════════════════════════════════════════
 
 -- 1. clients（客户）
@@ -27,7 +27,8 @@ create table if not exists campaigns (
 -- 3. players（玩家）
 create table if not exists players (
   id          uuid primary key default gen_random_uuid(),
-  phone       text not null unique,
+  phone       text,
+  email       text not null unique,
   created_at  timestamptz not null default now()
 );
 
@@ -61,11 +62,18 @@ alter table players         enable row level security;
 alter table play_sessions   enable row level security;
 alter table campaign_stats  enable row level security;
 
--- clients：只有 service_role 能操作
-create policy "service_role 管理客户" on clients
-  for all using (auth.role() = 'service_role');
+-- clients：管理员（通过 Edge Function + service_role）和管理后台登录用户可管理
+drop policy if exists "service_role 管理客户" on clients;
+create policy "管理员管理客户" on clients
+  for all using (
+    auth.role() = 'service_role'
+    or auth.jwt()->>'email' = 'superjj199901@gmail.com'  -- 管理员邮箱
+  );
 
--- campaigns：客户只能看/改自己的（通过邮箱匹配 client_id）
+-- campaigns：客户只能看/改自己的
+drop policy if exists "客户读自己的活动" on campaigns;
+drop policy if exists "客户改自己的活动" on campaigns;
+
 create policy "客户读自己的活动" on campaigns
   for select using (
     auth.role() = 'service_role'
@@ -78,21 +86,38 @@ create policy "客户改自己的活动" on campaigns
     or client_id in (select id from clients where email = auth.email())
   );
 
--- players：任何请求都可以 upsert（验证码验证通过后由 Workers 写入）
-create policy "玩家数据开放写入" on players
-  for all using (true);
+-- players：已登录用户可 upsert（验证码验证通过后写入）
+drop policy if exists "玩家数据开放写入" on players;
+create policy "玩家管理自己" on players
+  for all using (
+    auth.role() = 'service_role'
+    or email = auth.email()
+  );
 
--- play_sessions：任何已认证用户可以插入
+-- play_sessions：认证用户可以插入
+drop policy if exists "玩家插入流水" on play_sessions;
+drop policy if exists "玩家查自己的流水" on play_sessions;
+
 create policy "玩家插入流水" on play_sessions
   for insert with check (true);
 
-create policy "玩家查自己的流水" on play_sessions
+create policy "读流水" on play_sessions
   for select using (
     auth.role() = 'service_role'
-    or player_id in (select id from players where phone = (auth.jwt()->>'phone'))
+    -- 玩家查自己
+    or player_id in (select id from players where email = auth.email())
+    -- 客户查自己活动的统计
+    or campaign_id in (
+      select c.id from campaigns c
+      join clients cl on cl.id = c.client_id
+      where cl.email = auth.email()
+    )
   );
 
--- campaign_stats：service_role 写，客户读自己活动的统计
+-- campaign_stats：客户端插入，客户读自己活动的统计
+drop policy if exists "客户读统计" on campaign_stats;
+drop policy if exists "写统计" on campaign_stats;
+
 create policy "客户读统计" on campaign_stats
   for select using (
     auth.role() = 'service_role'
@@ -103,8 +128,11 @@ create policy "客户读统计" on campaign_stats
     )
   );
 
-create policy "写统计" on campaign_stats
-  for all using (auth.role() = 'service_role');
+create policy "玩家写统计" on campaign_stats
+  for all using (
+    auth.role() = 'service_role'
+    or true  -- 允许任何认证用户 upsert（通过匿名键 + 登录session）
+  );
 
 -- ═══════════════════════════════════════════
 -- 90天自动清理 play_sessions
