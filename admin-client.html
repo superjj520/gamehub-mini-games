@@ -205,7 +205,14 @@ function openLink() {
 }
 
 function goCreateGame() {
-  window.location.href = 'builder.html';
+  // 用新窗口打开，关闭后自动刷新活动列表
+  const win = window.open('builder.html', '_blank');
+  const timer = setInterval(() => {
+    if (win && win.closed) {
+      clearInterval(timer);
+      loadCampaigns();
+    }
+  }, 1000);
 }
 </script>
 </body>

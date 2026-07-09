@@ -47,18 +47,27 @@ const GameReporter = (() => {
         .eq('date', today)
         .single();
 
+      // 检查今天该玩家是否已经玩过（用于 unique_players 去重）
+      const { count: todayCount } = await GHSupabase
+        .from('play_sessions')
+        .select('id', { count: 'exact', head: true })
+        .eq('campaign_id', campaignId)
+        .eq('player_id', player.id)
+        .gte('played_at', today + 'T00:00:00Z')
+        .lt('played_at', today + 'T23:59:59Z');
+      const isNewPlayerToday = todayCount === 1; // 刚插入的那条，所以等于1表示今天首次
+
       if (existing) {
-        // 更新
         await GHSupabase
           .from('campaign_stats')
           .update({
-            plays:   existing.plays + 1,
-            winners: existing.winners + (isWin ? 1 : 0),
+            plays:          existing.plays + 1,
+            winners:        existing.winners + (isWin ? 1 : 0),
+            unique_players: existing.unique_players + (isNewPlayerToday ? 1 : 0),
           })
           .eq('campaign_id', campaignId)
           .eq('date', today);
       } else {
-        // 新建
         await GHSupabase
           .from('campaign_stats')
           .insert({
@@ -79,19 +88,18 @@ const GameReporter = (() => {
 })();
 
 // ─── 拦截 GameLeaderboard.submitAndNotify ───
-// 在 leaderboard.js 加载完成后执行（本文件放在 leaderboard.js 之后引入）
-document.addEventListener('DOMContentLoaded', () => {
-  if (typeof GameLeaderboard === 'undefined') return;
-
-  const original = GameLeaderboard.submitAndNotify.bind(GameLeaderboard);
-  GameLeaderboard.submitAndNotify = function(opts) {
-    const result = original(opts);
-    // 异步上报，不阻塞游戏
-    GameReporter.report({
-      game:   opts.game   || '',
-      score:  opts.score  || 0,
-      result: opts.result || '',
-    }).catch(() => {});
-    return result;
-  };
-});
+// reporter.js 是动态注入的，DOMContentLoaded 可能已触发，直接执行
+(function patchLeaderboard() {
+  if (typeof GameLeaderboard !== 'undefined') {
+    const original = GameLeaderboard.submitAndNotify.bind(GameLeaderboard);
+    GameLeaderboard.submitAndNotify = function(opts) {
+      const result = original(opts);
+      GameReporter.report({
+        game:   opts.game   || '',
+        score:  opts.score  || 0,
+        result: opts.result || '',
+      }).catch(() => {});
+      return result;
+    };
+  }
+})();

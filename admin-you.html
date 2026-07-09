@@ -207,8 +207,6 @@ async function loadClients() {
 }
 
 // ─── 新建客户 ───
-const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlieXB1dGtodHJlam5xeWJsdmRjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTk0MzI1NiwiZXhwIjoyMDk1NTE5MjU2fQ.JrVwLYu-IqR4Gri5V-8gjTklIKLSBtvUSpHeJB2gMQI';
-
 async function createClient() {
   const name  = document.getElementById('new-name').value.trim();
   const email = document.getElementById('new-email').value.trim();
@@ -221,20 +219,21 @@ async function createClient() {
 
   msg.textContent = '创建中…'; msg.style.color = 'var(--muted)';
 
-  // 1. 通过 Admin API 创建 Auth 用户
-  const authRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
+  // 1. 通过 Edge Function 创建 Auth 用户（service_key 不暴露前端）
+  const { data: { session } } = await GHSupabase.auth.getSession();
+  const authRes = await fetch(`${SUPABASE_URL}/functions/v1/create-client-user`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': 'Bearer ' + SUPABASE_SERVICE_KEY },
-    body: JSON.stringify({ email, password: pwd, email_confirm: true })
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+    body: JSON.stringify({ email, password: pwd })
   });
   const authData = await authRes.json();
-  if (!authRes.ok) { msg.textContent = '创建账号失败：' + (authData.msg || authData.message || JSON.stringify(authData)); msg.style.color='#F87171'; return; }
+  if (!authRes.ok || authData.error) { msg.textContent = '创建账号失败：' + (authData.error || JSON.stringify(authData)); msg.style.color='#F87171'; return; }
 
   // 2. 写 clients 表
   const { error } = await GHSupabase.from('clients').insert({ name, email, plan });
   if (error) { msg.textContent = '账号已创建，但写入客户表失败：' + error.message; msg.style.color='#F5C842'; return; }
 
-  msg.textContent = `✓ 客户创建成功！登录地址：games.jydigtal.com/admin-client.html，密码：${pwd}`;
+  msg.innerHTML = `✓ 客户创建成功！登录地址：games.jydigtal.com/admin-client.html &nbsp;<button onclick="navigator.clipboard.writeText('${email}\\n密码：${pwd}\\n登录地址：https://games.jydigtal.com/admin-client.html').then(()=>alert('已复制账号信息'))" style="padding:3px 10px;border-radius:6px;border:1px solid #34D399;background:transparent;color:#34D399;font-size:11px;cursor:pointer">复制账号信息</button><br><span style="font-size:11px;color:rgba(240,234,248,0.5)">邮箱：${email} &nbsp; 密码：${pwd}</span>`;
   msg.style.color = '#34D399';
   document.getElementById('new-name').value = '';
   document.getElementById('new-email').value = '';

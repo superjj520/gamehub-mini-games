@@ -656,7 +656,13 @@ async function generateLink() {
   document.getElementById('resultBox').style.display = '';
   document.getElementById('qrWrap').style.display = 'none';
 
-  showToast('🎉 链接生成成功！');
+  // 提示登录状态
+  const { data: { session: s } } = await GHSupabase.auth.getSession();
+  if (!s) {
+    showToast('⚠️ 未登录客户账号，链接不含活动ID，数据无法统计');
+  } else {
+    showToast('🎉 链接生成成功！');
+  }
   forceRefreshPreview();
 }
 
