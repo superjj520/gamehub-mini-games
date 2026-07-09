@@ -283,12 +283,21 @@ const GameAuth = (() => {
     hideFloatingBtn();
   }
 
-  // ─── 自动检测：如果 URL 有 ?cid= 且未登录，自动弹窗 ───
-  document.addEventListener('DOMContentLoaded', () => {
+  // ─── 立即检查：URL 有 ?cid= 且未登录则弹窗 ───
+  // 注意：auth-player.js 是动态注入的，DOMContentLoaded 已触发，不能依赖事件
+  if (document.readyState !== 'loading') {
+    // 页面已加载完毕，直接执行
     if (GameSupabase.getCampaignId() && !GameSupabase.isLoggedIn()) {
       showModal();
     }
-  });
+  } else {
+    // 页面仍在加载，等 DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', () => {
+      if (GameSupabase.getCampaignId() && !GameSupabase.isLoggedIn()) {
+        showModal();
+      }
+    });
+  }
 
   return { requireLogin, onLoginSuccess, promptAfterGame, _showLogin, _onSkip };
 })();

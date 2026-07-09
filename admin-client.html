@@ -131,7 +131,7 @@ async function loadCampaigns() {
     .order('created_at', { ascending: false });
 
   const el = document.getElementById('campaigns-list');
-  if (!data?.length) { el.innerHTML = '<p style="color:var(--muted)">暂无活动，请联系管理员创建</p>'; return; }
+  if (!data?.length) { el.innerHTML = '<p style="color:var(--muted)">暂无活动，点击右上角「创建游戏」开始</p>'; return; }
 
   el.innerHTML = data.map(c => `
     <div class="campaign-card" id="cc-${c.id}" onclick="selectCampaign(${JSON.stringify(c).replace(/"/g,'&quot;')})">
