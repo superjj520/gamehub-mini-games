@@ -1,14 +1,10 @@
 /**
- * GameHub 玩家手机号登录组件
+ * GameHub 玩家邮箱登录组件
  * 依赖：supabase.js（先引入）
- * 效果：检测到未登录时自动弹出手机号验证弹窗，登录后继续游戏
+ * 效果：检测到未登录时自动弹出邮箱验证弹窗，登录后继续游戏
  */
 
 const GameAuth = (() => {
-  // Workers 短信接口地址
-  const SMS_API = 'https://api.jydigtal.com';
-  // 本地开发时改为：const SMS_API = 'http://localhost:8787';
-
   let loginCallbacks = [];
   let modalEl = null;
   let cooldownTimer = null;
@@ -51,8 +47,7 @@ const GameAuth = (() => {
         width: 100%; padding: 12px 16px; border-radius: 10px;
         background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
         color: #F0EAF8; font-size: 15px; outline: none; box-sizing: border-box;
-        margin-bottom: 12px; font-family: inherit;
-        transition: border-color 0.2s;
+        margin-bottom: 12px; font-family: inherit; transition: border-color 0.2s;
       }
       .gh-auth-input:focus { border-color: #7C3AED; }
       .gh-auth-btn {
@@ -74,13 +69,13 @@ const GameAuth = (() => {
     document.head.appendChild(style);
   }
 
-  // ─── 渲染第一步：输入手机号 ───
-  function renderPhoneStep() {
+  // ─── 渲染第一步：输入邮箱 ───
+  function renderEmailStep() {
     modalEl.innerHTML = `
       <div id="gh-auth-box">
-        <h2>🎮 验证手机号</h2>
-        <p>参与活动需要验证手机号，用于记录您的游戏数据</p>
-        <input id="gh-phone" class="gh-auth-input" type="tel" placeholder="请输入手机号" maxlength="11" inputmode="numeric">
+        <h2>🎮 验证邮箱</h2>
+        <p>参与活动需要验证邮箱，用于记录您的游戏数据</p>
+        <input id="gh-email" class="gh-auth-input" type="email" placeholder="请输入邮箱" autocomplete="email">
         <div id="gh-auth-msg" class="gh-auth-err"></div>
         <button id="gh-send-btn" class="gh-auth-btn">获取验证码</button>
         <button class="gh-auth-link" onclick="document.getElementById('gh-auth-backdrop').remove()">暂时跳过</button>
@@ -88,44 +83,47 @@ const GameAuth = (() => {
     `;
 
     document.getElementById('gh-send-btn').addEventListener('click', async () => {
-      const phone = document.getElementById('gh-phone').value.trim();
-      if (!/^1[3-9]\d{9}$/.test(phone)) {
-        showMsg('请输入正确的11位手机号', 'err'); return;
+      const email = document.getElementById('gh-email').value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showMsg('请输入正确的邮箱地址', 'err'); return;
       }
-      await sendCode(phone);
+      await sendCode(email);
+    });
+
+    // 回车触发
+    document.getElementById('gh-email').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('gh-send-btn').click();
     });
   }
 
-  // ─── 发送验证码 ───
-  async function sendCode(phone) {
+  // ─── 发送验证码（Supabase OTP）───
+  async function sendCode(email) {
     const btn = document.getElementById('gh-send-btn');
     btn.disabled = true;
     showMsg('发送中…', 'ok');
 
-    try {
-      const res = await fetch(`${SMS_API}/api/sms/send`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone }),
-      });
-      const data = await res.json();
-      if (!data.ok) { showMsg(data.error || '发送失败', 'err'); btn.disabled = false; return; }
+    const { error } = await GHSupabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: true }
+    });
 
-      showMsg('验证码已发送 ✓', 'ok');
-      renderCodeStep(phone);
-      startCooldown();
-    } catch (e) {
-      showMsg('网络错误，请重试', 'err');
+    if (error) {
+      showMsg(error.message || '发送失败，请重试', 'err');
       btn.disabled = false;
+      return;
     }
+
+    showMsg('验证码已发送，请查收邮件 ✓', 'ok');
+    renderCodeStep(email);
+    startCooldown();
   }
 
   // ─── 渲染第二步：输入验证码 ───
-  function renderCodeStep(phone) {
+  function renderCodeStep(email) {
     modalEl.innerHTML = `
       <div id="gh-auth-box">
         <h2>🔐 输入验证码</h2>
-        <p>验证码已发送至 ${phone.slice(0,3)}****${phone.slice(-4)}</p>
+        <p>验证码已发送至 ${email}</p>
         <input id="gh-code" class="gh-auth-input" type="text" placeholder="6位验证码" maxlength="6" inputmode="numeric">
         <div id="gh-auth-msg" class="gh-auth-err"></div>
         <button id="gh-verify-btn" class="gh-auth-btn">验证</button>
@@ -134,47 +132,53 @@ const GameAuth = (() => {
     `;
 
     document.getElementById('gh-verify-btn').addEventListener('click', () => {
-      verifyCode(phone, document.getElementById('gh-code').value.trim());
+      verifyCode(email, document.getElementById('gh-code').value.trim());
+    });
+
+    document.getElementById('gh-code').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('gh-verify-btn').click();
     });
 
     document.getElementById('gh-resend').addEventListener('click', () => {
       if (cooldownSec > 0) return;
-      renderPhoneStep();
-      document.getElementById('gh-phone').value = phone;
+      renderEmailStep();
+      setTimeout(() => { document.getElementById('gh-email').value = email; }, 50);
     });
 
-    // 自动聚焦
     setTimeout(() => document.getElementById('gh-code')?.focus(), 100);
   }
 
   // ─── 验证验证码 ───
-  async function verifyCode(phone, code) {
-    if (code.length !== 6) { showMsg('请输入6位验证码', 'err'); return; }
+  async function verifyCode(email, token) {
+    if (token.length !== 6) { showMsg('请输入6位验证码', 'err'); return; }
 
     const btn = document.getElementById('gh-verify-btn');
     btn.disabled = true;
     showMsg('验证中…', 'ok');
 
-    try {
-      const res = await fetch(`${SMS_API}/api/sms/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, code }),
-      });
-      const data = await res.json();
+    const { data, error } = await GHSupabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'email'
+    });
 
-      if (!data.ok) { showMsg(data.error || '验证失败', 'err'); btn.disabled = false; return; }
-
-      // 登录成功
-      GameSupabase.setPlayerSession({ token: data.token, id: data.playerId, phone });
-      modalEl.remove();
-      loginCallbacks.forEach(fn => { try { fn(); } catch(e) {} });
-      loginCallbacks = [];
-
-    } catch (e) {
-      showMsg('网络错误，请重试', 'err');
+    if (error) {
+      showMsg(error.message || '验证码错误', 'err');
       btn.disabled = false;
+      return;
     }
+
+    // 登录成功，同步写 players 表
+    const userId = data.user?.id;
+    if (userId) {
+      await GHSupabase.from('players').upsert({ email }, { onConflict: 'email' });
+      const { data: player } = await GHSupabase.from('players').select('id').eq('email', email).single();
+      GameSupabase.setPlayerSession({ token: data.session?.access_token || userId, id: player?.id || userId, phone: email });
+    }
+
+    modalEl.remove();
+    loginCallbacks.forEach(fn => { try { fn(); } catch(e) {} });
+    loginCallbacks = [];
   }
 
   // ─── 工具 ───
@@ -202,7 +206,7 @@ const GameAuth = (() => {
     modalEl = document.createElement('div');
     modalEl.id = 'gh-auth-backdrop';
     document.body.appendChild(modalEl);
-    renderPhoneStep();
+    renderEmailStep();
   }
 
   // ─── 自动检测：如果 URL 有 ?cid= 且未登录，自动弹窗 ───
