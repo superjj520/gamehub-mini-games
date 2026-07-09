@@ -9,6 +9,7 @@ const GameAuth = (() => {
   let modalEl = null;
   let cooldownTimer = null;
   let cooldownSec = 0;
+  let floatingBtnEl = null;
 
   // ─── 注册登录成功回调 ───
   function onLoginSuccess(fn) {
@@ -25,7 +26,7 @@ const GameAuth = (() => {
     showModal();
   }
 
-  // ─── 注入弹窗样式 ───
+  // ─── 注入弹窗样式 + 浮动按钮样式 ───
   function injectStyles() {
     if (document.getElementById('gh-auth-style')) return;
     const style = document.createElement('style');
@@ -65,8 +66,70 @@ const GameAuth = (() => {
       .gh-auth-link:hover { color: rgba(240,234,248,0.7); }
       .gh-auth-err { font-size: 12px; color: #F87171; margin-bottom: 10px; min-height: 18px; }
       .gh-auth-ok  { font-size: 12px; color: #34D399; margin-bottom: 10px; }
+      /* 浮动登录按钮 */
+      #gh-login-float {
+        position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+        width: 48px; height: 48px; border-radius: 50%;
+        background: linear-gradient(135deg, #7C3AED, #EC4899);
+        border: none; color: white; font-size: 20px; cursor: pointer;
+        box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+        display: flex; align-items: center; justify-content: center;
+        transition: transform 0.2s, opacity 0.3s;
+      }
+      #gh-login-float:hover { transform: scale(1.1); }
+      /* 游戏结束后登录提示 */
+      #gh-prompt {
+        position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+        background: rgba(26,10,46,0.95); border: 1px solid rgba(245,200,66,0.4);
+        border-radius: 16px; padding: 16px 20px; z-index: 9998;
+        text-align: center; font-family: -apple-system,'PingFang SC',sans-serif;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      }
+      #gh-prompt p { font-size: 13px; color: #F0EAF8; margin-bottom: 8px; }
+      #gh-prompt button {
+        padding: 8px 20px; border-radius: 8px; border: none;
+        background: linear-gradient(135deg, #7C3AED, #EC4899);
+        color: white; font-size: 13px; font-weight: 600; cursor: pointer;
+        font-family: inherit; margin: 0 4px;
+      }
+      #gh-prompt .gh-prompt-skip {
+        background: transparent; border: 1px solid rgba(255,255,255,0.15);
+        color: rgba(240,234,248,0.5);
+      }
     `;
     document.head.appendChild(style);
+  }
+
+  // ─── 浮动登录按钮 ───
+  function showFloatingBtn() {
+    if (GameSupabase.isLoggedIn() || document.getElementById('gh-login-float')) return;
+    floatingBtnEl = document.createElement('button');
+    floatingBtnEl.id = 'gh-login-float';
+    floatingBtnEl.textContent = '🔑';
+    floatingBtnEl.title = '登录以记录游戏数据';
+    floatingBtnEl.onclick = () => { showModal(); hideFloatingBtn(); };
+    document.body.appendChild(floatingBtnEl);
+  }
+
+  function hideFloatingBtn() {
+    if (floatingBtnEl) { floatingBtnEl.remove(); floatingBtnEl = null; }
+  }
+
+  // ─── 游戏结束后提示登录 ───
+  function promptAfterGame() {
+    if (GameSupabase.isLoggedIn()) return;
+    // 移除旧提示
+    document.getElementById('gh-prompt')?.remove();
+    const el = document.createElement('div');
+    el.id = 'gh-prompt';
+    el.innerHTML = `
+      <p>登录后可记录您的游戏成绩</p>
+      <button onclick="this.closest('#gh-prompt').remove();GameAuth._showLogin()">立即登录</button>
+      <button class="gh-prompt-skip" onclick="this.closest('#gh-prompt').remove()">暂不登录</button>
+    `;
+    document.body.appendChild(el);
+    // 5秒后自动消失
+    setTimeout(() => el?.remove(), 5000);
   }
 
   // ─── 渲染第一步：输入邮箱 ───
@@ -78,7 +141,7 @@ const GameAuth = (() => {
         <input id="gh-email" class="gh-auth-input" type="email" placeholder="请输入邮箱" autocomplete="email">
         <div id="gh-auth-msg" class="gh-auth-err"></div>
         <button id="gh-send-btn" class="gh-auth-btn">获取验证码</button>
-        <button class="gh-auth-link" onclick="document.getElementById('gh-auth-backdrop').remove()">暂时跳过</button>
+        <button class="gh-auth-link" onclick="document.getElementById('gh-auth-backdrop').remove();GameAuth._onSkip();">暂时跳过</button>
       </div>
     `;
 
@@ -90,7 +153,6 @@ const GameAuth = (() => {
       await sendCode(email);
     });
 
-    // 回车触发
     document.getElementById('gh-email').addEventListener('keydown', e => {
       if (e.key === 'Enter') document.getElementById('gh-send-btn').click();
     });
@@ -168,15 +230,15 @@ const GameAuth = (() => {
       return;
     }
 
-    // 登录成功，同步写 players 表
     const userId = data.user?.id;
     if (userId) {
       await GHSupabase.from('players').upsert({ email }, { onConflict: 'email' });
       const { data: player } = await GHSupabase.from('players').select('id').eq('email', email).single();
-      GameSupabase.setPlayerSession({ token: data.session?.access_token || userId, id: player?.id || userId, phone: email });
+      GameSupabase.setPlayerSession({ token: data.session?.access_token || userId, id: player?.id || userId, email });
     }
 
     modalEl.remove();
+    hideFloatingBtn();
     loginCallbacks.forEach(fn => { try { fn(); } catch(e) {} });
     loginCallbacks = [];
   }
@@ -207,6 +269,18 @@ const GameAuth = (() => {
     modalEl.id = 'gh-auth-backdrop';
     document.body.appendChild(modalEl);
     renderEmailStep();
+    setTimeout(() => document.getElementById('gh-email')?.focus(), 200);
+  }
+
+  // ─── 暴露给 HTML onclick 的方法 ───
+  function _onSkip() {
+    hideFloatingBtn();
+    showFloatingBtn();
+  }
+
+  function _showLogin() {
+    showModal();
+    hideFloatingBtn();
   }
 
   // ─── 自动检测：如果 URL 有 ?cid= 且未登录，自动弹窗 ───
@@ -216,5 +290,5 @@ const GameAuth = (() => {
     }
   });
 
-  return { requireLogin, onLoginSuccess };
+  return { requireLogin, onLoginSuccess, promptAfterGame, _showLogin, _onSkip };
 })();

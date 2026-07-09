@@ -142,6 +142,10 @@ const GameReporter = (() => {
       if (isWin && GameSupabase && GameSupabase.getCampaignId()) {
         setTimeout(() => GameReporter.showWinModal(res), 800);
       }
+      // 未登录时，游戏结束后提示登录
+      if (GameSupabase && GameSupabase.getCampaignId() && !GameSupabase.isLoggedIn()) {
+        setTimeout(() => { if (typeof GameAuth !== 'undefined') GameAuth.promptAfterGame(); }, 1200);
+      }
       return result;
     };
   }
