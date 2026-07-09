@@ -54,7 +54,7 @@ tr:hover td { background:rgba(255,255,255,0.02); }
 
 /* 新建客户表单 */
 .form-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:20px; }
-.form-row { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:10px; align-items:end; }
+.form-row { display:grid; grid-template-columns:1fr 1fr 1fr 1fr auto; gap:10px; align-items:end; }
 .field label { display:block; font-size:11px; color:var(--muted); margin-bottom:5px; font-weight:600; }
 .pill { display:inline-block; padding:2px 8px; border-radius:5px; font-size:11px; font-weight:700; }
 .pill-green { background:rgba(34,197,94,0.15); color:var(--green); border:1px solid rgba(34,197,94,0.3); }
@@ -105,6 +105,7 @@ tr:hover td { background:rgba(255,255,255,0.02); }
         <div class="form-row">
           <div class="field"><label>公司名</label><input id="new-name" class="input" placeholder="如：某某品牌" style="margin:0"></div>
           <div class="field"><label>登录邮箱</label><input id="new-email" class="input" type="email" placeholder="client@example.com" style="margin:0"></div>
+          <div class="field"><label>初始密码</label><input id="new-pwd" class="input" type="text" placeholder="至少6位" style="margin:0"></div>
           <div class="field"><label>套餐</label>
             <select id="new-plan" class="input" style="margin:0">
               <option value="free">Free</option>
@@ -206,20 +207,38 @@ async function loadClients() {
 }
 
 // ─── 新建客户 ───
+const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlieXB1dGtodHJlam5xeWJsdmRjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTk0MzI1NiwiZXhwIjoyMDk1NTE5MjU2fQ.JrVwLYu-IqR4Gri5V-8gjTklIKLSBtvUSpHeJB2gMQI';
+
 async function createClient() {
   const name  = document.getElementById('new-name').value.trim();
   const email = document.getElementById('new-email').value.trim();
   const plan  = document.getElementById('new-plan').value;
+  const pwd   = document.getElementById('new-pwd').value.trim();
   const msg   = document.getElementById('create-msg');
 
-  if (!name || !email) { msg.textContent = '请填写公司名和邮箱'; msg.style.color='#F87171'; return; }
+  if (!name || !email || !pwd) { msg.textContent = '请填写公司名、邮箱和初始密码'; msg.style.color='#F87171'; return; }
+  if (pwd.length < 6) { msg.textContent = '密码至少6位'; msg.style.color='#F87171'; return; }
 
-  // 写 clients 表
+  msg.textContent = '创建中…'; msg.style.color = 'var(--muted)';
+
+  // 1. 通过 Admin API 创建 Auth 用户
+  const authRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': 'Bearer ' + SUPABASE_SERVICE_KEY },
+    body: JSON.stringify({ email, password: pwd, email_confirm: true })
+  });
+  const authData = await authRes.json();
+  if (!authRes.ok) { msg.textContent = '创建账号失败：' + (authData.msg || authData.message || JSON.stringify(authData)); msg.style.color='#F87171'; return; }
+
+  // 2. 写 clients 表
   const { error } = await GHSupabase.from('clients').insert({ name, email, plan });
-  if (error) { msg.textContent = '创建失败：' + error.message; msg.style.color='#F87171'; return; }
+  if (error) { msg.textContent = '账号已创建，但写入客户表失败：' + error.message; msg.style.color='#F5C842'; return; }
 
-  msg.textContent = '✓ 客户已创建，请在 Supabase Dashboard → Authentication → Users 创建登录账号，密码发给客户';
+  msg.textContent = `✓ 客户创建成功！登录地址：games.jydigtal.com/admin-client.html，密码：${pwd}`;
   msg.style.color = '#34D399';
+  document.getElementById('new-name').value = '';
+  document.getElementById('new-email').value = '';
+  document.getElementById('new-pwd').value = '';
   loadClients();
 }
 
