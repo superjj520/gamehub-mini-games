@@ -4,6 +4,35 @@
  * 用法：GameLeaderboard.submit({ game: '大转盘', score: 100, result: '一等奖' })
  */
 
+// ─── 动态注入 Supabase SDK + supabase.js + auth-player.js + reporter.js ───
+(function() {
+  const base = (function() {
+    const scripts = document.querySelectorAll('script[src]');
+    for (const s of scripts) {
+      if (s.src.includes('leaderboard.js')) {
+        return s.src.replace('leaderboard.js', '');
+      }
+    }
+    return '';
+  })();
+
+  function loadScript(src, onload) {
+    if (document.querySelector('script[src="' + src + '"]')) { if (onload) onload(); return; }
+    const s = document.createElement('script');
+    s.src = src;
+    if (onload) s.onload = onload;
+    document.head.appendChild(s);
+  }
+
+  // 按顺序加载：SDK → supabase.js → auth-player.js → reporter.js
+  loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js', function() {
+    loadScript(base + 'supabase.js', function() {
+      loadScript(base + 'auth-player.js');
+      loadScript(base + 'reporter.js');
+    });
+  });
+})();
+
 const GameLeaderboard = (() => {
   const STORAGE_KEY = 'gh_leaderboard';
   const MAX_PER_GAME = 100;  // 每个游戏最多保存100条记录
