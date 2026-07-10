@@ -421,73 +421,66 @@ function renderPreview() {
 }
 
 function buildPreviewHTML(config) {
-  return '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="UTF-8">\n' +
-    '<style>\n' +
-    '*{margin:0;padding:0;box-sizing:border-box;}\n' +
-    ':root{--gold:#F5C842;--bg:#0D0720;--accent:#7C3AED;--accent2:#EC4899;--deep:#1A0A2E;--card:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.1);--text:#F0EAF8;--muted:rgba(240,234,248,0.5);}\n' +
-    'body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}\n' +
-    '.preview-info{text-align:center;}\n' +
-    '.preview-info h2{font-size:18px;margin-bottom:8px;}\n' +
-    '.preview-info p{font-size:12px;color:var(--muted);}\n' +
-    '.preview-grid{width:100%;max-width:400px;margin:0 auto;}\n' +
-    '</style>\n</head>\n<body>\n' +
-    '<div class="preview-info">\n' +
-    '<h2>' + config.title + '</h2>\n' +
-    '<p>' + config.blocks.length + ' 个 Block · 大富翁</p>\n' +
-    '<div class="preview-grid" id="pvGrid"></div>\n' +
-    '</div>\n' +
-    '<script>\n' +
-    // 内联必要的渲染逻辑
-    '(' + function() {
-      var config = JSON.parse(document.currentScript.getAttribute('data-config'));
-      var gridBlock = null;
-      for (var i = 0; i < config.blocks.length; i++) {
-        if (config.blocks[i].type === 'grid') { gridBlock = config.blocks[i]; break; }
-      }
-      if (!gridBlock) return;
-
-      var container = document.getElementById('pvGrid');
-      var c = gridBlock.config;
-      var rows = c.rows || 7;
-      var cols = c.cols || 7;
-      var cells = c.cells || [];
-
-      var board = document.createElement('div');
-      board.style.cssText = 'display:grid;grid-template-columns:repeat(' + cols + ',1fr);grid-template-rows:repeat(' + rows + ',1fr);gap:1px;aspect-ratio:' + cols + '/' + rows + ';';
-      var CI = cells;
-
-      for (var r = 0; r < rows; r++) {
-        for (var c2 = 0; c2 < cols; c2++) {
-          var isB = r === 0 || r === rows-1 || c2 === 0 || c2 === cols-1;
-          if (!isB) {
-            var emp = document.createElement('div');
-            board.appendChild(emp);
-            continue;
-          }
-          var idx;
-          if (r === 0) idx = c2;
-          else if (c2 === cols-1) idx = cols-1 + r;
-          else if (r === rows-1) idx = cols-1 + rows-1 + cols-1 - c2;
-          else idx = cols-1 + rows-1 + cols-1 + rows-1 - r;
-
-          var cd = { name: '', icon: '', type: 'empty' };
-          for (var j = 0; j < CI.length; j++) {
-            if (CI[j].index === idx) { cd = CI[j]; break; }
-          }
-          var div = document.createElement('div');
-          div.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:8px;text-align:center;border-radius:2px;border:1px solid var(--border);padding:1px;';
-          var tC = { start:'rgba(34,197,94,0.2)', property:'rgba(124,58,237,0.15)', chance:'rgba(245,200,66,0.15)', destiny:'rgba(236,72,153,0.15)', jail:'rgba(239,68,68,0.15)', shop:'rgba(59,130,246,0.15)', event:'rgba(34,211,238,0.15)', tax:'rgba(251,146,60,0.15)' };
-          div.style.background = tC[cd.type] || 'var(--card)';
-          div.innerHTML = '<span style="font-size:12px">' + (cd.icon||'') + '</span><span style="font-size:7px;color:var(--text)">' + (cd.name||'') + '</span>';
-          board.appendChild(div);
-        }
-      }
-      container.appendChild(board);
-    }.toString() + '\n</script>\n' +
-    '<script data-config=\'' + JSON.stringify(config).replace(/'/g, "\\'") + '\'>\n' +
-    'var el = document.currentScript; var s = document.createElement("script"); s.textContent = "(" + el.previousElementSibling.textContent + ")()"; s.setAttribute("data-config", el.getAttribute("data-config")); document.body.appendChild(s);\n' +
-    '</script>\n' +
-    '</body>\n</html>';
+  // 将配置转为纯 JSON 字符串
+  var configJson = JSON.stringify(config);
+  // 构建简单直接的预览 HTML，完全避免 '</' + 'script>' 的复杂嵌套
+  var html = '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="UTF-8">\n';
+  html += '<style>\n';
+  html += '*{margin:0;padding:0;box-sizing:border-box;}\n';
+  html += ':root{--gold:#F5C842;--bg:#0D0720;--accent:#7C3AED;--accent2:#EC4899;--deep:#1A0A2E;--card:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.1);--text:#F0EAF8;--muted:rgba(240,234,248,0.5);}\n';
+  html += 'body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}\n';
+  html += '.preview-info{text-align:center;}\n';
+  html += '.preview-info h2{font-size:18px;margin-bottom:8px;}\n';
+  html += '.preview-info p{font-size:12px;color:var(--muted);}\n';
+  html += '.preview-grid{width:100%;max-width:400px;margin:0 auto;}\n';
+  html += '</style>\n<' + '/head>\n<body>\n';
+  html += '<div class="preview-info">\n';
+  html += '<h2>' + config.title + '</h2>\n';
+  html += '<p>' + config.blocks.length + ' 个 Block · 大富翁</p>\n';
+  html += '<div class="preview-grid" id="pvGrid"></' + 'div>\n';
+  html += '</' + 'div>\n';
+  // 直接把配置嵌入 JS 变量，脚本直接渲染
+  html += '<' + 'script>\n';
+  html += '(function(){\n';
+  html += 'var config = ' + configJson + ';\n';
+  html += 'var gridBlock = null;\n';
+  html += 'for (var i = 0; i < config.blocks.length; i++) {\n';
+  html += '  if (config.blocks[i].type === "grid") { gridBlock = config.blocks[i]; break; }\n';
+  html += '}\n';
+  html += 'if (!gridBlock) return;\n';
+  html += 'var container = document.getElementById("pvGrid");\n';
+  html += 'var c = gridBlock.config;\n';
+  html += 'var rows = c.rows || 7;\n';
+  html += 'var cols = c.cols || 7;\n';
+  html += 'var cells = c.cells || [];\n';
+  html += 'var board = document.createElement("div");\n';
+  html += 'board.style.cssText = "display:grid;grid-template-columns:repeat(" + cols + ",1fr);grid-template-rows:repeat(" + rows + ",1fr);gap:1px;aspect-ratio:" + cols + "/" + rows + ";";\n';
+  html += 'var tC = { start:"rgba(34,197,94,0.2)", property:"rgba(124,58,237,0.15)", chance:"rgba(245,200,66,0.15)", destiny:"rgba(236,72,153,0.15)", jail:"rgba(239,68,68,0.15)", shop:"rgba(59,130,246,0.15)", event:"rgba(34,211,238,0.15)", tax:"rgba(251,146,60,0.15)" };\n';
+  html += 'for (var r = 0; r < rows; r++) {\n';
+  html += '  for (var c2 = 0; c2 < cols; c2++) {\n';
+  html += '    var isB = r === 0 || r === rows-1 || c2 === 0 || c2 === cols-1;\n';
+  html += '    if (!isB) { board.appendChild(document.createElement("div")); continue; }\n';
+  html += '    var idx;\n';
+  html += '    if (r === 0) idx = c2;\n';
+  html += '    else if (c2 === cols-1) idx = cols-1 + r;\n';
+  html += '    else if (r === rows-1) idx = cols-1 + rows-1 + cols-1 - c2;\n';
+  html += '    else idx = cols-1 + rows-1 + cols-1 + rows-1 - r;\n';
+  html += '    var cd = { name:"", icon:"", type:"empty" };\n';
+  html += '    for (var j = 0; j < cells.length; j++) {\n';
+  html += '      if (cells[j].index === idx) { cd = cells[j]; break; }\n';
+  html += '    }\n';
+  html += '    var div = document.createElement("div");\n';
+  html += '    div.style.cssText = "display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:8px;text-align:center;border-radius:2px;border:1px solid var(--border);padding:1px;";\n';
+  html += '    div.style.background = tC[cd.type] || "var(--card)";\n';
+  html += '    div.innerHTML = \'<span style="font-size:12px">\' + (cd.icon||"") + \'<' + '/span><span style="font-size:7px;color:var(--text)">\' + (cd.name||"") + \'<' + '/span>\';\n';
+  html += '    board.appendChild(div);\n';
+  html += '  }\n';
+  html += '}\n';
+  html += 'container.appendChild(board);\n';
+  html += '})();\n';
+  html += '</' + 'script>\n';
+  html += '</' + 'body>\n<' + '/html>';
+  return html;
 }
 
 function renderPropertyPanel() {
