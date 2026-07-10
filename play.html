@@ -137,8 +137,26 @@ body {
 <script src="runtime/core/piece.js"></script>
 <script src="runtime/engine.js"></script>
 <script src="runtime/games/monopoly.js"></script>
+<script src="runtime/games/snake.js"></script>
+<script src="runtime/games/wheel.js"></script>
+<script src="runtime/games/quiz.js"></script>
+<script src="runtime/games/game2048.js"></script>
+<script src="runtime/games/match3.js"></script>
+<script src="runtime/games/flying-chess.js"></script>
+<script src="runtime/games/truth-or-dare.js"></script>
 
 <script>
+var GAME_MAP = {
+  'monopoly':      { name: '大富翁',     module: MonopolyGame },
+  'snake':         { name: '贪吃蛇',     module: SnakeGame },
+  'wheel':         { name: '大转盘',     module: WheelGame },
+  'quiz':          { name: '答题',       module: QuizGame },
+  'game-2048':     { name: '2048',       module: Game2048 },
+  'match3':        { name: '消消乐',     module: Match3Game },
+  'flying-chess':  { name: '飞行棋',     module: FlyingChessGame },
+  'truth-or-dare': { name: '真心话大冒险', module: TruthOrDareGame },
+};
+
 (async function main() {
   var params = new URLSearchParams(location.search);
   var slug = params.get('config');
@@ -185,59 +203,93 @@ body {
 function startGame(config) {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
-  document.getElementById('gameTitle').textContent = config.title || '大富翁';
-  document.getElementById('gameType').textContent = config.game_type === 'monopoly' ? '大富翁' : config.game_type;
+
+  var gameInfo = GAME_MAP[config.game_type] || { name: config.game_type, module: null };
+  document.getElementById('gameTitle').textContent = config.title || gameInfo.name;
+  document.getElementById('gameType').textContent = gameInfo.name;
+
+  if (!gameInfo.module) {
+    document.getElementById('statusBar').textContent = '❌ 不支持: ' + config.game_type;
+    return;
+  }
+
   document.getElementById('statusBar').textContent = '🎮 游戏初始化中…';
 
-  // 监听游戏事件
-  GameEngine.on('monopoly:state', function(gameState) {
-    renderPlayers(gameState.players, gameState.currentPlayer, gameState.gameOver);
-    renderLog(gameState.log || []);
-    document.getElementById('btnRoll').disabled = gameState.gameOver;
+  // 通用事件监听
+  GameEngine.on('game:state', function(gs) {
+    renderGenericState(config.game_type, gs);
   });
-
+  GameEngine.on('game:status', function(msg) {
+    document.getElementById('statusBar').textContent = msg;
+  });
+  // 兼容大富翁专用事件
+  GameEngine.on('monopoly:state', function(gs) {
+    renderMonopolyState(gs);
+  });
   GameEngine.on('monopoly:status', function(msg) {
     document.getElementById('statusBar').textContent = msg;
   });
 
-  // 启动
   var container = document.getElementById('boardContainer');
-  GameEngine.init(config, container, MonopolyGame).catch(function(e) {
+  // 非棋盘游戏需要全屏容器
+  if (config.game_type === 'wheel' || config.game_type === 'truth-or-dare') {
+    container.style.maxWidth = '100%';
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'center';
+  }
+
+  GameEngine.init(config, container, gameInfo.module).catch(function(e) {
     document.getElementById('statusBar').textContent = '❌ 启动失败: ' + e.message;
     console.error(e);
   });
+
+  // 根据游戏类型显示/隐藏按钮
+  var btnSection = document.getElementById('btnSection');
+  if (config.game_type === 'monopoly') {
+    btnSection.innerHTML = '<button class="btn btn-primary" id="btnRoll" onclick="MonopolyGame.rollDice()">🎲 掷骰子</button><button class="btn btn-secondary" id="btnBuy" onclick="MonopolyGame.buyProperty()">🏠 购买地产</button>';
+  } else if (config.game_type === 'flying-chess') {
+    btnSection.innerHTML = '<button class="btn btn-primary" onclick="FlyingChessGame.rollDice()">🎲 掷骰子</button>';
+  } else if (config.game_type === 'wheel') {
+    btnSection.innerHTML = '<button class="btn btn-primary" onclick="WheelGame.spin()">🎡 开始抽奖</button>';
+  } else if (config.game_type === 'truth-or-dare') {
+    btnSection.innerHTML = '<button class="btn btn-primary" onclick="TruthOrDareGame.pickTruth()" style="margin-bottom:4px">💬 真心话</button><button class="btn btn-secondary" onclick="TruthOrDareGame.pickDare()" style="margin-bottom:4px">🎯 大冒险</button><button class="btn btn-danger" onclick="TruthOrDareGame.skip()">⏭️ 跳过</button>';
+  } else {
+    btnSection.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center">使用键盘/触屏操作</div>';
+  }
 }
 
-function renderPlayers(players, currentIdx, gameOver) {
+function renderGenericState(gameType, gs) {
+  var logEl = document.getElementById('eventLog');
+  var playerEl = document.getElementById('playerList');
+  if (gs.score !== undefined) {
+    playerEl.innerHTML = '<div class="player-card"><div class="player-card-header"><span style="font-size:20px">🏆</span><span class="player-name">得分</span></div><div class="player-stats"><span style="font-size:24px;font-weight:800">' + gs.score + '</span></div></div>';
+  }
+  if (gs.gameOver) {
+    document.getElementById('btnRoll').disabled = true;
+  }
+}
+
+function renderMonopolyState(gameState) {
   var html = '';
+  var players = gameState.players || [];
   for (var i = 0; i < players.length; i++) {
     var p = players[i];
-    var activeClass = (i === currentIdx && !gameOver) ? ' active' : '';
-    html += '<div class="player-card' + activeClass + '">';
-    html += '<div class="player-card-header">';
-    html += '<span class="player-emoji">' + p.emoji + '</span>';
-    html += '<span class="player-name">' + p.name + '</span>';
+    var activeClass = (i === gameState.currentPlayer && !gameState.gameOver) ? ' active' : '';
+    html += '<div class="player-card' + activeClass + '"><div class="player-card-header">';
+    html += '<span class="player-emoji">' + p.emoji + '</span><span class="player-name">' + p.name + '</span>';
     if (p.isAI) html += '<span class="player-ai-badge">🤖 AI</span>';
-    html += '</div>';
-    html += '<div class="player-stats">';
-    html += '<span>💰 ' + p.gold + ' 金币</span>';
-    html += '<span>📍 格' + (p.position + 1) + '</span>';
-    html += '<span>🔄 第' + (p.laps + 1) + '圈</span>';
-    if (p.properties && p.properties.length > 0) {
-      html += '<span>🏠 ×' + p.properties.length + '</span>';
-    }
-    html += '</div>';
-    html += '</div>';
+    html += '</div><div class="player-stats">';
+    html += '<span>💰 ' + p.gold + '</span><span>📍 ' + (p.position+1) + '</span><span>🔄 第' + (p.laps+1) + '圈</span>';
+    if (p.properties && p.properties.length > 0) html += '<span>🏠 ×' + p.properties.length + '</span>';
+    html += '</div></div>';
   }
   document.getElementById('playerList').innerHTML = html;
-}
-
-function renderLog(logLines) {
-  var html = '';
-  for (var i = 0; i < logLines.length; i++) {
-    html += '<div>' + logLines[i] + '</div>';
-  }
-  document.getElementById('eventLog').innerHTML = html || '<div style="opacity:0.5">游戏即将开始…</div>';
+  document.getElementById('btnRoll').disabled = gameState.gameOver;
+  var logHtml = '';
+  var log = gameState.log || [];
+  for (var j = 0; j < log.length; j++) logHtml += '<div>' + log[j] + '</div>';
+  document.getElementById('eventLog').innerHTML = logHtml || '<div style="opacity:0.5">游戏即将开始…</div>';
 }
 </script>
 </body>

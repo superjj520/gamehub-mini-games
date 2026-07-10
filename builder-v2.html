@@ -220,7 +220,8 @@ body {
   <div class="topbar-left">
     <a class="topbar-logo" href="index.html">🎮 <span>GameHub</span></a>
     <div class="topbar-sep"></div>
-    <input class="topbar-title-input" id="titleInput" value="未命名大富翁" placeholder="输入游戏名称…" onchange="onTitleChange()">
+    <select id="gameTypeSelect" onchange="switchGameType(this.value)" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 8px;font-size:13px;font-family:inherit;cursor:pointer;outline:none;"></select>
+    <input class="topbar-title-input" id="titleInput" value="未命名大富翁" placeholder="输入游戏名称…" onchange="onTitleChange()" style="margin-left:4px;">
   </div>
   <div class="topbar-right">
     <span class="topbar-status" id="saveStatus">
@@ -278,6 +279,17 @@ body {
 <script>
 // ========= 创作工坊状态管理 =========
 
+var GAME_TYPES = {
+  'monopoly':      { name: '大富翁',       icon: '🎰' },
+  'snake':         { name: '贪吃蛇',       icon: '🐍' },
+  'wheel':         { name: '大转盘',       icon: '🎡' },
+  'quiz':          { name: '答题',         icon: '🧠' },
+  'game-2048':     { name: '2048',         icon: '🔢' },
+  'match3':        { name: '消消乐',       icon: '💎' },
+  'flying-chess':  { name: '飞行棋',       icon: '✈️' },
+  'truth-or-dare': { name: '真心话大冒险', icon: '🤝' },
+};
+
 var editor = {
   gameType: 'monopoly',
   title: '未命名大富翁',
@@ -291,6 +303,7 @@ var editor = {
 // ========= 初始化 =========
 (function init() {
   document.getElementById('titleInput').value = editor.title;
+  buildGameTypeSelector();
 
   // 检查 URL 参数
   var params = new URLSearchParams(location.search);
@@ -302,14 +315,37 @@ var editor = {
   } else if (forkId) {
     forkConfig(forkId);
   } else {
-    // 新建：加载默认配置
     editor.blocks = BlockRegistry.getDefaults('monopoly');
     renderAll();
   }
 
-  // 构建 Block 类型菜单
   buildBlockTypeMenu();
 })();
+
+function buildGameTypeSelector() {
+  var sel = document.getElementById('gameTypeSelect');
+  var html = '';
+  var keys = Object.keys(GAME_TYPES);
+  for (var i = 0; i < keys.length; i++) {
+    var gt = GAME_TYPES[keys[i]];
+    html += '<option value="' + keys[i] + '"' + (editor.gameType === keys[i] ? ' selected' : '') + '>' + gt.icon + ' ' + gt.name + '</option>';
+  }
+  sel.innerHTML = html;
+}
+
+function switchGameType(newType) {
+  if (editor.isDirty && !confirm('切换游戏类型将替换当前 Block 配置，未保存的修改会丢失。确定继续？')) return;
+  editor.gameType = newType;
+  editor.blocks = BlockRegistry.getDefaults(newType);
+  editor.title = '未命名' + (GAME_TYPES[newType] ? GAME_TYPES[newType].name : '游戏');
+  editor.selectedBlockId = null;
+  editor.isDirty = true;
+  editor.configId = null;
+  editor.shareSlug = null;
+  document.getElementById('titleInput').value = editor.title;
+  updateSaveStatus();
+  renderAll();
+}
 
 // ========= Block 操作 =========
 function selectBlock(id) {

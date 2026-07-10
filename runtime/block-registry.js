@@ -194,10 +194,129 @@ const BlockRegistry = (() => {
     },
   ];
 
+  // ─── 贪吃蛇默认配置 ───
+  const SNAKE_DEFAULTS = [
+    { id: 'blk_grid', type: 'grid', label: '游戏区域', config: { rows: 15, cols: 15, cells: [] } },
+    { id: 'blk_rules', type: 'rule', label: '游戏规则', config: { variables: [
+      { key: 'speed', label: '移动速度(ms)', value: 150, min: 50, max: 500 },
+      { key: 'growCount', label: '每次增长', value: 1, min: 1, max: 5 },
+    ]}},
+    { id: 'blk_theme', type: 'theme', label: '视觉主题', config: { preset: '暗绿' } },
+  ];
+
+  // ─── 大转盘默认配置 ───
+  const WHEEL_DEFAULTS = [
+    { id: 'blk_prizes', type: 'collection', label: '奖池', config: { drawMode: 'weighted', cards: [
+      { id: 'p1', title: '一等奖 iPhone', weight: 5 },
+      { id: 'p2', title: '二等奖 耳机', weight: 10 },
+      { id: 'p3', title: '三等奖 优惠券', weight: 25 },
+      { id: 'p4', title: '四等奖 积分', weight: 30 },
+      { id: 'p5', title: '谢谢参与', weight: 30 },
+    ]}},
+    { id: 'blk_rules', type: 'rule', label: '游戏规则', config: { variables: [
+      { key: 'spinCost', label: '每次消耗金币', value: 10, min: 0, max: 1000 },
+    ]}},
+    { id: 'blk_theme', type: 'theme', label: '视觉主题', config: { preset: '暗金' } },
+  ];
+
+  // ─── 答题游戏默认配置 ───
+  const QUIZ_DEFAULTS = [
+    { id: 'blk_questions', type: 'collection', label: '题库', config: { drawMode: 'random', cards: [
+      { id: 'q1', title: '世界上最大的洋是？', options: ['大西洋','太平洋','印度洋','北冰洋'], answer: 1 },
+      { id: 'q2', title: '光的传播速度约为？', options: ['30万km/s','3万km/s','300万km/s','3000km/s'], answer: 0 },
+      { id: 'q3', title: '水的化学式是？', options: ['H₂O','CO₂','O₂','NaCl'], answer: 0 },
+      { id: 'q4', title: '一年大约有多少天？', options: ['300天','365天','400天','500天'], answer: 1 },
+      { id: 'q5', title: '太阳系最大的行星是？', options: ['地球','火星','木星','土星'], answer: 2 },
+      { id: 'q6', title: '人体最大的器官是？', options: ['心脏','肝脏','皮肤','大脑'], answer: 2 },
+      { id: 'q7', title: '中国最长的河流是？', options: ['黄河','长江','珠江','淮河'], answer: 1 },
+      { id: 'q8', title: '1KB 等于多少字节？', options: ['100','512','1000','1024'], answer: 3 },
+    ]}},
+    { id: 'blk_rules', type: 'rule', label: '游戏规则', config: { variables: [
+      { key: 'totalQuestions', label: '题目数量', value: 5, min: 1, max: 50 },
+      { key: 'timePerQuestion', label: '每题时限(秒)', value: 15, min: 5, max: 60 },
+      { key: 'passScore', label: '及格线(%)', value: 60, min: 0, max: 100 },
+    ]}},
+    { id: 'blk_theme', type: 'theme', label: '视觉主题', config: { preset: '暗蓝' } },
+  ];
+
+  // ─── 2048 默认配置 ───
+  const GAME2048_DEFAULTS = [
+    { id: 'blk_grid', type: 'grid', label: '游戏区域', config: { rows: 4, cols: 4, cells: [] } },
+    { id: 'blk_rules', type: 'rule', label: '游戏规则', config: { variables: [
+      { key: 'winValue', label: '获胜目标值', value: 2048, min: 256, max: 8192 },
+    ]}},
+    { id: 'blk_theme', type: 'theme', label: '视觉主题', config: { preset: '暗紫' } },
+  ];
+
+  // ─── 消消乐默认配置 ───
+  const MATCH3_DEFAULTS = [
+    { id: 'blk_grid', type: 'grid', label: '游戏区域', config: { rows: 8, cols: 8, cells: [] } },
+    { id: 'blk_rules', type: 'rule', label: '游戏规则', config: { variables: [
+      { key: 'colorCount', label: '颜色种类', value: 6, min: 3, max: 8 },
+      { key: 'maxMoves', label: '最大步数', value: 30, min: 10, max: 100 },
+    ]}},
+    { id: 'blk_theme', type: 'theme', label: '视觉主题', config: { preset: '暗紫' } },
+  ];
+
+  // ─── 飞行棋默认配置 ───
+  const FLYING_CHESS_DEFAULTS = [
+    { id: 'blk_grid', type: 'grid', label: '飞行路径', config: { rows: 1, cols: 1, cells: Array.from({length:52}, function(_,i){return {index:i,type:'path',name:'格'+(i+1),icon:i%13===0?'✈️':i%7===0?'⭐':''}}) } },
+    { id: 'blk_players', type: 'player', label: '玩家设置', config: { minPlayers: 2, maxPlayers: 4, initialGold: 0, players: [
+      { id:'p1', name:'红队', emoji:'🔴', isAI:true, color:'#EF4444' },
+      { id:'p2', name:'蓝队', emoji:'🔵', isAI:true, color:'#3B82F6' },
+      { id:'p3', name:'绿队', emoji:'🟢', isAI:true, color:'#22C55E' },
+      { id:'p4', name:'黄队', emoji:'🟡', isAI:true, color:'#F59E0B' },
+    ]}},
+    { id: 'blk_rules', type: 'rule', label: '游戏规则', config: { variables: [
+      { key: 'diceMin', label: '骰子最小值', value: 1, min: 1, max: 3 },
+      { key: 'diceMax', label: '骰子最大值', value: 6, min: 4, max: 12 },
+    ]}},
+    { id: 'blk_theme', type: 'theme', label: '视觉主题', config: { preset: '暗紫' } },
+  ];
+
+  // ─── 真心话大冒险默认配置 ───
+  const TRUTH_OR_DARE_DEFAULTS = [
+    { id: 'blk_truths', type: 'collection', label: '真心话牌堆', config: { drawMode: 'random', cards: [
+      { id:'t1', title:'你最大的秘密是什么？', difficulty:1 },
+      { id:'t2', title:'上一次哭是什么时候？', difficulty:1 },
+      { id:'t3', title:'你最尴尬的经历是什么？', difficulty:2 },
+      { id:'t4', title:'有没有暗恋过朋友的对象？', difficulty:3 },
+      { id:'t5', title:'做过最后悔的事是什么？', difficulty:2 },
+      { id:'t6', title:'你最害怕什么？', difficulty:1 },
+      { id:'t7', title:'最想念的人是谁？', difficulty:1 },
+      { id:'t8', title:'最想对谁说对不起？', difficulty:2 },
+    ]}},
+    { id: 'blk_dares', type: 'collection', label: '大冒险牌堆', config: { drawMode: 'random', cards: [
+      { id:'d1', title:'学狗叫 30 秒', difficulty:2 },
+      { id:'d2', title:'模仿在场一个人', difficulty:2 },
+      { id:'d3', title:'打电话给第 5 个联系人说"我想你了"', difficulty:4 },
+      { id:'d4', title:'闭眼转 10 圈走直线', difficulty:1 },
+      { id:'d5', title:'用方言唱一首歌', difficulty:2 },
+      { id:'d6', title:'表演喜怒哀乐表情', difficulty:1 },
+      { id:'d7', title:'对窗外喊"我是最棒的"', difficulty:3 },
+      { id:'d8', title:'单脚站立一分钟', difficulty:1 },
+    ]}},
+    { id: 'blk_rules', type: 'rule', label: '游戏规则', config: { variables: [
+      { key: 'maxSkips', label: '最多跳过次数', value: 2, min: 0, max: 10 },
+      { key: 'penaltyMode', label: '惩罚模式(none/drink/score)', value: 'none' },
+    ]}},
+    { id: 'blk_theme', type: 'theme', label: '视觉主题', config: { preset: '暗紫' } },
+  ];
+
   // ─── API ───
   function getDefaults(gameType) {
-    const defaults = { monopoly: JSON.parse(JSON.stringify(MONOPOLY_DEFAULTS)) };
-    return defaults[gameType] || [];
+    var games = {
+      monopoly:       MONOPOLY_DEFAULTS,
+      snake:          SNAKE_DEFAULTS,
+      wheel:          WHEEL_DEFAULTS,
+      quiz:           QUIZ_DEFAULTS,
+      'game-2048':    GAME2048_DEFAULTS,
+      match3:         MATCH3_DEFAULTS,
+      'flying-chess': FLYING_CHESS_DEFAULTS,
+      'truth-or-dare': TRUTH_OR_DARE_DEFAULTS,
+    };
+    var defaults = games[gameType];
+    return defaults ? JSON.parse(JSON.stringify(defaults)) : [];
   }
 
   function getSchema(blockType) {
