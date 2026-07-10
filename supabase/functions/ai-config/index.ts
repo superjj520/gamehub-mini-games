@@ -1,6 +1,6 @@
 // GameHub AI 配置助手 Edge Function
 // 部署: supabase functions deploy ai-config --no-verify-jwt
-// 环境变量: ANTHROPIC_API_KEY
+// 环境变量: DEEPSEEK_API_KEY
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -37,7 +37,7 @@ ${JSON.stringify(currentBlocks, null, 2)}
     { "blockId": "blk_xxx", "config": { "key": "newValue" } }
   ],
   "newBlocks": [
-    { "type": "collection", "label": "新卡堆", "config": { ... } }
+    { "type": "collection", "label": "新卡堆", "config": {} }
   ]
 }
 
@@ -48,26 +48,29 @@ ${JSON.stringify(currentBlocks, null, 2)}
 4. 所有文案必须用中文，符合用户描述的主题风格
 5. 只返回 JSON，不要其他内容`;
 
-    const apiKey = Deno.env.get("ANTHROPIC_API_KEY") || "";
+    const apiKey = Deno.env.get("DEEPSEEK_API_KEY") || "";
     if (!apiKey) {
       return new Response(
-        JSON.stringify({ error: "ANTHROPIC_API_KEY 未配置" }),
+        JSON.stringify({ error: "DEEPSEEK_API_KEY 未配置" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
+        "Authorization": "Bearer " + apiKey,
       },
       body: JSON.stringify({
-        model: "claude-sonnet-5",
+        model: "deepseek-chat",
         max_tokens: 4096,
-        system: systemPrompt,
-        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: prompt },
+        ],
+        response_format: { type: "json_object" },
       }),
     });
 
@@ -80,14 +83,13 @@ ${JSON.stringify(currentBlocks, null, 2)}
       );
     }
 
-    const content = aiResponse.content?.[0]?.text || "";
+    const content = aiResponse.choices?.[0]?.message?.content || "";
 
     // 解析 AI 返回的 JSON
     let result;
     try {
       result = JSON.parse(content);
     } catch {
-      // 尝试从文本中提取 JSON
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         try {
