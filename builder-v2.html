@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameHub · 创作工坊</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --gold:#F5C842; --bg:#0D0720; --accent:#7C3AED; --accent2:#EC4899;
+  --deep:#1A0A2E; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1);
+  --text:#F0EAF8; --muted:rgba(240,234,248,0.5); --green:#22C55E; --red:#EF4444;
+}
+body {
+  font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  background:var(--bg); color:var(--text);
+  min-height:100dvh; display:flex; flex-direction:column;
+  overflow:hidden;
+}
+
+/* 顶栏 */
+.topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 16px; height:48px; border-bottom:1px solid var(--border);
+  background:rgba(13,7,32,0.98); flex-shrink:0; gap:12px;
+}
+.topbar-left { display:flex; align-items:center; gap:8px; }
+.topbar-logo { font-size:17px; font-weight:800; text-decoration:none; color:var(--text); cursor:pointer; }
+.topbar-logo span { color:var(--gold); }
+.topbar-sep { width:1px; height:20px; background:var(--border); }
+.topbar-title-input {
+  background:transparent; border:1px solid transparent; border-radius:6px;
+  color:var(--text); font-size:15px; font-weight:700; padding:4px 8px;
+  font-family:inherit; outline:none; width:200px;
+  transition:border-color 0.2s;
+}
+.topbar-title-input:hover, .topbar-title-input:focus { border-color:var(--border); }
+.topbar-right { display:flex; align-items:center; gap:8px; }
+.topbar-status { font-size:12px; color:var(--muted); }
+.topbar-dot { width:6px; height:6px; border-radius:50%; display:inline-block; margin-right:4px; }
+.topbar-dot.saved { background:var(--green); }
+.topbar-dot.unsaved { background:var(--gold); }
+
+.btn {
+  padding:7px 14px; border-radius:8px; border:none;
+  font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;
+  transition:opacity 0.2s; white-space:nowrap;
+}
+.btn:hover { opacity:0.85; }
+.btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; }
+.btn-gold { background:linear-gradient(135deg,var(--gold),#F59E0B); color:#1A0A2E; }
+.btn-outline { background:transparent; border:1px solid var(--border); color:var(--muted); }
+.btn-outline:hover { color:var(--text); border-color:var(--text); }
+.btn-sm { padding:4px 10px; font-size:11px; }
+.btn-danger { background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#EF4444; }
+
+/* 主体三栏 */
+.main { flex:1; display:flex; min-height:0; }
+.panel-left {
+  width:240px; border-right:1px solid var(--border);
+  background:rgba(255,255,255,0.02); overflow-y:auto;
+  display:flex; flex-direction:column; flex-shrink:0;
+}
+.panel-center { flex:1; display:flex; flex-direction:column; min-width:0; }
+.panel-right {
+  width:320px; border-left:1px solid var(--border);
+  background:rgba(255,255,255,0.02); overflow-y:auto;
+  display:flex; flex-direction:column; flex-shrink:0;
+}
+
+/* 左侧 Block 列表 */
+.block-list-header {
+  padding:12px; border-bottom:1px solid var(--border);
+  font-size:12px; font-weight:700; color:var(--muted);
+  text-transform:uppercase; letter-spacing:1px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.block-list { flex:1; overflow-y:auto; padding:8px; }
+.block-item {
+  display:flex; align-items:center; gap:8px;
+  padding:8px 10px; border-radius:8px; margin-bottom:4px;
+  cursor:pointer; border:1px solid transparent;
+  transition:all 0.2s; font-size:13px;
+}
+.block-item:hover { background:var(--card); }
+.block-item.selected { background:rgba(124,58,237,0.15); border-color:rgba(124,58,237,0.4); }
+.block-item-icon { font-size:16px; width:24px; text-align:center; flex-shrink:0; }
+.block-item-label { flex:1; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.block-item-type { font-size:10px; color:var(--muted); flex-shrink:0; }
+.block-item-del {
+  width:22px; height:22px; border-radius:5px; flex-shrink:0;
+  background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2);
+  color:#EF4444; cursor:pointer; font-size:12px; display:none;
+  align-items:center; justify-content:center;
+}
+.block-item:hover .block-item-del { display:flex; }
+.block-add-area { padding:8px; }
+.block-add-btn {
+  width:100%; padding:10px; border-radius:8px;
+  border:1px dashed rgba(124,58,237,0.3);
+  background:rgba(124,58,237,0.05); color:var(--accent);
+  font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;
+  transition:all 0.2s;
+}
+.block-add-btn:hover { background:rgba(124,58,237,0.12); border-color:var(--accent); }
+
+/* 添加 Block 弹出菜单 */
+.block-type-menu {
+  position:absolute; z-index:200; background:var(--deep);
+  border:1px solid var(--border); border-radius:12px;
+  padding:8px; box-shadow:0 8px 32px rgba(0,0,0,0.5);
+  display:none; min-width:180px;
+}
+.block-type-menu.show { display:block; }
+.block-type-option {
+  display:flex; align-items:center; gap:8px;
+  padding:8px 12px; border-radius:6px; cursor:pointer;
+  font-size:13px; transition:background 0.2s;
+}
+.block-type-option:hover { background:rgba(124,58,237,0.15); }
+
+/* 中间预览 */
+.preview-header {
+  padding:8px 12px; border-bottom:1px solid var(--border);
+  font-size:11px; font-weight:600; color:var(--muted);
+  display:flex; align-items:center; gap:6px;
+}
+.preview-frame {
+  flex:1; width:100%; border:none;
+  background:var(--bg);
+}
+
+/* 右侧属性面板 */
+.prop-header {
+  padding:12px; border-bottom:1px solid var(--border);
+  font-size:12px; font-weight:700; color:var(--muted);
+  text-transform:uppercase; letter-spacing:1px;
+}
+.prop-empty {
+  padding:32px 16px; text-align:center;
+  font-size:13px; color:var(--muted); line-height:1.6;
+}
+.prop-body { flex:1; overflow-y:auto; padding:12px; }
+.prop-field { margin-bottom:14px; }
+.prop-field label {
+  display:block; font-size:11px; font-weight:600;
+  color:var(--muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;
+}
+.prop-field input, .prop-field select, .prop-field textarea {
+  width:100%; padding:7px 10px; border-radius:6px;
+  background:rgba(255,255,255,0.06); border:1px solid var(--border);
+  color:var(--text); font-size:13px; font-family:inherit; outline:none;
+  transition:border-color 0.2s;
+}
+.prop-field input:focus, .prop-field select:focus, .prop-field textarea:focus {
+  border-color:var(--accent);
+}
+.prop-field select option { background:var(--deep); color:var(--text); }
+.prop-field-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
+/* 列表编辑通用 */
+.prop-list-item {
+  display:flex; align-items:center; gap:6px;
+  padding:6px 8px; border-radius:6px;
+  background:rgba(255,255,255,0.03); border:1px solid var(--border);
+  margin-bottom:4px; font-size:12px;
+}
+.prop-list-add {
+  width:100%; padding:6px; border-radius:6px;
+  border:1px dashed var(--border); background:transparent;
+  color:var(--muted); font-size:12px; cursor:pointer; font-family:inherit;
+}
+.prop-list-add:hover { border-color:var(--accent); color:var(--accent); }
+
+/* 底部 AI */
+.ai-bar {
+  height:52px; border-top:1px solid var(--border);
+  background:rgba(13,7,32,0.98); display:flex; align-items:center;
+  padding:0 12px; gap:8px; flex-shrink:0;
+}
+.ai-bar-icon { font-size:18px; flex-shrink:0; }
+.ai-bar-input {
+  flex:1; background:rgba(255,255,255,0.06); border:1px solid var(--border);
+  border-radius:8px; padding:8px 12px; color:var(--text);
+  font-size:13px; font-family:inherit; outline:none;
+  transition:border-color 0.2s;
+}
+.ai-bar-input:focus { border-color:var(--accent); }
+.ai-bar-input::placeholder { color:var(--muted); }
+
+/* Toast */
+.toast {
+  position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+  background:var(--deep); border:1px solid var(--gold);
+  border-radius:12px; padding:12px 20px; font-size:13px;
+  color:var(--text); z-index:9999; white-space:pre-line;
+  box-shadow:0 8px 32px rgba(0,0,0,0.6);
+  opacity:0; transition:opacity 0.3s;
+  pointer-events:none;
+}
+.toast.show { opacity:1; }
+
+/* 响应式 */
+@media (max-width:900px) {
+  .panel-left { width:180px; }
+  .panel-right { width:260px; }
+}
+@media (max-width:700px) {
+  .main { flex-direction:column; }
+  .panel-left { width:100%; max-height:120px; border-right:none; border-bottom:1px solid var(--border); }
+  .panel-right { width:100%; max-height:200px; border-left:none; border-top:1px solid var(--border); }
+  .panel-center { min-height:300px; }
+}
+</style>
+</head>
+<body>
+
+<!-- 顶栏 -->
+<div class="topbar">
+  <div class="topbar-left">
+    <a class="topbar-logo" href="index.html">🎮 <span>GameHub</span></a>
+    <div class="topbar-sep"></div>
+    <input class="topbar-title-input" id="titleInput" value="未命名大富翁" placeholder="输入游戏名称…" onchange="onTitleChange()">
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-status" id="saveStatus">
+      <span class="topbar-dot saved"></span>就绪
+    </span>
+    <button class="btn btn-outline btn-sm" onclick="saveConfig()" id="btnSave">💾 保存</button>
+    <button class="btn btn-gold btn-sm" onclick="publishConfig()" id="btnPublish">🚀 发布</button>
+  </div>
+</div>
+
+<!-- 主体 -->
+<div class="main">
+  <!-- 左侧：Block 列表 -->
+  <div class="panel-left" id="leftPanel">
+    <div class="block-list-header">📦 Block 列表</div>
+    <div class="block-list" id="blockList"></div>
+    <div class="block-add-area">
+      <button class="block-add-btn" id="btnAddBlock" onclick="toggleBlockMenu()">+ 添加 Block</button>
+      <div class="block-type-menu" id="blockTypeMenu"></div>
+    </div>
+  </div>
+
+  <!-- 中间：预览 -->
+  <div class="panel-center">
+    <div class="preview-header">👁️ 实时预览</div>
+    <iframe class="preview-frame" id="previewFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+  </div>
+
+  <!-- 右侧：属性面板 -->
+  <div class="panel-right" id="rightPanel">
+    <div class="prop-header">⚙️ 属性面板</div>
+    <div class="prop-body" id="propBody">
+      <div class="prop-empty">👈 点击左侧 Block<br>编辑其属性</div>
+    </div>
+  </div>
+</div>
+
+<!-- AI 栏 -->
+<div class="ai-bar">
+  <span class="ai-bar-icon">🤖</span>
+  <input class="ai-bar-input" id="aiInput" placeholder="告诉 AI 你想怎么改… 如：把棋盘改成10×10、帮我设计丧尸主题" onkeydown="if(event.key==='Enter')askAI()">
+  <button class="btn btn-outline btn-sm" onclick="askAI()" id="btnAI">发送</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- 依赖脚本 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.js"></script>
+<script src="auth-player.js"></script>
+<script src="runtime/block-registry.js"></script>
+<script src="runtime/core/theme.js"></script>
+
+<script>
+// ========= 创作工坊状态管理 =========
+
+var editor = {
+  gameType: 'monopoly',
+  title: '未命名大富翁',
+  blocks: [],
+  selectedBlockId: null,
+  isDirty: false,
+  configId: null,
+  shareSlug: null,
+};
+
+// ========= 初始化 =========
+(function init() {
+  document.getElementById('titleInput').value = editor.title;
+
+  // 检查 URL 参数
+  var params = new URLSearchParams(location.search);
+  var editId = params.get('edit');
+  var forkId = params.get('fork');
+
+  if (editId) {
+    loadConfig(editId);
+  } else if (forkId) {
+    forkConfig(forkId);
+  } else {
+    // 新建：加载默认配置
+    editor.blocks = BlockRegistry.getDefaults('monopoly');
+    renderAll();
+  }
+
+  // 构建 Block 类型菜单
+  buildBlockTypeMenu();
+})();
+
+// ========= Block 操作 =========
+function selectBlock(id) {
+  editor.selectedBlockId = id;
+  renderBlockList();
+  renderPropertyPanel();
+}
+
+function addBlock(type) {
+  var block = BlockRegistry.createBlock(type);
+  if (!block) {
+    showToast('❌ 未知的 Block 类型: ' + type);
+    return;
+  }
+  editor.blocks = editor.blocks.concat([block]);
+  editor.selectedBlockId = block.id;
+  editor.isDirty = true;
+  updateSaveStatus();
+  renderAll();
+}
+
+function removeBlock(id) {
+  editor.blocks = editor.blocks.filter(function(b) { return b.id !== id; });
+  if (editor.selectedBlockId === id) editor.selectedBlockId = null;
+  editor.isDirty = true;
+  updateSaveStatus();
+  renderAll();
+}
+
+function updateBlock(id, newConfig) {
+  editor.blocks = editor.blocks.map(function(b) {
+    if (b.id !== id) return b;
+    return { id: b.id, type: b.type, label: b.label, config: { ...b.config, ...newConfig } };
+  });
+  editor.isDirty = true;
+  updateSaveStatus();
+  renderPreview();
+}
+
+function onTitleChange() {
+  editor.title = document.getElementById('titleInput').value || '未命名大富翁';
+  editor.isDirty = true;
+  updateSaveStatus();
+  renderPreview();
+}
+
+function toggleBlockMenu() {
+  var menu = document.getElementById('blockTypeMenu');
+  menu.classList.toggle('show');
+}
+
+function buildBlockTypeMenu() {
+  var schemas = BlockRegistry.getAllSchemas();
+  var types = Object.keys(schemas);
+  var html = '';
+  for (var i = 0; i < types.length; i++) {
+    var s = schemas[types[i]];
+    html += '<div class="block-type-option" onclick="addBlock(\'' + types[i] + '\');toggleBlockMenu();">';
+    html += '<span>' + s.icon + '</span>';
+    html += '<span>' + s.label + '</span>';
+    html += '<span style="font-size:10px;color:var(--muted);margin-left:auto">' + types[i] + '</span>';
+    html += '</div>';
+  }
+  document.getElementById('blockTypeMenu').innerHTML = html;
+}
+
+// ========= 渲染 =========
+function renderAll() {
+  renderBlockList();
+  renderPreview();
+  renderPropertyPanel();
+}
+
+function renderBlockList() {
+  var html = '';
+  for (var i = 0; i < editor.blocks.length; i++) {
+    var b = editor.blocks[i];
+    var schema = BlockRegistry.getSchema(b.type);
+    var icon = schema ? schema.icon : '📦';
+    var selected = b.id === editor.selectedBlockId ? ' selected' : '';
+    html += '<div class="block-item' + selected + '" onclick="selectBlock(\'' + b.id + '\')">';
+    html += '<span class="block-item-icon">' + icon + '</span>';
+    html += '<span class="block-item-label">' + b.label + '</span>';
+    html += '<span class="block-item-type">' + b.type + '</span>';
+    html += '<span class="block-item-del" onclick="event.stopPropagation();removeBlock(\'' + b.id + '\')">×</span>';
+    html += '</div>';
+  }
+  document.getElementById('blockList').innerHTML = html || '<div style="padding:12px;color:var(--muted);font-size:12px;text-align:center">暂无 Block，点击下方按钮添加</div>';
+}
+
+function renderPreview() {
+  // 在 iframe 中渲染预览
+  var iframe = document.getElementById('previewFrame');
+  var previewConfig = {
+    game_type: editor.gameType,
+    title: editor.title,
+    blocks: editor.blocks,
+  };
+
+  // 构建预览 HTML
+  var html = buildPreviewHTML(previewConfig);
+  var blob = new Blob([html], { type: 'text/html' });
+  var url = URL.createObjectURL(blob);
+
+  // 释放旧 URL
+  if (iframe._prevUrl) URL.revokeObjectURL(iframe._prevUrl);
+  iframe._prevUrl = url;
+  iframe.src = url;
+}
+
+function buildPreviewHTML(config) {
+  return '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="UTF-8">\n' +
+    '<style>\n' +
+    '*{margin:0;padding:0;box-sizing:border-box;}\n' +
+    ':root{--gold:#F5C842;--bg:#0D0720;--accent:#7C3AED;--accent2:#EC4899;--deep:#1A0A2E;--card:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.1);--text:#F0EAF8;--muted:rgba(240,234,248,0.5);}\n' +
+    'body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}\n' +
+    '.preview-info{text-align:center;}\n' +
+    '.preview-info h2{font-size:18px;margin-bottom:8px;}\n' +
+    '.preview-info p{font-size:12px;color:var(--muted);}\n' +
+    '.preview-grid{width:100%;max-width:400px;margin:0 auto;}\n' +
+    '</style>\n</head>\n<body>\n' +
+    '<div class="preview-info">\n' +
+    '<h2>' + config.title + '</h2>\n' +
+    '<p>' + config.blocks.length + ' 个 Block · 大富翁</p>\n' +
+    '<div class="preview-grid" id="pvGrid"></div>\n' +
+    '</div>\n' +
+    '<script>\n' +
+    // 内联必要的渲染逻辑
+    '(' + function() {
+      var config = JSON.parse(document.currentScript.getAttribute('data-config'));
+      var gridBlock = null;
+      for (var i = 0; i < config.blocks.length; i++) {
+        if (config.blocks[i].type === 'grid') { gridBlock = config.blocks[i]; break; }
+      }
+      if (!gridBlock) return;
+
+      var container = document.getElementById('pvGrid');
+      var c = gridBlock.config;
+      var rows = c.rows || 7;
+      var cols = c.cols || 7;
+      var cells = c.cells || [];
+
+      var board = document.createElement('div');
+      board.style.cssText = 'display:grid;grid-template-columns:repeat(' + cols + ',1fr);grid-template-rows:repeat(' + rows + ',1fr);gap:1px;aspect-ratio:' + cols + '/' + rows + ';';
+      var CI = cells;
+
+      for (var r = 0; r < rows; r++) {
+        for (var c2 = 0; c2 < cols; c2++) {
+          var isB = r === 0 || r === rows-1 || c2 === 0 || c2 === cols-1;
+          if (!isB) {
+            var emp = document.createElement('div');
+            board.appendChild(emp);
+            continue;
+          }
+          var idx;
+          if (r === 0) idx = c2;
+          else if (c2 === cols-1) idx = cols-1 + r;
+          else if (r === rows-1) idx = cols-1 + rows-1 + cols-1 - c2;
+          else idx = cols-1 + rows-1 + cols-1 + rows-1 - r;
+
+          var cd = { name: '', icon: '', type: 'empty' };
+          for (var j = 0; j < CI.length; j++) {
+            if (CI[j].index === idx) { cd = CI[j]; break; }
+          }
+          var div = document.createElement('div');
+          div.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:8px;text-align:center;border-radius:2px;border:1px solid var(--border);padding:1px;';
+          var tC = { start:'rgba(34,197,94,0.2)', property:'rgba(124,58,237,0.15)', chance:'rgba(245,200,66,0.15)', destiny:'rgba(236,72,153,0.15)', jail:'rgba(239,68,68,0.15)', shop:'rgba(59,130,246,0.15)', event:'rgba(34,211,238,0.15)', tax:'rgba(251,146,60,0.15)' };
+          div.style.background = tC[cd.type] || 'var(--card)';
+          div.innerHTML = '<span style="font-size:12px">' + (cd.icon||'') + '</span><span style="font-size:7px;color:var(--text)">' + (cd.name||'') + '</span>';
+          board.appendChild(div);
+        }
+      }
+      container.appendChild(board);
+    }.toString() + '\n</script>\n' +
+    '<script data-config=\'' + JSON.stringify(config).replace(/'/g, "\\'") + '\'>\n' +
+    'var el = document.currentScript; var s = document.createElement("script"); s.textContent = "(" + el.previousElementSibling.textContent + ")()"; s.setAttribute("data-config", el.getAttribute("data-config")); document.body.appendChild(s);\n' +
+    '</script>\n' +
+    '</body>\n</html>';
+}
+
+function renderPropertyPanel() {
+  var body = document.getElementById('propBody');
+  if (!editor.selectedBlockId) {
+    body.innerHTML = '<div class="prop-empty">👈 点击左侧 Block<br>编辑其属性</div>';
+    return;
+  }
+
+  var block = null;
+  for (var i = 0; i < editor.blocks.length; i++) {
+    if (editor.blocks[i].id === editor.selectedBlockId) { block = editor.blocks[i]; break; }
+  }
+  if (!block) {
+    body.innerHTML = '<div class="prop-empty">Block 未找到</div>';
+    return;
+  }
+
+  var schema = BlockRegistry.getSchema(block.type);
+  if (!schema) {
+    body.innerHTML = '<div class="prop-empty">无编辑 Schema: ' + block.type + '</div>';
+    return;
+  }
+
+  var html = '<div style="margin-bottom:16px;font-size:14px;font-weight:700">' + schema.icon + ' ' + schema.label + '</div>';
+
+  // 通用字段
+  html += '<div class="prop-field"><label>Block 名称</label>';
+  html += '<input value="' + block.label + '" onchange="updateBlock(\'' + block.id + '\',{label:this.value});renderBlockList();">';
+  html += '</div>';
+
+  // 根据 Schema 字段渲染表单
+  var fields = schema.fields || [];
+  for (var f = 0; f < fields.length; f++) {
+    var field = fields[f];
+    var currentVal = block.config[field.key];
+    html += '<div class="prop-field"><label>' + field.label + '</label>';
+
+    switch (field.type) {
+      case 'number':
+        html += '<input type="number" value="' + (currentVal != null ? currentVal : '') + '" min="' + (field.min || '') + '" max="' + (field.max || '') + '" onchange="updateBlock(\'' + block.id + '\',{' + field.key + ':parseInt(this.value)||0})">';
+        break;
+      case 'text':
+        html += '<input type="text" value="' + (currentVal || '') + '" onchange="updateBlock(\'' + block.id + '\',{' + field.key + ':this.value})">';
+        break;
+      case 'color':
+        html += '<input type="color" value="' + (currentVal || '#000000') + '" onchange="updateBlock(\'' + block.id + '\',{' + field.key + ':this.value})">';
+        break;
+      case 'select':
+        html += '<select onchange="updateBlock(\'' + block.id + '\',{' + field.key + ':this.value})">';
+        var opts = field.options || [];
+        for (var o = 0; o < opts.length; o++) {
+          var sel = (currentVal === opts[o]) ? ' selected' : '';
+          html += '<option value="' + opts[o] + '"' + sel + '>' + opts[o] + '</option>';
+        }
+        html += '</select>';
+        break;
+      case 'cell-list':
+        html += renderCellListEditor(block, field.key);
+        break;
+      case 'card-list':
+      case 'store-item-list':
+      case 'effect-list':
+      case 'variable-list':
+      case 'building-list':
+      case 'piece-list':
+        html += renderSimpleListEditor(block, field.key, field.type);
+        break;
+      default:
+        html += '<span style="font-size:11px;color:var(--muted)">编辑类型 ' + field.type + ' 待实现</span>';
+    }
+    html += '</div>';
+  }
+
+  body.innerHTML = html;
+}
+
+// ─── 格子列表编辑器 ───
+function renderCellListEditor(block, key) {
+  var cells = block.config[key] || [];
+  var html = '<div style="max-height:200px;overflow-y:auto;">';
+  for (var i = 0; i < cells.length; i++) {
+    var c = cells[i];
+    html += '<div class="prop-list-item">';
+    html += '<span style="font-size:16px">' + (c.icon || '') + '</span>';
+    html += '<span style="flex:1;font-size:11px;">#' + c.index + ' ' + c.name + '</span>';
+    html += '<span style="font-size:10px;color:var(--muted)">' + c.type + '</span>';
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">';
+  html += '格子数量: ' + cells.length + ' · 点击预览区中格子可在后续版本中进行编辑';
+  html += '</div>';
+  return html;
+}
+
+function renderSimpleListEditor(block, key, type) {
+  var items = block.config[key] || [];
+  var isCards = type === 'card-list';
+  var isVars = type === 'variable-list';
+
+  var html = '<div style="max-height:200px;overflow-y:auto;">';
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    if (isCards) {
+      html += '<div class="prop-list-item"><span style="flex:1;font-size:11px;">🃏 ' + (item.title || item.id) + '</span></div>';
+    } else if (isVars) {
+      html += '<div class="prop-list-item"><span style="flex:1;font-size:11px;">' + item.label + '</span><span style="font-size:11px;color:var(--muted)">' + item.value + '</span></div>';
+    } else {
+      html += '<div class="prop-list-item"><span style="flex:1;font-size:11px;">' + (item.name || item.id) + '</span></div>';
+    }
+  }
+  html += '</div>';
+  html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">共 ' + items.length + ' 项 · 增删编辑在后续版本完善</div>';
+  return html;
+}
+
+// ========= 保存 & 发布 =========
+async function saveConfig() {
+  var player = GameSupabase.getCurrentPlayer();
+  if (!player) {
+    GameAuth.requireLogin(function() { saveConfig(); });
+    return;
+  }
+
+  document.getElementById('btnSave').disabled = true;
+  document.getElementById('btnSave').textContent = '保存中…';
+
+  var payload = {
+    user_id: player.id,
+    game_type: editor.gameType,
+    title: editor.title,
+    blocks: editor.blocks,
+    is_public: false,
+  };
+
+  var result;
+  if (editor.configId) {
+    result = await GHSupabase
+      .from('user_configs')
+      .update({ ...payload, updated_at: new Date().toISOString() })
+      .eq('id', editor.configId)
+      .select('*')
+      .single();
+  } else {
+    result = await GHSupabase
+      .from('user_configs')
+      .insert(payload)
+      .select('*')
+      .single();
+  }
+
+  document.getElementById('btnSave').disabled = false;
+  document.getElementById('btnSave').textContent = '💾 保存';
+
+  if (result.error) {
+    showToast('❌ 保存失败: ' + result.error.message);
+    return;
+  }
+
+  editor.configId = result.data.id;
+  editor.isDirty = false;
+  updateSaveStatus();
+  showToast('✅ 已保存\n\nID: ' + result.data.id);
+}
+
+async function publishConfig() {
+  if (!editor.configId || editor.isDirty) {
+    await saveConfig();
+  }
+  if (!editor.configId) return;
+
+  document.getElementById('btnPublish').disabled = true;
+  document.getElementById('btnPublish').textContent = '发布中…';
+
+  // 如果已有 share_slug，直接使用
+  if (editor.shareSlug) {
+    var shareUrl = location.origin + '/play.html?config=' + editor.shareSlug;
+    showToast('🎉 分享链接 (已发布)\n\n' + shareUrl);
+    navigator.clipboard && navigator.clipboard.writeText(shareUrl);
+    document.getElementById('btnPublish').disabled = false;
+    document.getElementById('btnPublish').textContent = '🚀 发布';
+    return;
+  }
+
+  var slug = Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 4);
+
+  var result = await GHSupabase
+    .from('user_configs')
+    .update({
+      is_published: true,
+      share_slug: slug,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', editor.configId)
+    .select('*')
+    .single();
+
+  document.getElementById('btnPublish').disabled = false;
+  document.getElementById('btnPublish').textContent = '🚀 发布';
+
+  if (result.error) {
+    showToast('❌ 发布失败: ' + result.error.message);
+    return;
+  }
+
+  editor.shareSlug = slug;
+  var shareUrl = location.origin + '/play.html?config=' + slug;
+  showToast('🎉 已发布！链接已复制到剪贴板\n\n' + shareUrl);
+  navigator.clipboard && navigator.clipboard.writeText(shareUrl);
+}
+
+// ========= AI 助手 =========
+async function askAI() {
+  var input = document.getElementById('aiInput');
+  var prompt = input.value.trim();
+  if (!prompt) return;
+
+  input.disabled = true;
+  document.getElementById('btnAI').disabled = true;
+  document.getElementById('btnAI').textContent = '思考中…';
+  showToast('🤖 AI 正在分析: ' + prompt);
+
+  try {
+    var result = await GHSupabase.functions.invoke('ai-config', {
+      body: {
+        prompt: prompt,
+        gameType: editor.gameType,
+        currentBlocks: editor.blocks,
+      },
+    });
+
+    if (result.error) throw result.error;
+
+    var data = result.data;
+    // 应用 patches
+    if (data.patches) {
+      for (var i = 0; i < data.patches.length; i++) {
+        var patch = data.patches[i];
+        updateBlock(patch.blockId, patch.config);
+      }
+    }
+    // 应用 newBlocks
+    if (data.newBlocks) {
+      for (var j = 0; j < data.newBlocks.length; j++) {
+        var nb = data.newBlocks[j];
+        var block = BlockRegistry.createBlock(nb.type, nb.config);
+        if (block) {
+          editor.blocks = editor.blocks.concat([block]);
+        }
+      }
+    }
+
+    editor.isDirty = true;
+    updateSaveStatus();
+    renderAll();
+    showToast('✅ AI 已完成修改\n\n' + (data.explanation || ''));
+    input.value = '';
+  } catch (e) {
+    showToast('❌ AI 请求失败: ' + (e.message || '网络错误'));
+  }
+
+  input.disabled = false;
+  document.getElementById('btnAI').disabled = false;
+  document.getElementById('btnAI').textContent = '发送';
+}
+
+// ========= 数据加载 =========
+async function loadConfig(configId) {
+  try {
+    var result = await GHSupabase.from('user_configs').select('*').eq('id', configId).single();
+    if (result.error) throw result.error;
+    applyLoadedConfig(result.data);
+  } catch (e) {
+    showToast('❌ 加载失败: ' + e.message);
+  }
+}
+
+async function forkConfig(configId) {
+  try {
+    var result = await GHSupabase.from('user_configs').select('*').eq('id', configId).single();
+    if (result.error) throw result.error;
+    var data = result.data;
+    editor.blocks = JSON.parse(JSON.stringify(data.blocks));
+    editor.title = (data.title || '未命名') + ' (Fork)';
+    editor.configId = null;
+    editor.shareSlug = null;
+    document.getElementById('titleInput').value = editor.title;
+    renderAll();
+    showToast('🍴 已 Fork: ' + data.title);
+  } catch (e) {
+    showToast('❌ Fork 失败: ' + e.message);
+  }
+}
+
+function applyLoadedConfig(data) {
+  editor.blocks = data.blocks || [];
+  editor.title = data.title || '未命名大富翁';
+  editor.configId = data.id;
+  editor.shareSlug = data.share_slug;
+  editor.isDirty = false;
+  document.getElementById('titleInput').value = editor.title;
+  updateSaveStatus();
+  renderAll();
+  showToast('📂 已加载: ' + editor.title);
+}
+
+// ========= 工具函数 =========
+function updateSaveStatus() {
+  var el = document.getElementById('saveStatus');
+  if (editor.isDirty) {
+    el.innerHTML = '<span class="topbar-dot unsaved"></span>未保存';
+  } else {
+    el.innerHTML = '<span class="topbar-dot saved"></span>已保存';
+  }
+}
+
+function showToast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(function() { el.classList.remove('show'); }, 3000);
+}
+
+// 点击其他地方关闭 Block 菜单
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('blockTypeMenu');
+  var btn = document.getElementById('btnAddBlock');
+  if (menu.classList.contains('show') && e.target !== btn && !btn.contains(e.target)) {
+    menu.classList.remove('show');
+  }
+});
+</script>
+</body>
+</html>

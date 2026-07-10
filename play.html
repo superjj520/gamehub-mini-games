@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>GameHub · 大富翁</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --gold:#F5C842; --bg:#0D0720; --accent:#7C3AED; --accent2:#EC4899;
+  --deep:#1A0A2E; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1);
+  --text:#F0EAF8; --muted:rgba(240,234,248,0.5);
+}
+body {
+  font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  background:var(--bg); color:var(--text);
+  min-height:100dvh; display:flex; flex-direction:column;
+}
+
+/* 顶栏 */
+.topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 16px; height:48px; border-bottom:1px solid var(--border);
+  background:rgba(13,7,32,0.97); flex-shrink:0; gap:12px;
+}
+.topbar-title { font-size:15px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.topbar-badge { font-size:11px; padding:3px 8px; border-radius:12px; background:rgba(124,58,237,0.2); color:var(--accent); flex-shrink:0; }
+
+/* 游戏区 */
+.game-area { flex:1; display:flex; min-height:0; }
+.game-board {
+  flex:1; padding:12px; display:flex;
+  align-items:center; justify-content:center; overflow:auto;
+}
+.game-board-inner { width:100%; max-width:560px; }
+
+/* 侧面板 */
+.game-panel {
+  width:280px; border-left:1px solid var(--border);
+  padding:12px; overflow-y:auto; background:rgba(255,255,255,0.02);
+  display:flex; flex-direction:column; gap:12px;
+}
+.panel-section { /* no extra */ }
+.panel-label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+
+.player-card {
+  background:var(--card); border:1px solid var(--border); border-radius:10px;
+  padding:10px 12px; margin-bottom:6px; transition:border-color 0.3s;
+}
+.player-card.active { border-color:var(--gold); box-shadow:0 0 8px rgba(245,200,66,0.15); }
+.player-card-header { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+.player-emoji { font-size:20px; }
+.player-name { font-size:13px; font-weight:700; flex:1; }
+.player-ai-badge { font-size:10px; color:var(--muted); }
+.player-stats { font-size:11px; color:var(--muted); display:flex; gap:12px; flex-wrap:wrap; }
+
+.btn {
+  padding:10px 16px; border-radius:10px; border:none;
+  font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;
+  transition:opacity 0.2s,transform 0.1s; width:100%;
+}
+.btn:active { transform:scale(0.97); }
+.btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+.btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; }
+.btn-secondary { background:var(--card); border:1px solid var(--border); color:var(--text); margin-top:4px; }
+.btn-danger { background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#EF4444; margin-top:4px; }
+
+/* 状态栏 */
+.status-bar {
+  padding:10px 16px; border-top:1px solid var(--border);
+  background:rgba(255,255,255,0.02); font-size:13px;
+  text-align:center; flex-shrink:0; min-height:40px;
+}
+
+/* 加载 */
+.loading {
+  display:flex; align-items:center; justify-content:center;
+  height:100dvh; flex-direction:column; gap:12px;
+}
+.loading-spinner { font-size:40px; animation:spin 1s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading-text { font-size:14px; color:var(--muted); }
+
+/* 移动端适配 */
+@media (max-width:768px) {
+  .game-area { flex-direction:column; }
+  .game-panel { width:100%; border-left:none; border-top:1px solid var(--border); max-height:35dvh; flex-shrink:0; }
+  .game-board { min-height:40dvh; }
+}
+</style>
+</head>
+<body>
+
+<div id="loading" class="loading">
+  <div class="loading-spinner">🎮</div>
+  <div class="loading-text">加载游戏配置中…</div>
+</div>
+
+<div id="app" style="display:none;flex-direction:column;min-height:100dvh">
+  <div class="topbar">
+    <div class="topbar-title" id="gameTitle">—</div>
+    <div class="topbar-badge" id="gameType">大富翁</div>
+  </div>
+  <div class="game-area">
+    <div class="game-board">
+      <div class="game-board-inner" id="boardContainer"></div>
+    </div>
+    <div class="game-panel" id="sidePanel">
+      <div class="panel-section">
+        <div class="panel-label">👥 玩家</div>
+        <div id="playerList"></div>
+      </div>
+      <div class="panel-section" id="btnSection">
+        <button class="btn btn-primary" id="btnRoll" onclick="MonopolyGame.rollDice()">🎲 掷骰子</button>
+        <button class="btn btn-secondary" id="btnBuy" onclick="MonopolyGame.buyProperty()">🏠 购买地产</button>
+      </div>
+      <div class="panel-section">
+        <div class="panel-label">📋 最近事件</div>
+        <div id="eventLog" style="font-size:11px;color:var(--muted);line-height:1.8;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="status-bar" id="statusBar">准备开始…</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.js"></script>
+<script src="runtime/block-registry.js"></script>
+<script src="runtime/core/theme.js"></script>
+<script src="runtime/core/rule.js"></script>
+<script src="runtime/core/collection.js"></script>
+<script src="runtime/core/grid.js"></script>
+<script src="runtime/core/effect.js"></script>
+<script src="runtime/core/player.js"></script>
+<script src="runtime/core/store.js"></script>
+<script src="runtime/core/building.js"></script>
+<script src="runtime/core/piece.js"></script>
+<script src="runtime/engine.js"></script>
+<script src="runtime/games/monopoly.js"></script>
+
+<script>
+(async function main() {
+  var params = new URLSearchParams(location.search);
+  var slug = params.get('config');
+  var configId = params.get('cid');
+
+  // ─── 调试模式：无参数时使用默认配置 ───
+  if (!slug && !configId) {
+    console.log('[play] 无配置参数，使用大富翁默认配置');
+    var config = {
+      id: 'default',
+      game_type: 'monopoly',
+      title: '大富翁（默认配置）',
+      blocks: BlockRegistry.getDefaults('monopoly'),
+    };
+    startGame(config);
+    return;
+  }
+
+  // ─── 从 Supabase 加载 ───
+  try {
+    var query = GHSupabase.from('user_configs').select('*');
+    if (slug) {
+      query = query.eq('share_slug', slug);
+    } else {
+      query = query.eq('id', configId);
+    }
+    var result = await query.single();
+    if (result.error) throw result.error;
+    var config = result.data;
+
+    // 更新游玩次数（静默）
+    GHSupabase.from('user_configs')
+      .update({ plays_count: (config.plays_count || 0) + 1 })
+      .eq('id', config.id)
+      .then(function(){}).catch(function(){});
+
+    startGame(config);
+  } catch (e) {
+    document.getElementById('loading').innerHTML =
+      '<div style="font-size:40px">❌</div><div class="loading-text">加载失败: ' + e.message + '</div>';
+  }
+})();
+
+function startGame(config) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('gameTitle').textContent = config.title || '大富翁';
+  document.getElementById('gameType').textContent = config.game_type === 'monopoly' ? '大富翁' : config.game_type;
+  document.getElementById('statusBar').textContent = '🎮 游戏初始化中…';
+
+  // 监听游戏事件
+  GameEngine.on('monopoly:state', function(gameState) {
+    renderPlayers(gameState.players, gameState.currentPlayer, gameState.gameOver);
+    renderLog(gameState.log || []);
+    document.getElementById('btnRoll').disabled = gameState.gameOver;
+  });
+
+  GameEngine.on('monopoly:status', function(msg) {
+    document.getElementById('statusBar').textContent = msg;
+  });
+
+  // 启动
+  var container = document.getElementById('boardContainer');
+  GameEngine.init(config, container, MonopolyGame).catch(function(e) {
+    document.getElementById('statusBar').textContent = '❌ 启动失败: ' + e.message;
+    console.error(e);
+  });
+}
+
+function renderPlayers(players, currentIdx, gameOver) {
+  var html = '';
+  for (var i = 0; i < players.length; i++) {
+    var p = players[i];
+    var activeClass = (i === currentIdx && !gameOver) ? ' active' : '';
+    html += '<div class="player-card' + activeClass + '">';
+    html += '<div class="player-card-header">';
+    html += '<span class="player-emoji">' + p.emoji + '</span>';
+    html += '<span class="player-name">' + p.name + '</span>';
+    if (p.isAI) html += '<span class="player-ai-badge">🤖 AI</span>';
+    html += '</div>';
+    html += '<div class="player-stats">';
+    html += '<span>💰 ' + p.gold + ' 金币</span>';
+    html += '<span>📍 格' + (p.position + 1) + '</span>';
+    html += '<span>🔄 第' + (p.laps + 1) + '圈</span>';
+    if (p.properties && p.properties.length > 0) {
+      html += '<span>🏠 ×' + p.properties.length + '</span>';
+    }
+    html += '</div>';
+    html += '</div>';
+  }
+  document.getElementById('playerList').innerHTML = html;
+}
+
+function renderLog(logLines) {
+  var html = '';
+  for (var i = 0; i < logLines.length; i++) {
+    html += '<div>' + logLines[i] + '</div>';
+  }
+  document.getElementById('eventLog').innerHTML = html || '<div style="opacity:0.5">游戏即将开始…</div>';
+}
+</script>
+</body>
+</html>
