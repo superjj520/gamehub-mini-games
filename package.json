@@ -23,5 +23,8 @@
   "homepage": "https://github.com/superjj520/gamehub-mini-games#readme",
   "dependencies": {
     "@supabase/supabase-js": "^2.110.1"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.1"
   }
 }

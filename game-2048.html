@@ -819,8 +819,8 @@ window.addEventListener('DOMContentLoaded', () => {
   // 读取 localStorage
   bestScore = parseInt(localStorage.getItem('2048-best') || '0');
   history = JSON.parse(localStorage.getItem('2048-history') || '[]');
-  renderRight();
   newGame();
+  renderRight();
   bindKeys();
   bindTouch();
   // 导航自动滚动到当前 active tab
@@ -958,6 +958,7 @@ function tileFontSize(val) {
    完整重绘所有方块（不带动画）
 ============================ */
 function fullRender() {
+  if (!board || !board.length) return;
   calcTileSize();
   const layer = document.getElementById('board-tiles');
   layer.innerHTML = '';

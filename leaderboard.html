@@ -1346,6 +1346,9 @@ function startAutoRefresh() {
   }, 5000);
 }
 
+let currentMode = 'real';
+let currentGame = '__all__';
+
 /* ═══════════════════════════════════════════════════════════
    初始化
 ═══════════════════════════════════════════════════════════ */
@@ -1366,14 +1369,10 @@ function startAutoRefresh() {
   renderRealBoard('__all__');
   renderRealStats();
 })();
-</script>
 
-<script>
 /* ═══════════════════════════════════════════════════════════
    真实得分榜逻辑
 ═══════════════════════════════════════════════════════════ */
-let currentMode = 'real';
-let currentGame = '__all__';
 
 function switchMode(mode, btn) {
   currentMode = mode;
