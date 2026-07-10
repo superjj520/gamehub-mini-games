@@ -30,7 +30,19 @@ create index if not exists idx_user_configs_plays on user_configs(plays_count de
 create index if not exists idx_user_configs_public on user_configs(is_public, is_published);
 create index if not exists idx_play_sessions_config on play_sessions(config_id);
 
--- 4. RLS 策略
+-- 4. 邀请追踪表
+create table if not exists invites (
+  id             bigint primary key generated always as identity,
+  inviter_id     uuid references players(id) on delete cascade,
+  invited_player text,
+  page_url       text,
+  game_type      text,
+  created_at     timestamptz default now()
+);
+
+create index if not exists idx_invites_inviter on invites(inviter_id, created_at desc);
+
+-- 5. RLS 策略
 alter table user_configs enable row level security;
 
 drop policy if exists "所有人可读已发布的配置" on user_configs;

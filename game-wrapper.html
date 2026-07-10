@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameHub · 游戏包装器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--gold:#F5C842;--bg:#0D0720;--accent:#7C3AED;--accent2:#EC4899;--border:rgba(255,255,255,0.1);--text:#F0EAF8;--muted:rgba(240,234,248,0.5);}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:44px;border-bottom:1px solid var(--border);background:rgba(13,7,32,0.97);flex-shrink:0;}
+.topbar-title{font-size:14px;font-weight:700;}
+.topbar-link{font-size:11px;color:var(--muted);text-decoration:none;}
+.game-frame{flex:1;width:100%;border:none;}
+.config-bar{display:flex;align-items:center;gap:6px;padding:6px 12px;border-top:1px solid var(--border);background:rgba(255,255,255,0.02);overflow-x:auto;flex-shrink:0;flex-wrap:wrap;}
+.config-bar label{font-size:11px;color:var(--muted);white-space:nowrap;}
+.config-bar select,.config-bar input{background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:4px 8px;font-size:11px;font-family:inherit;outline:none;min-width:60px;}
+.config-bar select:focus,.config-bar input:focus{border-color:var(--accent);}
+.config-bar button{padding:5px 12px;border-radius:6px;border:none;background:var(--accent);color:white;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
+.loading{display:flex;align-items:center;justify-content:center;height:100dvh;font-size:14px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<div id="loading" class="loading">🎮 加载中…</div>
+
+<div id="app" style="display:none;flex-direction:column;min-height:100dvh">
+  <div class="topbar">
+    <span class="topbar-title" id="gameLabel">游戏</span>
+    <a class="topbar-link" href="builder-v2.html">🎨 自己做一个 →</a>
+  </div>
+  <iframe class="game-frame" id="gameFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+  <div class="config-bar" id="configBar">
+    <span style="font-size:11px;color:var(--muted)">⚙️ 快速配置:</span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.js"></script>
+<script>
+(function() {
+  var params = new URLSearchParams(location.search);
+  var game = params.get('game') || 'wheel'; // 默认大转盘
+  var configParams = {};
+
+  // 支持的轻配游戏列表
+  var LIGHT_GAMES = {
+    'wheel':          { name:'大转盘',          file:'wheel.html',          params:['prizes','spinCost'] },
+    'scratch-card':   { name:'刮刮乐',          file:'scratch-card.html',   params:['prizes'] },
+    'nine-grid':      { name:'九宫格抽奖',       file:'nine-grid.html',      params:['prizes'] },
+    'shake-dice':     { name:'摇骰子',          file:'shake-dice.html',     params:['diceCount'] },
+    'smash-egg':      { name:'砸金蛋',          file:'smash-egg.html',      params:['prizes'] },
+    'slot-machine':   { name:'老虎机',          file:'slot-machine.html',   params:['prizes'] },
+    'red-packet-rain':{ name:'红包雨',          file:'red-packet-rain.html',params:['redPackets','duration'] },
+    'gashapon':       { name:'扭蛋机',          file:'gashapon.html',       params:['prizes'] },
+    'blind-box':      { name:'盲盒',            file:'blind-box.html',      params:['prizes'] },
+    'lottery-ball':   { name:'双色球',          file:'lottery-ball.html',   params:['prizes'] },
+    'lucky-number':   { name:'幸运数字',         file:'lucky-number.html',   params:['numberRange'] },
+    'ring-toss':      { name:'套圈',            file:'ring-toss.html',      params:['rings','difficulty'] },
+    'fishing':        { name:'钓鱼',            file:'fishing.html',        params:['fishTypes','difficulty'] },
+    'archery':        { name:'射箭',            file:'archery.html',        params:['arrows','difficulty'] },
+    'fruit-cut':      { name:'切水果',          file:'fruit-cut.html',      params:['difficulty'] },
+    'whack-mole':     { name:'打地鼠',          file:'whack-mole.html',     params:['duration','difficulty'] },
+    'catch-coins':    { name:'接金币',          file:'catch-coins.html',    params:['duration','difficulty'] },
+    'jump-game':      { name:'跳一跳',          file:'jump-game.html',      params:['difficulty'] },
+    'pinball':        { name:'弹球',            file:'pinball.html',        params:['balls','difficulty'] },
+    'slingshot':      { name:'弹弓',            file:'slingshot.html',      params:['ammo','difficulty'] },
+    'flip-match':     { name:'翻牌配对',         file:'flip-match.html',     params:['pairs','difficulty'] },
+    'link-match':     { name:'连连看',          file:'link-match.html',     params:['difficulty'] },
+    'puzzle':         { name:'拼图',            file:'puzzle.html',         params:['size'] },
+    'maze':           { name:'迷宫',            file:'maze.html',           params:['size','difficulty'] },
+    'sliding-puzzle': { name:'滑动拼图',         file:'sliding-puzzle.html', params:['size'] },
+    'minesweeper':    { name:'扫雷',            file:'minesweeper.html',    params:['rows','cols','mines'] },
+    'sudoku':         { name:'数独',            file:'sudoku.html',         params:['difficulty'] },
+    'sokoban':        { name:'推箱子',          file:'sokoban.html',        params:['level'] },
+    'number-bomb':    { name:'数字炸弹',         file:'number-bomb.html',    params:['range'] },
+    'shake':          { name:'摇一摇',          file:'shake.html',          params:['duration'] },
+    'gift-box':       { name:'礼物盒',          file:'gift-box.html',       params:['prizes'] },
+    'stamp-collect':  { name:'盖章收集',         file:'stamp-collect.html',  params:['stamps'] },
+    'energy-collect': { name:'能量收集',         file:'energy-collect.html', params:['target'] },
+    'grow-tree':      { name:'种树',            file:'grow-tree.html',      params:['target'] },
+    'progress-unlock':{ name:'进度解锁',         file:'progress-unlock.html',params:['milestones'] },
+    'personality-test':{name:'人格测试',         file:'personality-test.html',params:['questions'] },
+    'name-generator': { name:'名字生成器',        file:'name-generator.html', params:['style'] },
+    'emoji-maker':    { name:'Emoji制作',       file:'emoji-maker.html',    params:['style'] },
+    'vote-pk':        { name:'投票PK',          file:'vote-pk.html',        params:['options'] },
+    'claw-machine':   { name:'抓娃娃',          file:'claw-machine.html',   params:['prizes','difficulty'] },
+    'cup-game':       { name:'猜杯子',          file:'cup-game.html',       params:['cups','speed'] },
+    'daily-checkin':  { name:'每日签到',         file:'daily-checkin.html',  params:['rewards'] },
+    'team-challenge': { name:'团队挑战',         file:'team-challenge.html', params:['teams'] },
+  };
+
+  var gameInfo = LIGHT_GAMES[game] || LIGHT_GAMES['wheel'];
+
+  // 显示 UI
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('gameLabel').textContent = '🎮 ' + gameInfo.name + '（轻量配置模式）';
+
+  // 构建参数栏
+  var barHtml = '<span style="font-size:11px;color:var(--muted)">⚙️ 快速配置:</span>';
+  var paramDefs = {
+    'prizes':       { label:'奖品数', type:'select', options:['3','5','8','10'], default:'5' },
+    'spinCost':     { label:'消耗',   type:'number', default:'10' },
+    'difficulty':   { label:'难度',   type:'select', options:['简单','普通','困难'], default:'普通' },
+    'duration':     { label:'时长(秒)',type:'number', default:'30' },
+    'size':         { label:'大小',   type:'select', options:['3','4','5','6'], default:'4' },
+    'rows':         { label:'行数',   type:'number', default:'9' },
+    'cols':         { label:'列数',   type:'number', default:'9' },
+    'mines':        { label:'雷数',   type:'number', default:'10' },
+    'diceCount':    { label:'骰子数', type:'select', options:['1','2','3','5'], default:'2' },
+    'speed':        { label:'速度',   type:'select', options:['慢','中','快'], default:'中' },
+    'level':        { label:'关卡',   type:'select', options:['1','2','3','4','5'], default:'1' },
+    'range':        { label:'范围',   type:'number', default:'100' },
+    'numberRange':  { label:'数字范围',type:'number', default:'36' },
+    'redPackets':   { label:'红包数', type:'select', options:['5','10','20','30'], default:'10' },
+    'balls':        { label:'球数',   type:'select', options:['3','5','7'], default:'5' },
+    'ammo':         { label:'弹药',   type:'select', options:['3','5','10'], default:'5' },
+    'arrows':       { label:'箭数',   type:'select', options:['3','5','10'], default:'5' },
+    'rings':        { label:'圈数',   type:'select', options:['3','5','10'], default:'5' },
+    'pairs':        { label:'配对数', type:'select', options:['4','6','8','12'], default:'6' },
+    'stamps':       { label:'印章数', type:'select', options:['5','8','10'], default:'8' },
+    'target':       { label:'目标值', type:'number', default:'100' },
+    'milestones':   { label:'里程碑', type:'select', options:['3','5','8'], default:'5' },
+    'questions':    { label:'题目数', type:'select', options:['5','10','15'], default:'10' },
+    'options':      { label:'选项数', type:'select', options:['2','3','4'], default:'2' },
+    'cups':         { label:'杯子数', type:'select', options:['3','5','7'], default:'3' },
+    'teams':        { label:'队伍数', type:'select', options:['2','3','4'], default:'2' },
+    'style':        { label:'风格',   type:'select', options:['默认','随机','趣味'], default:'默认' },
+    'rewards':      { label:'奖励',   type:'select', options:['基础','豪华','超级'], default:'基础' },
+    'fishTypes':    { label:'鱼种类', type:'select', options:['3','5','8'], default:'5' },
+  };
+
+  for (var i = 0; i < gameInfo.params.length; i++) {
+    var pKey = gameInfo.params[i];
+    var def = paramDefs[pKey] || { label:pKey, type:'number', default:'1' };
+
+    // 读取URL参数
+    var urlVal = params.get(pKey);
+    configParams[pKey] = urlVal || def.default;
+
+    barHtml += '<label>' + def.label + '</label>';
+
+    if (def.type === 'select' && def.options) {
+      barHtml += '<select id="cfg-' + pKey + '" onchange="applyConfig()">';
+      for (var j = 0; j < def.options.length; j++) {
+        var sel = configParams[pKey] === def.options[j] ? ' selected' : '';
+        barHtml += '<option value="' + def.options[j] + '"' + sel + '>' + def.options[j] + '</option>';
+      }
+      barHtml += '</select>';
+    } else {
+      barHtml += '<input type="number" id="cfg-' + pKey + '" value="' + configParams[pKey] + '" onchange="applyConfig()" style="width:50px">';
+    }
+  }
+
+  barHtml += '<button onclick="applyConfigAndReload()">应用</button>';
+  document.getElementById('configBar').innerHTML = barHtml;
+
+  // 加载游戏
+  loadGame();
+
+  function applyConfig() {
+    for (var k in configParams) {
+      var el = document.getElementById('cfg-' + k);
+      if (el) configParams[k] = el.value;
+    }
+  }
+
+  window.applyConfig = applyConfig;
+
+  window.applyConfigAndReload = function() {
+    applyConfig();
+    loadGame();
+  };
+
+  function loadGame() {
+    var url = gameInfo.file;
+    var qsParts = [];
+    for (var k in configParams) {
+      qsParts.push(k + '=' + encodeURIComponent(configParams[k]));
+    }
+    if (qsParts.length > 0) url += '?' + qsParts.join('&');
+    // 添加邀请码
+    url += (qsParts.length > 0 ? '&' : '?') + 'from=wrapper';
+    document.getElementById('gameFrame').src = url;
+  }
+})();
+</script>
+</body>
+</html>
