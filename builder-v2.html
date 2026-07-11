@@ -239,8 +239,7 @@ body {
     <div class="block-list-header">📦 Block 列表</div>
     <div class="block-list" id="blockList"></div>
     <div class="block-add-area">
-      <button class="block-add-btn" id="btnAddBlock" onclick="toggleBlockMenu()">+ 添加 Block</button>
-      <div class="block-type-menu" id="blockTypeMenu"></div>
+      <button class="block-add-btn" id="btnAddBlock" onclick="showBlockPicker()">+ 添加 Block</button>
     </div>
   </div>
 
@@ -319,7 +318,7 @@ var editor = {
     renderAll();
   }
 
-  buildBlockTypeMenu();
+  buildBlockTypePicker();
 })();
 
 function buildGameTypeSelector() {
@@ -392,12 +391,10 @@ function onTitleChange() {
   renderPreview();
 }
 
-function toggleBlockMenu() {
-  var menu = document.getElementById('blockTypeMenu');
-  menu.classList.toggle('show');
-}
+function showBlockPicker() { document.getElementById('blockTypeOverlay').classList.add('show'); }
+function hideBlockPicker() { document.getElementById('blockTypeOverlay').classList.remove('show'); }
 
-function buildBlockTypeMenu() {
+function buildBlockTypePicker() {
   var schemas = BlockRegistry.getAllSchemas();
   var types = Object.keys(schemas);
   var html = '';
@@ -519,120 +516,263 @@ function buildPreviewHTML(config) {
   return html;
 }
 
+// ============ 属性面板核心 ============
+function getSelectedBlock() {
+  if (!editor.selectedBlockId) return null;
+  for (var i = 0; i < editor.blocks.length; i++) {
+    if (editor.blocks[i].id === editor.selectedBlockId) return editor.blocks[i];
+  }
+  return null;
+}
+
+function updateBlockConfig(key, value) {
+  var block = getSelectedBlock();
+  if (!block) return;
+  var cfg = {}; cfg[key] = value;
+  updateBlock(block.id, cfg);
+}
+
+function updateListItem(listKey, index, field, value) {
+  var block = getSelectedBlock();
+  if (!block) return;
+  var items = (block.config[listKey] || []).slice();
+  if (index >= items.length) return;
+  items[index] = { ...items[index] };
+  items[index][field] = value;
+  var cfg = {}; cfg[listKey] = items;
+  updateBlock(block.id, cfg);
+}
+
+function removeListItem(listKey, index) {
+  var block = getSelectedBlock();
+  if (!block) return;
+  var items = (block.config[listKey] || []).slice();
+  items.splice(index, 1);
+  var cfg = {}; cfg[listKey] = items;
+  updateBlock(block.id, cfg);
+}
+
+function addListItem(listKey, template) {
+  var block = getSelectedBlock();
+  if (!block) return;
+  var items = (block.config[listKey] || []).slice();
+  items.push(JSON.parse(JSON.stringify(template)));
+  var cfg = {}; cfg[listKey] = items;
+  updateBlock(block.id, cfg);
+}
+
+// ============ 属性面板渲染 ============
 function renderPropertyPanel() {
   var body = document.getElementById('propBody');
-  if (!editor.selectedBlockId) {
+  var block = getSelectedBlock();
+  if (!block) {
     body.innerHTML = '<div class="prop-empty">👈 点击左侧 Block<br>编辑其属性</div>';
     return;
   }
-
-  var block = null;
-  for (var i = 0; i < editor.blocks.length; i++) {
-    if (editor.blocks[i].id === editor.selectedBlockId) { block = editor.blocks[i]; break; }
-  }
-  if (!block) {
-    body.innerHTML = '<div class="prop-empty">Block 未找到</div>';
-    return;
-  }
-
   var schema = BlockRegistry.getSchema(block.type);
   if (!schema) {
     body.innerHTML = '<div class="prop-empty">无编辑 Schema: ' + block.type + '</div>';
     return;
   }
 
-  var html = '<div style="margin-bottom:16px;font-size:14px;font-weight:700">' + schema.icon + ' ' + schema.label + '</div>';
+  var bid = block.id;
+  var html = '<div style="margin-bottom:16px;font-size:15px;font-weight:800">' + schema.icon + ' ' + schema.label + '</div>';
+  html += '<div class="prop-field"><label>名称</label>';
+  html += '<input value="' + esc(block.label) + '" onchange="updateBlock(\'' + bid + '\',{label:this.value});renderBlockList();"></div>';
 
-  // 通用字段
-  html += '<div class="prop-field"><label>Block 名称</label>';
-  html += '<input value="' + block.label + '" onchange="updateBlock(\'' + block.id + '\',{label:this.value});renderBlockList();">';
-  html += '</div>';
-
-  // 根据 Schema 字段渲染表单
+  // 核心配置区
   var fields = schema.fields || [];
   for (var f = 0; f < fields.length; f++) {
     var field = fields[f];
-    var currentVal = block.config[field.key];
-    html += '<div class="prop-field"><label>' + field.label + '</label>';
-
-    switch (field.type) {
-      case 'number':
-        html += '<input type="number" value="' + (currentVal != null ? currentVal : '') + '" min="' + (field.min || '') + '" max="' + (field.max || '') + '" onchange="updateBlock(\'' + block.id + '\',{' + field.key + ':parseInt(this.value)||0})">';
-        break;
-      case 'text':
-        html += '<input type="text" value="' + (currentVal || '') + '" onchange="updateBlock(\'' + block.id + '\',{' + field.key + ':this.value})">';
-        break;
-      case 'color':
-        html += '<input type="color" value="' + (currentVal || '#000000') + '" onchange="updateBlock(\'' + block.id + '\',{' + field.key + ':this.value})">';
-        break;
-      case 'select':
-        html += '<select onchange="updateBlock(\'' + block.id + '\',{' + field.key + ':this.value})">';
-        var opts = field.options || [];
-        for (var o = 0; o < opts.length; o++) {
-          var sel = (currentVal === opts[o]) ? ' selected' : '';
-          html += '<option value="' + opts[o] + '"' + sel + '>' + opts[o] + '</option>';
-        }
-        html += '</select>';
-        break;
-      case 'cell-list':
-        html += renderCellListEditor(block, field.key);
-        break;
-      case 'card-list':
-      case 'store-item-list':
-      case 'effect-list':
-      case 'variable-list':
-      case 'building-list':
-      case 'piece-list':
-        html += renderSimpleListEditor(block, field.key, field.type);
-        break;
-      default:
-        html += '<span style="font-size:11px;color:var(--muted)">编辑类型 ' + field.type + ' 待实现</span>';
-    }
-    html += '</div>';
+    html += renderField(block, field);
   }
+
+  // 删除 Block 按钮
+  html += '<div style="margin-top:20px;padding-top:12px;border-top:1px solid var(--border)">';
+  html += '<button class="btn btn-danger btn-sm" onclick="removeBlock(\'' + bid + '\')" style="width:100%">🗑️ 删除此 Block</button>';
+  html += '</div>';
 
   body.innerHTML = html;
 }
 
-// ─── 格子列表编辑器 ───
-function renderCellListEditor(block, key) {
+function renderField(block, field) {
+  var val = block.config[field.key];
+  var html = '<div class="prop-field"><label>' + field.label + '</label>';
+  switch (field.type) {
+    case 'number':
+      html += '<input type="number" value="' + (val != null ? val : '') + '" min="' + (field.min || '') + '" max="' + (field.max || '') + '" onchange="updateBlockConfig(\'' + field.key + '\',parseInt(this.value)||0)">';
+      break;
+    case 'text':
+      html += '<input type="text" value="' + esc(val || '') + '" onchange="updateBlockConfig(\'' + field.key + '\',this.value)">';
+      break;
+    case 'color':
+      html += '<div style="display:flex;align-items:center;gap:8px">';
+      html += '<input type="color" value="' + esc(val || '#7C3AED') + '" onchange="updateBlockConfig(\'' + field.key + '\',this.value)" style="width:40px;height:32px;border:none;cursor:pointer">';
+      html += '<span style="font-size:12px;color:var(--muted)">' + esc(val || '#7C3AED') + '</span>';
+      html += '</div>';
+      break;
+    case 'select':
+      html += '<select onchange="updateBlockConfig(\'' + field.key + '\',this.value)">';
+      (field.options || []).forEach(function(o) {
+        html += '<option value="' + o + '"' + (val === o ? ' selected' : '') + '>' + o + '</option>';
+      });
+      html += '</select>';
+      break;
+    case 'cell-list': html += renderCellEditor(block, field.key); break;
+    case 'card-list': html += renderCardEditor(block, field.key); break;
+    case 'variable-list': html += renderVarEditor(block, field.key); break;
+    case 'store-item-list': html += renderStoreEditor(block, field.key); break;
+    case 'building-list': html += renderBuildingEditor(block, field.key); break;
+    case 'effect-list': html += renderEffectEditor(block, field.key); break;
+    case 'piece-list': html += renderPieceEditor(block, field.key); break;
+    default: html += '<span style="font-size:11px;color:var(--muted)">编辑类型 ' + field.type + ' 待实现</span>';
+  }
+  html += '</div>';
+  return html;
+}
+
+// ============ 专用编辑器 ============
+
+// 格子编辑器 — 可编辑每个格子的名称/图标/类型/价格
+function renderCellEditor(block, key) {
   var cells = block.config[key] || [];
-  var html = '<div style="max-height:200px;overflow-y:auto;">';
+  var types = ['start','property','chance','destiny','jail','shop','event','tax','empty'];
+  var html = '<div class="ed-list">';
   for (var i = 0; i < cells.length; i++) {
     var c = cells[i];
-    html += '<div class="prop-list-item">';
-    html += '<span style="font-size:16px">' + (c.icon || '') + '</span>';
-    html += '<span style="flex:1;font-size:11px;">#' + c.index + ' ' + c.name + '</span>';
-    html += '<span style="font-size:10px;color:var(--muted)">' + c.type + '</span>';
+    html += '<div class="ed-item" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:6px 8px;background:var(--card);border-radius:8px;margin-bottom:6px">';
+    html += '<span style="font-size:11px;color:var(--muted);width:24px">#' + c.index + '</span>';
+    html += '<input value="' + esc(c.icon || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'icon\',this.value)" style="width:32px;font-size:16px;text-align:center;padding:2px" title="图标">';
+    html += '<input value="' + esc(c.name || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'name\',this.value)" style="flex:1;min-width:60px;font-size:11px;padding:3px 6px" title="名称">';
+    html += '<select onchange="updateListItem(\'' + key + '\',' + i + ',\'type\',this.value)" style="width:72px;font-size:10px;padding:3px">';
+    types.forEach(function(t) { html += '<option value="' + t + '"' + (c.type === t ? ' selected' : '') + '>' + t + '</option>'; });
+    html += '</select>';
+    if (c.type === 'property') {
+      html += '<input type="number" value="' + (c.price || 0) + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'price\',parseInt(this.value)||0)" style="width:56px;font-size:10px;padding:3px" title="价格" placeholder="价格">';
+    }
+    html += '<button onclick="removeListItem(\'' + key + '\',' + i + ')" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--red);cursor:pointer;font-size:14px;line-height:1" title="删除">×</button>';
     html += '</div>';
   }
   html += '</div>';
-  html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">';
-  html += '格子数量: ' + cells.length + ' · 点击预览区中格子可在后续版本中进行编辑';
-  html += '</div>';
+  html += '<button class="ed-add" onclick="addListItem(\'' + key + '\',{index:' + cells.length + ',type:\'property\',name:\'新地产\',icon:\'🏠\',price:200})">+ 添加格子</button>';
   return html;
 }
 
-function renderSimpleListEditor(block, key, type) {
-  var items = block.config[key] || [];
-  var isCards = type === 'card-list';
-  var isVars = type === 'variable-list';
-
-  var html = '<div style="max-height:200px;overflow-y:auto;">';
-  for (var i = 0; i < items.length; i++) {
-    var item = items[i];
-    if (isCards) {
-      html += '<div class="prop-list-item"><span style="flex:1;font-size:11px;">🃏 ' + (item.title || item.id) + '</span></div>';
-    } else if (isVars) {
-      html += '<div class="prop-list-item"><span style="flex:1;font-size:11px;">' + item.label + '</span><span style="font-size:11px;color:var(--muted)">' + item.value + '</span></div>';
-    } else {
-      html += '<div class="prop-list-item"><span style="flex:1;font-size:11px;">' + (item.name || item.id) + '</span></div>';
-    }
+// 卡牌编辑器 — 可编辑每张卡的标题和效果
+function renderCardEditor(block, key) {
+  var cards = block.config[key] || [];
+  var html = '<div class="ed-list">';
+  for (var i = 0; i < cards.length; i++) {
+    var c = cards[i];
+    html += '<div class="ed-item" style="display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:6px 8px;background:var(--card);border-radius:8px;margin-bottom:4px">';
+    html += '<span style="font-size:18px;width:24px;text-align:center">🃏</span>';
+    html += '<input value="' + esc(c.title || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'title\',this.value)" style="flex:1;min-width:80px;font-size:11px;padding:3px 6px" placeholder="卡牌标题">';
+    html += '<input type="number" value="' + (c.effect ? (c.effect.gold || '') : '') + '" onchange="var e=(this.value||0);updateListItem(\'' + key + '\',' + i + ',\'effect\',{gold:' + (parseInt(c.effect && c.effect.gold) || 0) + '})" style="width:50px;font-size:10px;padding:3px" placeholder="金币" title="金币效果" disabled>';
+    html += '<button onclick="removeListItem(\'' + key + '\',' + i + ')" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--red);cursor:pointer;font-size:14px;line-height:1">×</button>';
+    html += '</div>';
   }
   html += '</div>';
-  html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">共 ' + items.length + ' 项 · 增删编辑在后续版本完善</div>';
+  html += '<button class="ed-add" onclick="addListItem(\'' + key + '\',{id:\'c' + Date.now() + '\',title:\'新卡牌\',effect:{}})">+ 添加卡牌</button>';
   return html;
 }
+
+// 变量编辑器
+function renderVarEditor(block, key) {
+  var vars = block.config[key] || [];
+  var html = '<div class="ed-list">';
+  for (var i = 0; i < vars.length; i++) {
+    var v = vars[i];
+    html += '<div class="ed-item" style="display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:6px 8px;background:var(--card);border-radius:8px;margin-bottom:4px">';
+    html += '<input value="' + esc(v.label || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'label\',this.value)" style="flex:1;min-width:60px;font-size:11px;padding:3px 6px" placeholder="名称">';
+    html += '<input type="number" value="' + (v.value || 0) + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'value\',parseInt(this.value)||0)" style="width:56px;font-size:10px;padding:3px" placeholder="值">';
+    html += '<button onclick="removeListItem(\'' + key + '\',' + i + ')" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--red);cursor:pointer;font-size:14px;line-height:1">×</button>';
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<button class="ed-add" onclick="addListItem(\'' + key + '\',{key:\'v' + Date.now() + '\',label:\'新变量\',value:0,min:0,max:100})">+ 添加变量</button>';
+  return html;
+}
+
+// 商店编辑器
+function renderStoreEditor(block, key) {
+  var items = block.config[key] || [];
+  var html = '<div class="ed-list">';
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    html += '<div class="ed-item" style="display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:6px 8px;background:var(--card);border-radius:8px;margin-bottom:4px">';
+    html += '<span style="font-size:16px;width:24px;text-align:center">' + (it.effect && it.effect.icon ? it.effect.icon : '🏪') + '</span>';
+    html += '<input value="' + esc(it.name || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'name\',this.value)" style="flex:1;min-width:60px;font-size:11px;padding:3px 6px" placeholder="商品名">';
+    html += '<input type="number" value="' + (it.cost || 0) + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'cost\',parseInt(this.value)||0)" style="width:56px;font-size:10px;padding:3px" placeholder="价格">';
+    html += '<button onclick="removeListItem(\'' + key + '\',' + i + ')" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--red);cursor:pointer;font-size:14px;line-height:1">×</button>';
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<button class="ed-add" onclick="addListItem(\'' + key + '\',{id:\'it' + Date.now() + '\',name:\'新商品\',cost:100,effect:{}})">+ 添加商品</button>';
+  return html;
+}
+
+// 建筑编辑器
+function renderBuildingEditor(block, key) {
+  var buildings = block.config[key] || [];
+  var html = '<div class="ed-list">';
+  for (var i = 0; i < buildings.length; i++) {
+    var b = buildings[i];
+    html += '<div class="ed-item" style="display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:6px 8px;background:var(--card);border-radius:8px;margin-bottom:4px">';
+    html += '<input value="' + esc(b.name || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'name\',this.value)" style="flex:1;min-width:60px;font-size:11px;padding:3px 6px" placeholder="建筑名">';
+    html += '<input type="number" value="' + (b.cost || 0) + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'cost\',parseInt(this.value)||0)" style="width:56px;font-size:10px;padding:3px" placeholder="费用">';
+    html += '<button onclick="removeListItem(\'' + key + '\',' + i + ')" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--red);cursor:pointer;font-size:14px;line-height:1">×</button>';
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<button class="ed-add" onclick="addListItem(\'' + key + '\',{id:\'b' + Date.now() + '\',name:\'新建筑\',cost:500,level:1})">+ 添加建筑</button>';
+  return html;
+}
+
+// 效果编辑器
+function renderEffectEditor(block, key) {
+  var effects = block.config[key] || [];
+  var actions = ['add_gold','deduct_gold','skip_turns','move','draw_card','swap_position','lucky_draw','shop_reward','luck_bonus'];
+  var triggers = ['land_on','pass_start','before_roll','game_end'];
+  var html = '<div class="ed-list">';
+  for (var i = 0; i < effects.length; i++) {
+    var ef = effects[i];
+    html += '<div class="ed-item" style="display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:6px 8px;background:var(--card);border-radius:8px;margin-bottom:4px">';
+    html += '<select onchange="updateListItem(\'' + key + '\',' + i + ',\'trigger\',this.value)" style="font-size:10px;padding:3px;width:80px">';
+    triggers.forEach(function(t) { html += '<option value="' + t + '"' + (ef.trigger === t ? ' selected' : '') + '>' + t + '</option>'; });
+    html += '</select>';
+    html += '<select onchange="updateListItem(\'' + key + '\',' + i + ',\'action\',this.value)" style="font-size:10px;padding:3px;width:80px">';
+    actions.forEach(function(a) { html += '<option value="' + a + '"' + (ef.action === a ? ' selected' : '') + '>' + a + '</option>'; });
+    html += '</select>';
+    html += '<input type="number" value="' + (ef.value || 0) + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'value\',parseInt(this.value)||0)" style="width:48px;font-size:10px;padding:3px" title="值">';
+    html += '<button onclick="removeListItem(\'' + key + '\',' + i + ')" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--red);cursor:pointer;font-size:14px;line-height:1">×</button>';
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<button class="ed-add" onclick="addListItem(\'' + key + '\',{id:\'e' + Date.now() + '\',trigger:\'land_on\',action:\'add_gold\',value:0})">+ 添加效果</button>';
+  return html;
+}
+
+// 棋子编辑器
+function renderPieceEditor(block, key) {
+  var pieces = block.config[key] || [];
+  var html = '<div class="ed-list">';
+  for (var i = 0; i < pieces.length; i++) {
+    var p = pieces[i];
+    html += '<div class="ed-item" style="display:flex;gap:3px;align-items:center;padding:6px 8px;background:var(--card);border-radius:8px;margin-bottom:4px">';
+    html += '<input value="' + esc(p.emoji || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'emoji\',this.value)" style="width:36px;font-size:18px;text-align:center;padding:2px" title="图标">';
+    html += '<input value="' + esc(p.name || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'name\',this.value)" style="flex:1;min-width:60px;font-size:11px;padding:3px 6px" placeholder="名称">';
+    html += '<input value="' + esc(p.color || '') + '" type="color" onchange="updateListItem(\'' + key + '\',' + i + ',\'color\',this.value)" style="width:32px;height:28px;border:none;cursor:pointer" title="颜色">';
+    html += '<label style="font-size:10px;display:flex;align-items:center;gap:2px"><input type="checkbox" ' + (p.isAI ? 'checked' : '') + ' onchange="updateListItem(\'' + key + '\',' + i + ',\'isAI\',this.checked)">AI</label>';
+    html += '<button onclick="removeListItem(\'' + key + '\',' + i + ')" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--red);cursor:pointer;font-size:14px;line-height:1">×</button>';
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<button class="ed-add" onclick="addListItem(\'' + key + '\',{id:\'p' + Date.now() + '\',name:\'新玩家\',emoji:\'🎮\',color:\'#7C3AED\',isAI:false})">+ 添加棋子</button>';
+  return html;
+}
+
+// HTML 转义辅助
+function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 // ========= 保存 & 发布 =========
 async function saveConfig() {
@@ -842,14 +982,17 @@ function showToast(msg) {
   el._timer = setTimeout(function() { el.classList.remove('show'); }, 3000);
 }
 
-// 点击其他地方关闭 Block 菜单
-document.addEventListener('click', function(e) {
-  var menu = document.getElementById('blockTypeMenu');
-  var btn = document.getElementById('btnAddBlock');
-  if (menu.classList.contains('show') && e.target !== btn && !btn.contains(e.target)) {
-    menu.classList.remove('show');
-  }
-});
+
 </script>
+
+<!-- Block 选择器 -->
+<div class="block-type-overlay" id="blockTypeOverlay" onclick="if(event.target===this)hideBlockPicker()">
+  <div class="block-type-grid">
+    <h3>🧩 选择要添加的 Block</h3>
+    <div class="sub">每种 Block 代表一种游戏元素，点击即可添加到左侧列表</div>
+    <div class="block-type-cards" id="blockTypeCards"></div>
+    <button class="block-type-close" onclick="hideBlockPicker()">取消</button>
+  </div>
+</div>
 </body>
 </html>
