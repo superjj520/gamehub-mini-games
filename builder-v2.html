@@ -422,6 +422,7 @@ function onTitleChange() {
   renderPreview();
 }
 
+function showBlockPicker() { buildBlockTypePicker(); document.getElementById('blockTypeOverlay').classList.add('show'); }
 function hideBlockPicker() { document.getElementById('blockTypeOverlay').classList.remove('show'); }
 
 function buildBlockTypePicker() {
