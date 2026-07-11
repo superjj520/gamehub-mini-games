@@ -24,6 +24,11 @@ const BlockRegistry = (() => {
         { key: 'cols',    label: '列数',   type: 'number', min: 5, max: 15, default: 7 },
         { key: 'cells',   label: '格子列表', type: 'cell-list' },
       ],
+      templates: [
+        { name: "🏙️ 经典24格", desc: "7×7,12地产+4机会+4命运", config: { rows:7, cols:7 } },
+        { name: "🌃 赛博都市", desc: "9×9, 密集地产", config: { rows:9, cols:9 } },
+        { name: "🏘️ 迷你小镇", desc: "5×5, 快速游戏", config: { rows:5, cols:5 } },
+      ],
     },
     collection: {
       label: '卡堆/奖池', icon: '🎲',
@@ -31,11 +36,36 @@ const BlockRegistry = (() => {
         { key: 'drawMode', label: '抽选模式', type: 'select', options: ['random', 'weighted', 'sequential'], default: 'random' },
         { key: 'cards',    label: '条目列表',  type: 'card-list' },
       ],
+      templates: [
+        { name: "🎰 经典奖池", desc: "5档奖品+权重", config: { drawMode:"weighted", cards:[
+          {id:"p1",title:"一等奖 iPhone",weight:5,effect:{gold:1000}},
+          {id:"p2",title:"二等奖 耳机",weight:10,effect:{gold:500}},
+          {id:"p3",title:"三等奖 优惠券",weight:25,effect:{gold:100}},
+          {id:"p4",title:"四等奖 积分",weight:30,effect:{gold:50}},
+          {id:"p5",title:"谢谢参与",weight:30,effect:{gold:0}},
+        ]}},
+        { name: "🃏 冒险卡堆", desc: "前退+金币混合", config: { drawMode:"random", cards:[
+          {id:"a1",title:"发现宝藏 +200",effect:{gold:200}},
+          {id:"a2",title:"遭遇陷阱 -100",effect:{gold:-100}},
+          {id:"a3",title:"前进5格",effect:{move:5}},
+        ]}},
+      ],
     },
     rule: {
       label: '规则', icon: '📐',
       fields: [
         { key: 'variables', label: '变量定义', type: 'variable-list' },
+      ],
+      templates: [
+        { name: "💰 大富翁标准", desc: "1500金币+起点200+5圈", config: { variables:[
+          {key:"initialGold",label:"初始金币",value:1500},
+          {key:"startBonus",label:"起点奖励",value:200},
+          {key:"maxLaps",label:"获胜圈数",value:5},
+        ]}},
+        { name: "⏱️ 限时挑战", desc: "60秒倒计时", config: { variables:[
+          {key:"timeLimit",label:"时限(秒)",value:60},
+          {key:"targetScore",label:"目标分",value:1000},
+        ]}},
       ],
     },
     piece: {
@@ -43,11 +73,24 @@ const BlockRegistry = (() => {
       fields: [
         { key: 'pieces', label: '棋子列表', type: 'piece-list' },
       ],
+      templates: [
+        { name: "🎨 多彩棋子", desc: "4色+emoji", config: { pieces:[
+          {id:"p1",name:"红方",emoji:"🔴",color:"#EF4444",isAI:false},
+          {id:"p2",name:"蓝方",emoji:"🔵",color:"#3B82F6",isAI:true},
+        ]}},
+      ],
     },
     building: {
       label: '建筑', icon: '🏗️',
       fields: [
         { key: 'buildings', label: '建筑类型', type: 'building-list' },
+      ],
+      templates: [
+        { name: "🏘️ 住宅链", desc: "平房→别墅→城堡", config: { buildings:[
+          {id:"b1",name:"平房",cost:200,level:1},
+          {id:"b2",name:"别墅",cost:800,level:2},
+          {id:"b3",name:"城堡",cost:3000,level:3},
+        ]}},
       ],
     },
     store: {
@@ -56,11 +99,25 @@ const BlockRegistry = (() => {
         { key: 'currency',  label: '货币类型', type: 'text',   default: 'gold' },
         { key: 'items',     label: '商品列表', type: 'store-item-list' },
       ],
+      templates: [
+        { name: "🏗️ 地产商店", desc: "公寓+商场+酒店", config: { currency:"gold", items:[
+          {id:"apt",name:"公寓",cost:200,effect:{rent_multiplier:2,icon:"🏠"}},
+          {id:"mall",name:"商场",cost:500,effect:{rent_multiplier:5,icon:"🏬"}},
+          {id:"hotel",name:"酒店",cost:1000,effect:{rent_multiplier:10,icon:"🏨"}},
+        ]}},
+      ],
     },
     effect: {
       label: '效果/事件', icon: '⚡',
       fields: [
         { key: 'effects', label: '效果列表', type: 'effect-list' },
+      ],
+      templates: [
+        { name: "🎯 经典事件", desc: "起点加钱+监禁跳过", config: { effects:[
+          {id:"e1",trigger:"land_on",cellType:"start",action:"add_gold",value:200},
+          {id:"e2",trigger:"land_on",cellType:"jail",action:"skip_turns",value:1},
+          {id:"e3",trigger:"pass_start",action:"add_gold",value:200},
+        ]}},
       ],
     },
     player: {
@@ -69,6 +126,18 @@ const BlockRegistry = (() => {
         { key: 'minPlayers',  label: '最少玩家', type: 'number', min: 1, max: 10, default: 2 },
         { key: 'maxPlayers',  label: '最多玩家', type: 'number', min: 1, max: 10, default: 4 },
         { key: 'initialGold', label: '初始金币', type: 'number', min: 0, max: 99999, default: 1500 },
+      ],
+      templates: [
+        { name: "👥 双人对战", desc: "1玩家+1AI", config: { minPlayers:2, maxPlayers:2, initialGold:1500, players:[
+          {id:"p1",name:"玩家",emoji:"🧑",isAI:false,color:"#7C3AED"},
+          {id:"p2",name:"电脑",emoji:"🤖",isAI:true,color:"#EC4899"},
+        ]}},
+        { name: "👨‍👩‍👧‍👦 四人派对", desc: "1玩家+3AI", config: { minPlayers:4, maxPlayers:4, initialGold:2000, players:[
+          {id:"p1",name:"你",emoji:"🧑",isAI:false,color:"#7C3AED"},
+          {id:"p2",name:"小明",emoji:"🤖",isAI:true,color:"#EC4899"},
+          {id:"p3",name:"小红",emoji:"🤖",isAI:true,color:"#22C55E"},
+          {id:"p4",name:"小刚",emoji:"🤖",isAI:true,color:"#F59E0B"},
+        ]}},
       ],
     },
     theme: {
