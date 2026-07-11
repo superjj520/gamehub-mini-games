@@ -427,6 +427,7 @@ function showBlockPicker() { document.getElementById('blockTypeOverlay').classLi
 function hideBlockPicker() { document.getElementById('blockTypeOverlay').classList.remove('show'); }
 
 function buildBlockTypePicker() {
+  var el = document.getElementById('blockTypeCards'); if (!el) return;
   var schemas = BlockRegistry.getAllSchemas();
   var types = Object.keys(schemas);
   var descs = {
