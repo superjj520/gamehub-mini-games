@@ -29,6 +29,11 @@ const BlockRegistry = (() => {
         { name: "🌃 赛博都市", desc: "9×9, 密集地产", config: { rows:9, cols:9 } },
         { name: "🏘️ 迷你小镇", desc: "5×5, 快速游戏", config: { rows:5, cols:5 } },
       ],
+      templates: [
+        { name: "🏙️ 经典24格", desc: "7×7,12地产+4机会+4命运", config: { rows:7, cols:7 } },
+        { name: "🌃 赛博都市", desc: "9×9, 密集地产", config: { rows:9, cols:9 } },
+        { name: "🏘️ 迷你小镇", desc: "5×5, 快速游戏", config: { rows:5, cols:5 } },
+      ],
     },
     collection: {
       label: '卡堆/奖池', icon: '🎲',
