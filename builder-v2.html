@@ -94,7 +94,7 @@ body {
   align-items:center; justify-content:center;
 }
 .block-item:hover .block-item-del { display:flex; }
-.block-add-area { padding:8px; }
+.block-add-area { padding:8px; position:relative; }
 .block-add-btn {
   width:100%; padding:10px; border-radius:8px;
   border:1px dashed rgba(124,58,237,0.3);
@@ -109,7 +109,7 @@ body {
   position:absolute; z-index:200; background:var(--deep);
   border:1px solid var(--border); border-radius:12px;
   padding:8px; box-shadow:0 8px 32px rgba(0,0,0,0.5);
-  display:none; min-width:180px;
+  display:none; min-width:180px; bottom:100%; left:8px; right:8px; margin-bottom:4px; max-height:320px; overflow-y:auto;
 }
 .block-type-menu.show { display:block; }
 .block-type-option {
