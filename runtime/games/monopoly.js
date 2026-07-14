@@ -1,336 +1,231 @@
 /**
- * 大富翁游戏逻辑 — Block 驱动，回合制
- * 依赖：GameEngine, GridRenderer, CollectionManager, EffectEngine, StoreManager, PieceController, RuleEngine, PlayerManager
+ * 大富翁 — boardgame.io 模式重构
+ * 阶段: roll → action → endTurn
+ * Moves: rollDice, buyProperty, buildBuilding, drawCard, payRent, endTurn
  */
-const MonopolyGame = (() => {
-  var ctx = null;
-  var state = null;
-  var animating = false;
+var MonopolyGame = (function() {
+  var game = null;
+  var _container = null;
+  var _gridResult = null; // { board, element, config }
+  var _pieceEls = [];
+  var _statusEl = null;
+  var _renderFn = null;
 
-  function start(gameCtx) {
-    ctx = gameCtx;
-    var players = gameCtx.players;
+  // ─── 创建 game 定义 ───
+  function createGame(blocks) {
+    // 提取 Block 配置
+    var gridBlock = findBlock(blocks, 'grid');
+    var chanceBlock = findBlock(blocks, 'collection', '机会');
+    var destinyBlock = findBlock(blocks, 'collection', '命运');
+    var storeBlock = findBlock(blocks, 'store');
+    var ruleBlock = findBlock(blocks, 'rule');
+    var playerBlock = findBlock(blocks, 'player');
 
-    state = {
-      players: players.map(function(p) { return { ...p }; }),
-      currentPlayer: 0,
-      round: 1,
-      gameOver: false,
-      winner: null,
-      pieceEls: [],
-      log: [],
-    };
+    var cells = (gridBlock && gridBlock.config.cells) || [];
+    var chanceCards = (chanceBlock && chanceBlock.config.cards) || [];
+    var destinyCards = (destinyBlock && destinyBlock.config.cards) || [];
+    var storeItems = (storeBlock && storeBlock.config.items) || [];
+    var ruleVars = getRuleVars(ruleBlock);
+    var players = (playerBlock && playerBlock.config.players) || [
+      { id:'p1', name:'玩家A', emoji:'🧑', isAI:false, color:'#7C3AED' },
+      { id:'p2', name:'玩家B', emoji:'🤖', isAI:true,  color:'#EC4899' },
+    ];
 
-    // 获取棋盘容器并在其上放置棋子
-    var gridResult = findGridResult();
-    if (!gridResult) {
-      addLog('❌ 未找到棋盘 Block，请确保配置中包含 Grid 类型的 Block');
-      return;
-    }
+    return BoardGameEngine.create({
+      _startPhase: 'roll',
 
-    // 在棋盘容器上放棋子
-    if (typeof PieceController !== 'undefined') {
-      var gridContainer = gridResult.element;
-      // 确保容器有 position:relative
-      gridContainer.style.position = 'relative';
-      state.pieceEls = [];
-      for (var i = 0; i < players.length; i++) {
-        var pieceEl = PieceController.createPieceEl(players[i], i);
-        gridContainer.appendChild(pieceEl);
-        state.pieceEls.push(pieceEl);
-      }
-      placeAllPieces();
-    }
+      // ─── 初始化游戏状态 ───
+      setup: function(ctx) {
+        return {
+          players: players.map(function(p, i) {
+            return {
+              id: p.id || 'p' + i,
+              name: p.name, emoji: p.emoji, isAI: !!p.isAI, color: p.color,
+              position: 0, gold: ruleVars.initialGold || 1500, laps: 0,
+              skipNext: false, properties: [], prizes: [], buildings: {},
+            };
+          }),
+          cells: cells,
+          chanceCards: ctx.random.shuffle(chanceCards),
+          destinyCards: ctx.random.shuffle(destinyCards),
+          chanceIdx: 0, destinyIdx: 0,
+          storeItems: storeItems,
+          rules: ruleVars,
+          log: [],
+        };
+      },
 
-    // 渲染 UI
-    emitState();
-    emitStatus('🎲 ' + players[0].name + ' 的回合，请掷骰子');
+      // ─── Moves ───
+      moves: {
+        // 掷骰子并移动
+        rollDice: function(G, ctx) {
+          var pi = parseInt(ctx.currentPlayer);
+          var p = G.players[pi];
+          if (p.skipNext) {
+            G.players = updatePlayer(G.players, pi, { skipNext: false });
+            G.log = addLog(G.log, p.emoji + ' ' + p.name + ' 本回合跳过');
+            return moveToPhase(G, 'endTurn');
+          }
+          var dice = ctx.random.D6();
+          var totalCells = G.cells.length;
+          var newPos = (p.position + dice) % totalCells;
+          var passedStart = p.position + dice >= totalCells;
+          var newGold = p.gold + (passedStart ? (G.rules.startBonus || 200) : 0);
+          var newLaps = p.laps + (passedStart ? 1 : 0);
 
-    // 如果当前玩家是 AI，自动掷骰子
-    if (players[0].isAI) {
-      setTimeout(function() { handleRollDice(); }, 1200);
-    }
-  }
+          G.players = updatePlayer(G.players, pi, {
+            position: newPos, gold: newGold, laps: newLaps
+          });
+          G.lastDice = dice;
+          G.log = addLog(G.log, p.emoji + ' ' + p.name + ' 掷出 ' + dice + ' 点 → 格' + (newPos+1));
+          if (passedStart) G.log = addLog(G.log, '🚩 经过起点 +' + (G.rules.startBonus||200) + ' 金币');
 
-  // ─── 掷骰子 ───
-  function handleRollDice() {
-    if (state.gameOver || animating) return;
-    var pi = state.currentPlayer;
-    var player = state.players[pi];
+          // 落地自动处理
+          var cell = G.cells[newPos];
+          if (cell) {
+            if (cell.type === 'chance') {
+              return moveToPhase(G, 'card');
+            } else if (cell.type === 'destiny') {
+              return moveToPhase(G, 'card');
+            }
+          }
+          // 检查胜利
+          if (newLaps >= (G.rules.maxLaps || 5)) {
+            G.log = addLog(G.log, '🏆 ' + p.name + ' 获胜！');
+            return { ...G, winner: pi };
+          }
+          return moveToPhase(G, 'action');
+        },
 
-    // 检查是否被跳过
-    if (player.skipNext) {
-      state.players[pi] = { ...player, skipNext: false };
-      addLog(player.emoji + ' ' + player.name + ' 本回合被跳过');
-      emitStatus(player.emoji + ' ' + player.name + ' ⏸️ 暂停一回合');
-      setTimeout(function() { nextTurn(); }, 1200);
-      return;
-    }
+        // 购买当前地产
+        buyProperty: function(G, ctx) {
+          var pi = parseInt(ctx.currentPlayer);
+          var p = G.players[pi];
+          var cell = G.cells[p.position];
+          if (!cell || cell.type !== 'property' || !cell.price) return G;
+          if (p.properties.indexOf(p.position) !== -1) return G;
+          if (p.gold < cell.price) return G;
 
-    // 骰子
-    var ruleCfg = getRuleConfig();
-    var diceMin = ruleCfg.diceMin || 1;
-    var diceMax = ruleCfg.diceMax || 6;
-    var steps = Math.floor(Math.random() * (diceMax - diceMin + 1)) + diceMin;
+          G.players = updatePlayer(G.players, pi, {
+            gold: p.gold - cell.price,
+            properties: p.properties.concat([p.position]),
+          });
+          G.log = addLog(G.log, '🏠 ' + p.name + ' 购买 ' + cell.name + ' (-' + cell.price + ')');
+          return G;
+        },
 
-    addLog(player.emoji + ' ' + player.name + ' 掷出 ' + steps + ' 点');
-    emitStatus('🎲 ' + player.name + ' 掷出 ' + steps + ' 点');
+        // 建造建筑
+        buildBuilding: function(G, ctx, itemId) {
+          var pi = parseInt(ctx.currentPlayer);
+          var p = G.players[pi];
+          var item = null;
+          for (var i = 0; i < G.storeItems.length; i++) {
+            if (G.storeItems[i].id === itemId) { item = G.storeItems[i]; break; }
+          }
+          if (!item || p.gold < item.cost) return G;
 
-    // 计算新位置
-    var gridBlock = findBlockByType('grid');
-    var totalCells = (gridBlock && gridBlock.config.cells) ? gridBlock.config.cells.length : 24;
-    var fromPos = player.position;
+          var buildings = { ...p.buildings };
+          buildings[itemId] = (buildings[itemId] || 0) + 1;
+          G.players = updatePlayer(G.players, pi, {
+            gold: p.gold - item.cost, buildings: buildings
+          });
+          G.log = addLog(G.log, '🏗️ ' + p.name + ' 建造 ' + item.name + ' (-' + item.cost + ')');
+          return G;
+        },
 
-    animating = true;
-    animateStepByStep(pi, fromPos, steps, totalCells, function(newPos, passedStart) {
-      // 更新玩家位置
-      var newPlayer = { ...state.players[pi], position: newPos };
-      if (passedStart) {
-        var startBonus = ruleCfg.startBonus || 200;
-        newPlayer = PlayerManager.addGold(newPlayer, startBonus);
-        newPlayer.laps += 1;
-        addLog('🚩 ' + player.name + ' 经过起点 +' + startBonus + ' 金币 (第' + newPlayer.laps + '圈)');
-        emitStatus('🚩 ' + player.name + ' 经过起点 +' + startBonus + ' 金币');
-      }
-      state.players[pi] = newPlayer;
+        // 抽卡(机会/命运)
+        drawCard: function(G, ctx) {
+          var pi = parseInt(ctx.currentPlayer);
+          var p = G.players[pi];
+          var cell = G.cells[p.position];
+          var isChance = cell && cell.type === 'chance';
+          var deck = isChance ? G.chanceCards : G.destinyCards;
+          var idxKey = isChance ? 'chanceIdx' : 'destinyIdx';
+          var card = deck[G[idxKey] % deck.length];
+          G[idxKey] = G[idxKey] + 1;
 
-      // 落地效果
-      var cellData = findCellData(newPos);
-      if (cellData) {
-        handleLandOnCell(pi, cellData);
-      }
+          if (!card) return moveToPhase(G, 'action');
 
-      // 检查胜利
-      var maxLaps = ruleCfg.maxLaps || 5;
-      if (newPlayer.laps >= maxLaps) {
-        state.gameOver = true;
-        state.winner = newPlayer;
-        emitStatus('🏆 ' + newPlayer.name + ' 获得胜利！走了 ' + newPlayer.laps + ' 圈');
-        emitState();
-        animating = false;
-        return;
-      }
+          G.log = addLog(G.log, '🃏 ' + p.name + ' 抽到: ' + card.title);
 
-      animating = false;
-      emitState();
+          if (card.effect) {
+            if (card.effect.gold) {
+              G.players = updatePlayer(G.players, pi, { gold: Math.max(0, p.gold + card.effect.gold) });
+            }
+            if (card.effect.move) {
+              var totalCells = G.cells.length;
+              var newPos = ((p.position + card.effect.move) % totalCells + totalCells) % totalCells;
+              G.players = updatePlayer(G.players, pi, { position: newPos });
+              G.log = addLog(G.log, '➡️ 移动至格' + (newPos+1));
+            }
+            if (card.effect.skip) {
+              G.players = updatePlayer(G.players, pi, { skipNext: true });
+            }
+            if (card.effect.swap) {
+              var other = pi === 0 ? 1 : 0;
+              var otherPos = G.players[other].position;
+              G.players = updatePlayer(G.players, pi, { position: otherPos });
+              G.players = updatePlayer(G.players, other, { position: p.position });
+            }
+          }
+          return moveToPhase(G, 'action');
+        },
 
-      // 下一个玩家
-      setTimeout(function() { nextTurn(); }, 800);
+        // 结束回合
+        endTurn: function(G) {
+          return moveToPhase(G, 'roll');
+        },
+      },
+
+      // ─── Phases ───
+      phases: {
+        roll: {
+          moves: ['rollDice'],
+          onEnter: function(G, ctx) {
+            var pi = parseInt(ctx.currentPlayer);
+            var p = G.players[pi];
+            // AI 自动掷骰子
+            if (p.isAI) {
+              setTimeout(function() {
+                if (game) { game.move('rollDice'); handleCellEffect(); }
+              }, 1000);
+            }
+          },
+        },
+        action: {
+          moves: ['buyProperty', 'buildBuilding', 'endTurn'],
+          onEnter: function(G, ctx) {
+            var pi = parseInt(ctx.currentPlayer);
+            var p = G.players[pi];
+            // AI 自动决策：能买就买
+            if (p.isAI) {
+              var cell = G.cells[p.position];
+              if (cell && cell.type === 'property' && cell.price && p.gold >= cell.price && p.properties.indexOf(p.position) === -1) {
+                setTimeout(function() { game.move('buyProperty'); game.move('endTurn'); }, 800);
+              } else {
+                setTimeout(function() { game.move('endTurn'); }, 600);
+              }
+            }
+          },
+        },
+        card: {
+          moves: ['drawCard'],
+          onEnter: function(G) {
+            // 自动抽卡
+            setTimeout(function() { game.move('drawCard'); }, 300);
+          },
+        },
+      },
+
+      // ─── 游戏结束条件 ───
+      endIf: function(G) {
+        return G.winner != null ? G.winner : null;
+      },
     });
   }
 
-  // ─── 逐格动画移动 ───
-  function animateStepByStep(playerIdx, fromPos, steps, totalCells, callback) {
-    var gridResult = findGridResult();
-    if (!gridResult || !state.pieceEls) { callback(fromPos, false); return; }
-
-    var current = fromPos;
-    var moved = 0;
-    var passedStart = false;
-    var pieceEl = state.pieceEls[playerIdx];
-    var offsetY = playerIdx * 8 - 4;
-    var offsetX = playerIdx * 10 - 5;
-
-    function moveNext() {
-      if (moved >= steps) {
-        GridRenderer.clearHighlights(gridResult.board);
-        callback(current, passedStart);
-        return;
-      }
-
-      current = (current + 1) % totalCells;
-      if (current === 0) passedStart = true;
-      moved++;
-
-      GridRenderer.clearHighlights(gridResult.board);
-      GridRenderer.updateCell(gridResult.board, current, { highlight: true });
-
-      var pos = GridRenderer.getCellPosition(gridResult.board, current);
-      PieceController.animatePiece(pieceEl, pos, 250, offsetX, offsetY).then(function() {
-        moveNext();
-      });
-    }
-
-    moveNext();
-  }
-
-  // ─── 落地格处理 ───
-  function handleLandOnCell(pi, cellData) {
-    var player = state.players[pi];
-
-    switch (cellData.type) {
-      case 'property':
-        if (!cellData.price) return;
-        emitStatus('🏠 ' + cellData.name + ' — 购买价 ' + cellData.price + ' 金币，当前租金 ' + (cellData.rent ? cellData.rent[0] : 0));
-        addLog('📍 ' + player.name + ' 到达 ' + cellData.name + '（可购买）');
-        break;
-
-      case 'chance':
-        emitStatus('🃏 ' + player.name + ' 抽机会卡...');
-        setTimeout(function() { drawCard(pi, 'chance'); }, 600);
-        break;
-
-      case 'destiny':
-        emitStatus('🔮 ' + player.name + ' 抽命运卡...');
-        setTimeout(function() { drawCard(pi, 'destiny'); }, 600);
-        break;
-
-      case 'jail':
-        state.players[pi] = { ...player, skipNext: true };
-        addLog('🚔 ' + player.name + ' 被监禁！下回合跳过');
-        emitStatus('🚔 ' + player.name + ' 被监禁！下回合跳过');
-        break;
-
-      case 'shop':
-        addLog('🏪 ' + player.name + ' 到达商铺街');
-        emitStatus('🏪 ' + player.name + ' 到达商铺街，可获得商铺奖励');
-        break;
-
-      case 'event':
-        if (cellData.effect && cellData.effect.gold) {
-          state.players[pi] = PlayerManager.addGold(player, cellData.effect.gold);
-          if (cellData.effect.gold > 0) {
-            addLog('🍀 ' + player.name + ' +' + cellData.effect.gold + ' 金币');
-            emitStatus('🍀 ' + player.name + ' +' + cellData.effect.gold + ' 金币');
-          } else {
-            addLog('💸 ' + player.name + ' ' + cellData.effect.gold + ' 金币');
-            emitStatus('💸 ' + player.name + ' ' + cellData.effect.gold + ' 金币');
-          }
-        }
-        break;
-
-      case 'start':
-        // 已经在 passedStart 中处理
-        break;
-
-      default:
-        addLog('📍 ' + player.name + ' 到达 ' + (cellData.name || '未知格'));
-    }
-
-    emitState();
-  }
-
-  // ─── 抽卡 ───
-  function drawCard(pi, deckType) {
-    var player = state.players[pi];
-    var label = deckType === 'chance' ? '机会卡' : '命运卡';
-    var block = findBlockByType('collection', label);
-    if (!block) {
-      addLog('❌ 未找到' + label + ' Block');
-      return;
-    }
-
-    var result = CollectionManager.draw(block.config);
-    if (!result.card) return;
-
-    var card = result.card;
-    addLog('🃏 ' + player.name + ' 抽到: ' + card.title);
-    emitStatus('🃏 ' + card.title);
-
-    if (!card.effect) return;
-
-    var p = state.players[pi];
-
-    if (card.effect.gold) {
-      p = PlayerManager.addGold(p, card.effect.gold);
-      addLog('💰 ' + (card.effect.gold > 0 ? '+' : '') + card.effect.gold + ' 金币');
-    }
-    if (card.effect.move) {
-      var gridBlock = findBlockByType('grid');
-      var totalCells = (gridBlock && gridBlock.config.cells) ? gridBlock.config.cells.length : 24;
-      p = PlayerManager.movePlayer(p, card.effect.move, totalCells);
-      addLog('➡️ 移动 ' + card.effect.move + ' 格');
-    }
-    if (card.effect.skip) {
-      p = { ...p, skipNext: true };
-    }
-    if (card.effect.swap) {
-      var other = pi === 0 ? 1 : 0;
-      var tempPos = p.position;
-      p = { ...p, position: state.players[other].position };
-      state.players[other] = { ...state.players[other], position: tempPos };
-      addLog('🔄 与对手交换位置！');
-      placeAllPieces();
-    }
-    if (card.effect.prize) {
-      p = PlayerManager.addPrize(p, card.effect.prize);
-    }
-
-    state.players[pi] = p;
-    emitState();
-  }
-
-  // ─── 购买地产 ───
-  function buyProperty() {
-    if (state.gameOver || animating) return;
-    var pi = state.currentPlayer;
-    var player = state.players[pi];
-    var cellData = findCellData(player.position);
-
-    if (!cellData || cellData.type !== 'property' || !cellData.price) {
-      emitStatus('❌ 当前位置不可购买');
-      return;
-    }
-    if (player.properties.indexOf(cellData.index) !== -1) {
-      emitStatus('❌ 你已经拥有 ' + cellData.name);
-      return;
-    }
-    if (player.gold < cellData.price) {
-      emitStatus('❌ 金币不足！需要 ' + cellData.price + ' 金币，当前 ' + player.gold);
-      return;
-    }
-
-    state.players[pi] = PlayerManager.addProperty(
-      PlayerManager.addGold(player, -cellData.price),
-      cellData.index
-    );
-    addLog('🏠 ' + player.name + ' 购买了 ' + cellData.name + '！(-' + cellData.price + ' 金币)');
-    emitStatus('🏠 ' + player.name + ' 购买了 ' + cellData.name + '！');
-    emitState();
-  }
-
-  // ─── 建造建筑 ───
-  function buildBuilding(itemId) {
-    if (state.gameOver || animating) return;
-    var pi = state.currentPlayer;
-    var player = state.players[pi];
-    var storeBlock = findBlockByType('store');
-    if (!storeBlock) return;
-
-    var item = StoreManager.findItem(storeBlock.config, itemId);
-    if (!item) return;
-
-    if (!StoreManager.canBuy(player, item)) {
-      emitStatus('❌ 金币不足！需要 ' + item.cost + ' 金币');
-      return;
-    }
-
-    state.players[pi] = StoreManager.buy(player, item);
-    addLog('🏗️ ' + player.name + ' 建造了 ' + item.name + '！(-' + item.cost + ' 金币)');
-    emitStatus('🏗️ ' + player.name + ' 建造了 ' + item.name + '！');
-    emitState();
-  }
-
-  // ─── 回合切换 ───
-  function nextTurn() {
-    if (state.gameOver) return;
-    state.currentPlayer = (state.currentPlayer + 1) % state.players.length;
-    if (state.currentPlayer === 0) state.round++;
-
-    emitState();
-
-    // AI 自动行动
-    if (state.players[state.currentPlayer].isAI) {
-      emitStatus('🤖 ' + state.players[state.currentPlayer].name + ' 思考中...');
-      setTimeout(function() { handleRollDice(); }, 1500);
-    } else {
-      emitStatus('🎲 ' + state.players[state.currentPlayer].name + ' 的回合，请掷骰子');
-    }
-  }
-
-  // ─── 辅助 ───
-  function findBlockByType(type, labelMatch) {
-    var blocks = ctx.config.blocks || [];
+  // ─── 辅助函数 ───
+  function findBlock(blocks, type, labelMatch) {
     for (var i = 0; i < blocks.length; i++) {
       if (blocks[i].type !== type) continue;
       if (labelMatch && blocks[i].label.indexOf(labelMatch) === -1) continue;
@@ -339,75 +234,165 @@ const MonopolyGame = (() => {
     return null;
   }
 
-  function findGridResult() {
-    var results = ctx.blockResults || {};
-    var keys = Object.keys(results);
-    for (var i = 0; i < keys.length; i++) {
-      if (results[keys[i]].board) return results[keys[i]];
-    }
-    return null;
-  }
-
-  function getRuleConfig() {
-    var block = findBlockByType('rule');
-    if (!block) return {};
+  function getRuleVars(block) {
     var vars = {};
-    var variables = block.config.variables || [];
-    for (var i = 0; i < variables.length; i++) {
-      vars[variables[i].key] = variables[i].value;
+    if (!block || !block.config.variables) return vars;
+    for (var i = 0; i < block.config.variables.length; i++) {
+      vars[block.config.variables[i].key] = block.config.variables[i].value;
     }
     return vars;
   }
 
-  function findCellData(index) {
-    var block = findBlockByType('grid');
-    if (!block) return null;
-    var cells = block.config.cells || [];
-    for (var i = 0; i < cells.length; i++) {
-      if (cells[i].index === index) return cells[i];
+  function updatePlayer(players, idx, updates) {
+    var copy = players.slice();
+    copy[idx] = { ...copy[idx], ...updates };
+    return copy;
+  }
+
+  function addLog(log, msg) {
+    return log.concat([msg]).slice(-50);
+  }
+
+  function moveToPhase(G, phase) {
+    G._nextPhase = phase;
+    return G;
+  }
+
+  // ─── 落地格子效果处理 ───
+  function handleCellEffect() {
+    var state = game.getState();
+    var G = state.G;
+    var ctx = state.ctx;
+    if (!G || ctx.gameover != null) return;
+
+    var pi = parseInt(ctx.currentPlayer);
+    var p = G.players[pi];
+    var cell = G.cells[p.position];
+
+    // 延迟自动移动到正确阶段
+    setTimeout(function() {
+      if (!game) return;
+      var s = game.getState();
+      if (s.ctx.gameover != null) return;
+
+      if (cell && (cell.type === 'chance' || cell.type === 'destiny')) {
+        // 已在 card 阶段处理
+      }
+    }, 100);
+  }
+
+  // ─── 渲染 ───
+  function renderBoard(G, ctx) {
+    if (!_gridResult || !_gridResult.board) return;
+    var board = _gridResult.board;
+
+    // 清除高亮
+    for (var i = 0; i < G.cells.length; i++) {
+      if (typeof GridRenderer !== 'undefined') {
+        GridRenderer.updateCell(board, i, { highlight: false });
+      }
     }
-    return null;
-  }
 
-  function placeAllPieces() {
-    var gridResult = findGridResult();
-    if (!gridResult || !state.pieceEls) return;
-    for (var i = 0; i < state.players.length; i++) {
-      var pos = GridRenderer.getCellPosition(gridResult.board, state.players[i].position);
-      PieceController.placePiece(state.pieceEls[i], pos, i * 10 - 5, i * 8 - 4);
+    // 高亮当前位置
+    var pi = parseInt(ctx.currentPlayer);
+    var p = G.players[pi];
+    if (typeof GridRenderer !== 'undefined') {
+      GridRenderer.updateCell(board, p.position, { highlight: true });
+    }
+
+    // 放置棋子
+    for (var j = 0; j < G.players.length; j++) {
+      if (_pieceEls[j]) {
+        var pos = typeof GridRenderer !== 'undefined' ? GridRenderer.getCellPosition(board, G.players[j].position) : { x:0, y:0 };
+        var ox = j * 8 - 4;
+        var oy = j * 6 - 3;
+        if (typeof PieceController !== 'undefined') {
+          PieceController.placePiece(_pieceEls[j], pos, ox, oy);
+        }
+      }
     }
   }
 
-  function addLog(msg) {
-    state.log = (state.log || []).concat([msg]).slice(-50);
-  }
+  // ─── 启动 ───
+  function start(container, blocks) {
+    _container = container;
+    container.innerHTML = '';
 
-  function emitState() {
-    if (ctx && ctx.engine) {
-      ctx.engine.emit('monopoly:state', {
-        players: state.players.map(function(p) { return { ...p }; }),
-        currentPlayer: state.currentPlayer,
-        round: state.round,
-        gameOver: state.gameOver,
-        winner: state.winner,
-        log: (state.log || []).slice(-10),
-      });
+    // 渲染棋盘
+    var gridBlock = findBlock(blocks, 'grid');
+    if (gridBlock && typeof GridRenderer !== 'undefined') {
+      var gridDiv = document.createElement('div');
+      gridDiv.style.position = 'relative';
+      container.appendChild(gridDiv);
+      var board = GridRenderer.render(gridDiv, gridBlock.config);
+      _gridResult = { element: gridDiv, board: board, config: gridBlock.config };
     }
-  }
 
-  function emitStatus(msg) {
-    if (ctx && ctx.engine) {
-      ctx.engine.emit('monopoly:status', msg);
+    // 创建游戏引擎
+    game = createGame(blocks);
+    game.start(container, blocks);
+
+    // 创建棋子
+    var G = game.getState().G;
+    if (_gridResult && typeof PieceController !== 'undefined') {
+      _pieceEls = [];
+      for (var i = 0; i < G.players.length; i++) {
+        var el = PieceController.createPieceEl(G.players[i], i);
+        _gridResult.element.appendChild(el);
+        _pieceEls.push(el);
+      }
     }
-  }
 
-  function getState() { return state; }
+    // 监听状态变化 → 重新渲染
+    game.on('state', function(state) {
+      renderBoard(state.G, state.ctx);
+
+      // 通知外部UI
+      if (typeof window !== 'undefined' && window._onMonopolyState) {
+        window._onMonopolyState(state);
+      }
+    });
+
+    // 事件通知
+    game.on('state', function(state) {
+      if (typeof window !== 'undefined' && window._onMonopolyStatus) {
+        var G = state.G;
+        var ctx = state.ctx;
+        var lastLog = G.log && G.log.length > 0 ? G.log[G.log.length - 1] : '';
+        if (ctx.gameover != null) {
+          window._onMonopolyStatus('🏆 ' + G.players[ctx.gameover].name + ' 获胜！');
+        } else {
+          var pi = parseInt(ctx.currentPlayer);
+          window._onMonopolyStatus(lastLog || ('🎲 ' + (G.players[pi] ? G.players[pi].name : '') + ' 的回合'));
+        }
+      }
+    });
+
+    // 处理 _nextPhase (在 moves 中设置)
+    var origMove = game.move.bind(game);
+    game.move = function(moveName, args) {
+      var result = origMove(moveName, args);
+      var G = game.getState().G;
+      if (G._nextPhase) {
+        var nextPhase = G._nextPhase;
+        // 清除 _nextPhase
+        var state = game.getState();
+        game.setPhase(nextPhase);
+      }
+      return result;
+    };
+
+    // 初始渲染
+    renderBoard(game.getState().G, game.getState().ctx);
+
+    return game;
+  }
 
   return {
     start: start,
-    getState: getState,
-    rollDice: handleRollDice,
-    buyProperty: buyProperty,
-    buildBuilding: buildBuilding,
+    rollDice:   function() { if (game) game.move('rollDice'); },
+    buyProperty: function() { if (game) game.move('buyProperty'); },
+    buildBuilding: function(id) { if (game) game.move('buildBuilding', id); },
+    endTurn:    function() { if (game) game.move('endTurn'); },
   };
 })();

@@ -136,6 +136,7 @@ body {
 <script src="runtime/core/building.js"></script>
 <script src="runtime/core/piece.js"></script>
 <script src="runtime/engine.js"></script>
+<script src="runtime/boardgame-engine.js"></script>
 <script src="runtime/games/monopoly.js"></script>
 <script src="runtime/games/snake.js"></script>
 <script src="runtime/games/wheel.js"></script>
@@ -214,25 +215,11 @@ function startGame(config) {
     return;
   }
 
-  document.getElementById('statusBar').textContent = '🎮 游戏初始化中…';
-
-  // 通用事件监听
-  GameEngine.on('game:state', function(gs) {
-    renderGenericState(config.game_type, gs);
-  });
-  GameEngine.on('game:status', function(msg) {
-    document.getElementById('statusBar').textContent = msg;
-  });
-  // 兼容大富翁专用事件
-  GameEngine.on('monopoly:state', function(gs) {
-    renderMonopolyState(gs);
-  });
-  GameEngine.on('monopoly:status', function(msg) {
-    document.getElementById('statusBar').textContent = msg;
-  });
-
   var container = document.getElementById('boardContainer');
-  // 非棋盘游戏需要全屏容器
+  container.innerHTML = '';
+  document.getElementById('statusBar').textContent = '🎮 游戏初始化…';
+
+  // 非棋盘游戏全屏容器
   if (config.game_type === 'wheel' || config.game_type === 'truth-or-dare') {
     container.style.maxWidth = '100%';
     container.style.display = 'flex';
@@ -240,21 +227,38 @@ function startGame(config) {
     container.style.alignItems = 'center';
   }
 
+  // ─── 大富翁 v2 引擎 (boardgame.io 模式) ───
+  if (config.game_type === 'monopoly') {
+    document.getElementById('btnSection').innerHTML =
+      '<button class="btn btn-primary" id="btnRoll" onclick="MonopolyGame.rollDice()">🎲 掷骰子</button>' +
+      '<button class="btn btn-secondary" id="btnBuy" onclick="MonopolyGame.buyProperty()">🏠 购买地产</button>';
+
+    window._onMonopolyState = function(state) {
+      renderMonopolyState({ players: state.G.players, currentPlayer: parseInt(state.ctx.currentPlayer), gameOver: state.ctx.gameover != null, log: state.G.log || [] });
+    };
+    window._onMonopolyStatus = function(msg) {
+      document.getElementById('statusBar').textContent = msg;
+    };
+
+    MonopolyGame.start(container, config.blocks);
+    return;
+  }
+
+  // ─── 其他游戏保持原引擎 ───
+  GameEngine.on('game:state', function(gs) { renderGenericState(config.game_type, gs); });
+  GameEngine.on('game:status', function(msg) { document.getElementById('statusBar').textContent = msg; });
+
   GameEngine.init(config, container, gameInfo.module).catch(function(e) {
     document.getElementById('statusBar').textContent = '❌ 启动失败: ' + e.message;
-    console.error(e);
   });
 
-  // 根据游戏类型显示/隐藏按钮
   var btnSection = document.getElementById('btnSection');
-  if (config.game_type === 'monopoly') {
-    btnSection.innerHTML = '<button class="btn btn-primary" id="btnRoll" onclick="MonopolyGame.rollDice()">🎲 掷骰子</button><button class="btn btn-secondary" id="btnBuy" onclick="MonopolyGame.buyProperty()">🏠 购买地产</button>';
-  } else if (config.game_type === 'flying-chess') {
+  if (config.game_type === 'flying-chess') {
     btnSection.innerHTML = '<button class="btn btn-primary" onclick="FlyingChessGame.rollDice()">🎲 掷骰子</button>';
   } else if (config.game_type === 'wheel') {
     btnSection.innerHTML = '<button class="btn btn-primary" onclick="WheelGame.spin()">🎡 开始抽奖</button>';
   } else if (config.game_type === 'truth-or-dare') {
-    btnSection.innerHTML = '<button class="btn btn-primary" onclick="TruthOrDareGame.pickTruth()" style="margin-bottom:4px">💬 真心话</button><button class="btn btn-secondary" onclick="TruthOrDareGame.pickDare()" style="margin-bottom:4px">🎯 大冒险</button><button class="btn btn-danger" onclick="TruthOrDareGame.skip()">⏭️ 跳过</button>';
+    btnSection.innerHTML = '<button class="btn btn-primary" onclick="TruthOrDareGame.pickTruth()">💬 真心话</button><button class="btn btn-secondary" onclick="TruthOrDareGame.pickDare()">🎯 大冒险</button><button class="btn btn-danger" onclick="TruthOrDareGame.skip()">⏭️ 跳过</button>';
   } else {
     btnSection.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center">使用键盘/触屏操作</div>';
   }
