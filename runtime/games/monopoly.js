@@ -328,32 +328,17 @@ var MonopolyGame = (function() {
       _gridResult = { element: gridDiv, board: board, config: gridBlock.config };
     }
 
-    // 创建游戏引擎
+    // 创建游戏引擎(不立即启动)
     game = createGame(blocks);
-    game.start(container, blocks);
 
-    // 创建棋子
-    var G = game.getState().G;
-    if (_gridResult && typeof PieceController !== 'undefined') {
-      _pieceEls = [];
-      for (var i = 0; i < G.players.length; i++) {
-        var el = PieceController.createPieceEl(G.players[i], i);
-        _gridResult.element.appendChild(el);
-        _pieceEls.push(el);
-      }
-    }
-
-    // 监听状态变化 → 重新渲染
+    // ⚠️ 先注册所有监听器，再启动
     game.on('state', function(state) {
       renderBoard(state.G, state.ctx);
-
-      // 通知外部UI
       if (typeof window !== 'undefined' && window._onMonopolyState) {
         window._onMonopolyState(state);
       }
     });
 
-    // 事件通知
     game.on('state', function(state) {
       if (typeof window !== 'undefined' && window._onMonopolyStatus) {
         var G = state.G;
@@ -374,13 +359,24 @@ var MonopolyGame = (function() {
       var result = origMove(moveName, args);
       var G = game.getState().G;
       if (G._nextPhase) {
-        var nextPhase = G._nextPhase;
-        // 清除 _nextPhase
-        var state = game.getState();
-        game.setPhase(nextPhase);
+        game.setPhase(G._nextPhase);
       }
       return result;
     };
+
+    // 启动引擎（触发初始状态→监听器收到通知）
+    game.start(container, blocks);
+
+    // 创建棋子
+    var G = game.getState().G;
+    if (_gridResult && typeof PieceController !== 'undefined') {
+      _pieceEls = [];
+      for (var i = 0; i < G.players.length; i++) {
+        var el = PieceController.createPieceEl(G.players[i], i);
+        _gridResult.element.appendChild(el);
+        _pieceEls.push(el);
+      }
+    }
 
     // 初始渲染
     renderBoard(game.getState().G, game.getState().ctx);
