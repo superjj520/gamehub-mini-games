@@ -18,7 +18,7 @@ const BlockRegistry = (() => {
   // ─── 每种 Block 类型的编辑 Schema ───
   const SCHEMAS = {
     grid: {
-      label: '棋盘', icon: '🗺️',
+      label: '棋盘', icon: '🗺️', iconSvg: 'grid',
       fields: [
         { key: 'rows',    label: '行数',   type: 'number', min: 5, max: 15, default: 7 },
         { key: 'cols',    label: '列数',   type: 'number', min: 5, max: 15, default: 7 },
@@ -36,7 +36,7 @@ const BlockRegistry = (() => {
       ],
     },
     collection: {
-      label: '卡堆/奖池', icon: '🎲',
+      label: '卡堆/奖池', icon: '🎲', iconSvg: 'collection',
       fields: [
         { key: 'drawMode', label: '抽选模式', type: 'select', options: ['random', 'weighted', 'sequential'], default: 'random' },
         { key: 'cards',    label: '条目列表',  type: 'card-list' },
@@ -57,7 +57,7 @@ const BlockRegistry = (() => {
       ],
     },
     rule: {
-      label: '规则', icon: '📐',
+      label: '规则', icon: '📐', iconSvg: 'rule',
       fields: [
         { key: 'variables', label: '变量定义', type: 'variable-list' },
       ],
@@ -74,7 +74,7 @@ const BlockRegistry = (() => {
       ],
     },
     piece: {
-      label: '棋子/实体', icon: '🧩',
+      label: '棋子/实体', icon: '🧩', iconSvg: 'piece',
       fields: [
         { key: 'pieces', label: '棋子列表', type: 'piece-list' },
       ],
@@ -86,7 +86,7 @@ const BlockRegistry = (() => {
       ],
     },
     building: {
-      label: '建筑', icon: '🏗️',
+      label: '建筑', icon: '🏗️', iconSvg: 'building',
       fields: [
         { key: 'buildings', label: '建筑类型', type: 'building-list' },
       ],
@@ -99,7 +99,7 @@ const BlockRegistry = (() => {
       ],
     },
     store: {
-      label: '商店', icon: '🏪',
+      label: '商店', icon: '🏪', iconSvg: 'store',
       fields: [
         { key: 'currency',  label: '货币类型', type: 'text',   default: 'gold' },
         { key: 'items',     label: '商品列表', type: 'store-item-list' },
@@ -113,7 +113,7 @@ const BlockRegistry = (() => {
       ],
     },
     effect: {
-      label: '效果/事件', icon: '⚡',
+      label: '效果/事件', icon: '⚡', iconSvg: 'effect',
       fields: [
         { key: 'effects', label: '效果列表', type: 'effect-list' },
       ],
@@ -126,7 +126,7 @@ const BlockRegistry = (() => {
       ],
     },
     player: {
-      label: '玩家设置', icon: '👥',
+      label: '玩家设置', icon: '👥', iconSvg: 'player',
       fields: [
         { key: 'minPlayers',  label: '最少玩家', type: 'number', min: 1, max: 10, default: 2 },
         { key: 'maxPlayers',  label: '最多玩家', type: 'number', min: 1, max: 10, default: 4 },
