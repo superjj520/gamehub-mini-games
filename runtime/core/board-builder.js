@@ -1,710 +1,835 @@
 /**
- * BoardBuilder — 节点式地图编辑器
+ * BoardBuilder v2 — Canvas 2D 地图编辑器
  *
- * 用户可以在画布上自由放置格子(cell)，自定义连接路径。
- * 不限于矩形边框，支持任意形状的地图布局。
+ * 借鉴 MineMonopoly (THREE.js) 的架构模式:
+ * - 层级渲染: 网格 → 路径线 → 格子 → 选中高亮 → 悬停预览
+ * - 轨道控制: 平移(中键/空格+拖拽) + 缩放(滚轮)
+ * - 射线检测: Canvas hit-test 点击检测
+ * - 框选: 拖拽矩形多选
+ * - 高亮Pass: 选中格子发光边框 + 路径高亮
  *
  * 依赖：无
- * 用法：
- *   var editor = BoardBuilder.create(container, config, callbacks);
- *   editor.addCell(x, y, type);
- *   editor.moveCell(id, x, y);
- *   editor.deleteCell(id);
- *   editor.getConfig(); // 导出配置
  */
 
 var BoardBuilder = (function() {
+  'use strict';
+
   var CELL_TYPES = {
-    start:    { label: '起点',   icon: '🚩', color: 'rgba(34,197,94,0.2)',  defaultName: '起点' },
-    property: { label: '地产',   icon: '🏠', color: 'rgba(124,58,237,0.15)', defaultName: '新地产' },
-    chance:   { label: '机会',   icon: '❓', color: 'rgba(245,200,66,0.15)', defaultName: '机会' },
-    destiny:  { label: '命运',   icon: '🔮', color: 'rgba(236,72,153,0.15)', defaultName: '命运' },
-    jail:     { label: '监禁',   icon: '🚔', color: 'rgba(239,68,68,0.15)',  defaultName: '监禁' },
-    event:    { label: '事件',   icon: '⚡', color: 'rgba(34,211,238,0.15)', defaultName: '事件' },
-    shop:     { label: '商店',   icon: '🏪', color: 'rgba(59,130,246,0.15)', defaultName: '商店' },
-    tax:      { label: '税务',   icon: '💰', color: 'rgba(251,146,60,0.15)', defaultName: '税务' },
+    start:    { label:'起点', icon:'🚩', color:'#22C55E', bg:'rgba(34,197,94,0.15)' },
+    property: { label:'地产', icon:'🏠', color:'#7C3AED', bg:'rgba(124,58,237,0.12)' },
+    chance:   { label:'机会', icon:'❓', color:'#F5C842', bg:'rgba(245,200,66,0.12)' },
+    destiny:  { label:'命运', icon:'🔮', color:'#EC4899', bg:'rgba(236,72,153,0.12)' },
+    jail:     { label:'监禁', icon:'🚔', color:'#EF4444', bg:'rgba(239,68,68,0.12)' },
+    event:    { label:'事件', icon:'⚡', color:'#22D3EE', bg:'rgba(34,211,238,0.12)' },
+    shop:     { label:'商店', icon:'🏪', color:'#3B82F6', bg:'rgba(59,130,246,0.12)' },
+    tax:      { label:'税务', icon:'💰', color:'#FB923C', bg:'rgba(251,146,60,0.12)' },
   };
 
-  /**
-   * 创建编辑器实例
-   * @param {HTMLElement} container — 容器元素
-   * @param {object} config — 初始配置 { cells: [...], pathOrder: [...] }
-   * @param {object} callbacks — { onSelect(id, cell), onChange(), onDblClick(id, cell) }
-   */
+  var CELL_W = 80, CELL_H = 56, GRID_SIZE = 20;
+
+  // ─── 公开 API ───
   function create(container, config, callbacks) {
     var cb = callbacks || {};
-    config = config || { cells: [], pathOrder: [] };
+    config = JSON.parse(JSON.stringify(config || { cells:[], pathOrder:[] }));
+    if (!config.pathOrder || !config.pathOrder.length) {
+      config.pathOrder = (config.cells||[]).map(function(c){return c.id;});
+    }
 
-    var editor = {
+    var ed = {
       _container: container,
-      _config: JSON.parse(JSON.stringify(config)),
+      _config: config,
       _callbacks: cb,
-      _selectedId: null,
-      _svgLayer: null,
-      _cellLayer: null,
-      _cellEls: {},
+      _canvas: null, _ctx: null,
+      _camera: { x:0, y:0, zoom:1 },
+      _hoveredId: null,
+      _selectedIds: [],
       _dragging: null,
       _panning: false,
-      _panStart: { x: 0, y: 0 },
-      _zoom: 1,
-      _history: [],
-      _historyIdx: -1,
-      _maxHistory: 50,
+      _boxSelect: null,
+      _history: [], _historyIdx: -1,
+      _dirty: true,
+      _animFrame: null,
+      _editingCell: null, // 内联编辑状态
     };
 
-    // 确保 pathOrder 与 cells 同步
-    if (!editor._config.pathOrder || editor._config.pathOrder.length === 0) {
-      editor._config.pathOrder = (editor._config.cells || []).map(function(c) { return c.id; });
+    buildUI(ed);
+    pushHistory(ed);
+    fitView(ed);
+    startLoop(ed);
+    return buildAPI(ed);
+  }
+
+  // ─── UI 构建 ───
+  function buildUI(ed) {
+    var c = ed._container;
+    c.innerHTML = '';
+    c.style.position = 'relative';
+    c.style.overflow = 'hidden';
+    c.style.background = '#0A0A1A';
+    c.style.cursor = 'grab';
+    c.style.userSelect = 'none';
+    c.style.webkitUserSelect = 'none';
+    c.style.minHeight = '400px';
+
+    // Canvas
+    ed._canvas = document.createElement('canvas');
+    ed._canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;';
+    c.appendChild(ed._canvas);
+    ed._ctx = ed._canvas.getContext('2d');
+
+    // 工具栏
+    var bar = document.createElement('div');
+    bar.style.cssText = 'position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10;background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:4px 8px;backdrop-filter:blur(8px);';
+    bar.innerHTML =
+      '<button data-action="undo" title="撤销 Ctrl+Z" style="width:30px;height:30px;border:none;background:rgba(255,255,255,0.05);color:#ccc;border-radius:6px;cursor:pointer;font-size:14px">↩</button>' +
+      '<button data-action="redo" title="重做 Ctrl+Y" style="width:30px;height:30px;border:none;background:rgba(255,255,255,0.05);color:#ccc;border-radius:6px;cursor:pointer;font-size:14px">↪</button>' +
+      '<span style="width:1px;background:rgba(255,255,255,0.1);margin:2px 4px"></span>' +
+      '<button data-action="zoomIn" title="放大" style="width:30px;height:30px;border:none;background:rgba(255,255,255,0.05);color:#ccc;border-radius:6px;cursor:pointer">+</button>' +
+      '<button data-action="zoomOut" title="缩小" style="width:30px;height:30px;border:none;background:rgba(255,255,255,0.05);color:#ccc;border-radius:6px;cursor:pointer">−</button>' +
+      '<button data-action="fitView" title="适应窗口" style="width:30px;height:30px;border:none;background:rgba(255,255,255,0.05);color:#ccc;border-radius:6px;cursor:pointer;font-size:12px">⊡</button>' +
+      '<span style="width:1px;background:rgba(255,255,255,0.1);margin:2px 4px"></span>' +
+      '<span style="font-size:10px;color:rgba(255,255,255,0.4);padding:0 4px;display:flex;align-items:center" id="bb-info">' + (ed._config.cells||[]).length + '格</span>';
+    c.appendChild(bar);
+
+    // 右键菜单容器
+    var ctxMenu = document.createElement('div');
+    ctxMenu.id = 'bb-context-menu';
+    ctxMenu.style.cssText = 'position:fixed;z-index:1000;display:none;background:#1E1E2E;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:4px;min-width:140px;box-shadow:0 8px 24px rgba(0,0,0,0.5);';
+    c.appendChild(ctxMenu);
+
+    bindEvents(ed);
+    resizeCanvas(ed);
+    window.addEventListener('resize', function(){ resizeCanvas(ed); });
+  }
+
+  function resizeCanvas(ed) {
+    var rect = ed._container.getBoundingClientRect();
+    var dpr = window.devicePixelRatio || 1;
+    ed._canvas.width = rect.width * dpr;
+    ed._canvas.height = rect.height * dpr;
+    ed._canvas.style.width = rect.width + 'px';
+    ed._canvas.style.height = rect.height + 'px';
+    ed._ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ed._dirty = true;
+  }
+
+  // ─── 事件处理 ───
+  function bindEvents(ed) {
+    var c = ed._canvas;
+
+    c.addEventListener('mousedown', function(e){ onMouseDown(ed, e); });
+    c.addEventListener('mousemove', function(e){ onMouseMove(ed, e); });
+    c.addEventListener('mouseup', function(e){ onMouseUp(ed, e); });
+    c.addEventListener('wheel', function(e){ onWheel(ed, e); e.preventDefault(); }, {passive:false});
+    c.addEventListener('dblclick', function(e){ onDblClick(ed, e); });
+    c.addEventListener('contextmenu', function(e){ e.preventDefault(); onContextMenu(ed, e); });
+
+    // 键盘
+    ed._container.tabIndex = 0;
+    ed._container.addEventListener('keydown', function(e){ onKeyDown(ed, e); });
+
+    // 工具栏按钮
+    ed._container.addEventListener('click', function(e){
+      var btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      var act = btn.dataset.action;
+      if (act === 'undo') undo(ed);
+      else if (act === 'redo') redo(ed);
+      else if (act === 'zoomIn') { ed._camera.zoom = Math.min(2, ed._camera.zoom + 0.15); ed._dirty = true; }
+      else if (act === 'zoomOut') { ed._camera.zoom = Math.max(0.2, ed._camera.zoom - 0.15); ed._dirty = true; }
+      else if (act === 'fitView') fitView(ed);
+    });
+
+    // 关闭右键菜单
+    document.addEventListener('click', function(){ hideContextMenu(ed); });
+  }
+
+  function screenToWorld(ed, e) {
+    var rect = ed._canvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left - ed._camera.x) / ed._camera.zoom,
+      y: (e.clientY - rect.top - ed._camera.y) / ed._camera.zoom
+    };
+  }
+
+  function hitTest(ed, worldX, worldY) {
+    var cells = ed._config.cells || [];
+    // 倒序遍历(上层优先)
+    for (var i = cells.length - 1; i >= 0; i--) {
+      var c = cells[i];
+      var hw = CELL_W/2, hh = CELL_H/2;
+      if (worldX >= c.x - hw && worldX <= c.x + hw && worldY >= c.y - hh && worldY <= c.y + hh) {
+        return c;
+      }
+    }
+    return null;
+  }
+
+  function onMouseDown(ed, e) {
+    var pos = screenToWorld(ed, e);
+    var cell = hitTest(ed, pos.x, pos.y);
+
+    // 空格键+拖拽 = 平移
+    if (ed._spaceDown || e.button === 1) {
+      ed._panning = { sx: e.clientX, sy: e.clientY, cx: ed._camera.x, cy: ed._camera.y };
+      return;
     }
 
-    // 初始化历史
-    pushHistory(editor);
-
-    buildDOM(editor);
-    renderAll(editor);
-    bindEvents(editor);
-    bindKeyboard(editor);
-    // 自动适配视图，让所有格子可见
-    setTimeout(function() { fitView(editor); }, 100);
-
-    return {
-      addCell: function(x, y, type) { return addCell(editor, x, y, type); },
-      moveCell: function(id, x, y) { moveCell(editor, id, x, y); },
-      deleteCell: function(id) { deleteCell(editor, id); },
-      updateCell: function(id, updates) { updateCell(editor, id, updates); },
-      selectCell: function(id) { selectCell(editor, id); },
-      getConfig: function() { return getConfig(editor); },
-      setConfig: function(cfg) { setConfig(editor, cfg); },
-      getCell: function(id) { return getCell(editor, id); },
-      zoomIn: function() { zoomIn(editor); },
-      zoomOut: function() { zoomOut(editor); },
-      resetView: function() { resetView(editor); },
-      destroy: function() { destroy(editor); },
-      undo: function() { undo(editor); },
-      redo: function() { redo(editor); },
-      movePathUp: function(id) { movePathItem(editor, id, -1); },
-      movePathDown: function(id) { movePathItem(editor, id, 1); },
-    };
+    if (cell) {
+      if (e.shiftKey) {
+        // Shift+点击 = 多选切换
+        toggleSelect(ed, cell.id);
+      } else if (!ed._selectedIds.includes(cell.id)) {
+        selectCell(ed, cell.id, false);
+      }
+      // 开始拖拽
+      ed._dragging = { id: cell.id, sx: pos.x, sy: pos.y, ox: cell.x, oy: cell.y };
+    } else {
+      // 框选
+      selectCell(ed, null, false);
+      ed._boxSelect = { sx: pos.x, sy: pos.y, ex: pos.x, ey: pos.y };
+    }
   }
 
-  // ─── DOM 构建 ───
-  function buildDOM(ed) {
-    ed._container.innerHTML = '';
-    ed._container.style.position = 'relative';
-    ed._container.style.overflow = 'auto';
-    ed._container.style.background = '#0D0720';
-    ed._container.style.borderRadius = '12px';
-    ed._container.style.minHeight = '400px';
-    ed._container.style.cursor = 'grab';
-    ed._container.style.userSelect = 'none';
+  function onMouseMove(ed, e) {
+    var pos = screenToWorld(ed, e);
 
-    // 网格背景
-    var bg = document.createElement('div');
-    bg.className = 'bb-grid-bg';
-    bg.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;' +
-      'background-image:radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px);' +
-      'background-size:20px 20px;z-index:0;';
-    ed._container.appendChild(bg);
+    if (ed._panning) {
+      ed._camera.x = ed._panning.cx + (e.clientX - ed._panning.sx);
+      ed._camera.y = ed._panning.cy + (e.clientY - ed._panning.sy);
+      ed._dirty = true; return;
+    }
 
-    // SVG 路径层
-    ed._svgLayer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    ed._svgLayer.setAttribute('class', 'bb-svg-layer');
-    ed._svgLayer.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;;width:100%;height:100%;pointer-events:none;z-index:1;';
-    ed._container.appendChild(ed._svgLayer);
-
-    // 细胞层
-    ed._cellLayer = document.createElement('div');
-    ed._cellLayer.className = 'bb-cell-layer';
-    ed._cellLayer.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;;z-index:2;';
-    ed._container.appendChild(ed._cellLayer);
-
-    // 控制栏
-    var ctrl = document.createElement('div');
-    ctrl.className = 'bb-controls';
-    ctrl.style.cssText = 'position:absolute;bottom:8px;right:8px;z-index:10;display:flex;gap:4px;';
-    ctrl.innerHTML =
-      '<button class="bb-ctrl-btn" title="放大" data-action="zoomIn" style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.6);color:var(--text,#F0EAF8);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>' +
-      '<button class="bb-ctrl-btn" title="缩小" data-action="zoomOut" style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.6);color:var(--text,#F0EAF8);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">−</button>' +
-      '<button class="bb-ctrl-btn" title="重置视图" data-action="resetView" style="width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.6);color:var(--text,#F0EAF8);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center">⌂</button>';
-    ed._container.appendChild(ctrl);
-
-    // 工具栏提示
-    var tip = document.createElement('div');
-    tip.style.cssText = 'position:absolute;top:8px;left:8px;z-index:10;font-size:11px;color:rgba(255,255,255,0.3);pointer-events:none;';
-    tip.textContent = '双击空白处添加格子 | 拖拽格子移动 | 点击格子编辑';
-    ed._container.appendChild(tip);
-  }
-
-  // ─── 事件绑定 ───
-  function bindEvents(ed) {
-    var container = ed._container;
-
-    // 双击空白处添加格子
-    container.addEventListener('dblclick', function(e) {
-      var rect = container.getBoundingClientRect();
-      var x = (e.clientX - rect.left) / ed._zoom;
-      var y = (e.clientY - rect.top) / ed._zoom;
-      // 判断是否点击了格子
-      if (e.target.closest('.bb-cell')) return;
-      // 弹出类型选择
-      showAddCellMenu(ed, x, y, e.clientX, e.clientY);
-    });
-
-    // 鼠标按下
-    container.addEventListener('mousedown', function(e) {
-      if (e.button !== 0) return;
-      var cellEl = e.target.closest('.bb-cell');
-      if (cellEl) {
-        // 拖拽格子
-        var id = cellEl.dataset.cellId;
-        selectCell(ed, id);
-        startDragCell(ed, id, e);
-      } else if (e.target.closest('.bb-ctrl-btn')) {
-        // 控制按钮由 click 处理
-        return;
-      } else {
-        // 平移画布
-        startPan(ed, e);
+    if (ed._dragging) {
+      var dx = pos.x - ed._dragging.sx;
+      var dy = pos.y - ed._dragging.sy;
+      var cell = getCell(ed, ed._dragging.id);
+      if (cell && (Math.abs(dx) > 1 || Math.abs(dy) > 1)) {
+        cell.x = snapToGrid(ed._dragging.ox + dx / ed._camera.zoom);
+        cell.y = snapToGrid(ed._dragging.oy + dy / ed._camera.zoom);
+        ed._dirty = true;
+        if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
       }
-    });
+      return;
+    }
 
-    // 控制按钮点击
-    container.addEventListener('click', function(e) {
-      var btn = e.target.closest('.bb-ctrl-btn');
-      if (!btn) return;
-      var action = btn.dataset.action;
-      if (action === 'zoomIn') zoomIn(ed);
-      else if (action === 'zoomOut') zoomOut(ed);
-      else if (action === 'resetView') resetView(ed);
-    });
-
-    // 全局鼠标移动和松开
-    document.addEventListener('mousemove', function(e) {
-      if (ed._dragging) {
-        moveDragCell(ed, e);
-      } else if (ed._panning) {
-        movePan(ed, e);
-      }
-    });
-
-    document.addEventListener('mouseup', function() {
-      if (ed._dragging) endDragCell(ed);
-      if (ed._panning) endPan(ed);
-    });
-
-    // 触控支持
-    container.addEventListener('touchstart', function(e) {
-      if (e.touches.length === 1) {
-        var cellEl = e.target.closest('.bb-cell');
-        if (cellEl) {
-          var id = cellEl.dataset.cellId;
-          selectCell(ed, id);
-          startDragCell(ed, id, e.touches[0]);
-        } else if (!e.target.closest('.bb-ctrl-btn')) {
-          startPan(ed, e.touches[0]);
+    if (ed._boxSelect) {
+      ed._boxSelect.ex = pos.x; ed._boxSelect.ey = pos.y;
+      // 实时更新框选
+      var rect = normalizeRect(ed._boxSelect);
+      var newIds = [];
+      var cells = ed._config.cells || [];
+      for (var i = 0; i < cells.length; i++) {
+        var c = cells[i];
+        if (c.x >= rect.x && c.x <= rect.x+rect.w && c.y >= rect.y && c.y <= rect.y+rect.h) {
+          newIds.push(c.id);
         }
       }
-    }, { passive: false });
+      ed._selectedIds = newIds;
+      ed._dirty = true; return;
+    }
 
-    container.addEventListener('touchmove', function(e) {
-      if (ed._dragging) {
-        e.preventDefault();
-        moveDragCell(ed, e.touches[0]);
-      } else if (ed._panning) {
-        movePan(ed, e.touches[0]);
-      }
-    }, { passive: false });
-
-    container.addEventListener('touchend', function() {
-      if (ed._dragging) endDragCell(ed);
-      if (ed._panning) endPan(ed);
-    });
-  }
-
-  // ─── 拖拽格子 ───
-  function startDragCell(ed, id, e) {
-    var cell = getCell(ed, id);
-    if (!cell) return;
-    ed._dragging = {
-      id: id,
-      startX: e.clientX,
-      startY: e.clientY,
-      origX: cell.x,
-      origY: cell.y,
-    };
-    ed._container.style.cursor = 'grabbing';
-  }
-
-  function moveDragCell(ed, e) {
-    var d = ed._dragging;
-    var dx = (e.clientX - d.startX) / ed._zoom;
-    var dy = (e.clientY - d.startY) / ed._zoom;
-    var newX = Math.round((d.origX + dx) / 10) * 10; // 吸附到 10px 网格
-    var newY = Math.round((d.origY + dy) / 10) * 10;
-
-    // 更新 cell 位置
-    var cell = getCell(ed, d.id);
-    if (cell) {
-      cell.x = Math.max(0, newX);
-      cell.y = Math.max(0, newY);
-      updateCellEl(ed, d.id, cell);
-      renderPaths(ed);
+    // 悬停检测
+    var hovered = hitTest(ed, pos.x, pos.y);
+    if (hovered && hovered.id !== ed._hoveredId) {
+      ed._hoveredId = hovered.id;
+      ed._dirty = true;
+      ed._canvas.style.cursor = ed._selectedIds.includes(hovered.id) ? 'move' : 'pointer';
+    } else if (!hovered && ed._hoveredId) {
+      ed._hoveredId = null;
+      ed._dirty = true;
+      ed._canvas.style.cursor = ed._spaceDown ? 'grab' : 'default';
     }
   }
 
-  function endDragCell(ed) {
-    ed._dragging = null;
-    ed._container.style.cursor = 'grab';
+  function onMouseUp(ed, e) {
+    if (ed._panning) { ed._panning = null; return; }
+    if (ed._dragging) {
+      var cell = getCell(ed, ed._dragging.id);
+      if (cell && (cell.x !== ed._dragging.ox || cell.y !== ed._dragging.oy)) {
+        pushHistory(ed);
+      }
+      ed._dragging = null;
+      ed._dirty = true;
+      return;
+    }
+    if (ed._boxSelect) {
+      ed._boxSelect = null;
+      ed._dirty = true;
+      if (ed._callbacks.onSelect) {
+        ed._callbacks.onSelect(ed._selectedIds.length === 1 ? ed._selectedIds[0] : null,
+          ed._selectedIds.length === 1 ? getCell(ed, ed._selectedIds[0]) : null);
+      }
+      return;
+    }
+  }
+
+  function onWheel(ed, e) {
+    var oldZoom = ed._camera.zoom;
+    ed._camera.zoom *= (e.deltaY > 0 ? 0.9 : 1.1);
+    ed._camera.zoom = Math.max(0.15, Math.min(3, ed._camera.zoom));
+    // 缩放中心 = 鼠标位置
+    var rect = ed._canvas.getBoundingClientRect();
+    var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    ed._camera.x = mx - (mx - ed._camera.x) * ed._camera.zoom / oldZoom;
+    ed._camera.y = my - (my - ed._camera.y) * ed._camera.zoom / oldZoom;
+    ed._dirty = true;
+  }
+
+  function onDblClick(ed, e) {
+    var pos = screenToWorld(ed, e);
+    var cell = hitTest(ed, pos.x, pos.y);
+    if (cell) {
+      // 双击编辑
+      startInlineEdit(ed, cell);
+    } else {
+      // 双击空白处添加格子
+      showAddMenu(ed, snapToGrid(pos.x), snapToGrid(pos.y), e.clientX, e.clientY);
+    }
+  }
+
+  function onContextMenu(ed, e) {
+    var pos = screenToWorld(ed, e);
+    var cell = hitTest(ed, pos.x, pos.y);
+    showContextMenu(ed, cell, e.clientX, e.clientY);
+  }
+
+  function onKeyDown(ed, e) {
+    if (e.key === ' ' || e.code === 'Space') { ed._spaceDown = true; ed._canvas.style.cursor = 'grab'; e.preventDefault(); }
+    if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(ed); }
+    if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(ed); }
+    if ((e.ctrlKey && e.key === 'c') || (e.metaKey && e.key === 'c')) { copyCells(ed); }
+    if ((e.ctrlKey && e.key === 'v') || (e.metaKey && e.key === 'v')) { pasteCells(ed); }
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      if (ed._selectedIds.length > 0 && document.activeElement === ed._container) {
+        e.preventDefault();
+        for (var i = ed._selectedIds.length-1; i >= 0; i--) deleteCell(ed, ed._selectedIds[i]);
+        pushHistory(ed);
+      }
+    }
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      nudgeCells(ed, e);
+    }
+  }
+
+  function nudgeCells(ed, e) {
+    if (ed._selectedIds.length === 0) return;
+    e.preventDefault();
+    var dx = 0, dy = 0;
+    if (e.key === 'ArrowUp') dy = -GRID_SIZE;
+    if (e.key === 'ArrowDown') dy = GRID_SIZE;
+    if (e.key === 'ArrowLeft') dx = -GRID_SIZE;
+    if (e.key === 'ArrowRight') dx = GRID_SIZE;
+    for (var i = 0; i < ed._selectedIds.length; i++) {
+      var cell = getCell(ed, ed._selectedIds[i]);
+      if (cell) { cell.x += dx; cell.y += dy; }
+    }
+    ed._dirty = true;
     pushHistory(ed);
     if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
   }
 
-  // ─── 平移画布 ───
-  function startPan(ed, e) {
-    ed._panning = true;
-    ed._panStart = { x: e.clientX, y: e.clientY };
-    ed._container.style.cursor = 'grabbing';
+  // ─── 内联编辑 ───
+  function startInlineEdit(ed, cell) {
+    var pos = worldToScreen(ed, cell.x, cell.y);
+    var input = document.createElement('input');
+    input.value = cell.name || '';
+    input.style.cssText = 'position:absolute;z-index:20;left:'+pos.x+'px;top:'+pos.y+'px;width:70px;' +
+      'background:rgba(0,0,0,0.9);border:1px solid var(--accent,#7C3AED);border-radius:4px;color:white;' +
+      'font-size:11px;padding:2px 4px;text-align:center;font-family:inherit;';
+    ed._container.appendChild(input);
+    input.focus(); input.select();
+    input.addEventListener('blur', function(){
+      if (input.value.trim()) { cell.name = input.value.trim(); }
+      input.remove();
+      ed._dirty = true;
+      pushHistory(ed);
+      if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
+    });
+    input.addEventListener('keydown', function(ev){
+      if (ev.key === 'Enter') input.blur();
+      if (ev.key === 'Escape') { input.value = cell.name; input.blur(); }
+    });
   }
 
-  function movePan(ed, e) {
-    var dx = e.clientX - ed._panStart.x;
-    var dy = e.clientY - ed._panStart.y;
-    ed._panStart = { x: e.clientX, y: e.clientY };
-    var currentTransform = ed._cellLayer.style.transform || '';
-    var match = currentTransform.match(/translate\(([^)]+)\)/) || ['', '0px,0px'];
-    var parts = match[1].split(',');
-    var cx = parseFloat(parts[0]) || 0;
-    var cy = parseFloat(parts[1]) || 0;
-    var newTransform = 'translate(' + (cx + dx) + 'px, ' + (cy + dy) + 'px)';
-    ed._cellLayer.style.transform = newTransform;
-    ed._svgLayer.style.transform = newTransform;
-    ed._container.querySelector('.bb-grid-bg').style.transform = newTransform;
+  // ─── 右键菜单 ───
+  function showContextMenu(ed, cell, cx, cy) {
+    var menu = document.getElementById('bb-context-menu');
+    if (!menu) return;
+    if (!cell) {
+      menu.innerHTML = '<div data-act="addHere" style="padding:8px 12px;cursor:pointer;border-radius:4px;font-size:12px;color:#ccc">➕ 在此添加格子</div>';
+    } else {
+      menu.innerHTML =
+        '<div data-act="edit" style="padding:8px 12px;cursor:pointer;border-radius:4px;font-size:12px;color:#ccc">✏️ 编辑名称</div>' +
+        '<div data-act="duplicate" style="padding:8px 12px;cursor:pointer;border-radius:4px;font-size:12px;color:#ccc">📋 复制格子</div>' +
+        '<div data-act="moveUp" style="padding:8px 12px;cursor:pointer;border-radius:4px;font-size:12px;color:#ccc">⬆ 路径前移</div>' +
+        '<div data-act="moveDown" style="padding:8px 12px;cursor:pointer;border-radius:4px;font-size:12px;color:#ccc">⬇ 路径后移</div>' +
+        '<div style="height:1px;background:rgba(255,255,255,0.1);margin:2px 0"></div>' +
+        '<div data-act="delete" style="padding:8px 12px;cursor:pointer;border-radius:4px;font-size:12px;color:#EF4444">🗑️ 删除</div>';
+    }
+    menu.style.display = 'block';
+    menu.style.left = cx + 'px';
+    menu.style.top = cy + 'px';
+
+    menu.querySelectorAll('[data-act]').forEach(function(item){
+      item.addEventListener('mouseenter', function(){ item.style.background = 'rgba(255,255,255,0.05)'; });
+      item.addEventListener('mouseleave', function(){ item.style.background = ''; });
+      item.addEventListener('click', function(){
+        var act = item.dataset.act;
+        if (act === 'edit' && cell) startInlineEdit(ed, cell);
+        else if (act === 'duplicate' && cell) { var c = JSON.parse(JSON.stringify(cell)); c.id='c'+Date.now().toString(36); c.x+=60; c.y+=30; ed._config.cells.push(c); ed._config.pathOrder.push(c.id); pushHistory(ed); ed._dirty=true; if(ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed)); }
+        else if (act === 'moveUp' && cell) movePathItem(ed, cell.id, -1);
+        else if (act === 'moveDown' && cell) movePathItem(ed, cell.id, 1);
+        else if (act === 'delete' && cell) { deleteCell(ed, cell.id); pushHistory(ed); }
+        else if (act === 'addHere') showAddMenu(ed, snapToGrid(cx-200), snapToGrid(cy-50), cx, cy);
+        hideContextMenu(ed);
+      });
+    });
   }
 
-  function endPan(ed) {
-    ed._panning = false;
-    ed._container.style.cursor = 'grab';
+  function hideContextMenu(ed) {
+    var menu = document.getElementById('bb-context-menu');
+    if (menu) menu.style.display = 'none';
   }
 
-  // ─── 缩放 ───
-  function zoomIn(ed) {
-    ed._zoom = Math.min(2, ed._zoom + 0.1);
-    applyZoom(ed);
-  }
-
-  function zoomOut(ed) {
-    ed._zoom = Math.max(0.3, ed._zoom - 0.1);
-    applyZoom(ed);
-  }
-
-  function resetView(ed) {
-    ed._zoom = 1;
-    ed._cellLayer.style.transform = 'translate(0px, 0px)';
-    ed._svgLayer.style.transform = 'translate(0px, 0px)';
-    var bg = ed._container.querySelector('.bb-grid-bg');
-    if (bg) bg.style.transform = 'translate(0px, 0px)';
-    applyZoom(ed);
-  }
-
-  function applyZoom(ed) {
-    ed._cellLayer.style.transformOrigin = '0 0';
-    ed._svgLayer.style.transformOrigin = '0 0';
-    var bg = ed._container.querySelector('.bb-grid-bg');
-    if (bg) bg.style.transformOrigin = '0 0';
-    // 保持现有平移，叠加缩放
-    var currentTransform = ed._cellLayer.style.transform || '';
-    var match = currentTransform.match(/translate\(([^)]+)\)/) || ['', '0px,0px'];
-    var parts = match[1].split(',');
-    var tx = parseFloat(parts[0]) || 0;
-    var ty = parseFloat(parts[1]) || 0;
-    var newTransform = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + ed._zoom + ')';
-    ed._cellLayer.style.transform = newTransform;
-    ed._svgLayer.style.transform = newTransform;
-    if (bg) bg.style.transform = newTransform;
-  }
-
-  // ─── 添加格子 ───
-  function showAddCellMenu(ed, x, y, clientX, clientY) {
-    // 移除旧菜单
-    var old = document.querySelector('.bb-add-menu');
-    if (old) old.remove();
-
+  // ─── 添加格子菜单 ───
+  function showAddMenu(ed, wx, wy, sx, sy) {
+    hideContextMenu(ed);
     var menu = document.createElement('div');
     menu.className = 'bb-add-menu';
-    menu.style.cssText = 'position:fixed;z-index:1000;background:#1A0A2E;border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:8px;box-shadow:0 8px 32px rgba(0,0,0,0.5);display:grid;grid-template-columns:1fr 1fr;gap:4px;min-width:180px;';
-
+    menu.style.cssText = 'position:fixed;z-index:1000;background:#1E1E2E;border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:8px;box-shadow:0 8px 32px rgba(0,0,0,0.6);display:grid;grid-template-columns:repeat(4,1fr);gap:4px;min-width:220px;';
     var types = Object.keys(CELL_TYPES);
     for (var i = 0; i < types.length; i++) {
-      (function(type) {
+      (function(type){
         var info = CELL_TYPES[type];
-        var item = document.createElement('div');
-        item.style.cssText = 'padding:8px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text,#F0EAF8);transition:background 0.15s;';
-        item.innerHTML = '<span style="font-size:16px">' + info.icon + '</span><span>' + info.label + '</span>';
-        item.addEventListener('mouseenter', function() { item.style.background = 'rgba(255,255,255,0.06)'; });
-        item.addEventListener('mouseleave', function() { item.style.background = ''; });
-        item.addEventListener('click', function() {
+        var d = document.createElement('div');
+        d.style.cssText = 'padding:8px 6px;border-radius:8px;cursor:pointer;text-align:center;transition:all 0.15s;font-size:11px;color:#ccc;';
+        d.innerHTML = '<div style="font-size:22px">'+info.icon+'</div><div>'+info.label+'</div>';
+        d.addEventListener('mouseenter', function(){ d.style.background='rgba(255,255,255,0.06)'; d.style.transform='scale(1.05)'; });
+        d.addEventListener('mouseleave', function(){ d.style.background=''; d.style.transform='scale(1)'; });
+        d.addEventListener('click', function(){
           menu.remove();
-          addCell(ed, x, y, type);
+          addCell(ed, wx, wy, type);
         });
-        menu.appendChild(item);
+        menu.appendChild(d);
       })(types[i]);
     }
-
     document.body.appendChild(menu);
-    menu.style.left = Math.min(clientX, window.innerWidth - 200) + 'px';
-    menu.style.top = Math.min(clientY, window.innerHeight - 260) + 'px';
-
-    // 点击外部关闭
-    setTimeout(function() {
-      document.addEventListener('click', function closeMenu(e) {
-        if (!menu.contains(e.target)) {
-          menu.remove();
-          document.removeEventListener('click', closeMenu);
-        }
-      });
+    menu.style.left = Math.min(sx, window.innerWidth-240) + 'px';
+    menu.style.top = Math.min(sy, window.innerHeight-220) + 'px';
+    setTimeout(function(){
+      document.addEventListener('click', function close(){ menu.remove(); document.removeEventListener('click', close); });
     }, 10);
   }
 
-  function addCell(ed, x, y, type) {
-    var info = CELL_TYPES[type] || CELL_TYPES['property'];
-    var id = 'c' + Date.now().toString(36);
-    var cell = {
-      id: id,
-      x: x,
-      y: y,
-      type: type,
-      name: info.defaultName,
-      icon: info.icon,
-      price: type === 'property' ? 200 : 0,
-      rent: type === 'property' ? [50, 100, 200] : [],
-      effects: {},
-    };
+  // ─── Canvas 渲染 ───
+  function render(ed) {
+    if (!ed._dirty) return;
+    ed._dirty = false;
+    var ctx = ed._ctx;
+    var w = ed._canvas.width / (window.devicePixelRatio||1);
+    var h = ed._canvas.height / (window.devicePixelRatio||1);
+    var cam = ed._camera;
 
-    ed._config.cells.push(cell);
-    ed._config.pathOrder.push(id);
-    createCellEl(ed, cell);
-    renderPaths(ed);
-    pushHistory(ed);
+    ctx.clearRect(0, 0, w, h);
 
-    if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
-    if (ed._callbacks.onSelect) ed._callbacks.onSelect(id, cell);
+    ctx.save();
+    ctx.translate(cam.x, cam.y);
+    ctx.scale(cam.zoom, cam.zoom);
 
-    return id;
+    // 第1层: 网格背景
+    drawGrid(ed, ctx, w, h);
+
+    // 第2层: 路径线
+    drawPaths(ed, ctx);
+
+    // 第3层: 框选矩形
+    if (ed._boxSelect) drawBoxSelect(ed, ctx);
+
+    // 第4层: 格子
+    drawCells(ed, ctx);
+
+    // 第5层: 选中高亮
+    drawSelectionHighlight(ed, ctx);
+
+    // 第6层: 悬停高亮
+    if (ed._hoveredId && !ed._dragging) drawHoverHighlight(ed, ctx);
+
+    ctx.restore();
   }
 
-  // ─── 移动格子 ───
-  function moveCell(ed, id, x, y) {
-    var cell = getCell(ed, id);
-    if (!cell) return;
-    cell.x = Math.round(x / 10) * 10;
-    cell.y = Math.round(y / 10) * 10;
-    updateCellEl(ed, id, cell);
-    renderPaths(ed);
-    if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
+  function drawGrid(ed, ctx, w, h) {
+    var cam = ed._camera;
+    var startX = Math.floor(-cam.x / cam.zoom / GRID_SIZE) * GRID_SIZE;
+    var startY = Math.floor(-cam.y / cam.zoom / GRID_SIZE) * GRID_SIZE;
+    var endX = startX + w / cam.zoom + GRID_SIZE * 2;
+    var endY = startY + h / cam.zoom + GRID_SIZE * 2;
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (var x = startX; x <= endX; x += GRID_SIZE) { ctx.moveTo(x, startY); ctx.lineTo(x, endY); }
+    for (var y = startY; y <= endY; y += GRID_SIZE) { ctx.moveTo(startX, y); ctx.lineTo(endX, y); }
+    ctx.stroke();
   }
 
-  // ─── 删除格子 ───
-  function deleteCell(ed, id) {
-    ed._config.cells = ed._config.cells.filter(function(c) { return c.id !== id; });
-    ed._config.pathOrder = ed._config.pathOrder.filter(function(cid) { return cid !== id; });
-    if (ed._selectedId === id) ed._selectedId = null;
+  function drawPaths(ed, ctx) {
+    var cells = ed._config.cells || [];
+    var po = ed._config.pathOrder || [];
+    if (po.length < 2) return;
 
-    var el = ed._cellEls[id];
-    if (el) { el.remove(); delete ed._cellEls[id]; }
-    renderPaths(ed);
-    pushHistory(ed);
-    if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
-  }
+    ctx.strokeStyle = 'rgba(139,92,246,0.35)';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([8, 4]);
+    ctx.lineCap = 'round';
+    ctx.beginPath();
 
-  // ─── 更新格子属性 ───
-  function updateCell(ed, id, updates) {
-    var cell = getCell(ed, id);
-    if (!cell) return;
-    for (var k in updates) {
-      if (updates.hasOwnProperty(k)) cell[k] = updates[k];
+    for (var i = 0; i < po.length; i++) {
+      var from = getCell(ed, po[i]);
+      var to = getCell(ed, po[(i+1) % po.length]);
+      if (!from || !to) continue;
+      ctx.moveTo(from.x, from.y + CELL_H/2);
+      ctx.lineTo(to.x, to.y - CELL_H/2);
     }
-    updateCellEl(ed, id, cell);
-    renderPaths(ed);
-    pushHistory(ed);
-    if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 箭头
+    for (var j = 0; j < po.length; j++) {
+      var f = getCell(ed, po[j]);
+      var t = getCell(ed, po[(j+1) % po.length]);
+      if (!f || !t) continue;
+      var midX = (f.x + t.x) / 2, midY = (f.y + CELL_H/2 + t.y - CELL_H/2) / 2;
+      var angle = Math.atan2(t.y - CELL_H/2 - f.y - CELL_H/2, t.x - f.x);
+      drawArrow(ctx, midX, midY, angle, 'rgba(139,92,246,0.5)', 6);
+    }
   }
 
-  // ─── 选中格子 ───
-  function selectCell(ed, id) {
-    ed._selectedId = id;
-    // 高亮选中
-    for (var cid in ed._cellEls) {
-      var el = ed._cellEls[cid];
-      if (el) {
-        el.style.boxShadow = cid === id ? '0 0 0 2px var(--gold,#F5C842), 0 0 12px rgba(245,200,66,0.3)' : '';
-        el.style.zIndex = cid === id ? '10' : '1';
+  function drawArrow(ctx, x, y, angle, color, size) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(size, 0);
+    ctx.lineTo(-size/2, -size/2);
+    ctx.lineTo(-size/2, size/2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawBoxSelect(ed, ctx) {
+    var r = normalizeRect(ed._boxSelect);
+    ctx.fillStyle = 'rgba(139,92,246,0.08)';
+    ctx.strokeStyle = 'rgba(139,92,246,0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 2]);
+    ctx.fillRect(r.x, r.y, r.w, r.h);
+    ctx.strokeRect(r.x, r.y, r.w, r.h);
+    ctx.setLineDash([]);
+  }
+
+  function drawCells(ed, ctx) {
+    var cells = ed._config.cells || [];
+    var po = ed._config.pathOrder || [];
+
+    for (var i = 0; i < cells.length; i++) {
+      var c = cells[i];
+      var info = CELL_TYPES[c.type] || CELL_TYPES.property;
+      var x = c.x - CELL_W/2, y = c.y - CELL_H/2;
+      var isSelected = ed._selectedIds.includes(c.id);
+
+      // 阴影
+      if (isSelected) {
+        ctx.shadowColor = info.color;
+        ctx.shadowBlur = 12;
+      }
+
+      // 背景
+      ctx.fillStyle = info.bg;
+      roundRect(ctx, x, y, CELL_W, CELL_H, 10);
+      ctx.fill();
+
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+
+      // 边框
+      ctx.strokeStyle = isSelected ? info.color : 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = isSelected ? 2 : 1;
+      roundRect(ctx, x, y, CELL_W, CELL_H, 10);
+      ctx.stroke();
+
+      // 序号标签
+      var pathIdx = po.indexOf(c.id);
+      if (pathIdx >= 0) {
+        ctx.fillStyle = info.color;
+        ctx.beginPath();
+        ctx.arc(x - 2, y - 2, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 9px -apple-system,sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(pathIdx, x - 2, y - 2);
+      }
+
+      // 图标
+      ctx.font = '22px -apple-system,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText(c.icon || info.icon, c.x, y + 4);
+
+      // 名称
+      ctx.fillStyle = '#E8E0F0';
+      ctx.font = 'bold 10px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+      ctx.fillText(truncate(c.name || info.defaultName, 6), c.x, y + 28);
+
+      // 价格
+      if (c.price && c.type === 'property') {
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.font = '9px -apple-system,sans-serif';
+        ctx.fillText('¥'+c.price, c.x, y + 40);
       }
     }
-    var cell = getCell(ed, id);
-    if (ed._callbacks.onSelect) ed._callbacks.onSelect(id, cell);
   }
 
-  // ─── 渲染 ───
-  function renderAll(ed) {
-    // 清空
-    ed._cellLayer.innerHTML = '';
-    ed._cellEls = {};
-
-    // 渲染格子
-    var cells = ed._config.cells || [];
-    for (var i = 0; i < cells.length; i++) {
-      createCellEl(ed, cells[i]);
+  function drawSelectionHighlight(ed, ctx) {
+    if (ed._selectedIds.length <= 1) return;
+    // 多选时额外绘制数量角标
+    for (var i = 0; i < ed._selectedIds.length; i++) {
+      var c = getCell(ed, ed._selectedIds[i]);
+      if (!c) continue;
+      var info = CELL_TYPES[c.type] || CELL_TYPES.property;
+      ctx.strokeStyle = info.color;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([2, 2]);
+      roundRect(ctx, c.x - CELL_W/2 - 3, c.y - CELL_H/2 - 3, CELL_W + 6, CELL_H + 6, 13);
+      ctx.stroke();
+      ctx.setLineDash([]);
     }
-    renderPaths(ed);
   }
 
-  function createCellEl(ed, cell) {
-    var info = CELL_TYPES[cell.type] || CELL_TYPES['property'];
-    var el = document.createElement('div');
-    el.className = 'bb-cell';
-    el.dataset.cellId = cell.id;
-    el.style.cssText =
-      'position:absolute;left:' + cell.x + 'px;top:' + cell.y + 'px;' +
-      'min-width:72px;padding:6px 8px;border-radius:10px;' +
-      'background:' + (info.color) + ';' +
-      'border:1px solid rgba(255,255,255,0.12);' +
-      'cursor:pointer;font-size:11px;text-align:center;' +
-      'transition:box-shadow 0.15s;z-index:1;' +
-      'display:flex;flex-direction:column;align-items:center;gap:2px;' +
-      '-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);';
-
-    var pathIdx = (ed._config.pathOrder || []).indexOf(cell.id);
-    var badgeHtml = pathIdx >= 0 ? '<span style="position:absolute;top:-6px;left:-6px;width:18px;height:18px;border-radius:50%;background:var(--accent,#7C3AED);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:5">' + pathIdx + '</span>' : '';
-
-    el.innerHTML = badgeHtml +
-      '<span style="font-size:20px;line-height:1">' + (cell.icon || info.icon) + '</span>' +
-      '<span style="font-size:10px;color:var(--text,#F0EAF8);font-weight:600;line-height:1.1;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (cell.name || info.defaultName) + '</span>' +
-      (cell.price ? '<span style="font-size:9px;color:var(--muted,rgba(255,255,255,0.4))">¥' + cell.price + '</span>' : '');
-
-    el.addEventListener('click', function(e) {
-      e.stopPropagation();
-      selectCell(ed, cell.id);
-    });
-
-    ed._cellLayer.appendChild(el);
-    ed._cellEls[cell.id] = el;
+  function drawHoverHighlight(ed, ctx) {
+    var c = getCell(ed, ed._hoveredId);
+    if (!c || ed._selectedIds.includes(c.id)) return;
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, c.x - CELL_W/2, c.y - CELL_H/2, CELL_W, CELL_H, 10);
+    ctx.stroke();
   }
 
-  function updateCellEl(ed, id, cell) {
-    var el = ed._cellEls[id];
-    if (!el) return;
-    el.style.left = cell.x + 'px';
-    el.style.top = cell.y + 'px';
-
-    var info = CELL_TYPES[cell.type] || CELL_TYPES['property'];
-    el.style.background = info.color;
-    var pathIdx = (ed._config.pathOrder || []).indexOf(id);
-    var badgeHtml = pathIdx >= 0 ? '<span style="position:absolute;top:-6px;left:-6px;width:18px;height:18px;border-radius:50%;background:var(--accent,#7C3AED);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:5">' + pathIdx + '</span>' : '';
-    el.innerHTML = badgeHtml +
-      '<span style="font-size:20px;line-height:1">' + (cell.icon || info.icon) + '</span>' +
-      '<span style="font-size:10px;color:var(--text,#F0EAF8);font-weight:600;line-height:1.1;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (cell.name || info.defaultName) + '</span>' +
-      (cell.price ? '<span style="font-size:9px;color:var(--muted,rgba(255,255,255,0.4))">¥' + cell.price + '</span>' : '');
+  // ─── 辅助 ───
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
+    ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+    ctx.lineTo(x+w, y+h-r);
+    ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+    ctx.lineTo(x+r, y+h);
+    ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+    ctx.lineTo(x, y+r);
+    ctx.quadraticCurveTo(x, y, x+r, y);
+    ctx.closePath();
   }
 
-  // ─── SVG 路径渲染 ───
-  function renderPaths(ed) {
-    // 清空 SVG
-    while (ed._svgLayer.firstChild) {
-      ed._svgLayer.removeChild(ed._svgLayer.firstChild);
-    }
-
-    var cells = ed._config.cells || [];
-    var pathOrder = ed._config.pathOrder || [];
-    if (cells.length < 2) return;
-
-    // 创建 defs 用于箭头
-    var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-    var marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
-    marker.setAttribute('id', 'bb-arrow');
-    marker.setAttribute('markerWidth', '8');
-    marker.setAttribute('markerHeight', '8');
-    marker.setAttribute('refX', '4');
-    marker.setAttribute('refY', '4');
-    marker.setAttribute('orient', 'auto');
-    var arrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    arrowPath.setAttribute('d', 'M0,0 L8,4 L0,8 Z');
-    arrowPath.setAttribute('fill', 'rgba(124,58,237,0.4)');
-    marker.appendChild(arrowPath);
-    defs.appendChild(marker);
-    ed._svgLayer.appendChild(defs);
-
-    // 画连接线（按 pathOrder 顺序）
-    for (var i = 0; i < pathOrder.length; i++) {
-      var fromId = pathOrder[i];
-      var toId = pathOrder[(i + 1) % pathOrder.length]; // 循环回到起点
-      var fromCell = getCell(ed, fromId);
-      var toCell = getCell(ed, toId);
-      if (!fromCell || !toCell) continue;
-
-      // 计算连接点（格子底部中心 → 下一格子顶部中心）
-      var fx = fromCell.x + 36; // 格子中心
-      var fy = fromCell.y + 30; // 格子底部
-      var tx = toCell.x + 36;
-      var ty = toCell.y;         // 格子顶部
-
-      var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', fx);
-      line.setAttribute('y1', fy);
-      line.setAttribute('x2', tx);
-      line.setAttribute('y2', ty);
-      line.setAttribute('stroke', 'rgba(124,58,237,0.25)');
-      line.setAttribute('stroke-width', '2');
-      line.setAttribute('stroke-dasharray', '6,3');
-      line.setAttribute('marker-end', 'url(#bb-arrow)');
-      ed._svgLayer.appendChild(line);
-    }
-
-    // 自动扩展 SVG viewBox
-    var maxX = 0, maxY = 0;
-    for (var j = 0; j < cells.length; j++) {
-      if (cells[j].x + 100 > maxX) maxX = cells[j].x + 100;
-      if (cells[j].y + 60 > maxY) maxY = cells[j].y + 60;
-    }
-    ed._svgLayer.setAttribute('viewBox', '0 0 ' + Math.max(maxX, 600) + ' ' + Math.max(maxY, 400));
-    ed._svgLayer.style.width = Math.max(maxX, 600) + 'px';
-    ed._svgLayer.style.height = Math.max(maxY, 400) + 'px';
+  function snapToGrid(v) { return Math.round(v / GRID_SIZE) * GRID_SIZE; }
+  function normalizeRect(r) {
+    var x = Math.min(r.sx, r.ex), y = Math.min(r.sy, r.ey);
+    return { x:x, y:y, w:Math.abs(r.ex-r.sx), h:Math.abs(r.ey-r.sy) };
+  }
+  function truncate(s, n) { return s && s.length > n ? s.substring(0, n-1)+'…' : (s||''); }
+  function worldToScreen(ed, wx, wy) {
+    return { x: wx * ed._camera.zoom + ed._camera.x, y: wy * ed._camera.zoom + ed._camera.y };
   }
 
   // ─── 数据操作 ───
   function getCell(ed, id) {
-    var cells = ed._config.cells || [];
-    for (var i = 0; i < cells.length; i++) {
-      if (cells[i].id === id) return cells[i];
+    for (var i = 0; i < ed._config.cells.length; i++) {
+      if (ed._config.cells[i].id === id) return ed._config.cells[i];
     }
     return null;
   }
 
   function getConfig(ed) {
-    return {
-      cells: JSON.parse(JSON.stringify(ed._config.cells || [])),
-      pathOrder: (ed._config.pathOrder || []).slice(),
-    };
+    return { cells: JSON.parse(JSON.stringify(ed._config.cells||[])), pathOrder: (ed._config.pathOrder||[]).slice() };
   }
 
   function setConfig(ed, cfg) {
-    ed._config = JSON.parse(JSON.stringify(cfg || { cells: [], pathOrder: [] }));
-    if (!ed._config.pathOrder || ed._config.pathOrder.length === 0) {
-      ed._config.pathOrder = (ed._config.cells || []).map(function(c) { return c.id; });
+    ed._config = JSON.parse(JSON.stringify(cfg||{cells:[],pathOrder:[]}));
+    if (!ed._config.pathOrder || !ed._config.pathOrder.length) {
+      ed._config.pathOrder = (ed._config.cells||[]).map(function(c){return c.id;});
     }
-    ed._selectedId = null;
-    renderAll(ed);
+    ed._selectedIds = [];
+    ed._dirty = true;
   }
 
-  function destroy(ed) {
-    ed._container.innerHTML = '';
-    ed._cellEls = {};
-    ed._config = { cells: [], pathOrder: [] };
+  function addCell(ed, x, y, type) {
+    var info = CELL_TYPES[type] || CELL_TYPES.property;
+    var id = 'c'+Date.now().toString(36);
+    var cell = { id:id, x:x, y:y, type:type, name:info.defaultName, icon:info.icon, price:type==='property'?200:0, rent:[], effects:{} };
+    ed._config.cells.push(cell);
+    ed._config.pathOrder.push(id);
+    selectCell(ed, id, false);
+    pushHistory(ed);
+    ed._dirty = true;
+    if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
+    if (ed._callbacks.onSelect) ed._callbacks.onSelect(id, cell);
+    return id;
   }
 
-  // ─── 自动适配视图 ───
-  function fitView(ed) {
-    var cells = ed._config.cells || [];
-    if (cells.length === 0) return;
-    var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    for (var i = 0; i < cells.length; i++) {
-      if (cells[i].x < minX) minX = cells[i].x;
-      if (cells[i].y < minY) minY = cells[i].y;
-      if (cells[i].x + 100 > maxX) maxX = cells[i].x + 100;
-      if (cells[i].y + 70 > maxY) maxY = cells[i].y + 70;
+  function deleteCell(ed, id) {
+    ed._config.cells = ed._config.cells.filter(function(c){return c.id!==id;});
+    ed._config.pathOrder = ed._config.pathOrder.filter(function(cid){return cid!==id;});
+    ed._selectedIds = ed._selectedIds.filter(function(sid){return sid!==id;});
+    ed._dirty = true;
+    if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
+  }
+
+  function updateCell(ed, id, updates) {
+    var cell = getCell(ed, id);
+    if (!cell) return;
+    for (var k in updates) { if (updates.hasOwnProperty(k)) cell[k] = updates[k]; }
+    ed._dirty = true;
+    pushHistory(ed);
+    if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
+  }
+
+  function selectCell(ed, id, additive) {
+    if (id === null || id === undefined) {
+      ed._selectedIds = [];
+    } else if (additive) {
+      if (!ed._selectedIds.includes(id)) ed._selectedIds.push(id);
+      else ed._selectedIds = ed._selectedIds.filter(function(x){return x!==id;});
+    } else {
+      ed._selectedIds = [id];
     }
-    var containerWidth = ed._container.clientWidth;
-    var containerHeight = ed._container.clientHeight;
-    var contentWidth = maxX - minX + 40;
-    var contentHeight = maxY - minY + 40;
-    var zoomX = containerWidth / contentWidth;
-    var zoomY = containerHeight / contentHeight;
-    ed._zoom = Math.min(zoomX, zoomY, 1); // 不超过100%
-    ed._zoom = Math.max(0.3, Math.min(ed._zoom, 1.5));
-    // 居中平移
-    var offsetX = (containerWidth - contentWidth * ed._zoom) / 2 - minX * ed._zoom + 20;
-    var offsetY = (containerHeight - contentHeight * ed._zoom) / 2 - minY * ed._zoom + 20;
-    ed._cellLayer.style.transform = 'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + ed._zoom + ')';
-    ed._svgLayer.style.transform = 'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + ed._zoom + ')';
-    var bg = ed._container.querySelector('.bb-grid-bg');
-    if (bg) bg.style.transform = 'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + ed._zoom + ')';
+    ed._dirty = true;
+    var cell = getCell(ed, id);
+    if (ed._callbacks.onSelect) ed._callbacks.onSelect(id, cell);
+  }
+
+  function toggleSelect(ed, id) {
+    var idx = ed._selectedIds.indexOf(id);
+    if (idx >= 0) ed._selectedIds.splice(idx, 1);
+    else ed._selectedIds.push(id);
+    ed._dirty = true;
+  }
+
+  // ─── 复制粘贴 ───
+  var _clipboard = [];
+  function copyCells(ed) {
+    _clipboard = [];
+    for (var i = 0; i < ed._selectedIds.length; i++) {
+      var c = getCell(ed, ed._selectedIds[i]);
+      if (c) _clipboard.push(JSON.parse(JSON.stringify(c)));
+    }
+  }
+
+  function pasteCells(ed) {
+    if (_clipboard.length === 0) return;
+    ed._selectedIds = [];
+    for (var i = 0; i < _clipboard.length; i++) {
+      var c = JSON.parse(JSON.stringify(_clipboard[i]));
+      c.id = 'c'+Date.now().toString(36)+'_'+i;
+      c.x += 60; c.y += 40;
+      ed._config.cells.push(c);
+      ed._config.pathOrder.push(c.id);
+      ed._selectedIds.push(c.id);
+    }
+    pushHistory(ed);
+    ed._dirty = true;
+    if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
+  }
+
+  // ─── 路径编辑 ───
+  function movePathItem(ed, cellId, dir) {
+    var po = ed._config.pathOrder;
+    var idx = po.indexOf(cellId);
+    if (idx < 0) return;
+    var newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= po.length) return;
+    var tmp = po[idx]; po[idx] = po[newIdx]; po[newIdx] = tmp;
+    ed._dirty = true;
+    pushHistory(ed);
+    if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
   }
 
   // ─── 撤销/重做 ───
   function pushHistory(ed) {
-    // 清除当前位置之后的历史
     ed._history = ed._history.slice(0, ed._historyIdx + 1);
-    var snap = getConfig(ed);
-    ed._history.push(snap);
-    if (ed._history.length > ed._maxHistory) ed._history.shift();
-    ed._historyIdx = ed._history.length - 1;
+    ed._history.push(getConfig(ed));
+    if (ed._history.length > 60) ed._history.shift();
+    else ed._historyIdx = ed._history.length - 1;
   }
 
   function undo(ed) {
     if (ed._historyIdx <= 0) return;
     ed._historyIdx--;
-    var snap = JSON.parse(JSON.stringify(ed._history[ed._historyIdx]));
-    ed._config = snap;
-    ed._selectedId = null;
-    renderAll(ed);
+    setConfig(ed, ed._history[ed._historyIdx]);
     if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
   }
 
   function redo(ed) {
     if (ed._historyIdx >= ed._history.length - 1) return;
     ed._historyIdx++;
-    var snap = JSON.parse(JSON.stringify(ed._history[ed._historyIdx]));
-    ed._config = snap;
-    ed._selectedId = null;
-    renderAll(ed);
+    setConfig(ed, ed._history[ed._historyIdx]);
     if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
   }
 
-  // ─── 路径顺序编辑 ───
-  function movePathItem(ed, cellId, direction) {
-    var po = ed._config.pathOrder || [];
-    var idx = po.indexOf(cellId);
-    if (idx === -1) return;
-    var newIdx = idx + direction;
-    if (newIdx < 0 || newIdx >= po.length) return;
-    // 交换
-    var tmp = po[idx];
-    po[idx] = po[newIdx];
-    po[newIdx] = tmp;
-    ed._config.pathOrder = po;
-    pushHistory(ed);
-    renderAll(ed);
-    if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
+  // ─── 视图 ───
+  function fitView(ed) {
+    var cells = ed._config.cells || [];
+    if (cells.length === 0) { ed._camera = {x:0, y:0, zoom:1}; ed._dirty=true; return; }
+    var rect = ed._container.getBoundingClientRect();
+    var minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+    for (var i = 0; i < cells.length; i++) {
+      if (cells[i].x < minX) minX = cells[i].x;
+      if (cells[i].y < minY) minY = cells[i].y;
+      if (cells[i].x > maxX) maxX = cells[i].x;
+      if (cells[i].y > maxY) maxY = cells[i].y;
+    }
+    var cw = (maxX - minX) + CELL_W * 2, ch = (maxY - minY) + CELL_H * 2;
+    var zoom = Math.min(rect.width / cw, rect.height / ch, 1.2);
+    ed._camera.zoom = Math.max(0.3, zoom);
+    ed._camera.x = rect.width/2 - (minX + (maxX-minX)/2) * ed._camera.zoom;
+    ed._camera.y = rect.height/2 - (minY + (maxY-minY)/2) * ed._camera.zoom;
+    ed._dirty = true;
   }
 
-  // ─── 键盘快捷键 ───
-  function bindKeyboard(ed) {
-    ed._container.tabIndex = 0; // 使容器可聚焦
-    ed._container.addEventListener('keydown', function(e) {
-      // Ctrl+Z
-      if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
-        e.preventDefault();
-        undo(ed);
-        return;
-      }
-      // Ctrl+Y or Ctrl+Shift+Z
-      if ((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'z')) {
-        e.preventDefault();
-        redo(ed);
-        return;
-      }
-      // Delete 键删除选中格子
-      if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (ed._selectedId && document.activeElement === ed._container) {
-          e.preventDefault();
-          deleteCell(ed, ed._selectedId);
-        }
-      }
-    });
+  // ─── 渲染循环 ───
+  function startLoop(ed) {
+    function loop() {
+      render(ed);
+      ed._animFrame = requestAnimationFrame(loop);
+    }
+    loop();
   }
 
-  // ─── 公开静态方法 ───
-  return {
-    create: create,
-    CELL_TYPES: CELL_TYPES,
-  };
+  function destroy(ed) {
+    if (ed._animFrame) cancelAnimationFrame(ed._animFrame);
+    ed._container.innerHTML = '';
+    ed._config = { cells:[], pathOrder:[] };
+  }
+
+  // ─── API ───
+  function buildAPI(ed) {
+    return {
+      addCell: function(x,y,t){return addCell(ed,x,y,t);},
+      deleteCell: function(id){deleteCell(ed,id);},
+      updateCell: function(id,u){updateCell(ed,id,u);},
+      selectCell: function(id){selectCell(ed,id,false);},
+      getConfig: function(){return getConfig(ed);},
+      setConfig: function(c){setConfig(ed,c); fitView(ed);},
+      getCell: function(id){return getCell(ed,id);},
+      movePathUp: function(id){movePathItem(ed,id,-1);},
+      movePathDown: function(id){movePathItem(ed,id,1);},
+      undo: function(){undo(ed);},
+      redo: function(){redo(ed);},
+      fitView: function(){fitView(ed);},
+      destroy: function(){destroy(ed);},
+    };
+  }
+
+  return { create: create, CELL_TYPES: CELL_TYPES };
 })();
