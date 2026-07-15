@@ -71,7 +71,7 @@ const GridRenderer = (() => {
     cell.dataset.index = index;
     cell.style.cssText = [
       'display:flex;flex-direction:column;align-items:center;justify-content:center;',
-      'font-size:10px;text-align:center;padding:2px;border-radius:4px;cursor:pointer;',
+      'font-size:11px;text-align:center;padding:2px;border-radius:4px;cursor:pointer;',
       'border:1px solid var(--border, rgba(255,255,255,0.1));',
       'transition:background 0.2s,box-shadow 0.2s;min-height:0;overflow:hidden;',
     ].join('');
@@ -91,7 +91,7 @@ const GridRenderer = (() => {
 
     cell.innerHTML = [
       '<span style="font-size:16px;line-height:1">' + (cellData.icon || '') + '</span>',
-      '<span style="font-size:9px;margin-top:1px;line-height:1.1;color:var(--text,#F0EAF8)">' + (cellData.name || '') + '</span>',
+      '<span style="font-size:11px;margin-top:1px;line-height:1.1;color:var(--text,#F0EAF8)">' + (cellData.name || '') + '</span>',
     ].join('');
 
     if (onClick) {

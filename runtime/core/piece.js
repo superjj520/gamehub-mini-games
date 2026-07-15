@@ -8,7 +8,7 @@ const PieceController = (() => {
     el.id = 'gh-piece-' + index;
     el.className = 'gh-piece';
     el.style.cssText = [
-      'position:absolute;width:24px;height:24px;border-radius:50%;',
+      'position:absolute;width:28px;height:28px;border-radius:50%;',
       'background:' + player.color + ';border:2px solid white;',
       'box-shadow:0 2px 8px rgba(0,0,0,0.5);z-index:10;',
       'transition:top 0.3s cubic-bezier(.4,1.3,.6,1),left 0.3s cubic-bezier(.4,1.3,.6,1);',
