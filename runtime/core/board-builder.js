@@ -90,7 +90,13 @@ var BoardBuilder = (function() {
   // ─── DOM 构建 ───
   function buildDOM(ed) {
     ed._container.innerHTML = '';
-    ed._container.style.cssText = 'position:relative;overflow:auto;background:#0D0720;border-radius:12px;min-height:400px;height:100%;cursor:grab;user-select:none;';
+    ed._container.style.position = 'relative';
+    ed._container.style.overflow = 'auto';
+    ed._container.style.background = '#0D0720';
+    ed._container.style.borderRadius = '12px';
+    ed._container.style.minHeight = '400px';
+    ed._container.style.cursor = 'grab';
+    ed._container.style.userSelect = 'none';
 
     // 网格背景
     var bg = document.createElement('div');

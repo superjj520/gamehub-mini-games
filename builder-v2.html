@@ -614,57 +614,117 @@ function renderPreview() {
 }
 
 function buildPreviewHTML(config) {
-  // 将配置转为纯 JSON 字符串
-  var configJson = JSON.stringify(config);
-  // 构建简单直接的预览 HTML，完全避免 '</' + 'script>' 的复杂嵌套
+  var configJson = JSON.stringify(config).replace(/</g, '\\u003c');
   var html = '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="UTF-8">\n';
   html += '<style>\n';
   html += '*{margin:0;padding:0;box-sizing:border-box;}\n';
   html += ':root{--gold:#F5C842;--bg:#0D0720;--accent:#7C3AED;--accent2:#EC4899;--deep:#1A0A2E;--card:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.1);--text:#F0EAF8;--muted:rgba(240,234,248,0.5);}\n';
   html += 'body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}\n';
-  html += '.preview-info{text-align:center;}\n';
-  html += '.preview-info h2{font-size:18px;margin-bottom:8px;}\n';
-  html += '.preview-info p{font-size:12px;color:var(--muted);}\n';
-  html += '.preview-grid{width:100%;max-width:400px;margin:0 auto;}\n';
+  html += '.pv-wrap{text-align:center;max-width:500px;width:100%;}\n';
+  html += '.pv-wrap h2{font-size:16px;margin-bottom:4px;}\n';
+  html += '.pv-wrap .sub{font-size:11px;color:var(--muted);margin-bottom:16px;}\n';
+  html += '.pv-board{position:relative;width:100%;overflow:auto;}\n';
+  html += '.pv-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:4px;text-align:left;font-size:11px;}\n';
+  html += '.pv-item{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--card);border-radius:6px;margin-bottom:3px;font-size:11px;}\n';
   html += '</style>\n<' + '/head>\n<body>\n';
-  html += '<div class="preview-info">\n';
-  html += '<h2>' + config.title + '</h2>\n';
-  html += '<p>' + config.blocks.length + ' 个 Block · 大富翁</p>\n';
-  html += '<div class="preview-grid" id="pvGrid"></' + 'div>\n';
-  html += '</' + 'div>\n';
-  // 直接把配置嵌入 JS 变量，脚本直接渲染
-  html += '<' + 'script>\n';
-  html += '(function(){\n';
-  html += 'var config = ' + configJson + ';\n';
-  html += 'var boardBlock = null;\n';
-  html += 'for (var i = 0; i < config.blocks.length; i++) {\n';
-  html += '  if (config.blocks[i].type === "board" || config.blocks[i].type === "grid") { boardBlock = config.blocks[i]; break; }\n';
-  html += '}\n';
-  html += 'if (!boardBlock) return;\n';
-  html += 'var container = document.getElementById("pvGrid");\n';
-  html += 'var c = boardBlock.config;\n';
-  html += 'var cells = c.cells || [];\n';
-  html += 'var board = document.createElement("div");\n';
-  html += 'board.style.cssText = "position:relative;width:100%;min-height:400px;overflow:auto;";\n';
-  html += 'var tC = { start:"rgba(34,197,94,0.2)", property:"rgba(124,58,237,0.15)", chance:"rgba(245,200,66,0.15)", destiny:"rgba(236,72,153,0.15)", jail:"rgba(239,68,68,0.15)", shop:"rgba(59,130,246,0.15)", event:"rgba(34,211,238,0.15)", tax:"rgba(251,146,60,0.15)" };\n';
-  html += 'var maxX = 0, maxY = 0;\n';
-  html += 'for (var j = 0; j < cells.length; j++) { if (cells[j].x+100>maxX) maxX=cells[j].x+100; if (cells[j].y+60>maxY) maxY=cells[j].y+60; }\n';
-  html += 'board.style.height = Math.max(maxY+20, 400) + "px";\n';
-  html += 'for (var k = 0; k < cells.length; k++) {\n';
-  html += '  var cd = cells[k];\n';
-  html += '  var div = document.createElement("div");\n';
-  html += '  div.style.cssText = "position:absolute;left:"+cd.x+"px;top:"+cd.y+"px;min-width:72px;padding:4px 6px;border-radius:8px;display:flex;flex-direction:column;align-items:center;border:1px solid rgba(255,255,255,0.12);font-size:9px;";\n';
-  html += '  div.style.background = tC[cd.type] || "var(--card)";\n';
-  html += '  var ico = cd.icon || "";\n';
-  html += '  var nm = cd.name || "";\n';
-  html += '  var pr = cd.price ? "<span style=\\"font-size:8px;color:var(--muted)\\">¥" + cd.price + "</span>" : "";\n';
-  html += '  div.innerHTML = "<span style=\\"font-size:16px;line-height:1\\">" + ico + "</span><span style=\\"font-size:9px;font-weight:600;color:var(--text)\\">" + nm + "</span>" + pr;\n';
-  html += '  board.appendChild(div);\n';
-  html += '}\n';
-  html += 'container.appendChild(board);\n';
-  html += '})();\n';
-  html += '</' + 'script>\n';
-  html += '</' + 'body>\n<' + '/html>';
+  html += '<div class="pv-wrap">\n';
+  html += '<h2>' + escHtml(config.title) + '</h2>\n';
+  html += '<p class="sub">' + config.blocks.length + ' 个 Block</p>\n';
+
+  // 渲染每个 Block 的预览
+  var blocks = config.blocks || [];
+  for (var i = 0; i < blocks.length; i++) {
+    var b = blocks[i];
+    if (b.type === 'board') {
+      html += renderBoardPreview(b);
+    } else if (b.type === 'collection') {
+      html += renderCollectionPreview(b);
+    } else if (b.type === 'rule') {
+      html += renderRulePreview(b);
+    } else if (b.type === 'player') {
+      html += renderPlayerPreview(b);
+    } else if (b.type === 'theme') {
+      html += renderThemePreview(b);
+    } else if (b.type === 'store') {
+      html += renderStorePreview(b);
+    } else {
+      html += '<div class="pv-card"><b>' + b.label + '</b> <span style="color:var(--muted)">(' + b.type + ')</span></div>\n';
+    }
+  }
+
+  html += '</div>\n<' + '/body>\n<' + '/html>';
+  return html;
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderBoardPreview(b) {
+  var c = b.config || {};
+  var cells = c.cells || [];
+  var html = '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">🗺️ ' + b.label + ' (' + cells.length + '格)</div>';
+  html += '<div class="pv-board" style="position:relative;min-height:200px;max-height:300px;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,0.2);overflow:hidden">';
+  if (cells.length > 0) {
+    // 计算比例缩放
+    var maxX = 0, maxY = 0;
+    for (var j = 0; j < cells.length; j++) { if (cells[j].x+100>maxX) maxX=cells[j].x+100; if (cells[j].y+60>maxY) maxY=cells[j].y+60; }
+    var scale = Math.min(1, 280 / Math.max(maxX, 1));
+    html += '<div style="position:relative;width:' + (maxX*scale+20) + 'px;height:' + (maxY*scale+20) + 'px;transform:scale(0.8);transform-origin:top left">';
+    var tC = { start:'rgba(34,197,94,0.25)',property:'rgba(124,58,237,0.18)',chance:'rgba(245,200,66,0.18)',destiny:'rgba(236,72,153,0.18)',jail:'rgba(239,68,68,0.18)',shop:'rgba(59,130,246,0.18)',event:'rgba(34,211,238,0.18)',tax:'rgba(251,146,60,0.18)' };
+    for (var k = 0; k < Math.min(cells.length, 30); k++) {
+      var cd = cells[k];
+      html += '<div style="position:absolute;left:'+cd.x+'px;top:'+cd.y+'px;min-width:60px;padding:3px 5px;border-radius:6px;background:'+(tC[cd.type]||'var(--card)')+';border:1px solid rgba(255,255,255,0.1);font-size:8px;text-align:center">';
+      html += '<span style="font-size:14px">'+(cd.icon||'')+'</span><br>'+(cd.name||'');
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderCollectionPreview(b) {
+  var cards = (b.config && b.config.cards) || [];
+  var html = '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">🎲 ' + b.label + ' (' + cards.length + '张)</div>';
+  for (var i = 0; i < Math.min(cards.length, 6); i++) {
+    html += '<div class="pv-item"><span style="font-size:14px">🃏</span><span>' + (cards[i].title || '卡#'+i) + '</span></div>';
+  }
+  if (cards.length > 6) html += '<div style="font-size:10px;color:var(--muted)">... 还有 ' + (cards.length-6) + ' 张</div>';
+  return html;
+}
+
+function renderRulePreview(b) {
+  var vars = (b.config && b.config.variables) || [];
+  var html = '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">📐 ' + b.label + '</div>';
+  html += '<div class="pv-card">';
+  for (var i = 0; i < vars.length; i++) {
+    html += '<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px"><span>' + vars[i].label + '</span><span style="color:var(--gold)">' + vars[i].value + '</span></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderPlayerPreview(b) {
+  var c = b.config || {};
+  var players = c.players || [];
+  var html = '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">👥 ' + b.label + ' (' + players.length + '人)</div>';
+  for (var i = 0; i < players.length; i++) {
+    var p = players[i];
+    html += '<div class="pv-item"><span style="font-size:14px">'+(p.emoji||'🎮')+'</span><span>'+p.name+'</span>'+(p.isAI?' <span style="color:var(--muted);font-size:9px">AI</span>':'')+'</div>';
+  }
+  return html;
+}
+
+function renderThemePreview(b) {
+  var c = b.config || {};
+  return '<div class="pv-card" style="text-align:center"><div style="width:100%;height:24px;border-radius:6px;background:linear-gradient(135deg,'+(c.accent||'#7C3AED')+','+(c.accent2||'#EC4899')+');margin-bottom:6px"></div><span style="font-size:11px">🎨 '+(c.preset||'主题')+'</span></div>';
+}
+
+function renderStorePreview(b) {
+  var items = (b.config && b.config.items) || [];
+  var html = '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">🏪 ' + b.label + ' (' + items.length + '件)</div>';
+  for (var i = 0; i < Math.min(items.length, 5); i++) {
+    html += '<div class="pv-item"><span>'+(items[i].icon||'📦')+'</span><span style="flex:1">'+items[i].name+'</span><span style="color:var(--gold)">💰'+items[i].cost+'</span></div>';
+  }
   return html;
 }
 
