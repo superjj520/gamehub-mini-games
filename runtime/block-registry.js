@@ -4,7 +4,7 @@
  */
 const BlockRegistry = (() => {
   const TYPES = {
-    GRID:       'grid',
+    BOARD:      'board',
     COLLECTION: 'collection',
     RULE:       'rule',
     PIECE:      'piece',
@@ -17,22 +17,15 @@ const BlockRegistry = (() => {
 
   // ─── 每种 Block 类型的编辑 Schema ───
   const SCHEMAS = {
-    grid: {
-      label: '棋盘', icon: '🗺️', iconSvg: 'grid',
+    board: {
+      label: '地图', icon: '🗺️', iconSvg: 'board',
       fields: [
-        { key: 'rows',    label: '行数',   type: 'number', min: 5, max: 15, default: 7 },
-        { key: 'cols',    label: '列数',   type: 'number', min: 5, max: 15, default: 7 },
-        { key: 'cells',   label: '格子列表', type: 'cell-list' },
+        { key: 'cells',     label: '格子列表', type: 'board-editor' },
+        { key: 'pathOrder', label: '路径顺序', type: 'hidden' },
       ],
       templates: [
-        { name: "🏙️ 经典24格", desc: "7×7,12地产+4机会+4命运", config: { rows:7, cols:7 } },
-        { name: "🌃 赛博都市", desc: "9×9, 密集地产", config: { rows:9, cols:9 } },
-        { name: "🏘️ 迷你小镇", desc: "5×5, 快速游戏", config: { rows:5, cols:5 } },
-      ],
-      templates: [
-        { name: "🏙️ 经典24格", desc: "7×7,12地产+4机会+4命运", config: { rows:7, cols:7 } },
-        { name: "🌃 赛博都市", desc: "9×9, 密集地产", config: { rows:9, cols:9 } },
-        { name: "🏘️ 迷你小镇", desc: "5×5, 快速游戏", config: { rows:5, cols:5 } },
+        { name: '经典大富翁', desc: '24格环形路径', config: {} },
+        { name: '自定义布局', desc: '自由拖拽搭建地图', config: {} },
       ],
     },
     collection: {
@@ -159,35 +152,35 @@ const BlockRegistry = (() => {
   // ─── 大富翁默认 Block 配置 ───
   const MONOPOLY_DEFAULTS = [
     {
-      id: 'blk_board', type: 'grid', label: '棋盘',
+      id: 'blk_board', type: 'board', label: '地图',
       config: {
-        rows: 7, cols: 7,
         cells: [
-          { index: 0,  type: 'start',    name: '起点',     icon: '🚩', effect: { gold: 200 } },
-          { index: 1,  type: 'property', name: '奶茶铺',   icon: '🧋', price: 200,  rent: [50, 100, 200] },
-          { index: 2,  type: 'chance',   name: '机会',     icon: '❓', effect: { draw: 'chance' } },
-          { index: 3,  type: 'property', name: '服装店',   icon: '👗', price: 300,  rent: [80, 160, 320] },
-          { index: 4,  type: 'jail',     name: '监禁',     icon: '🚔', effect: { skip: 1 } },
-          { index: 5,  type: 'property', name: '美妆店',   icon: '💄', price: 250,  rent: [60, 120, 240] },
-          { index: 6,  type: 'destiny',  name: '命运',     icon: '🔮', effect: { draw: 'destiny' } },
-          { index: 7,  type: 'property', name: '数码店',   icon: '📱', price: 350,  rent: [90, 180, 360] },
-          { index: 8,  type: 'shop',     name: '商铺街',   icon: '🏪', effect: { shop_reward: true } },
-          { index: 9,  type: 'property', name: '咖啡馆',   icon: '☕', price: 200,  rent: [50, 100, 200] },
-          { index: 10, type: 'chance',   name: '机会',     icon: '❓', effect: { draw: 'chance' } },
-          { index: 11, type: 'property', name: '餐饮店',   icon: '🍜', price: 400,  rent: [100, 200, 400] },
-          { index: 12, type: 'event',    name: '幸运日',   icon: '🌈', effect: { gold: 100 } },
-          { index: 13, type: 'property', name: '游戏馆',   icon: '🎮', price: 280,  rent: [70, 140, 280] },
-          { index: 14, type: 'destiny',  name: '命运',     icon: '🔮', effect: { draw: 'destiny' } },
-          { index: 15, type: 'property', name: '健身房',   icon: '🏋️', price: 320,  rent: [80, 160, 320] },
-          { index: 16, type: 'chance',   name: '机会',     icon: '❓', effect: { draw: 'chance' } },
-          { index: 17, type: 'property', name: '珠宝店',   icon: '💎', price: 500,  rent: [150, 300, 500] },
-          { index: 18, type: 'event',    name: '税务',     icon: '💰', effect: { gold: -100 } },
-          { index: 19, type: 'property', name: '黄金城',   icon: '👑', price: 600,  rent: [200, 400, 600] },
-          { index: 20, type: 'chance',   name: '机会',     icon: '❓', effect: { draw: 'chance' } },
-          { index: 21, type: 'property', name: '银行',     icon: '🏦', price: 450,  rent: [120, 240, 480] },
-          { index: 22, type: 'destiny',  name: '命运',     icon: '🔮', effect: { draw: 'destiny' } },
-          { index: 23, type: 'property', name: '庄园',     icon: '🏰', price: 700,  rent: [250, 500, 700] },
+          { id:'c0',  x:100, y:280, type:'start',    name:'起点',   icon:'🚩', effects:{gold:200} },
+          { id:'c1',  x:200, y:260, type:'property', name:'奶茶铺', icon:'🧋', price:200, rent:[50,100,200] },
+          { id:'c2',  x:300, y:220, type:'chance',   name:'机会',   icon:'❓', effects:{draw:'chance'} },
+          { id:'c3',  x:400, y:180, type:'property', name:'服装店', icon:'👗', price:300, rent:[80,160,320] },
+          { id:'c4',  x:500, y:140, type:'jail',     name:'监禁',   icon:'🚔', effects:{skip:1} },
+          { id:'c5',  x:600, y:100, type:'property', name:'美妆店', icon:'💄', price:250, rent:[60,120,240] },
+          { id:'c6',  x:680, y:60,  type:'destiny',  name:'命运',   icon:'🔮', effects:{draw:'destiny'} },
+          { id:'c7',  x:680, y:340, type:'property', name:'数码店', icon:'📱', price:350, rent:[90,180,360] },
+          { id:'c8',  x:660, y:420, type:'shop',     name:'商铺街', icon:'🏪', effects:{shop_reward:true} },
+          { id:'c9',  x:600, y:480, type:'property', name:'咖啡馆', icon:'☕', price:200, rent:[50,100,200] },
+          { id:'c10', x:500, y:520, type:'chance',   name:'机会',   icon:'❓', effects:{draw:'chance'} },
+          { id:'c11', x:400, y:540, type:'property', name:'餐饮店', icon:'🍜', price:400, rent:[100,200,400] },
+          { id:'c12', x:300, y:540, type:'event',    name:'幸运日', icon:'🌈', effects:{gold:100} },
+          { id:'c13', x:200, y:520, type:'property', name:'游戏馆', icon:'🎮', price:280, rent:[70,140,280] },
+          { id:'c14', x:100, y:480, type:'destiny',  name:'命运',   icon:'🔮', effects:{draw:'destiny'} },
+          { id:'c15', x:20,  y:420, type:'property', name:'健身房', icon:'🏋️', price:320, rent:[80,160,320] },
+          { id:'c16', x:20,  y:340, type:'chance',   name:'机会',   icon:'❓', effects:{draw:'chance'} },
+          { id:'c17', x:20,  y:260, type:'property', name:'珠宝店', icon:'💎', price:500, rent:[150,300,500] },
+          { id:'c18', x:40,  y:180, type:'event',    name:'税务',   icon:'💰', effects:{gold:-100} },
+          { id:'c19', x:100, y:140, type:'property', name:'黄金城', icon:'👑', price:600, rent:[200,400,600] },
+          { id:'c20', x:200, y:100, type:'chance',   name:'机会',   icon:'❓', effects:{draw:'chance'} },
+          { id:'c21', x:300, y:60,  type:'property', name:'银行',   icon:'🏦', price:450, rent:[120,240,480] },
+          { id:'c22', x:400, y:40,  type:'destiny',  name:'命运',   icon:'🔮', effects:{draw:'destiny'} },
+          { id:'c23', x:500, y:60,  type:'property', name:'庄园',   icon:'🏰', price:700, rent:[250,500,700] },
         ],
+        pathOrder: ['c0','c1','c2','c3','c4','c5','c6','c23','c22','c21','c20','c19','c18','c17','c16','c15','c14','c13','c12','c11','c10','c9','c8','c7'],
       },
     },
     {

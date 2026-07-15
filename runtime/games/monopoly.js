@@ -77,8 +77,7 @@ const MonopolyGame = (() => {
     emitStatus('🎲 ' + player.name + ' 掷出 ' + steps + ' 点');
 
     // 计算新位置
-    var gridBlock = findBlockByType('grid');
-    var totalCells = (gridBlock && gridBlock.config.cells) ? gridBlock.config.cells.length : 24;
+    var totalCells = getTotalCells();
     var fromPos = player.position;
 
     animating = true;
@@ -236,8 +235,7 @@ const MonopolyGame = (() => {
       addLog('💰 ' + (card.effect.gold > 0 ? '+' : '') + card.effect.gold + ' 金币');
     }
     if (card.effect.move) {
-      var gridBlock = findBlockByType('grid');
-      var totalCells = (gridBlock && gridBlock.config.cells) ? gridBlock.config.cells.length : 24;
+      var totalCells = getTotalCells();
       p = PlayerManager.movePlayer(p, card.effect.move, totalCells);
       addLog('➡️ 移动 ' + card.effect.move + ' 格');
     }
@@ -271,7 +269,8 @@ const MonopolyGame = (() => {
       emitStatus('❌ 当前位置不可购买');
       return;
     }
-    if (player.properties.indexOf(cellData.index) !== -1) {
+    var cellPosition = player.position;
+    if (player.properties.indexOf(cellPosition) !== -1) {
       emitStatus('❌ 你已经拥有 ' + cellData.name);
       return;
     }
@@ -282,7 +281,7 @@ const MonopolyGame = (() => {
 
     state.players[pi] = PlayerManager.addProperty(
       PlayerManager.addGold(player, -cellData.price),
-      cellData.index
+      cellPosition
     );
     addLog('🏠 ' + player.name + ' 购买了 ' + cellData.name + '！(-' + cellData.price + ' 金币)');
     emitStatus('🏠 ' + player.name + ' 购买了 ' + cellData.name + '！');
@@ -359,14 +358,44 @@ const MonopolyGame = (() => {
     return vars;
   }
 
-  function findCellData(index) {
-    var block = findBlockByType('grid');
-    if (!block) return null;
-    var cells = block.config.cells || [];
-    for (var i = 0; i < cells.length; i++) {
-      if (cells[i].index === index) return cells[i];
+  function findBoardBlock() {
+    var blocks = ctx.config.blocks || [];
+    for (var i = 0; i < blocks.length; i++) {
+      if (blocks[i].type === 'board' || blocks[i].type === 'grid') return blocks[i];
     }
     return null;
+  }
+
+  function getTotalCells() {
+    var block = findBoardBlock();
+    if (!block) return 24;
+    if (block.config.pathOrder && block.config.pathOrder.length > 0) {
+      return block.config.pathOrder.length;
+    }
+    return (block.config.cells || []).length;
+  }
+
+  function getCellByPosition(position) {
+    var block = findBoardBlock();
+    if (!block) return null;
+    var cells = block.config.cells || [];
+    var pathOrder = block.config.pathOrder || [];
+    // 新格式：pathOrder 映射
+    if (pathOrder.length > 0) {
+      var cellId = pathOrder[((position % pathOrder.length) + pathOrder.length) % pathOrder.length];
+      for (var i = 0; i < cells.length; i++) {
+        if (cells[i].id === cellId) return cells[i];
+      }
+    }
+    // 旧格式：index 匹配
+    for (var j = 0; j < cells.length; j++) {
+      if (cells[j].index === position) return cells[j];
+    }
+    return null;
+  }
+
+  function findCellData(index) {
+    return getCellByPosition(index);
   }
 
   function placeAllPieces() {

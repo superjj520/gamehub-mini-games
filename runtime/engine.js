@@ -101,6 +101,7 @@ const GameEngine = (() => {
     var id = block.id;
 
     switch (type) {
+      case 'board':
       case 'grid':
         if (typeof GridRenderer !== 'undefined') {
           var gridContainer = document.createElement('div');
