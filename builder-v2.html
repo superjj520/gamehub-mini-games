@@ -555,7 +555,7 @@ function renderPreview() {
     if (!bbContainer) {
       bbContainer = document.createElement('div');
       bbContainer.id = 'boardBuilderContainer';
-      bbContainer.style.cssText = 'width:100%;height:100%;overflow:auto;';
+      bbContainer.style.cssText = 'flex:1;width:100%;overflow:auto;position:relative;';
       iframe.parentNode.insertBefore(bbContainer, iframe);
     }
     bbContainer.style.display = 'block';
@@ -741,12 +741,17 @@ function renderPropertyPanel() {
   var templates = schema.templates || [];
   var html = '<div style="margin-bottom:12px;font-size:15px;font-weight:800">' + schema.icon + ' ' + schema.label + '</div>';
 
-  // 地图 Block 特殊提示
+  // 地图 Block 路径顺序面板
   if (block.type === 'board') {
-    html += '<div style="margin-bottom:12px;padding:8px 12px;background:rgba(124,58,237,0.08);border-radius:8px;font-size:11px;color:var(--muted);line-height:1.5">';
-    html += '💡 在中间画布上双击添加格子，拖拽移动位置，点击格子编辑属性<br>';
-    html += '<span style="font-size:10px">格子: ' + (block.config.cells || []).length + ' | 路径: ' + (block.config.pathOrder || []).length + ' 个节点</span>';
+    var cells = block.config.cells || [];
+    html += '<div style="margin-bottom:12px;padding:10px;background:rgba(124,58,237,0.06);border-radius:10px;border:1px rgba(124,58,237,0.2)">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+    html += '<span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px">路径顺序</span>';
+    html += '<span style="font-size:10px;color:var(--muted)">拖拽排序 | 共 ' + cells.length + ' 格</span>';
     html += '</div>';
+    html += '<div class="path-order-list" id="pathOrderList" style="max-height:260px;overflow-y:auto;font-size:11px">';
+    html += renderPathOrderList(block);
+    html += '</div></div>';
   }
 
   if (templates.length > 0) {
@@ -827,6 +832,88 @@ function updateCellField(cellId, key, value) {
     _boardEditor.updateCell(cellId, updates);
     renderPropertyPanel();
   }
+}
+
+function renderPathOrderList(block) {
+  var cells = block.config.cells || [];
+  var pathOrder = block.config.pathOrder || [];
+  var html = '';
+  for (var i = 0; i < pathOrder.length; i++) {
+    var cid = pathOrder[i];
+    var cell = null;
+    for (var j = 0; j < cells.length; j++) { if (cells[j].id === cid) { cell = cells[j]; break; } }
+    if (!cell) continue;
+    html += '<div class="path-order-item" draggable="true" data-cell-id="' + cid + '" data-idx="' + i + '"';
+    html += ' style="display:flex;align-items:center;gap:6px;padding:5px 8px;margin-bottom:2px;border-radius:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);cursor:grab;transition:background 0.15s"';
+    html += ' ondragstart="pathDragStart(event)" ondragover="pathDragOver(event)" ondrop="pathDrop(event,\'' + cid + '\')"';
+    html += ' onclick="selectBoardCell(\'' + cid + '\')">';
+    html += '<span style="font-size:10px;font-weight:700;color:var(--accent);width:16px;text-align:center">' + i + '</span>';
+    html += '<span style="font-size:14px;width:20px;text-align:center">' + (cell.icon || '📌') + '</span>';
+    html += '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">' + (cell.name || '?') + '</span>';
+    html += '<button style="width:20px;height:20px;border:none;background:rgba(124,58,237,0.15);color:var(--accent);cursor:pointer;border-radius:4px;font-size:10px" onclick="event.stopPropagation();movePathItem(\'' + cid + '\',-1)" title="前移">▲</button>';
+    html += '<button style="width:20px;height:20px;border:none;background:rgba(124,58,237,0.15);color:var(--accent);cursor:pointer;border-radius:4px;font-size:10px" onclick="event.stopPropagation();movePathItem(\'' + cid + '\',1)" title="后移">▼</button>';
+    html += '</div>';
+  }
+  return html || '<div style="color:var(--muted);font-size:11px;text-align:center;padding:8px">暂无格子</div>';
+}
+
+function selectBoardCell(cellId) {
+  _selectedCellId = cellId;
+  if (_boardEditor) _boardEditor.selectCell(cellId);
+  renderPropertyPanel();
+}
+
+function movePathItem(cellId, dir) {
+  if (_boardEditor) {
+    if (dir < 0) _boardEditor.movePathUp(cellId);
+    else _boardEditor.movePathDown(cellId);
+    renderPropertyPanel();
+    renderPreview();
+  }
+}
+
+var _pathDragFrom = null;
+function pathDragStart(e) {
+  _pathDragFrom = e.target.closest('.path-order-item');
+  if (_pathDragFrom) {
+    _pathDragFrom.style.opacity = '0.4';
+    e.dataTransfer.effectAllowed = 'move';
+  }
+}
+function pathDragOver(e) {
+  e.preventDefault();
+  var item = e.target.closest('.path-order-item');
+  if (item && item !== _pathDragFrom) {
+    item.style.borderColor = 'var(--accent)';
+  }
+}
+function pathDrop(e, targetId) {
+  e.preventDefault();
+  var items = document.querySelectorAll('.path-order-item');
+  for (var i = 0; i < items.length; i++) { items[i].style.borderColor = 'var(--border)'; }
+  if (_pathDragFrom) {
+    _pathDragFrom.style.opacity = '1';
+    var fromId = _pathDragFrom.dataset.cellId;
+    if (fromId !== targetId && _boardEditor) {
+      // 移动 fromId 到 targetId 的位置
+      var cfg = _boardEditor.getConfig();
+      var po = cfg.pathOrder || [];
+      var fromIdx = po.indexOf(fromId);
+      var toIdx = po.indexOf(targetId);
+      if (fromIdx >= 0 && toIdx >= 0 && fromIdx !== toIdx) {
+        // 重新排序：把 fromId 移到 targetId 之前
+        var newOrder = [];
+        for (var j = 0; j < po.length; j++) {
+          if (j === toIdx) newOrder.push(fromId);
+          if (po[j] !== fromId) newOrder.push(po[j]);
+        }
+        _boardEditor.setConfig({ cells: cfg.cells, pathOrder: newOrder });
+        renderPropertyPanel();
+        renderPreview();
+      }
+    }
+  }
+  _pathDragFrom = null;
 }
 
 function deleteBoardCell(cellId) {

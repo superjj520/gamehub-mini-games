@@ -64,6 +64,8 @@ var BoardBuilder = (function() {
     renderAll(editor);
     bindEvents(editor);
     bindKeyboard(editor);
+    // 自动适配视图，让所有格子可见
+    setTimeout(function() { fitView(editor); }, 100);
 
     return {
       addCell: function(x, y, type) { return addCell(editor, x, y, type); },
@@ -88,13 +90,13 @@ var BoardBuilder = (function() {
   // ─── DOM 构建 ───
   function buildDOM(ed) {
     ed._container.innerHTML = '';
-    ed._container.style.cssText = 'position:relative;overflow:hidden;background:#0D0720;border-radius:12px;min-height:400px;cursor:grab;user-select:none;';
+    ed._container.style.cssText = 'position:relative;overflow:auto;background:#0D0720;border-radius:12px;min-height:400px;height:100%;cursor:grab;user-select:none;';
 
     // 网格背景
     var bg = document.createElement('div');
     bg.className = 'bb-grid-bg';
-    bg.style.cssText = 'position:absolute;inset:0;pointer-events:none;' +
-      'background-image:radial-gradient(circle,rgba(255,255,255,0.03) 1px,transparent 1px);' +
+    bg.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;' +
+      'background-image:radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px);' +
       'background-size:20px 20px;z-index:0;';
     ed._container.appendChild(bg);
 
@@ -591,6 +593,34 @@ var BoardBuilder = (function() {
     ed._container.innerHTML = '';
     ed._cellEls = {};
     ed._config = { cells: [], pathOrder: [] };
+  }
+
+  // ─── 自动适配视图 ───
+  function fitView(ed) {
+    var cells = ed._config.cells || [];
+    if (cells.length === 0) return;
+    var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (var i = 0; i < cells.length; i++) {
+      if (cells[i].x < minX) minX = cells[i].x;
+      if (cells[i].y < minY) minY = cells[i].y;
+      if (cells[i].x + 100 > maxX) maxX = cells[i].x + 100;
+      if (cells[i].y + 70 > maxY) maxY = cells[i].y + 70;
+    }
+    var containerWidth = ed._container.clientWidth;
+    var containerHeight = ed._container.clientHeight;
+    var contentWidth = maxX - minX + 40;
+    var contentHeight = maxY - minY + 40;
+    var zoomX = containerWidth / contentWidth;
+    var zoomY = containerHeight / contentHeight;
+    ed._zoom = Math.min(zoomX, zoomY, 1); // 不超过100%
+    ed._zoom = Math.max(0.3, Math.min(ed._zoom, 1.5));
+    // 居中平移
+    var offsetX = (containerWidth - contentWidth * ed._zoom) / 2 - minX * ed._zoom + 20;
+    var offsetY = (containerHeight - contentHeight * ed._zoom) / 2 - minY * ed._zoom + 20;
+    ed._cellLayer.style.transform = 'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + ed._zoom + ')';
+    ed._svgLayer.style.transform = 'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + ed._zoom + ')';
+    var bg = ed._container.querySelector('.bb-grid-bg');
+    if (bg) bg.style.transform = 'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + ed._zoom + ')';
   }
 
   // ─── 撤销/重做 ───
