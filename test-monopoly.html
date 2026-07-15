@@ -1,0 +1,67 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Test Monopoly</title>
+<style>body{font-family:sans-serif;padding:20px;background:#0D0720;color:#F0EAF8}
+#log{font-size:12px;margin-top:16px;line-height:1.8;color:#aaa}
+.ok{color:#22C55E}.fail{color:#EF4444}</style></head><body>
+<h2>Monopoly 引擎测试</h2>
+<div id="board"></div>
+<div id="status"></div>
+<button id="rollBtn" onclick="testRoll()">🎲 掷骰子</button>
+<div id="log"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.js"></script>
+<script src="runtime/block-registry.js"></script>
+<script src="runtime/core/theme.js"></script>
+<script src="runtime/core/rule.js"></script>
+<script src="runtime/core/collection.js"></script>
+<script src="runtime/core/grid.js"></script>
+<script src="runtime/core/effect.js"></script>
+<script src="runtime/core/player.js"></script>
+<script src="runtime/core/store.js"></script>
+<script src="runtime/core/building.js"></script>
+<script src="runtime/core/piece.js"></script>
+<script src="runtime/boardgame-engine.js"></script>
+<script src="runtime/games/monopoly.js"></script>
+
+<script>
+var L = document.getElementById('log');
+function log(msg, ok) { L.innerHTML += '<div class="'+(ok?'ok':'fail')+'">'+msg+'</div>'; }
+
+try {
+  log('BoardGameEngine: ' + typeof BoardGameEngine, typeof BoardGameEngine !== 'undefined');
+  log('MonopolyGame: ' + typeof MonopolyGame, typeof MonopolyGame !== 'undefined');
+  log('BlockRegistry: ' + typeof BlockRegistry, typeof BlockRegistry !== 'undefined');
+  
+  var blocks = BlockRegistry.getDefaults('monopoly');
+  log('Blocks loaded: ' + blocks.length, blocks.length === 8);
+  
+  var container = document.getElementById('board');
+  container.style.cssText = 'width:400px;margin:16px auto;';
+  
+  var game = MonopolyGame.start(container, blocks);
+  log('Game started: ' + (game ? 'OK' : 'FAIL'), !!game);
+  
+  window._onMonopolyState = function(s) {
+    var p = s.G.players[parseInt(s.ctx.currentPlayer)];
+    document.getElementById('status').textContent = '当前: ' + (p ? p.name : '?') + ' | 阶段: ' + s.ctx.phase + ' | 回合: ' + s.ctx.turn;
+  };
+  window._onMonopolyStatus = function(m) {
+    document.getElementById('status').textContent = m;
+  };
+  
+  log('✅ 引擎初始化成功！', true);
+} catch(e) {
+  log('❌ 错误: ' + e.message + ' (line ' + e.lineNumber + ')', false);
+}
+
+function testRoll() {
+  try {
+    MonopolyGame.rollDice();
+    document.getElementById('status').textContent = '已掷骰子!';
+    log('掷骰子', true);
+  } catch(e) {
+    log('掷骰子失败: ' + e.message, false);
+  }
+}
+</script>
+</body></html>
