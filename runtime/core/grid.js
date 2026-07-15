@@ -36,7 +36,7 @@ var GridRenderer = (function() {
     // SVG 路径层
     if (cells.length >= 2) {
       var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:0;';
+      svg.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;';
       svg.setAttribute('viewBox', '0 0 ' + (maxX + 100) + ' ' + (maxY + 60));
       svg.setAttribute('width', (maxX + 100));
       svg.setAttribute('height', (maxY + 60));
@@ -109,7 +109,7 @@ var GridRenderer = (function() {
     board.style.cssText =
       'display:grid;grid-template-columns:repeat(' + cols + ',1fr);' +
       'grid-template-rows:repeat(' + rows + ',1fr);gap:2px;width:100%;' +
-      'aspect-ratio:' + cols + '/' + rows + ';';
+      'aspect-ratio:' + cols + '/' + rows + ';padding-bottom:' + (rows/cols*100) + '%;';
 
     for (var r = 0; r < rows; r++) {
       for (var c = 0; c < cols; c++) {

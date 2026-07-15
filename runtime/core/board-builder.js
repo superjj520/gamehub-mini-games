@@ -109,13 +109,13 @@ var BoardBuilder = (function() {
     // SVG 路径层
     ed._svgLayer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     ed._svgLayer.setAttribute('class', 'bb-svg-layer');
-    ed._svgLayer.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;';
+    ed._svgLayer.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;;width:100%;height:100%;pointer-events:none;z-index:1;';
     ed._container.appendChild(ed._svgLayer);
 
     // 细胞层
     ed._cellLayer = document.createElement('div');
     ed._cellLayer.className = 'bb-cell-layer';
-    ed._cellLayer.style.cssText = 'position:absolute;inset:0;z-index:2;';
+    ed._cellLayer.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;;z-index:2;';
     ed._container.appendChild(ed._cellLayer);
 
     // 控制栏
@@ -471,7 +471,7 @@ var BoardBuilder = (function() {
       'cursor:pointer;font-size:11px;text-align:center;' +
       'transition:box-shadow 0.15s;z-index:1;' +
       'display:flex;flex-direction:column;align-items:center;gap:2px;' +
-      'backdrop-filter:blur(4px);';
+      '-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);';
 
     var pathIdx = (ed._config.pathOrder || []).indexOf(cell.id);
     var badgeHtml = pathIdx >= 0 ? '<span style="position:absolute;top:-6px;left:-6px;width:18px;height:18px;border-radius:50%;background:var(--accent,#7C3AED);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:5">' + pathIdx + '</span>' : '';

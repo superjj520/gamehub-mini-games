@@ -15,7 +15,7 @@ body {
   touch-action:manipulation;
   font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
   background:var(--bg); color:var(--text);
-  min-height:100dvh; display:flex; flex-direction:column;
+  min-height:100vh; display:flex; flex-direction:column;
 }
 
 /* 顶栏 */
@@ -78,7 +78,7 @@ body {
 /* 加载 */
 .loading {
   display:flex; align-items:center; justify-content:center;
-  height:100dvh; flex-direction:column; gap:12px;
+  height:100vh; flex-direction:column; gap:12px;
 }
 .loading-spinner { font-size:40px; animation:spin 1s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
@@ -103,7 +103,7 @@ body {
   <div class="loading-text">加载游戏配置中…</div>
 </div>
 
-<div id="app" style="display:none;flex-direction:column;min-height:100dvh">
+<div id="app" style="display:none;flex-direction:column;min-height:100vh">
   <div class="topbar">
     <div class="topbar-title" id="gameTitle">—</div>
     <div class="topbar-badge" id="gameType">大富翁</div>

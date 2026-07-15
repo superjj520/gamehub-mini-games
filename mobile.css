@@ -84,7 +84,7 @@
     z-index: 200;
     background: rgba(13,7,32,0.97);
     border-top: 1px solid var(--border);
-    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
   }
   .mobile-tab {
     flex: 1;
