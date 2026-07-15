@@ -24,6 +24,7 @@
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
+    touch-action: manipulation;
   }
 
   /* ─── 导航 ─── */
@@ -330,6 +331,7 @@
     .games-grid { grid-template-columns: 1fr 1fr; }
     .hero-stats { gap: 24px; }
   }
+  @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; } }
 </style>
 <link rel="stylesheet" href="mobile.css">
 </head>
