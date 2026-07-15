@@ -41,11 +41,15 @@ var BoardBuilder = (function() {
       _callbacks: cb,
       _selectedId: null,
       _svgLayer: null,
+      _cellLayer: null,
       _cellEls: {},
       _dragging: null,
       _panning: false,
       _panStart: { x: 0, y: 0 },
       _zoom: 1,
+      _history: [],
+      _historyIdx: -1,
+      _maxHistory: 50,
     };
 
     // 确保 pathOrder 与 cells 同步
@@ -53,9 +57,13 @@ var BoardBuilder = (function() {
       editor._config.pathOrder = (editor._config.cells || []).map(function(c) { return c.id; });
     }
 
+    // 初始化历史
+    pushHistory(editor);
+
     buildDOM(editor);
     renderAll(editor);
     bindEvents(editor);
+    bindKeyboard(editor);
 
     return {
       addCell: function(x, y, type) { return addCell(editor, x, y, type); },
@@ -70,6 +78,10 @@ var BoardBuilder = (function() {
       zoomOut: function() { zoomOut(editor); },
       resetView: function() { resetView(editor); },
       destroy: function() { destroy(editor); },
+      undo: function() { undo(editor); },
+      redo: function() { redo(editor); },
+      movePathUp: function(id) { movePathItem(editor, id, -1); },
+      movePathDown: function(id) { movePathItem(editor, id, 1); },
     };
   }
 
@@ -235,6 +247,7 @@ var BoardBuilder = (function() {
   function endDragCell(ed) {
     ed._dragging = null;
     ed._container.style.cursor = 'grab';
+    pushHistory(ed);
     if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
   }
 
@@ -363,6 +376,7 @@ var BoardBuilder = (function() {
     ed._config.pathOrder.push(id);
     createCellEl(ed, cell);
     renderPaths(ed);
+    pushHistory(ed);
 
     if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
     if (ed._callbacks.onSelect) ed._callbacks.onSelect(id, cell);
@@ -390,6 +404,7 @@ var BoardBuilder = (function() {
     var el = ed._cellEls[id];
     if (el) { el.remove(); delete ed._cellEls[id]; }
     renderPaths(ed);
+    pushHistory(ed);
     if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
   }
 
@@ -402,6 +417,7 @@ var BoardBuilder = (function() {
     }
     updateCellEl(ed, id, cell);
     renderPaths(ed);
+    pushHistory(ed);
     if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
   }
 
@@ -449,7 +465,10 @@ var BoardBuilder = (function() {
       'display:flex;flex-direction:column;align-items:center;gap:2px;' +
       'backdrop-filter:blur(4px);';
 
-    el.innerHTML =
+    var pathIdx = (ed._config.pathOrder || []).indexOf(cell.id);
+    var badgeHtml = pathIdx >= 0 ? '<span style="position:absolute;top:-6px;left:-6px;width:18px;height:18px;border-radius:50%;background:var(--accent,#7C3AED);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:5">' + pathIdx + '</span>' : '';
+
+    el.innerHTML = badgeHtml +
       '<span style="font-size:20px;line-height:1">' + (cell.icon || info.icon) + '</span>' +
       '<span style="font-size:10px;color:var(--text,#F0EAF8);font-weight:600;line-height:1.1;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (cell.name || info.defaultName) + '</span>' +
       (cell.price ? '<span style="font-size:9px;color:var(--muted,rgba(255,255,255,0.4))">¥' + cell.price + '</span>' : '');
@@ -471,7 +490,9 @@ var BoardBuilder = (function() {
 
     var info = CELL_TYPES[cell.type] || CELL_TYPES['property'];
     el.style.background = info.color;
-    el.innerHTML =
+    var pathIdx = (ed._config.pathOrder || []).indexOf(id);
+    var badgeHtml = pathIdx >= 0 ? '<span style="position:absolute;top:-6px;left:-6px;width:18px;height:18px;border-radius:50%;background:var(--accent,#7C3AED);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:5">' + pathIdx + '</span>' : '';
+    el.innerHTML = badgeHtml +
       '<span style="font-size:20px;line-height:1">' + (cell.icon || info.icon) + '</span>' +
       '<span style="font-size:10px;color:var(--text,#F0EAF8);font-weight:600;line-height:1.1;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (cell.name || info.defaultName) + '</span>' +
       (cell.price ? '<span style="font-size:9px;color:var(--muted,rgba(255,255,255,0.4))">¥' + cell.price + '</span>' : '');
@@ -570,6 +591,79 @@ var BoardBuilder = (function() {
     ed._container.innerHTML = '';
     ed._cellEls = {};
     ed._config = { cells: [], pathOrder: [] };
+  }
+
+  // ─── 撤销/重做 ───
+  function pushHistory(ed) {
+    // 清除当前位置之后的历史
+    ed._history = ed._history.slice(0, ed._historyIdx + 1);
+    var snap = getConfig(ed);
+    ed._history.push(snap);
+    if (ed._history.length > ed._maxHistory) ed._history.shift();
+    ed._historyIdx = ed._history.length - 1;
+  }
+
+  function undo(ed) {
+    if (ed._historyIdx <= 0) return;
+    ed._historyIdx--;
+    var snap = JSON.parse(JSON.stringify(ed._history[ed._historyIdx]));
+    ed._config = snap;
+    ed._selectedId = null;
+    renderAll(ed);
+    if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
+  }
+
+  function redo(ed) {
+    if (ed._historyIdx >= ed._history.length - 1) return;
+    ed._historyIdx++;
+    var snap = JSON.parse(JSON.stringify(ed._history[ed._historyIdx]));
+    ed._config = snap;
+    ed._selectedId = null;
+    renderAll(ed);
+    if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
+  }
+
+  // ─── 路径顺序编辑 ───
+  function movePathItem(ed, cellId, direction) {
+    var po = ed._config.pathOrder || [];
+    var idx = po.indexOf(cellId);
+    if (idx === -1) return;
+    var newIdx = idx + direction;
+    if (newIdx < 0 || newIdx >= po.length) return;
+    // 交换
+    var tmp = po[idx];
+    po[idx] = po[newIdx];
+    po[newIdx] = tmp;
+    ed._config.pathOrder = po;
+    pushHistory(ed);
+    renderAll(ed);
+    if (ed._callbacks.onChange) ed._callbacks.onChange(getConfig(ed));
+  }
+
+  // ─── 键盘快捷键 ───
+  function bindKeyboard(ed) {
+    ed._container.tabIndex = 0; // 使容器可聚焦
+    ed._container.addEventListener('keydown', function(e) {
+      // Ctrl+Z
+      if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        undo(ed);
+        return;
+      }
+      // Ctrl+Y or Ctrl+Shift+Z
+      if ((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'z')) {
+        e.preventDefault();
+        redo(ed);
+        return;
+      }
+      // Delete 键删除选中格子
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (ed._selectedId && document.activeElement === ed._container) {
+          e.preventDefault();
+          deleteCell(ed, ed._selectedId);
+        }
+      }
+    });
   }
 
   // ─── 公开静态方法 ───

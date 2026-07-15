@@ -563,7 +563,19 @@ function renderPreview() {
     // 清理旧编辑器
     if (_boardEditor) { _boardEditor.destroy(); _boardEditor = null; }
 
-    // 初始化地图编辑器
+    // 添加撤销/重做工具栏
+    var toolbarDiv = document.getElementById('boardToolbar');
+    if (!toolbarDiv) {
+      toolbarDiv = document.createElement('div');
+      toolbarDiv.id = 'boardToolbar';
+      toolbarDiv.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.2);font-size:11px;color:var(--muted);';
+      toolbarDiv.innerHTML = '<span>🖱️ 双击添加 | 拖拽移动 | 滚轮缩放</span><div style="flex:1"></div>' +
+        '<button class="btn btn-outline btn-sm" onclick="_boardEditor.undo()" title="撤销 Ctrl+Z" style="width:auto;min-height:auto;padding:2px 8px">↩</button>' +
+        '<button class="btn btn-outline btn-sm" onclick="_boardEditor.redo()" title="重做 Ctrl+Y" style="width:auto;min-height:auto;padding:2px 8px">↪</button>';
+      bbContainer.parentNode.insertBefore(toolbarDiv, bbContainer);
+    }
+    toolbarDiv.style.display = 'flex';
+
     var boardConfig = selectedBlock.config || { cells: [], pathOrder: [] };
     _boardEditor = BoardBuilder.create(bbContainer, boardConfig, {
       onSelect: function(cellId, cell) {
@@ -582,6 +594,8 @@ function renderPreview() {
   iframe.style.display = '';
   var bbContainer = document.getElementById('boardBuilderContainer');
   if (bbContainer) bbContainer.style.display = 'none';
+  var toolbarDiv = document.getElementById('boardToolbar');
+  if (toolbarDiv) toolbarDiv.style.display = 'none';
   if (_boardEditor) { _boardEditor.destroy(); _boardEditor = null; }
 
   var previewConfig = {
@@ -767,6 +781,19 @@ function renderCellPropertyPanel(body, cell) {
   var TYPE_OPTS = ['start','property','chance','destiny','jail','event','shop','tax'];
   var html = '<div style="font-size:12px;color:var(--muted);margin-bottom:4px;cursor:pointer" onclick="_selectedCellId=null;renderPropertyPanel();">← 返回 Block 属性</div>';
   html += '<div style="margin-bottom:12px;font-size:15px;font-weight:800">' + (cell.icon||'📌') + ' 编辑格子</div>';
+
+  // 路径位置
+  var pathIdx = -1;
+  if (_boardEditor) {
+    var cfg = _boardEditor.getConfig();
+    pathIdx = (cfg.pathOrder || []).indexOf(cell.id);
+  }
+  html += '<div class="prop-field"><label>路径位置</label>';
+  html += '<div style="display:flex;gap:4px;align-items:center">';
+  html += '<button class="btn btn-outline btn-sm" onclick="_boardEditor.movePathUp(\'' + cell.id + '\');_selectedCellId=\'' + cell.id + '\';renderPropertyPanel();" title="前移" style="width:auto">↑</button>';
+  html += '<span style="flex:1;text-align:center;font-size:14px;font-weight:700">' + (pathIdx >= 0 ? '#' + pathIdx : '-') + '</span>';
+  html += '<button class="btn btn-outline btn-sm" onclick="_boardEditor.movePathDown(\'' + cell.id + '\');_selectedCellId=\'' + cell.id + '\';renderPropertyPanel();" title="后移" style="width:auto">↓</button>';
+  html += '</div></div>';
 
   // 类型
   html += '<div class="prop-field"><label>类型</label><select onchange="updateCellField(\'' + cell.id + '\',\'type\',this.value)">';
