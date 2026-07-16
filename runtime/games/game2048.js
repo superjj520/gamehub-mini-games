@@ -1,120 +1,87 @@
 /**
- * 2048 — 滑动合并，键盘方向键
- * 依赖：GridRenderer, RuleEngine, PieceController
+ * 2048 — 方向键滑动合并
+ * 参考: gabrielecirulli/2048 (MIT)
  */
-const Game2048 = (() => {
-  var ctx = null, state = null;
+var Game2048 = (function() {
+  var _ctx = null, _state = null, _boardEl = null;
 
   function start(gameCtx) {
-    ctx = gameCtx;
-    var gridBlock = findBlock('grid');
-    var ruleBlock = findBlock('rule');
-    var ruleCfg = getRuleVars(ruleBlock);
-    var size = gridBlock ? (gridBlock.config.rows || 4) : 4;
-    state = {
-      size: size,
-      grid: createEmpty(size),
-      score: 0,
-      gameOver: false,
-      winValue: ruleCfg.winValue || 2048,
-    };
-    addRandom();
-    addRandom();
-    renderGrid();
-    document.addEventListener('keydown', handleKey);
-    emitStatus('🕹️ 使用方向键滑动方块');
+    _ctx = gameCtx;
+    var size = 4;
+    var blocks = gameCtx.config.blocks||[];
+    for(var i=0;i<blocks.length;i++){ if(blocks[i].type==='rule'){var v=blocks[i].config.variables||[];for(var j=0;j<v.length;j++){if(v[j].key==='winValue') size=v[j].value===8192?5:4;}} }
+
+    _state = {grid:emptyGrid(size),score:0,gameOver:false,winValue:blocks.length>0?2048:2048};
+    addRandom(); addRandom();
+
+    gameCtx.container.innerHTML = '';
+    _boardEl = document.createElement('div');
+    _boardEl.style.cssText = 'display:grid;grid-template-columns:repeat('+size+',1fr);gap:6px;width:min(320px,90vw);margin:20px auto;padding:8px;background:rgba(255,255,255,0.05);border-radius:12px;';
+    gameCtx.container.appendChild(_boardEl);
+    render();
+
+    document.addEventListener('keydown',onKey);
+    if(_ctx&&_ctx.engine) _ctx.engine.emit('game:ready',{game:'2048'});
   }
 
-  function createEmpty(n) {
-    var g = [];
-    for (var r = 0; r < n; r++) { g[r] = []; for (var c = 0; c < n; c++) g[r][c] = 0; }
-    return g;
+  function emptyGrid(s){ var g=[]; for(var i=0;i<s;i++){g[i]=[];for(var j=0;j<s;j++)g[i][j]=0;} return g; }
+  function addRandom(){
+    var empty=[];
+    for(var i=0;i<_state.grid.length;i++) for(var j=0;j<_state.grid[i].length;j++) if(_state.grid[i][j]===0) empty.push({r:i,c:j});
+    if(empty.length){ var p=empty[Math.floor(Math.random()*empty.length)]; _state.grid[p.r][p.c]=Math.random()<0.9?2:4; }
   }
 
-  function addRandom() {
-    var empty = [];
-    for (var r = 0; r < state.size; r++) for (var c = 0; c < state.size; c++) if (state.grid[r][c] === 0) empty.push({r:r,c:c});
-    if (empty.length === 0) return;
-    var pos = empty[Math.floor(Math.random() * empty.length)];
-    state.grid[pos.r][pos.c] = Math.random() < 0.9 ? 2 : 4;
+  function onKey(e){
+    if(_state.gameOver) return;
+    var moved=false, dir=0;
+    if(e.key==='ArrowUp') dir=0; else if(e.key==='ArrowRight') dir=1; else if(e.key==='ArrowDown') dir=2; else if(e.key==='ArrowLeft') dir=3; else return;
+    e.preventDefault();
+    var old=JSON.stringify(_state.grid);
+    for(var r=0;r<4;r++){ var line=extractLine(dir,r); var merged=mergeLine(line); setLine(dir,r,merged); }
+    if(JSON.stringify(_state.grid)!==old){ moved=true; addRandom(); render(); }
+    if(isGameOver()){ _state.gameOver=true; if(_ctx&&_ctx.engine) _ctx.engine.emit('game:status','游戏结束! 得分:'+_state.score); }
+    if(_ctx&&_ctx.engine) _ctx.engine.emit('game:state',{score:_state.score,gameOver:_state.gameOver});
   }
 
-  function handleKey(e) {
-    var moved = false;
-    switch(e.key) {
-      case 'ArrowUp':    moved = move('up'); e.preventDefault(); break;
-      case 'ArrowDown':  moved = move('down'); e.preventDefault(); break;
-      case 'ArrowLeft':  moved = move('left'); e.preventDefault(); break;
-      case 'ArrowRight': moved = move('right'); e.preventDefault(); break;
-      default: return;
+  function extractLine(d,r){
+    var line=[],s=_state.grid.length;
+    for(var i=0;i<s;i++){ if(d===0)line.push(_state.grid[i][r]); else if(d===1)line.push(_state.grid[r][s-1-i]); else if(d===2)line.push(_state.grid[s-1-i][r]); else line.push(_state.grid[r][i]); }
+    return line;
+  }
+  function setLine(d,r,line){
+    var s=_state.grid.length;
+    for(var i=0;i<s;i++){ var v=line[i]||0; if(d===0)_state.grid[i][r]=v; else if(d===1)_state.grid[r][s-1-i]=v; else if(d===2)_state.grid[s-1-i][r]=v; else _state.grid[r][i]=v; }
+  }
+  function mergeLine(line){
+    var arr=line.filter(function(v){return v!==0;}), merged=[];
+    for(var i=0;i<arr.length;i++){
+      if(i<arr.length-1&&arr[i]===arr[i+1]){ merged.push(arr[i]*2); _state.score+=arr[i]*2; i++; }
+      else merged.push(arr[i]);
     }
-    if (moved) {
-      addRandom();
-      renderGrid();
-      emitState();
-      if (checkWin()) { state.gameOver = true; emitStatus('🏆 达到 ' + state.winValue + '！你赢了！'); }
-      if (checkLose()) { state.gameOver = true; emitStatus('💀 无法移动，游戏结束'); }
-    }
+    while(merged.length<line.length) merged.push(0);
+    return merged;
   }
 
-  function move(dir) {
-    var n = state.size, g = state.grid, moved = false;
-    var vectors = { up: [-1,0], down: [1,0], left: [0,-1], right: [0,1] };
-    var v = vectors[dir];
-
-    var traversals = { r: [], c: [] };
-    for (var i = 0; i < n; i++) { traversals.r.push(i); traversals.c.push(i); }
-    if (v[0] === 1) traversals.r.reverse();
-    if (v[1] === 1) traversals.c.reverse();
-
-    var merged = createEmpty(n);
-
-    for (var ri = 0; ri < n; ri++) {
-      for (var ci = 0; ci < n; ci++) {
-        var r = traversals.r[ri], c = traversals.c[ci];
-        if (g[r][c] === 0) continue;
-        var nr = r, nc = c;
-        while (true) {
-          var tr = nr + v[0], tc = nc + v[1];
-          if (tr < 0 || tr >= n || tc < 0 || tc >= n) break;
-          if (g[tr][tc] === 0) { nr = tr; nc = tc; moved = true; }
-          else if (g[tr][tc] === g[r][c] && !merged[tr][tc]) { nr = tr; nc = tc; merged[tr][tc] = true; moved = true; break; }
-          else break;
-        }
-        if (nr !== r || nc !== c) {
-          g[nr][nc] = (g[nr][nc] || 0) + g[r][c];
-          if (merged[nr][nc]) state.score += g[nr][nc];
-          g[r][c] = 0;
-        }
-      }
+  function isGameOver(){
+    for(var i=0;i<_state.grid.length;i++) for(var j=0;j<_state.grid[i].length;j++){
+      if(_state.grid[i][j]===0) return false;
+      if(j<_state.grid[i].length-1&&_state.grid[i][j]===_state.grid[i][j+1]) return false;
+      if(i<_state.grid.length-1&&_state.grid[i][j]===_state.grid[i+1][j]) return false;
     }
-    return moved;
+    return true;
   }
 
-  function checkWin() { for (var r = 0; r < state.size; r++) for (var c = 0; c < state.size; c++) if (state.grid[r][c] >= state.winValue) return true; return false; }
-  function checkLose() { for (var r = 0; r < state.size; r++) for (var c = 0; c < state.size; c++) { if (state.grid[r][c] === 0) return false; if (c < state.size-1 && state.grid[r][c] === state.grid[r][c+1]) return false; if (r < state.size-1 && state.grid[r][c] === state.grid[r+1][c]) return false; } return true; }
-
-  function renderGrid() {
-    ctx.container.innerHTML = '';
-    var board = document.createElement('div');
-    board.style.cssText = 'display:grid;grid-template-columns:repeat(' + state.size + ',1fr);grid-template-rows:repeat(' + state.size + ',1fr);gap:4px;width:100%;max-width:360px;aspect-ratio:1;margin:0 auto;background:rgba(255,255,255,0.03);padding:4px;border-radius:8px;';
-    var colors = { 0:'rgba(255,255,255,0.03)', 2:'#eee4da', 4:'#ede0c8', 8:'#f2b179', 16:'#f59563', 32:'#f67c5f', 64:'#f65e3b', 128:'#edcf72', 256:'#edcc61', 512:'#edc850', 1024:'#edc53f', 2048:'#edc22e' };
-    for (var r = 0; r < state.size; r++) {
-      for (var c = 0; c < state.size; c++) {
-        var v = state.grid[r][c];
-        var cell = document.createElement('div');
-        cell.style.cssText = 'display:flex;align-items:center;justify-content:center;font-size:' + (v >= 1000 ? '18px' : '22px') + ';font-weight:800;border-radius:4px;background:' + (colors[v] || '#3c3a32') + ';color:' + (v <= 4 ? '#776e65' : '#fff') + ';';
-        cell.textContent = v || '';
-        board.appendChild(cell);
-      }
+  function render(){
+    if(!_boardEl) return;
+    var colors={'2':'#EEE4DA','4':'#EDE0C8','8':'#F2B179','16':'#F59563','32':'#F67C5F','64':'#F65E3B','128':'#EDCF72','256':'#EDCC61','512':'#EDC850','1024':'#EDC53F','2048':'#EDC22E','4096':'#3C3A32','8192':'#3C3A32'};
+    var html='';
+    for(var i=0;i<_state.grid.length;i++) for(var j=0;j<_state.grid[i].length;j++){
+      var v=_state.grid[i][j];
+      html+='<div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:'+(v>512?'18px':'22px')+';font-weight:700;background:'+(v?colors[v]||'#3C3A32':'rgba(255,255,255,0.05)')+';color:'+(v>4?'#fff':'#776E65')+'">'+(v||'')+'</div>';
     }
-    ctx.container.appendChild(board);
+    _boardEl.innerHTML = html;
   }
 
-  function getRuleVars(block) { var v = {}; if (block) (block.config.variables || []).forEach(function(x) { v[x.key] = x.value; }); return v; }
-  function findBlock(type) { var b = ctx.config.blocks || []; for (var i = 0; i < b.length; i++) if (b[i].type === type) return b[i]; return null; }
-  function emitState() { if (ctx && ctx.engine) ctx.engine.emit('game:state', { score: state.score, gameOver: state.gameOver, grid: state.grid }); }
-  function emitStatus(msg) { if (ctx && ctx.engine) ctx.engine.emit('game:status', msg); }
-  function getState() { return state; }
-  return { start, getState };
+  function destroy(){ document.removeEventListener('keydown',onKey); _ctx=null; _boardEl=null; }
+  return {start:start,destroy:destroy};
 })();

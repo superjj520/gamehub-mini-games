@@ -1,176 +1,69 @@
 /**
- * 贪吃蛇 — 实时网格移动，方向键控制
- * 依赖：GameEngine, GridRenderer, PieceController, RuleEngine, EffectEngine
+ * 贪吃蛇 — Canvas 经典游戏
  */
-const SnakeGame = (() => {
-  var ctx = null, state = null, loopTimer = null;
+var SnakeGame = (function() {
+  var _ctx = null, _canvas = null, _state = null, _loop = null;
 
   function start(gameCtx) {
-    ctx = gameCtx;
-    var gridBlock = findBlock('grid');
-    var ruleBlock = findBlock('rule');
-    var ruleCfg = getRuleVars(ruleBlock);
-    var rows = gridBlock ? (gridBlock.config.rows || 15) : 15;
-    var cols = gridBlock ? (gridBlock.config.cols || 15) : 15;
+    _ctx = gameCtx;
+    gameCtx.container.innerHTML = '';
 
-    state = {
-      snake: [{ r: Math.floor(rows/2), c: Math.floor(cols/2) }],
-      food: null,
-      direction: { dr: 0, dc: 1 },
-      nextDir: { dr: 0, dc: 1 },
-      score: 0,
-      speed: ruleCfg.speed || 150,
-      growCount: ruleCfg.growCount || 1,
-      gameOver: false,
-      gridRows: rows, gridCols: cols,
-    };
+    _canvas = document.createElement('canvas');
+    _canvas.width = 400; _canvas.height = 400;
+    _canvas.style.cssText = 'display:block;margin:0 auto;border-radius:8px;background:#111;max-width:90vw;max-height:90vw;';
+    gameCtx.container.appendChild(_canvas);
 
-    // 渲染全网格
-    var gridResult = ctx.blockResults[gridBlock.id];
-    if (gridResult && gridResult.element) {
-      gridResult.element.style.position = 'relative';
-      var fullGrid = buildFullGrid(gridResult.element, rows, cols);
-      state.gridEl = fullGrid;
-      spawnFood();
-      renderAll();
-    }
+    _state = {snake:[{x:10,y:10},{x:9,y:10},{x:8,y:10}],dir:{x:1,y:0},food:{x:15,y:10},score:0,over:false,speed:120};
+    placeFood(); draw();
 
-    document.addEventListener('keydown', handleKey);
-    emitStatus('🐍 使用方向键控制蛇的方向');
-    startLoop();
+    document.addEventListener('keydown',onKey);
+    _loop = setInterval(tick, _state.speed);
+    if(_ctx&&_ctx.engine) _ctx.engine.emit('game:ready',{game:'snake'});
   }
 
-  function buildFullGrid(container, rows, cols) {
-    container.innerHTML = '';
-    var el = document.createElement('div');
-    el.style.cssText = 'display:grid;grid-template-columns:repeat(' + cols + ',1fr);grid-template-rows:repeat(' + rows + ',1fr);gap:1px;width:100%;aspect-ratio:' + cols + '/' + rows + ';background:rgba(255,255,255,0.03);position:relative;';
-    for (var r = 0; r < rows; r++) {
-      for (var c = 0; c < cols; c++) {
-        var cell = document.createElement('div');
-        cell.id = 'sc-' + r + '-' + c;
-        cell.style.cssText = 'background:var(--card);border-radius:2px;transition:background 0.1s;';
-        el.appendChild(cell);
-      }
-    }
-    container.appendChild(el);
-    return el;
+  function onKey(e){
+    var d=_state.dir;
+    if(e.key==='ArrowUp'&&d.y===0) _state.dir={x:0,y:-1};
+    else if(e.key==='ArrowDown'&&d.y===0) _state.dir={x:0,y:1};
+    else if(e.key==='ArrowLeft'&&d.x===0) _state.dir={x:-1,y:0};
+    else if(e.key==='ArrowRight'&&d.x===0) _state.dir={x:1,y:0};
   }
 
-  function handleKey(e) {
-    var dir = state.direction;
-    switch(e.key) {
-      case 'ArrowUp':    if (dir.dr !== 1)  state.nextDir = { dr: -1, dc: 0 }; e.preventDefault(); break;
-      case 'ArrowDown':  if (dir.dr !== -1) state.nextDir = { dr: 1,  dc: 0 }; e.preventDefault(); break;
-      case 'ArrowLeft':  if (dir.dc !== 1)  state.nextDir = { dr: 0,  dc: -1 }; e.preventDefault(); break;
-      case 'ArrowRight': if (dir.dc !== -1) state.nextDir = { dr: 0,  dc: 1 }; e.preventDefault(); break;
-    }
+  function tick(){
+    if(_state.over) return;
+    var head=_state.snake[0], nx=head.x+_state.dir.x, ny=head.y+_state.dir.y;
+    if(nx<0||nx>=20||ny<0||ny>=20){ gameOver(); return; }
+    for(var i=0;i<_state.snake.length;i++){ if(_state.snake[i].x===nx&&_state.snake[i].y===ny){gameOver();return;} }
+    _state.snake.unshift({x:nx,y:ny});
+    if(nx===_state.food.x&&ny===_state.food.y){ _state.score+=10; placeFood(); }
+    else _state.snake.pop();
+    draw();
+    if(_ctx&&_ctx.engine) _ctx.engine.emit('game:state',{score:_state.score});
   }
 
-  function startLoop() {
-    if (loopTimer) clearInterval(loopTimer);
-    loopTimer = setInterval(tick, state.speed);
+  function placeFood(){
+    var empty=[];
+    for(var x=0;x<20;x++) for(var y=0;y<20;y++){
+      var ok=true;
+      for(var i=0;i<_state.snake.length;i++) if(_state.snake[i].x===x&&_state.snake[i].y===y){ok=false;break;}
+      if(ok) empty.push({x:x,y:y});
+    }
+    if(empty.length) _state.food=empty[Math.floor(Math.random()*empty.length)];
   }
 
-  function tick() {
-    if (state.gameOver) { clearInterval(loopTimer); return; }
-    state.direction = state.nextDir;
-    var head = state.snake[0];
-    var newHead = { r: head.r + state.direction.dr, c: head.c + state.direction.dc };
-
-    // 撞墙检测
-    if (newHead.r < 0 || newHead.r >= state.gridRows || newHead.c < 0 || newHead.c >= state.gridCols) {
-      endGame('撞墙了！');
-      return;
-    }
-    // 撞自己
-    for (var i = 0; i < state.snake.length; i++) {
-      if (state.snake[i].r === newHead.r && state.snake[i].c === newHead.c) {
-        endGame('咬到自己了！');
-        return;
-      }
-    }
-
-    state.snake.unshift(newHead);
-    // 吃食物
-    if (state.food && newHead.r === state.food.r && newHead.c === state.food.c) {
-      state.score += 10;
-      spawnFood();
-      // 加速
-      if (state.speed > 50) { state.speed -= 3; startLoop(); }
-    } else {
-      state.snake.pop();
-    }
-    renderAll();
-    emitState();
+  function draw(){
+    var ctx=_canvas.getContext('2d'), cw=_canvas.width/20;
+    ctx.fillStyle='#111'; ctx.fillRect(0,0,400,400);
+    ctx.fillStyle='#EF4444'; ctx.fillRect(_state.food.x*cw+1,_state.food.y*cw+1,cw-2,cw-2);
+    var colors=['#22C55E','#16A34A','#15803D'];
+    for(var i=0;i<_state.snake.length;i++){ ctx.fillStyle=colors[Math.min(i,colors.length-1)]; ctx.fillRect(_state.snake[i].x*cw+1,_state.snake[i].y*cw+1,cw-2,cw-2); }
   }
 
-  function spawnFood() {
-    var occupied = {};
-    for (var i = 0; i < state.snake.length; i++) {
-      occupied[state.snake[i].r + ',' + state.snake[i].c] = true;
-    }
-    var available = [];
-    for (var r = 0; r < state.gridRows; r++) {
-      for (var c = 0; c < state.gridCols; c++) {
-        if (!occupied[r + ',' + c]) available.push({ r: r, c: c });
-      }
-    }
-    if (available.length === 0) { endGame('你赢了！蛇占满了整个棋盘'); return; }
-    state.food = available[Math.floor(Math.random() * available.length)];
+  function gameOver(){
+    _state.over=true; if(_loop){clearInterval(_loop);_loop=null;}
+    if(_ctx&&_ctx.engine) _ctx.engine.emit('game:status','游戏结束! 得分:'+_state.score);
   }
 
-  function renderAll() {
-    if (!state.gridEl) return;
-    // 清除所有样式
-    var cells = state.gridEl.querySelectorAll('[id^="sc-"]');
-    for (var i = 0; i < cells.length; i++) {
-      cells[i].style.background = 'var(--card)';
-    }
-    // 渲染蛇身
-    for (var j = 0; j < state.snake.length; j++) {
-      var s = state.snake[j];
-      var cel = document.getElementById('sc-' + s.r + '-' + s.c);
-      if (cel) cel.style.background = j === 0 ? 'var(--accent)' : 'var(--accent2)';
-    }
-    // 渲染食物
-    if (state.food) {
-      var fcel = document.getElementById('sc-' + state.food.r + '-' + state.food.c);
-      if (fcel) { fcel.style.background = 'var(--gold)'; fcel.style.boxShadow = '0 0 6px var(--gold)'; }
-    }
-  }
-
-  function endGame(msg) {
-    state.gameOver = true;
-    clearInterval(loopTimer);
-    document.removeEventListener('keydown', handleKey);
-    emitStatus('🏁 ' + msg + ' 得分: ' + state.score);
-    emitState();
-  }
-
-  function getRuleVars(block) {
-    var vars = {};
-    if (!block) return vars;
-    var variables = block.config.variables || [];
-    for (var i = 0; i < variables.length; i++) vars[variables[i].key] = variables[i].value;
-    return vars;
-  }
-
-  function findBlock(type) {
-    var blocks = ctx.config.blocks || [];
-    for (var i = 0; i < blocks.length; i++) {
-      if (blocks[i].type === type) return blocks[i];
-    }
-    return null;
-  }
-
-  function emitState() {
-    if (ctx && ctx.engine) ctx.engine.emit('game:state', { score: state.score, gameOver: state.gameOver, snake: state.snake });
-  }
-  function emitStatus(msg) {
-    if (ctx && ctx.engine) ctx.engine.emit('game:status', msg);
-  }
-
-  function getState() { return state; }
-
-  return { start, getState };
+  function destroy(){ document.removeEventListener('keydown',onKey); if(_loop)clearInterval(_loop); _ctx=null; _canvas=null; }
+  return {start:start,destroy:destroy};
 })();

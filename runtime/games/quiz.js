@@ -1,135 +1,68 @@
 /**
- * 答题游戏 — 题库随机抽取，计时计分
- * 依赖：CollectionManager, RuleEngine
+ * 答题 — 题库随机抽取，即时反馈
  */
-const QuizGame = (() => {
-  var ctx = null, state = null;
+var QuizGame = (function() {
+  var _ctx = null, _state = null, _el = null;
 
   function start(gameCtx) {
-    ctx = gameCtx;
-    var collBlock = findBlock('collection');
-    var ruleBlock = findBlock('rule');
-    var ruleCfg = getRuleVars(ruleBlock);
-    var questions = collBlock ? (collBlock.config.cards || []) : [];
+    _ctx = gameCtx;
+    var questions = getQuestions(gameCtx);
+    if(!questions.length) questions = [{title:'1+1=?',options:['1','2','3','4'],answer:1},{title:'水的化学式?',options:['H₂O','CO₂','O₂','NaCl'],answer:0},{title:'太阳系最大行星?',options:['地球','火星','木星','土星'],answer:2}];
 
-    state = {
-      questions: shuffle(questions.slice()),
-      currentIndex: 0,
-      score: 0,
-      correctCount: 0,
-      totalQuestions: ruleCfg.totalQuestions || Math.min(10, questions.length),
-      timePerQuestion: ruleCfg.timePerQuestion || 15,
-      passScore: ruleCfg.passScore || 60,
-      gameOver: false,
-      timerId: null,
-      timeLeft: 0,
-    };
+    _state = {questions:shuffle(questions.slice()),current:0,score:0,total:Math.min(questions.length,10),answered:false};
+    gameCtx.container.innerHTML = '';
 
-    if (state.questions.length === 0) {
-      state.questions = [
-        { id:'q1', title:'世界上最大的洋是？', options:['大西洋','太平洋','印度洋','北冰洋'], answer:1 },
-        { id:'q2', title:'1+1等于几？', options:['1','2','3','4'], answer:1 },
-        { id:'q3', title:'中国的首都是？', options:['上海','广州','北京','深圳'], answer:2 },
-        { id:'q4', title:'水的化学式是？', options:['H₂O','CO₂','O₂','N₂'], answer:0 },
-        { id:'q5', title:'一年有多少天？', options:['300','365','400','500'], answer:1 },
-      ];
-      state.totalQuestions = Math.min(state.totalQuestions, 5);
-    }
-
+    _el = document.createElement('div');
+    _el.style.cssText = 'max-width:400px;margin:20px auto;padding:16px;';
+    gameCtx.container.appendChild(_el);
     renderQuestion();
+    if(_ctx&&_ctx.engine) _ctx.engine.emit('game:ready',{game:'quiz'});
   }
 
-  function renderQuestion() {
-    if (state.currentIndex >= state.totalQuestions || state.currentIndex >= state.questions.length) {
-      endGame();
-      return;
+  function getQuestions(ctx){
+    var blocks = (ctx&&ctx.config&&ctx.config.blocks)||[];
+    for(var i=0;i<blocks.length;i++){ if(blocks[i].type==='collection') return blocks[i].config.cards||[]; }
+    return [];
+  }
+
+  function shuffle(a){ for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+
+  function renderQuestion(){
+    if(_state.current>=_state.total){ showResult(); return; }
+    var q=_state.questions[_state.current];
+    _state.answered=false;
+    var html='<div style="font-size:11px;color:var(--muted);margin-bottom:4px">第'+
+      (_state.current+1)+'/'+_state.total+'题 · 得分:'+_state.score+'</div>'+
+      '<div style="font-size:16px;font-weight:700;margin-bottom:16px">'+q.title+'</div>';
+    var opts = q.options||[];
+    var letters=['A','B','C','D'];
+    for(var i=0;i<opts.length;i++){
+      html+='<div class="quiz-opt" data-idx="'+i+'" style="padding:12px 14px;margin-bottom:6px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:all 0.15s">'+letters[i]+'. '+opts[i]+'</div>';
     }
-    var q = state.questions[state.currentIndex];
-    state.timeLeft = state.timePerQuestion;
-    var container = ctx.container;
-    container.innerHTML = '';
+    _el.innerHTML = html;
 
-    var card = document.createElement('div');
-    card.style.cssText = 'padding:24px;text-align:center;';
-    card.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:8px">第 ' + (state.currentIndex+1) + '/' + state.totalQuestions + ' 题 · 得分:' + state.score + '</div>' +
-      '<div style="font-size:18px;font-weight:700;margin-bottom:20px">' + q.title + '</div>' +
-      '<div style="font-size:13px;color:var(--gold);margin-bottom:16px" id="quizTimer">⏱ ' + state.timeLeft + 's</div>' +
-      '<div id="quizOptions"></div>';
-
-    container.appendChild(card);
-
-    var optsDiv = document.getElementById('quizOptions');
-    var options = q.options || [];
-    for (var i = 0; i < options.length; i++) {
-      var btn = document.createElement('button');
-      btn.textContent = options[i];
-      btn.style.cssText = 'display:block;width:100%;padding:12px;margin-bottom:8px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;cursor:pointer;font-family:inherit;transition:all 0.2s;';
-      btn.onmouseenter = function() { this.style.borderColor = 'var(--accent)'; };
-      btn.onmouseleave = function() { this.style.borderColor = 'var(--border)'; };
-      (function(idx) {
-        btn.onclick = function() { answer(idx); };
-      })(i);
-      optsDiv.appendChild(btn);
-    }
-
-    startTimer();
+    _el.querySelectorAll('.quiz-opt').forEach(function(opt){
+      opt.addEventListener('click',function(){
+        if(_state.answered) return;
+        _state.answered=true;
+        var idx=parseInt(this.dataset.idx);
+        var correct=idx===q.answer;
+        if(correct){ this.style.background='rgba(34,197,94,0.15)'; this.style.borderColor='#22C55E'; _state.score+=10; }
+        else { this.style.background='rgba(239,68,68,0.15)'; this.style.borderColor='#EF4444'; _el.querySelector('.quiz-opt[data-idx="'+q.answer+'"]').style.background='rgba(34,197,94,0.15)'; _el.querySelector('.quiz-opt[data-idx="'+q.answer+'"]').style.borderColor='#22C55E'; }
+        if(_ctx&&_ctx.engine) _ctx.engine.emit('game:state',{score:_state.score,total:_state.total,current:_state.current+1});
+        setTimeout(function(){ _state.current++; renderQuestion(); },800);
+      });
+    });
   }
 
-  function startTimer() {
-    clearInterval(state.timerId);
-    var timerEl = document.getElementById('quizTimer');
-    state.timerId = setInterval(function() {
-      state.timeLeft--;
-      if (timerEl) timerEl.textContent = '⏱ ' + state.timeLeft + 's';
-      if (state.timeLeft <= 0) {
-        clearInterval(state.timerId);
-        answer(-1);
-      }
-    }, 1000);
+  function showResult(){
+    _el.innerHTML = '<div style="text-align:center;padding:40px 20px"><div style="font-size:40px;margin-bottom:10px">'+
+      (_state.score>=_state.total*6?'🏆':_state.score>=_state.total*3?'👍':'💪')+'</div>'+
+      '<div style="font-size:20px;font-weight:700;margin-bottom:8px">得分: '+_state.score+'/'+(_state.total*10)+'</div>'+
+      '<div style="font-size:13px;color:var(--muted)">共答'+_state.total+'题</div></div>';
+    if(_ctx&&_ctx.engine) _ctx.engine.emit('game:status','答题结束! 得分:'+_state.score);
   }
 
-  function answer(idx) {
-    clearInterval(state.timerId);
-    var q = state.questions[state.currentIndex];
-    var correct = idx === q.answer;
-    if (correct) {
-      state.score += 10;
-      state.correctCount++;
-      emitStatus('✅ 正确！');
-    } else {
-      emitStatus('❌ 错误！答案是: ' + q.options[q.answer]);
-    }
-    state.currentIndex++;
-    emitState();
-    setTimeout(function() { renderQuestion(); }, 1500);
-  }
-
-  function endGame() {
-    state.gameOver = true;
-    clearInterval(state.timerId);
-    var pass = state.score >= (state.totalQuestions * 10 * state.passScore / 100);
-    emitStatus('🏁 答题结束！' + state.correctCount + '/' + state.totalQuestions + ' 得分:' + state.score + (pass ? ' ✅ 通过' : ''));
-    emitState();
-  }
-
-  function shuffle(arr) { for (var i = arr.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i+1)); var t = arr[i]; arr[i] = arr[j]; arr[j] = t; } return arr; }
-
-  function getRuleVars(block) {
-    var vars = {};
-    if (!block) return vars;
-    (block.config.variables || []).forEach(function(v) { vars[v.key] = v.value; });
-    return vars;
-  }
-
-  function findBlock(type) {
-    var blocks = ctx.config.blocks || [];
-    for (var i = 0; i < blocks.length; i++) { if (blocks[i].type === type) return blocks[i]; }
-    return null;
-  }
-
-  function emitState() { if (ctx && ctx.engine) ctx.engine.emit('game:state', state); }
-  function emitStatus(msg) { if (ctx && ctx.engine) ctx.engine.emit('game:status', msg); }
-
-  function getState() { return state; }
-  return { start, getState };
+  function destroy(){ _ctx=null; _el=null; }
+  return {start:start,destroy:destroy};
 })();
