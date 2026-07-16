@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GameHub 组件品质对标分析</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0A0A1A;--card:#12122A;--border:rgba(255,255,255,0.08);--accent:#7C3AED;--accent2:#EC4899;--gold:#F5C842;--text:#E0DCF0;--muted:rgba(224,220,240,0.5);--green:#22C55E;--red:#EF4444;--blue:#3B82F6;--orange:#F97316}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+.container{max-width:1200px;margin:0 auto;padding:40px 20px}
+h1{font-size:40px;font-weight:900;margin-bottom:8px;background:linear-gradient(135deg,var(--gold),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-size:14px;color:var(--muted);margin-bottom:40px}
+h2{font-size:26px;font-weight:800;margin:56px 0 20px;padding-bottom:10px;border-bottom:3px solid var(--accent);display:flex;align-items:center;gap:12px}
+h3{font-size:18px;font-weight:700;margin:28px 0 12px;color:var(--accent2)}
+
+/* 核心发现 */
+.finding{background:linear-gradient(135deg,rgba(245,200,66,.08),rgba(236,72,153,.08));border:1px solid rgba(245,200,66,.2);border-radius:16px;padding:28px;margin:32px 0}
+.finding h3{color:var(--gold);margin-top:0;font-size:20px}
+.finding p{font-size:14px;margin-bottom:8px}
+
+/* 游戏对比卡片 */
+.game-compare{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:20px 0}
+.game-compare .col{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px}
+.game-compare .col-header{font-size:14px;font-weight:800;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--border)}
+.game-compare .now .col-header{color:var(--red)}
+.game-compare .target .col-header{color:var(--green)}
+.game-compare .benchmark .col-header{color:var(--gold)}
+.game-compare .item{font-size:12px;padding:5px 0;color:var(--muted)}
+.game-compare .item::before{content:'· ';font-weight:900}
+.game-compare .now .item::before{color:var(--red)}
+.game-compare .target .item::before{color:var(--green)}
+.game-compare .benchmark .item::before{color:var(--gold)}
+
+/* 品质成分分解 */
+.juice-breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin:20px 0}
+.juice-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.juice-card .jnum{font-size:48px;font-weight:900;opacity:.08;line-height:1}
+.juice-card .jtitle{font-size:16px;font-weight:700;margin:-20px 0 8px}
+.juice-card .jdesc{font-size:12px;color:var(--muted);line-height:1.6}
+.juice-card .jexamples{font-size:11px;color:var(--gold);margin-top:8px}
+
+/* 质量等级 */
+.quality-bar{display:flex;align-items:center;gap:12px;margin:12px 0}
+.quality-label{font-size:12px;font-weight:600;width:80px;text-align:right;flex-shrink:0}
+.quality-track{flex:1;height:8px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden}
+.quality-fill{height:100%;border-radius:4px;transition:width .3s}
+.quality-fill.low{background:var(--red);width:20%}
+.quality-fill.mid{background:var(--orange);width:45%}
+.quality-fill.high{background:var(--gold);width:70%}
+.quality-fill.top{background:var(--green);width:90%}
+
+/* 游戏类型表 */
+.game-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13px}
+.game-table th{background:var(--accent);color:#fff;padding:14px 16px;text-align:left;font-weight:700;font-size:12px}
+.game-table td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:top}
+.game-table tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+.game-table .gname{font-weight:700;font-size:14px;white-space:nowrap}
+.game-table .gscore{font-size:18px;font-weight:900}
+.score-low{color:var(--red)}
+.score-mid{color:var(--orange)}
+.score-high{color:var(--green)}
+
+/* Checklist */
+.checklist{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0}
+.checklist h4{font-size:14px;margin-bottom:12px}
+.checklist li{font-size:12px;padding:6px 0;color:var(--muted);list-style:none;border-bottom:1px solid var(--border)}
+.checklist li:last-child{border-bottom:none}
+.checklist .done{color:var(--green)}
+.checklist .todo{color:var(--red)}
+.checklist .partial{color:var(--gold)}
+
+/* 竞品参考 */
+.ref-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:16px 0}
+.ref-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.ref-item .rname{font-size:14px;font-weight:700;margin-bottom:4px}
+.ref-item .rsource{font-size:10px;color:var(--gold);margin-bottom:6px}
+.ref-item .rnote{font-size:11px;color:var(--muted)}
+
+/* 下一步 */
+.next-step{background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(59,130,246,.1));border:2px solid var(--accent);border-radius:20px;padding:32px;margin:40px 0}
+.next-step h2{margin-top:0;font-size:22px;border:none;margin-bottom:16px}
+.next-step .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.next-step .step{background:rgba(0,0,0,.2);border-radius:12px;padding:20px}
+.next-step .step-num{font-size:36px;font-weight:900;opacity:.2;line-height:1}
+.next-step .step-title{font-size:15px;font-weight:700;margin:8px 0}
+.next-step .step-desc{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>GameHub 组件品质对标分析</h1>
+<p class="subtitle">不是编辑器不好用——是组件本身达不到可玩标准 · 2026-07-16</p>
+
+<!-- 核心发现 -->
+<div class="finding">
+<h3>核心发现: GameHub 的差距不在编辑器, 在组件品质</h3>
+<p>对比 Poki/CrazyGames 上线标准、支付宝小游戏、微信小游戏的质量，GameHub 的游戏组件缺的不是「怎么配」，而是 <b>动画效果、视觉层次、音效反馈、粒子特效、状态过渡、微交互</b>。这些是「游戏感」(Game Feel/Juice) 的核心要素。</p>
+<p>行业共识: <b>50% 的开发时间应该花在品质打磨上</b>——动画、音效、粒子、震动。没有 juice 的游戏 = 没人玩。</p>
+</div>
+
+<!-- 品质成分 -->
+<h2>🎮 一、什么是「好玩的游戏组件」</h2>
+<p>Poki 品质指南 + 游戏 Juice 理论的 12 项核心要素:</p>
+
+<div class="juice-breakdown">
+  <div class="juice-card"><div class="jnum">01</div><div class="jtitle">动画过渡</div><div class="jdesc">入场/退场动画、状态切换平滑、弹性缓动</div><div class="jexamples">例: 金币增长数字滚动、卡片翻转、棋盘淡入</div></div>
+  <div class="juice-card"><div class="jnum">02</div><div class="jtitle">粒子特效</div><div class="jdesc">星星/彩带/火花/烟雾等粒子爆发</div><div class="jexamples">例: 中奖后满屏彩带、骰子投出带火花轨迹</div></div>
+  <div class="juice-card"><div class="jnum">03</div><div class="jtitle">音效反馈</div><div class="jdesc">点击、成功、失败、转动、翻牌等声音</div><div class="jexamples">例: 转盘咔哒声、答题正确叮咚声、购买金币声</div></div>
+  <div class="juice-card"><div class="jnum">04</div><div class="jtitle">触觉反馈</div><div class="jdesc">手机震动: 轻触/中奖/失败三种强度</div><div class="jexamples">例: 刮卡时轻微震动、中大奖时长震动</div></div>
+  <div class="juice-card"><div class="jnum">05</div><div class="jtitle">视觉层次</div><div class="jdesc">渐变/阴影/光泽/模糊/发光等视觉效果</div><div class="jexamples">例: 卡片金属光泽、按钮渐变、选中发光边框</div></div>
+  <div class="juice-card"><div class="jnum">06</div><div class="jtitle">弹性形变</div><div class="jdesc">Squash & Stretch: 挤压和拉伸</div><div class="jexamples">例: 按钮按下缩小、弹窗弹出放大再回弹</div></div>
+  <div class="juice-card"><div class="jnum">07</div><div class="jtitle">屏幕震动</div><div class="jdesc">重要事件触发短暂震动(0.1-0.3s)</div><div class="jexamples">例: 中大奖时屏幕微震、炸弹爆炸震动</div></div>
+  <div class="juice-card"><div class="jnum">08</div><div class="jtitle">状态过渡</div><div class="jdesc">加载/空/错误/成功 四种状态完整</div><div class="jexamples">例: 骨架屏加载、空状态引导、错误重试按钮</div></div>
+  <div class="juice-card"><div class="jnum">09</div><div class="jtitle">微交互</div><div class="jdesc">悬停/按下/拖拽时的即时视觉反馈</div><div class="jexamples">例: 卡片悬停抬起、按钮按下凹陷、拖拽半透明</div></div>
+  <div class="juice-card"><div class="jnum">10</div><div class="jtitle">速度感</div><div class="jdesc">加速/减速曲线、惯性、重力感</div><div class="jexamples">例: 转盘先快后慢自然停止、骰子滚动减速</div></div>
+  <div class="juice-card"><div class="jnum">11</div><div class="jtitle">排版品质</div><div class="jdesc">字体层次、间距节奏、响应式适配</div><div class="jexamples">例: 奖品名大号粗体、规则小号灰色、适配手机</div></div>
+  <div class="juice-card"><div class="jnum">12</div><div class="jtitle">一致性</div><div class="jdesc">所有游戏组件共享同一套视觉语言</div><div class="jexamples">例: 统一的圆角/阴影/色彩系统/动画时长</div></div>
+</div>
+
+<!-- 当前评分 -->
+<h2>📊 二、GameHub 8款游戏当前品质评分</h2>
+
+<table class="game-table">
+<tr><th>游戏</th><th>对标产品</th><th>动画</th><th>粒子</th><th>音效</th><th>视觉</th><th>触觉</th><th>总评分</th><th>差距</th></tr>
+<tr>
+  <td class="gname">🎡 大转盘</td><td>支付宝积分转盘</td>
+  <td><div class="quality-track"><div class="quality-fill mid"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill mid"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td class="gscore score-mid">3/10</td>
+  <td style="font-size:11px;color:var(--muted)">缺中奖动画、音效、震动</td>
+</tr>
+<tr>
+  <td class="gname">🎰 大富翁</td><td>App Store 大富翁</td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td class="gscore score-low">2/10</td>
+  <td style="font-size:11px;color:var(--muted)">棋子移动无动画、购买无庆祝、骰子无特效</td>
+</tr>
+<tr>
+  <td class="gname">💳 刮刮乐</td><td>微信刮刮卡</td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td class="gscore score-low">1/10</td>
+  <td style="font-size:11px;color:var(--muted)">涂层无质感、无揭晓动画、无音效</td>
+</tr>
+<tr>
+  <td class="gname">🧠 答题</td><td>冲顶大会/头脑王者</td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td class="gscore score-low">2/10</td>
+  <td style="font-size:11px;color:var(--muted)">无倒计时动画、无对错过渡、无排行榜动效</td>
+</tr>
+<tr>
+  <td class="gname">🔢 2048</td><td>App Store 2048</td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td class="gscore score-low">2/10</td>
+  <td style="font-size:11px;color:var(--muted)">方块移动无动画、合并无特效、得分无弹出</td>
+</tr>
+<tr>
+  <td class="gname">🐍 贪吃蛇</td><td>Google 贪吃蛇</td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td class="gscore score-low">2/10</td>
+  <td style="font-size:11px;color:var(--muted)">移动生硬、吃食物无特效、死亡无动画</td>
+</tr>
+<tr>
+  <td class="gname">🤝 真心话</td><td>真心话大冒险 App</td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td class="gscore score-low">1/10</td>
+  <td style="font-size:11px;color:var(--muted)">卡片无翻转、选择无转场、结果无仪式感</td>
+</tr>
+<tr>
+  <td class="gname">✈️ 飞行棋</td><td>欢乐飞行棋</td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td><div class="quality-track"><div class="quality-fill low"></div></div></td>
+  <td class="gscore score-low">1/10</td>
+  <td style="font-size:11px;color:var(--muted)">棋盘无质感、骰子无3D、棋子移动跳跃</td>
+</tr>
+</table>
+
+<p style="font-size:13px;color:var(--red);text-align:center;margin:20px 0">⚠️ 全部 8 款游戏评分在 1-3/10, 无一达到可上线品质</p>
+
+<!-- 竞品参考 -->
+<h2>🏆 三、竞品游戏品质参考</h2>
+<p>这些是 GameHub 每个游戏类型应该对标的品质标准:</p>
+
+<div class="ref-grid">
+  <div class="ref-item"><div class="rname">🎡 支付宝积分转盘</div><div class="rsource">蚂蚁积分商城</div><div class="rnote">金属质感、粒子爆发、音效、震动、中奖弹窗动画</div></div>
+  <div class="ref-item"><div class="rname">💳 微信刮刮卡</div><div class="rsource">微信支付优惠</div><div class="rnote">银色涂层光泽、刮开灰尘粒子、金额数字弹出</div></div>
+  <div class="ref-item"><div class="rname">🧠 头脑王者</div><div class="rsource">微信小游戏 TOP10</div><div class="rnote">倒计时圆环动画、对错特效、排行榜滚动</div></div>
+  <div class="ref-item"><div class="rname">🔢 Threes!/2048</div><div class="rsource">App Store 年度游戏</div><div class="rnote">方块弹性合并、数字弹出、颜色渐变、震动</div></div>
+  <div class="ref-item"><div class="rname">🐍 Slither.io</div><div class="rsource">网页游戏标杆</div><div class="rnote">蛇身光晕、加速粒子、击杀爆炸、排名弹窗</div></div>
+  <div class="ref-item"><div class="rname">🎰 Monopoly Go!</div><div class="rsource">App Store 收入TOP1</div><div class="rnote">骰子3D滚动、地产建造动画、金币雨、震动频繁</div></div>
+</div>
+
+<!-- Poker 标准 -->
+<h2>📐 四、上线标准: Poki 品质指南</h2>
+<p>Poki 是目前最严格的 HTML5 游戏平台之一，以下是他们对「好游戏」的要求:</p>
+
+<div class="checklist">
+<h4>必须满足 (否则拒绝上线)</h4>
+<li class="partial">⏳ 4秒内加载完成 — GameHub: 未测试</li>
+<li class="todo">✗ 高视觉一致性 — GameHub: 各组件风格不统一</li>
+<li class="todo">✗ 即时的交互反馈 — GameHub: 多数操作无反馈</li>
+<li class="todo">✗ 移动端全面适配 — GameHub: 部分页面未适配</li>
+<li class="todo">✗ 无外部链接/广告 — GameHub: 满足 ✓</li>
+<li class="todo">✗ 原创性 — GameHub: 满足 ✓</li>
+</div>
+
+<div class="checklist" style="margin-top:12px">
+<h4>强烈建议 (影响推荐排名)</h4>
+<li class="todo">✗ 粒子特效: 光晕/拖尾/爆炸/碎屑</li>
+<li class="todo">✗ 屏幕震动: 重大事件触发</li>
+<li class="todo">✗ 音效设计: 多层叠音/随机变调</li>
+<li class="todo">✗ 弹性动画: 挤压拉伸/缓动函数</li>
+<li class="todo">✗ 触觉反馈: 三档强度震动</li>
+<li class="todo">✗ 明亮多彩: 2D/3D 明亮配色优先</li>
+</div>
+
+<!-- 分游戏改造清单 -->
+<h2>✅ 五、分游戏品质改造清单</h2>
+
+<h3>🎡 大转盘 (优先级最高: 已有 spin-wheel 基础)</h3>
+<div class="checklist">
+<li class="partial">✅ Canvas 渲染 (已有 spin-wheel)</li>
+<li class="todo">✗ 中奖弹窗: 粒子彩带 + 缩放弹出动画</li>
+<li class="todo">✗ 转盘音效: 转动咔哒声 + 中奖铃声</li>
+<li class="todo">✗ 移动端震动: 中奖时长震 (200ms)</li>
+<li class="todo">✗ 指针高亮动画 + 物品光晕</li>
+<li class="todo">✗ 按钮弹性形变: 按下 0.95x + 弹簧回弹</li>
+</div>
+
+<h3>🎰 大富翁</h3>
+<div class="checklist">
+<li class="todo">✗ 骰子 3D 滚动动画 (CSS 3D transform)</li>
+<li class="todo">✗ 棋子移动弹性路径动画</li>
+<li class="todo">✗ 地产购买庆祝: 金币飘落 + 建筑升起</li>
+<li class="todo">✗ 卡片抽取: 卡背翻转 + 光效</li>
+<li class="todo">✗ 金币变化: 数字滚动动画 (odometer)</li>
+</div>
+
+<h3>💳 刮刮乐</h3>
+<div class="checklist">
+<li class="todo">✗ 银色金属涂层渐变 (不是灰色纯色)</li>
+<li class="todo">✗ 刮开灰尘粒子 (细小碎屑飘落)</li>
+<li class="todo">✗ 揭晓动画: 奖品文字淡入 + 光效扫描</li>
+<li class="todo">✗ 刮开比例实时显示 (百分比进度)</li>
+<li class="todo">✗ 移动端轻微震动 (刮卡触感)</li>
+</div>
+
+<h3>🧠 答题</h3>
+<div class="checklist">
+<li class="todo">✗ 倒计时圆环动画 (SVG stroke-dashoffset)</li>
+<li class="todo">✗ 正确: 绿色脉冲 + 叮咚声 + 分数+10弹出</li>
+<li class="todo">✗ 错误: 红色抖动 + 嗡嗡声 + 正确答案高亮</li>
+<li class="todo">✗ 答题结束: 成绩弹窗 + 星星评级动画</li>
+<li class="todo">✗ 排行榜: 排名变化滚动动画</li>
+</div>
+
+<h3>🔢 2048</h3>
+<div class="checklist">
+<li class="todo">✗ 方块滑动: CSS transition + 弹性缓动</li>
+<li class="todo">✗ 合并动画: 缩放 1.2x → 回弹 1.0x</li>
+<li class="todo">✗ 新方块: 缩放 0→1 弹出动画</li>
+<li class="todo">✗ 得分弹出: +分值 上飘淡出</li>
+<li class="todo">✗ 颜色渐变: 2→2048 色阶平滑过渡</li>
+</div>
+
+<h3>🐍 贪吃蛇</h3>
+<div class="checklist">
+<li class="todo">✗ 蛇身: 光晕/渐变/节段圆角</li>
+<li class="todo">✗ 食物: 脉动动画 + 粒子光点</li>
+<li class="todo">✗ 移动: 补间过渡 (不是跳帧)</li>
+<li class="todo">✗ 死亡: 蛇身炸开粒子 + 分数弹出</li>
+</div>
+
+<h3>🤝 真心话大冒险</h3>
+<div class="checklist">
+<li class="todo">✗ 卡片翻转动画 (CSS 3D rotateY)</li>
+<li class="todo">✗ 选择按钮: 悬浮光效 + 缩放脉冲</li>
+<li class="todo">✗ 结果展示: 卡片从牌堆「抽出」动画</li>
+<li class="todo">✗ 跳过惩罚: 抖动 + 红色闪烁</li>
+</div>
+
+<!-- 下一步 -->
+<div class="next-step">
+<h2>🎯 建议: 先打透大转盘, 建立品质标杆</h2>
+<div class="steps">
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-title">大转盘品质升级</div>
+  <div class="step-desc">在已有 spin-wheel 基础上加: 中奖彩带粒子、音效(Howler.js)、震动(Navigator.vibrate)、指针动画、按钮弹性。做到能跟支付宝转盘对比的程度。</div>
+</div>
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-title">提取通用品质层</div>
+  <div class="step-desc">把粒子系统、音效管理、震动控制、动画缓动封装成 runtime/effects/*.js 通用模块, 让所有游戏复用。</div>
+</div>
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-title">逐游戏升级</div>
+  <div class="step-desc">用同样的品质标准逐款升级其他 7 个游戏。每款达到 7/10 以上。</div>
+</div>
+</div>
+</div>
+
+</div>
+</body>
+</html>
