@@ -799,11 +799,16 @@ var BoardBuilder = (function() {
 
   // ─── 渲染循环 ───
   function startLoop(ed) {
-    function loop() {
-      render(ed);
+    var lastTime = 0;
+    function loop(time) {
+      // 节流：最多 30fps
+      if (time - lastTime > 33) {
+        render(ed);
+        lastTime = time;
+      }
       ed._animFrame = requestAnimationFrame(loop);
     }
-    loop();
+    ed._animFrame = requestAnimationFrame(loop);
   }
 
   function destroy(ed) {
