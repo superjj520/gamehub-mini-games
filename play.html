@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GameHub · 大富翁</title>
+<title id="pageTitle">GameHub · 大富翁</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 :root {
@@ -177,15 +177,19 @@ var GAME_MAP = {
   var slug = params.get('config');
   var configId = params.get('cid');
 
-  // ─── 调试模式：无参数时使用默认配置 ───
+  // ─── 无分享链接时使用默认配置 ───
   if (!slug && !configId) {
-    console.log('[play] 无配置参数，使用大富翁默认配置');
+    var gameType = params.get('game') || 'monopoly';
+    var gameInfo = GAME_MAP[gameType] || GAME_MAP['monopoly'];
+    document.getElementById('pageTitle').textContent = 'GameHub · ' + gameInfo.name;
     var config = {
       id: 'default',
-      game_type: 'monopoly',
-      title: '大富翁（默认配置）',
-      blocks: BlockRegistry.getDefaults('monopoly'),
+      game_type: gameType,
+      title: gameInfo.name + '（默认配置）',
+      blocks: BlockRegistry.getDefaults(gameType),
     };
+    // 添加游戏选择器
+    addGameSwitcher(gameType);
     startGame(config);
     return;
   }
@@ -266,7 +270,7 @@ function startGame(config) {
   } else if (config.game_type === 'flying-chess') {
     btnSection.innerHTML = '<button class="btn btn-primary" onclick="FlyingChessGame.rollDice()">🎲 掷骰子</button>';
   } else if (config.game_type === 'wheel') {
-    btnSection.innerHTML = '<button class="btn btn-primary" onclick="WheelGame.spin()">🎡 开始抽奖</button>';
+    btnSection.innerHTML = '<button class="btn btn-primary" id="spinBtn" onclick="WheelGame.spin()">🎡 开始抽奖</button>';
   } else if (config.game_type === 'truth-or-dare') {
     btnSection.innerHTML = '<button class="btn btn-primary" onclick="TruthOrDareGame.pickTruth()" style="margin-bottom:4px">💬 真心话</button><button class="btn btn-secondary" onclick="TruthOrDareGame.pickDare()" style="margin-bottom:4px">🎯 大冒险</button><button class="btn btn-danger" onclick="TruthOrDareGame.skip()">⏭️ 跳过</button>';
   } else {
@@ -305,6 +309,30 @@ function renderMonopolyState(gameState) {
   var log = gameState.log || [];
   for (var j = 0; j < log.length; j++) logHtml += '<div>' + log[j] + '</div>';
   document.getElementById('eventLog').innerHTML = logHtml || '<div style="opacity:0.5">游戏即将开始…</div>';
+}
+
+function addGameSwitcher(currentGame) {
+  var games = [
+    {key:'monopoly',name:'大富翁',icon:'🎰'},{key:'wheel',name:'大转盘',icon:'🎡'},
+    {key:'scratch-card',name:'刮刮乐',icon:'💳'},{key:'quiz',name:'答题',icon:'🧠'},
+    {key:'game-2048',name:'2048',icon:'🔢'},{key:'snake',name:'贪吃蛇',icon:'🐍'},
+    {key:'truth-or-dare',name:'真心话大冒险',icon:'🤝'},{key:'flying-chess',name:'飞行棋',icon:'✈️'},
+    {key:'match3',name:'消消乐',icon:'💎'},
+  ];
+  var bar = document.createElement('div');
+  bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:200;display:flex;gap:2px;padding:6px 8px;background:rgba(10,10,26,0.97);border-top:1px solid rgba(255,255,255,0.08);overflow-x:auto;-webkit-overflow-scrolling:touch;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);';
+  for (var i=0;i<games.length;i++){
+    (function(g){
+      var btn = document.createElement('button');
+      btn.textContent = g.icon+' '+g.name;
+      btn.style.cssText = 'flex-shrink:0;padding:6px 10px;border:none;border-radius:8px;font-size:11px;font-family:inherit;cursor:pointer;white-space:nowrap;transition:all .15s;min-height:44px;'+
+        (g.key===currentGame?'background:var(--accent,#7C3AED);color:#fff;box-shadow:0 2px 8px rgba(124,58,237,.3);':'background:transparent;color:var(--muted);');
+      btn.addEventListener('click',function(){ location.href = '?game='+g.key; });
+      bar.appendChild(btn);
+    })(games[i]);
+  }
+  document.body.appendChild(bar);
+  document.body.style.paddingBottom = '56px';
 }
 </script>
 </body>

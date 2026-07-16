@@ -38,19 +38,28 @@ var WheelGame = (function() {
       onSpin: function(){ SoundFX.play('spin'); }
     });
 
-    // 按钮
-    _btnEl = document.createElement('button');
-    _btnEl.textContent = '🎡 开始抽奖';
-    _btnEl.style.cssText = 'display:block;margin:20px auto 0;padding:14px 40px;border:none;border-radius:14px;'+
-      'background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;font-size:16px;font-weight:700;'+
-      'cursor:pointer;box-shadow:0 4px 16px rgba(124,58,237,.4);transition:all .15s;width:auto;';
+    // 复用外部按钮或创建新按钮
+    _btnEl = document.getElementById('spinBtn') || document.getElementById('btnRoll');
+    if (_btnEl) {
+      _btnEl.textContent = '🎡 开始抽奖';
+      _btnEl.style.cssText = 'display:block;margin:20px auto 0;padding:14px 40px;border:none;border-radius:14px;'+
+        'background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;font-size:16px;font-weight:700;'+
+        'cursor:pointer;box-shadow:0 4px 16px rgba(124,58,237,.4);transition:all .15s;width:auto;min-height:44px;';
+      _btnEl.onclick = function(){ spin(); SoundFX.play('click'); Juice.vibrate('light'); };
+    } else {
+      _btnEl = document.createElement('button');
+      _btnEl.textContent = '🎡 开始抽奖';
+      _btnEl.style.cssText = 'display:block;margin:20px auto 0;padding:14px 40px;border:none;border-radius:14px;'+
+        'background:linear-gradient(135deg,#7C3AED,#EC4899);color:#fff;font-size:16px;font-weight:700;'+
+        'cursor:pointer;box-shadow:0 4px 16px rgba(124,58,237,.4);transition:all .15s;width:auto;';
+      _btnEl.addEventListener('click', function(){ spin(); SoundFX.play('click'); Juice.vibrate('light'); });
+      container.appendChild(_btnEl);
+    }
     _btnEl.addEventListener('mousedown',function(){ Juice.pressDown(_btnEl); });
     _btnEl.addEventListener('mouseup',function(){ Juice.pressUp(_btnEl); });
     _btnEl.addEventListener('mouseleave',function(){ Juice.pressUp(_btnEl); });
     _btnEl.addEventListener('touchstart',function(){ Juice.pressDown(_btnEl); });
     _btnEl.addEventListener('touchend',function(){ Juice.pressUp(_btnEl); });
-    _btnEl.addEventListener('click', function(){ spin(); SoundFX.play('click'); Juice.vibrate('light'); });
-    container.appendChild(_btnEl);
 
     if (_ctx&&_ctx.engine) _ctx.engine.emit('game:ready',{game:'wheel'});
   }
