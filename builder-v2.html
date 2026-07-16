@@ -5,256 +5,95 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GameHub · 创作工坊</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-:root {
-  --gold:#F5C842; --bg:#0D0720; --accent:#7C3AED; --accent2:#EC4899;
-  --deep:#1A0A2E; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1);
-  --text:#F0EAF8; --muted:rgba(240,234,248,0.5); --green:#22C55E; --red:#EF4444;
-}
-body { touch-action:manipulation;
-  font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
-  background:var(--bg); color:var(--text);
-  min-height:100vh; min-height:100dvh; display:flex; flex-direction:column;
-  overflow:hidden;
-}
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--gold:#F5C842;--bg:#0A0A1A;--accent:#7C3AED;--accent2:#EC4899;--deep:#12122A;--card:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.08);--text:#E0DCF0;--muted:rgba(224,220,240,0.5);--green:#22C55E;--red:#EF4444;}
+body{touch-action:manipulation;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
 /* 顶栏 */
-.topbar {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:0 16px; height:48px; border-bottom:1px solid var(--border);
-  background:rgba(13,7,32,0.98); flex-shrink:0; gap:12px;
-}
-.topbar-left { display:flex; align-items:center; gap:8px; }
-.topbar-logo { font-size:17px; font-weight:800; text-decoration:none; color:var(--text); cursor:pointer; }
-.topbar-logo span { color:var(--gold); }
-.topbar-sep { width:1px; height:20px; background:var(--border); }
-.topbar-title-input {
-  background:transparent; border:1px solid transparent; border-radius:6px;
-  color:var(--text); font-size:15px; font-weight:700; padding:4px 8px;
-  font-family:inherit; outline:none; width:200px;
-  transition:border-color 0.2s;
-}
-.topbar-title-input:hover, .topbar-title-input:focus { border-color:var(--border); }
-.topbar-right { display:flex; align-items:center; gap:8px; }
-.topbar-status { font-size:12px; color:var(--muted); }
-.topbar-dot { width:6px; height:6px; border-radius:50%; display:inline-block; margin-right:4px; }
-.topbar-dot.saved { background:var(--green); }
-.topbar-dot.unsaved { background:var(--gold); }
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:44px;border-bottom:1px solid var(--border);background:var(--deep);z-index:100;flex-shrink:0;gap:8px;}
+.topbar-left{display:flex;align-items:center;gap:8px;}
+.topbar-logo{font-size:15px;font-weight:800;text-decoration:none;color:var(--text);cursor:pointer;}
+.topbar-logo span{color:var(--gold);}
+.topbar-sep{width:1px;height:18px;background:var(--border);}
+.topbar-title{background:transparent;border:1px solid transparent;border-radius:4px;color:var(--text);font-size:14px;font-weight:600;padding:4px 8px;font-family:inherit;outline:none;width:180px;}
+.topbar-title:hover,.topbar-title:focus{border-color:var(--border);}
+.topbar-center{display:flex;align-items:center;gap:6px;}
+.topbar-mode{display:flex;background:rgba(255,255,255,0.04);border-radius:6px;padding:2px;}
+.topbar-mode-btn{padding:4px 12px;border:none;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;border-radius:4px;font-family:inherit;transition:all 0.15s;}
+.topbar-mode-btn.active{background:var(--accent);color:white;}
+.topbar-right{display:flex;align-items:center;gap:6px;}
+.topbar-status{font-size:10px;color:var(--muted);}
+.topbar-dot{width:5px;height:5px;border-radius:50%;display:inline-block;margin-right:3px;}
+.topbar-dot.saved{background:var(--green);}
+.topbar-dot.unsaved{background:var(--gold);}
 
-.btn { touch-action:manipulation;
-  padding:7px 14px; border-radius:8px; border:none;
-  font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;
-  transition:opacity 0.2s; white-space:nowrap;
-}
-.btn:hover { opacity:0.85; }
-.btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; }
-.btn-gold { background:linear-gradient(135deg,var(--gold),#F59E0B); color:#1A0A2E; }
-.btn-outline { background:transparent; border:1px solid var(--border); color:var(--muted); }
-.btn-outline:hover { color:var(--text); border-color:var(--text); }
-.btn-sm { padding:6px 12px; font-size:12px; min-height:44px; }
-.btn-danger { background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#EF4444; }
+/* 主体 - 全屏地图 */
+.main{flex:1;position:relative;min-height:0;}
+#boardContainer{position:absolute;top:0;left:0;width:100%;height:100%;}
+#previewFrame{position:absolute;inset:0;width:100%;height:100%;border:none;display:none;}
 
-/* 主体三栏 */
-.main { flex:1; display:flex; min-height:0; }
-.panel-left {
-  width:240px; border-right:1px solid var(--border);
-  background:rgba(255,255,255,0.02); overflow-y:auto;
-  display:flex; flex-direction:column; flex-shrink:0;
-}
-.panel-center { flex:1; display:flex; flex-direction:column; min-width:0; }
-.panel-right {
-  width:320px; border-left:1px solid var(--border);
-  background:rgba(255,255,255,0.02); overflow-y:auto;
-  display:flex; flex-direction:column; flex-shrink:0;
-}
+/* 底部内容管理器栏 */
+.manager-bar{display:flex;align-items:center;justify-content:center;gap:2px;padding:4px 8px;border-top:1px solid var(--border);background:var(--deep);flex-shrink:0;z-index:100;}
+.manager-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 14px;border:none;background:transparent;color:var(--muted);font-size:10px;cursor:pointer;border-radius:8px;font-family:inherit;transition:all 0.15s;min-width:56px;}
+.manager-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+.manager-item.active{color:var(--accent);background:rgba(124,58,237,0.1);}
+.manager-item .mi-icon{font-size:18px;line-height:1;}
 
-/* 左侧 Block 列表 */
-.block-list-header {
-  padding:12px; border-bottom:1px solid var(--border);
-  font-size:12px; font-weight:700; color:var(--muted);
-  text-transform:uppercase; letter-spacing:1px;
-  display:flex; justify-content:space-between; align-items:center;
-}
-.block-list { flex:1; overflow-y:auto; padding:8px; }
-.block-item {
-  user-select:none;
-  display:flex; align-items:center; gap:8px;
-  padding:8px 10px; border-radius:8px; margin-bottom:4px;
-  cursor:pointer; border:1px solid transparent;
-  transition:all 0.2s; font-size:13px;
-}
-.block-item:hover { background:var(--card); }
-.block-item.selected { background:rgba(124,58,237,0.15); border-color:rgba(124,58,237,0.4); }
-.block-item-icon { font-size:16px; width:24px; text-align:center; flex-shrink:0; }
-.block-item-label { flex:1; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.block-item-type { font-size:10px; color:var(--muted); flex-shrink:0; }
-.block-item-del {
-  width:22px; height:22px; border-radius:5px; flex-shrink:0;
-  background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2);
-  color:#EF4444; cursor:pointer; font-size:12px; display:none;
-  align-items:center; justify-content:center;
-}
-.block-item:hover .block-item-del { display:flex; }
-.block-add-area { padding:8px; position:relative; }
-.block-add-btn {
-  width:100%; padding:10px; border-radius:8px; min-height:44px;
-  border:1px dashed rgba(124,58,237,0.3);
-  background:rgba(124,58,237,0.05); color:var(--accent);
-  font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;
-  transition:all 0.2s;
-}
-.block-add-btn:hover { background:rgba(124,58,237,0.12); border-color:var(--accent); }
+/* 管理器面板（右侧滑入） */
+.manager-panel{position:fixed;top:0;right:0;bottom:0;width:380px;max-width:90vw;background:var(--deep);border-left:1px solid var(--border);z-index:200;transform:translateX(100%);transition:transform 0.25s ease;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,0.4);}
+.manager-panel.open{transform:translateX(0);}
+.manager-panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.manager-panel-title{font-size:14px;font-weight:700;}
+.manager-panel-close{width:28px;height:28px;border:none;background:rgba(255,255,255,0.06);color:var(--muted);border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+.manager-panel-close:hover{background:rgba(255,255,255,0.1);color:var(--text);}
+.manager-panel-body{flex:1;overflow-y:auto;padding:14px;}
 
-/* 添加 Block — 卡片网格覆盖层 */
-.block-type-overlay {
-  position:fixed; top:0;left:0;right:0;bottom:0; z-index:1000;
-  background:rgba(0,0,0,0.6); -webkit-backdrop-filter:blur(4px);
-  display:none; align-items:center; justify-content:center;
-}
-.block-type-overlay.show { display:flex; }
-.block-type-grid {
-  background:var(--deep); border:1px solid var(--border);
-  border-radius:16px; padding:20px; width:min(480px,90vw);
-  max-height:80vh; overflow-y:auto;
-  box-shadow:0 16px 48px rgba(0,0,0,0.6);
-}
-.block-type-grid h3 { font-size:15px; font-weight:700; margin-bottom:4px; }
-.block-type-grid .sub { font-size:12px; color:var(--muted); margin-bottom:16px; }
-.block-type-cards { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
-.block-type-card {
-  padding:14px 10px; border-radius:10px; border:1px solid var(--border);
-  cursor:pointer; text-align:center; transition:all 0.2s;
-}
-.block-type-card:hover { border-color:var(--accent); background:rgba(124,58,237,0.1); transform:translateY(-2px); }
-.block-type-card .icon { font-size:28px; margin-bottom:6px; }
-.block-type-card .name { font-size:12px; font-weight:600; }
-.block-type-card .desc { font-size:10px; color:var(--muted); margin-top:2px; }
-.block-type-close {
-  display:block; width:100%; margin-top:12px; padding:8px;
-  border-radius:8px; border:1px solid var(--border);
-  background:transparent; color:var(--muted); font-size:13px;
-  cursor:pointer; font-family:inherit; transition:all 0.2s;
-}
-.block-type-close:hover { color:var(--text); border-color:var(--text); }
+/* 面板通用组件 */
+.mgr-section{margin-bottom:18px;}
+.mgr-section-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.mgr-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:4px;font-size:12px;cursor:pointer;transition:all 0.15s;}
+.mgr-item:hover{border-color:rgba(124,58,237,0.3);background:rgba(124,58,237,0.05);}
+.mgr-item.selected{border-color:var(--accent);}
+.mgr-item-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0;}
+.mgr-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;}
+.mgr-item-del{width:22px;height:22px;border:none;background:rgba(239,68,68,0.1);color:var(--red);border-radius:4px;cursor:pointer;font-size:12px;display:none;align-items:center;justify-content:center;}
+.mgr-item:hover .mgr-item-del{display:flex;}
+.mgr-item-meta{font-size:10px;color:var(--muted);}
 
-/* 模板快捷按钮 */
-.tpl-chip {
-  padding:3px 8px; border-radius:12px; border:1px solid rgba(124,58,237,0.3);
-  background:rgba(124,58,237,0.08); color:var(--accent); font-size:11px;
-  cursor:pointer; font-family:inherit; white-space:nowrap;
-  transition:all 0.2s;
-}
-.tpl-chip:hover { background:rgba(124,58,237,0.2); border-color:var(--accent); }
+.mgr-add-btn{width:100%;padding:8px;border:1px dashed rgba(124,58,237,0.3);background:rgba(124,58,237,0.04);color:var(--accent);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+.mgr-add-btn:hover{background:rgba(124,58,237,0.1);border-color:var(--accent);}
 
-/* 编辑器通用 */
-.ed-list { max-height:300px; overflow-y:auto; margin-bottom:6px; }
-.ed-item input, .ed-item select { min-height:28px;
-  background:rgba(255,255,255,0.06); border:1px solid var(--border);
-  border-radius:4px; color:var(--text); font-family:inherit; outline:none;
-}
-.ed-item input:focus, .ed-item select:focus { border-color:var(--accent); }
-.ed-add {
-  width:100%; padding:6px; border-radius:6px; cursor:pointer;
-  border:1px dashed rgba(124,58,237,0.3); background:rgba(124,58,237,0.05);
-  color:var(--accent); font-size:12px; font-weight:600; font-family:inherit;
-  transition:all 0.2s;
-}
-.ed-add:hover { background:rgba(124,58,237,0.12); border-color:var(--accent); }
+.mgr-field{margin-bottom:12px;}
+.mgr-field label{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.mgr-field input,.mgr-field select,.mgr-field textarea{width:100%;padding:8px 10px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit;outline:none;}
+.mgr-field input:focus,.mgr-field select:focus,.mgr-field textarea:focus{border-color:var(--accent);}
+.mgr-field select option{background:var(--deep);color:var(--text);}
+.mgr-field-row{display:flex;gap:8px;}
+.mgr-field-row>*{flex:1;}
 
-/* 中间预览 */
-.preview-header {
-  padding:8px 12px; border-bottom:1px solid var(--border);
-  font-size:11px; font-weight:600; color:var(--muted);
-  display:flex; align-items:center; gap:6px;
-}
-.preview-frame {
-  flex:1; width:100%; border:none;
-  background:var(--bg);
-}
-
-/* 右侧属性面板 */
-.prop-header {
-  padding:12px; border-bottom:1px solid var(--border);
-  font-size:12px; font-weight:700; color:var(--muted);
-  text-transform:uppercase; letter-spacing:1px;
-}
-.prop-empty {
-  padding:32px 16px; text-align:center;
-  font-size:13px; color:var(--muted); line-height:1.6;
-}
-.prop-body { touch-action:manipulation; flex:1; overflow-y:auto; padding:12px; }
-.prop-field { margin-bottom:14px; }
-.prop-field label {
-  display:block; font-size:11px; font-weight:600;
-  color:var(--muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;
-}
-.prop-field input, .prop-field select, .prop-field textarea {
-  width:100%; padding:7px 10px; border-radius:6px;
-  background:rgba(255,255,255,0.06); border:1px solid var(--border);
-  color:var(--text); font-size:13px; font-family:inherit; outline:none;
-  transition:border-color 0.2s;
-}
-.prop-field input:focus, .prop-field select:focus, .prop-field textarea:focus {
-  border-color:var(--accent);
-}
-.prop-field select option { background:var(--deep); color:var(--text); }
-.prop-field-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-
-/* 列表编辑通用 */
-.prop-list-item {
-  display:flex; align-items:center; gap:6px;
-  padding:6px 8px; border-radius:6px;
-  background:rgba(255,255,255,0.03); border:1px solid var(--border);
-  margin-bottom:4px; font-size:12px;
-}
-.prop-list-add {
-  width:100%; padding:6px; border-radius:6px;
-  border:1px dashed var(--border); background:transparent;
-  color:var(--muted); font-size:12px; cursor:pointer; font-family:inherit;
-}
-.prop-list-add:hover { border-color:var(--accent); color:var(--accent); }
-
-/* 底部 AI */
-.ai-bar {
-  height:52px; border-top:1px solid var(--border);
-  background:rgba(13,7,32,0.98); display:flex; align-items:center;
-  padding:0 12px; gap:8px; flex-shrink:0;
-}
-.ai-bar-icon { font-size:18px; flex-shrink:0; }
-.ai-bar-input {
-  flex:1; background:rgba(255,255,255,0.06); border:1px solid var(--border);
-  border-radius:8px; padding:8px 12px; color:var(--text);
-  font-size:13px; font-family:inherit; outline:none;
-  transition:border-color 0.2s;
-}
-.ai-bar-input:focus { border-color:var(--accent); }
-.ai-bar-input::placeholder { color:var(--muted); }
+.btn{padding:7px 14px;border-radius:6px;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;display:inline-flex;align-items:center;gap:4px;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#F59E0B);color:#1A0A2E;}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted);}
+.btn-outline:hover{color:var(--text);border-color:var(--text);}
+.btn-danger{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:var(--red);}
+.btn-sm{padding:4px 10px;font-size:11px;min-height:32px;}
+.btn-icon{width:30px;height:30px;padding:0;border-radius:6px;font-size:14px;justify-content:center;}
 
 /* Toast */
-.toast {
-  position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
-  background:var(--deep); border:1px solid var(--gold);
-  border-radius:12px; padding:12px 20px; font-size:13px;
-  color:var(--text); z-index:9999; white-space:pre-line;
-  box-shadow:0 8px 32px rgba(0,0,0,0.6);
-  opacity:0; transition:opacity 0.3s;
-  pointer-events:none;
-}
-.toast.show { opacity:1; }
+.toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:var(--deep);border:1px solid var(--gold);border-radius:10px;padding:10px 18px;font-size:12px;z-index:300;opacity:0;transition:opacity 0.2s;pointer-events:none;}
+.toast.show{opacity:1;}
+
+/* 遮罩 */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:150;display:none;}
+.overlay.show{display:block;}
 
 /* 响应式 */
-@media (max-width:900px) {
-  .panel-left { width:180px; }
-  .panel-right { width:260px; }
-}
-@media (max-width:700px) {
-  .main { flex-direction:column; }
-  .panel-left { width:100%; max-height:120px; border-right:none; border-bottom:1px solid var(--border); }
-  .panel-right { width:100%; max-height:200px; border-left:none; border-top:1px solid var(--border); }
-  .panel-center { min-height:300px; }
-}
-@media (prefers-reduced-motion:reduce) {
-  *, *::before, *::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+@media(max-width:768px){
+  .manager-panel{width:100%;max-width:100%;}
+  .topbar-title{width:100px;}
+  .manager-item{padding:6px 8px;min-width:40px;font-size:9px;}
+  .manager-item .mi-icon{font-size:16px;}
 }
 </style>
 </head>
@@ -265,55 +104,72 @@ body { touch-action:manipulation;
   <div class="topbar-left">
     <a class="topbar-logo" href="index.html">🎮 <span>GameHub</span></a>
     <div class="topbar-sep"></div>
-    <select id="gameTypeSelect" onchange="switchGameType(this.value)" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 8px;font-size:13px;font-family:inherit;cursor:pointer;outline:none;"></select>
-    <input class="topbar-title-input" id="titleInput" value="未命名大富翁" placeholder="输入游戏名称…" onchange="onTitleChange()" style="margin-left:4px;">
+    <select id="gameType" onchange="switchGame()" style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px 6px;font-size:12px;font-family:inherit;cursor:pointer;outline:none;">
+      <option value="monopoly">🎰 大富翁</option><option value="snake">🐍 贪吃蛇</option><option value="wheel">🎡 大转盘</option><option value="quiz">🧠 答题</option><option value="game-2048">🔢 2048</option><option value="match3">💎 消消乐</option><option value="flying-chess">✈️ 飞行棋</option><option value="truth-or-dare">🤝 真心话</option>
+    </select>
+    <input class="topbar-title" id="titleInput" value="未命名大富翁" onchange="onTitleChange()">
+  </div>
+  <div class="topbar-center">
+    <div class="topbar-mode">
+      <button class="topbar-mode-btn active" data-mode="edit" onclick="setMode('edit')">✏️ 编辑</button>
+      <button class="topbar-mode-btn" data-mode="preview" onclick="setMode('preview')">👁️ 预览</button>
+    </div>
   </div>
   <div class="topbar-right">
-    <span class="topbar-status" id="saveStatus">
-      <span class="topbar-dot saved"></span>就绪
-    </span>
-    <button class="btn btn-outline btn-sm" onclick="saveConfig()" id="btnSave">💾 保存</button>
-    <button class="btn btn-gold btn-sm" onclick="publishConfig()" id="btnPublish">🚀 发布</button>
+    <span class="topbar-status" id="saveStatus"><span class="topbar-dot saved"></span>就绪</span>
+    <button class="btn btn-icon btn-outline" onclick="editorAPI.undo()" title="撤销 Ctrl+Z">↩</button>
+    <button class="btn btn-icon btn-outline" onclick="editorAPI.redo()" title="重做 Ctrl+Y">↪</button>
+    <button class="btn btn-outline btn-sm" onclick="saveConfig()">💾 保存</button>
+    <button class="btn btn-primary btn-sm" onclick="publishConfig()">🚀 发布</button>
   </div>
 </div>
 
-<!-- 主体 -->
-<div class="main">
-  <!-- 左侧：Block 列表 -->
-  <div class="panel-left" id="leftPanel">
-    <div class="block-list-header">📦 Block 列表</div>
-    <div class="block-list" id="blockList"></div>
-    <div class="block-add-area">
-      <button class="block-add-btn" id="btnAddBlock" onclick="showBlockPicker()">+ 添加 Block</button>
-    </div>
-  </div>
-
-  <!-- 中间：预览 -->
-  <div class="panel-center">
-    <div class="preview-header">👁️ 实时预览</div>
-    <iframe class="preview-frame" id="previewFrame" sandbox="allow-scripts"></iframe>
-  </div>
-
-  <!-- 右侧：属性面板 -->
-  <div class="panel-right" id="rightPanel">
-    <div class="prop-header">⚙️ 属性面板</div>
-    <div class="prop-body" id="propBody">
-      <div class="prop-empty">👈 点击左侧 Block<br>编辑其属性</div>
-    </div>
-  </div>
+<!-- 主区域 -->
+<div class="main" id="mainArea">
+  <div id="boardContainer"></div>
+  <iframe id="previewFrame" sandbox="allow-scripts"></iframe>
 </div>
 
-<!-- AI 栏 -->
-<div class="ai-bar">
-  <svg class="ai-bar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="10" r="1"/><circle cx="15" cy="10" r="1"/><path d="M9 15c.83.67 2.17 1 3 1s2.17-.33 3-1"/></svg>
-  <input class="ai-bar-input" id="aiInput" placeholder="告诉 AI 你想怎么改… 如：把棋盘改成10×10、帮我设计丧尸主题" onkeydown="if(event.key==='Enter')askAI()">
-  <button class="btn btn-outline btn-sm" onclick="askAI()" id="btnAI">发送</button>
+<!-- 底部内容管理器 -->
+<div class="manager-bar" id="managerBar">
+  <button class="manager-item active" data-panel="board">
+    <span class="mi-icon">🗺️</span>地图
+  </button>
+  <button class="manager-item" data-panel="collection">
+    <span class="mi-icon">🎲</span>卡牌
+  </button>
+  <button class="manager-item" data-panel="rule">
+    <span class="mi-icon">📐</span>规则
+  </button>
+  <button class="manager-item" data-panel="player">
+    <span class="mi-icon">👥</span>玩家
+  </button>
+  <button class="manager-item" data-panel="store">
+    <span class="mi-icon">🏪</span>商店
+  </button>
+  <button class="manager-item" data-panel="effect">
+    <span class="mi-icon">⚡</span>事件
+  </button>
+  <button class="manager-item" data-panel="theme">
+    <span class="mi-icon">🎨</span>主题
+  </button>
 </div>
+
+<!-- 管理器面板 -->
+<div class="manager-panel" id="managerPanel">
+  <div class="manager-panel-header">
+    <span class="manager-panel-title" id="panelTitle">编辑</span>
+    <button class="manager-panel-close" onclick="closePanel()">×</button>
+  </div>
+  <div class="manager-panel-body" id="panelBody"></div>
+</div>
+
+<!-- 遮罩 -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- 依赖脚本 -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase.js"></script>
 <script src="auth-player.js"></script>
@@ -323,1086 +179,391 @@ body { touch-action:manipulation;
 <script src="runtime/core/board-builder.js?v=3"></script>
 
 <script>
-// ========= 创作工坊状态管理 =========
-var _boardEditor = null;
-var _selectedCellId = null;
-
-var GAME_TYPES = {
-  'monopoly':      { name: '大富翁',       icon: '🎰' },
-  'snake':         { name: '贪吃蛇',       icon: '🐍' },
-  'wheel':         { name: '大转盘',       icon: '🎡' },
-  'quiz':          { name: '答题',         icon: '🧠' },
-  'game-2048':     { name: '2048',         icon: '🔢' },
-  'match3':        { name: '消消乐',       icon: '💎' },
-  'flying-chess':  { name: '飞行棋',       icon: '✈️' },
-  'truth-or-dare': { name: '真心话大冒险', icon: '🤝' },
-};
-
+// ==================== 编辑器核心 ====================
 var editor = {
-  gameType: 'monopoly',
-  title: '未命名大富翁',
-  blocks: [],
-  selectedBlockId: null,
-  isDirty: false,
-  configId: null,
-  shareSlug: null,
+  gameType:'monopoly', title:'未命名大富翁', blocks:[], isDirty:false,
+  configId:null, shareSlug:null, mode:'edit'
 };
+var editorAPI = null;  // BoardBuilder API
+var _selectedCellId = null;
+var _openPanel = null;
 
-// ========= 初始化 =========
-(function init() {
-  document.getElementById('titleInput').value = editor.title;
-  buildGameTypeSelector();
-
-  // 检查 URL 参数
-  var params = new URLSearchParams(location.search);
-  var editId = params.get('edit');
-  var forkId = params.get('fork');
-
-  if (editId) {
-    loadConfig(editId);
-  } else if (forkId) {
-    forkConfig(forkId);
-  } else {
-    editor.blocks = BlockRegistry.getDefaults('monopoly');
-    renderAll();
-  }
-
+// ==================== 初始化 ====================
+(function init(){
+  editor.blocks = BlockRegistry.getDefaults('monopoly');
+  document.getElementById('boardContainer').style.display = 'block';
+  initMapEditor();
 })();
 
-function buildGameTypeSelector() {
-  var sel = document.getElementById('gameTypeSelect');
-  var html = '';
-  var keys = Object.keys(GAME_TYPES);
-  for (var i = 0; i < keys.length; i++) {
-    var gt = GAME_TYPES[keys[i]];
-    html += '<option value="' + keys[i] + '"' + (editor.gameType === keys[i] ? ' selected' : '') + '>' + gt.icon + ' ' + gt.name + '</option>';
-  }
-  sel.innerHTML = html;
-}
-
-function switchGameType(newType) {
-  if (editor.isDirty && !confirm('切换游戏类型将替换当前 Block 配置，未保存的修改会丢失。确定继续？')) return;
-  editor.gameType = newType;
-  editor.blocks = BlockRegistry.getDefaults(newType);
-  editor.title = '未命名' + (GAME_TYPES[newType] ? GAME_TYPES[newType].name : '游戏');
-  editor.selectedBlockId = null;
-  editor.isDirty = true;
-  editor.configId = null;
-  editor.shareSlug = null;
-  document.getElementById('titleInput').value = editor.title;
-  updateSaveStatus();
-  renderAll();
-}
-
-// ========= Block 操作 =========
-function selectBlock(id) {
-  editor.selectedBlockId = id;
-  _selectedCellId = null; // 清除格子选中
-  renderBlockList();
-  renderPropertyPanel();
-  renderPreview();
-}
-
-function addBlock(type) {
-  var block = BlockRegistry.createBlock(type);
-  if (!block) {
-    showToast('❌ 未知的 Block 类型: ' + type);
-    return;
-  }
-  editor.blocks = editor.blocks.concat([block]);
-  editor.selectedBlockId = block.id;
-  editor.isDirty = true;
-  updateSaveStatus();
-  renderAll();
-}
-
-function removeBlock(id) {
-  editor.blocks = editor.blocks.filter(function(b) { return b.id !== id; });
-  if (editor.selectedBlockId === id) editor.selectedBlockId = null;
-  editor.isDirty = true;
-  updateSaveStatus();
-  renderAll();
-}
-
-function updateBlock(id, newConfig) {
-  editor.blocks = editor.blocks.map(function(b) {
-    if (b.id !== id) return b;
-    return { id: b.id, type: b.type, label: b.label, config: { ...b.config, ...newConfig } };
+function initMapEditor(){
+  var block = findBlockByType('board');
+  if(!block) return;
+  var container = document.getElementById('boardContainer');
+  if(editorAPI) editorAPI.destroy();
+  editorAPI = BoardBuilder.create(container, block.config, {
+    onSelect: function(cellId, cell){ _selectedCellId = cellId; },
+    onChange: function(cfg){ updateBlockCfg('board', cfg); markDirty(); }
   });
-  editor.isDirty = true;
-  updateSaveStatus();
-  renderPreview();
 }
 
-function onTitleChange() {
-  editor.title = document.getElementById('titleInput').value || '未命名大富翁';
-  editor.isDirty = true;
-  updateSaveStatus();
-  renderPreview();
-}
-
-function showBlockPicker() { buildBlockTypePicker();
-  // 监听预览区点击消息
-  window.addEventListener('message', function(e) {
-    if (!e.data || e.data.type !== 'gh-select-cell') return;
-    var gridBlock = null;
-    for (var i = 0; i < editor.blocks.length; i++) {
-      if (editor.blocks[i].id === e.data.blockId) { gridBlock = editor.blocks[i]; break; }
-    }
-    if (gridBlock) {
-      selectBlock(gridBlock.id);
-      // 滚动到对应格子
-      setTimeout(function() {
-        var cellEl = document.querySelector('[id^="ed-cell-"]:nth-child(' + (e.data.cellIndex + 1) + ')');
-        if (cellEl) cellEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 300);
-    }
-  }); document.getElementById('blockTypeOverlay').classList.add('show'); }
-
-var dragIdx = -1;
-
-function dragBlockStart(e, idx) {
-  dragIdx = idx;
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/plain', String(idx));
-  setTimeout(function() { e.target.style.opacity = '0.5'; }, 0);
-}
-
-function dragBlockOver(e) {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  e.target.closest('.block-item') && (e.target.closest('.block-item').style.borderTop = '2px solid var(--accent)');
-}
-
-function dragBlockLeave(e) {
-  e.target.closest('.block-item') && (e.target.closest('.block-item').style.borderTop = '');
-}
-
-function dragBlockDrop(e, toIdx) {
-  e.preventDefault();
-  dragBlockEnd(e);
-  if (dragIdx === -1 || dragIdx === toIdx) return;
-  var blocks = editor.blocks.slice();
-  var moved = blocks.splice(dragIdx, 1)[0];
-  blocks.splice(toIdx, 0, moved);
-  editor.blocks = blocks;
-  editor.isDirty = true;
-  updateSaveStatus();
-  renderAll();
-}
-
-function dragBlockEnd(e) {
-  dragIdx = -1;
-  document.querySelectorAll('.block-item').forEach(function(el) { el.style.opacity = '1'; el.style.borderTop = ''; });
-}
-
-function hideBlockPicker() { document.getElementById('blockTypeOverlay').classList.remove('show'); }
-
-function buildBlockTypePicker() {
-  var el = document.getElementById('blockTypeCards'); if (!el) return;
-  var schemas = BlockRegistry.getAllSchemas();
-  var types = Object.keys(schemas);
-  var descs = {
-    grid:'棋盘和路径', collection:'卡牌和奖池', rule:'数值和规则',
-    piece:'棋子和实体', building:'可建造结构', store:'商店和交易',
-    effect:'触发和事件', player:'玩家设置', theme:'主题和配色'
-  };
-  var html = '';
-  for (var i = 0; i < types.length; i++) {
-    var s = schemas[types[i]];
-    html += '<div class="block-type-card" onclick="addBlock(\'' + types[i] + '\');hideBlockPicker();">';
-    html += '<div class="icon">' + (s.iconSvg ? gi(s.iconSvg) : ('<span style="font-size:28px">' + s.icon + '</span>')) + '</div>';
-    html += '<div class="name">' + s.label + '</div>';
-    html += '<div class="desc">' + (descs[types[i]] || '') + '</div>';
-    html += '</div>';
-  }
-  document.getElementById('blockTypeCards').innerHTML = html;
-}
-
-// ========= 渲染 =========
-function renderAll() {
-  renderBlockList();
-  renderPreview();
-  renderPropertyPanel();
-}
-
-function renderBlockList() {
-  var html = '';
-  for (var i = 0; i < editor.blocks.length; i++) {
-    var b = editor.blocks[i];
-    var schema = BlockRegistry.getSchema(b.type);
-    var svgIcon = schema && schema.iconSvg ? gi(schema.iconSvg) : '<span>' + (schema ? schema.icon : '📦') + '</span>';
-    var selected = b.id === editor.selectedBlockId ? ' selected' : '';
-    html += '<div class="block-item' + selected + '" draggable="true" onclick="selectBlock(\'' + b.id + '\')" ondragstart="dragBlockStart(event,' + i + ')" ondragover="dragBlockOver(event)" ondragleave="dragBlockLeave(event)" ondrop="dragBlockDrop(event,' + i + ')" ondragend="dragBlockEnd(event)">';
-    html += '<span class="block-item-icon" style="cursor:grab">⠿</span>';
-    html += '<span class="block-item-icon" style="display:flex;align-items:center;color:var(--muted)">' + svgIcon + '</span>';
-    html += '<span class="block-item-label">' + b.label + '</span>';
-    html += '<span class="block-item-type">' + b.type + '</span>';
-    html += '<span class="block-item-del" onclick="event.stopPropagation();removeBlock(\'' + b.id + '\')">×</span>';
-    html += '</div>';
-  }
-  document.getElementById('blockList').innerHTML = html || '<div style="padding:12px;color:var(--muted);font-size:12px;text-align:center">暂无 Block，点击下方按钮添加</div>';
-}
-
-function renderPreview() {
-  var iframe = document.getElementById('previewFrame');
-
-  // ─── 地图 Block：使用 BoardBuilder 画布编辑器 ───
-  var selectedBlock = getSelectedBlock();
-  if (selectedBlock && selectedBlock.type === 'board') {
-    iframe.style.display = 'none';
-    var bbContainer = document.getElementById('boardBuilderContainer');
-    if (!bbContainer) {
-      bbContainer = document.createElement('div');
-      bbContainer.id = 'boardBuilderContainer';
-      bbContainer.style.cssText = 'flex:1;width:100%;overflow:auto;position:relative;';
-      iframe.parentNode.insertBefore(bbContainer, iframe);
-    }
-    bbContainer.style.display = 'block';
-
-    // 清理旧编辑器
-    if (_boardEditor) { _boardEditor.destroy(); _boardEditor = null; }
-
-    // 添加撤销/重做工具栏
-    var toolbarDiv = document.getElementById('boardToolbar');
-    if (!toolbarDiv) {
-      toolbarDiv = document.createElement('div');
-      toolbarDiv.id = 'boardToolbar';
-      toolbarDiv.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.2);font-size:11px;color:var(--muted);';
-      toolbarDiv.innerHTML = '<span>🖱️ 双击添加 | 拖拽移动 | 滚轮缩放</span><div style="flex:1"></div>' +
-        '<button class="btn btn-outline btn-sm" onclick="_boardEditor.undo()" title="撤销 Ctrl+Z" style="width:auto;min-height:auto;padding:2px 8px">↩</button>' +
-        '<button class="btn btn-outline btn-sm" onclick="_boardEditor.redo()" title="重做 Ctrl+Y" style="width:auto;min-height:auto;padding:2px 8px">↪</button>';
-      bbContainer.parentNode.insertBefore(toolbarDiv, bbContainer);
-    }
-    toolbarDiv.style.display = 'flex';
-
-    var boardConfig = selectedBlock.config || { cells: [], pathOrder: [] };
-    _boardEditor = BoardBuilder.create(bbContainer, boardConfig, {
-      onSelect: function(cellId, cell) {
-        _selectedCellId = cellId;
-        renderPropertyPanel();
-      },
-      onChange: function(newConfig) {
-        updateBlock(selectedBlock.id, newConfig);
-        updateSaveStatus();
-      },
-    });
-    return;
-  }
-
-  // ─── 其他 Block：iframe 预览 ───
-  iframe.style.display = '';
-  var bbContainer = document.getElementById('boardBuilderContainer');
-  if (bbContainer) bbContainer.style.display = 'none';
-  var toolbarDiv = document.getElementById('boardToolbar');
-  if (toolbarDiv) toolbarDiv.style.display = 'none';
-  if (_boardEditor) { _boardEditor.destroy(); _boardEditor = null; }
-
-  var previewConfig = {
-    game_type: editor.gameType,
-    title: editor.title,
-    blocks: editor.blocks,
-  };
-
-  var html = buildPreviewHTML(previewConfig);
-  var blob = new Blob([html], { type: 'text/html' });
-  var url = URL.createObjectURL(blob);
-
-  if (iframe._prevUrl) URL.revokeObjectURL(iframe._prevUrl);
-  iframe._prevUrl = url;
-  iframe.src = url;
-}
-
-function buildPreviewHTML(config) {
-  var configJson = JSON.stringify(config).replace(/</g, '\\u003c');
-  var html = '<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n<meta charset="UTF-8">\n';
-  html += '<style>\n';
-  html += '*{margin:0;padding:0;box-sizing:border-box;}\n';
-  html += ':root{--gold:#F5C842;--bg:#0D0720;--accent:#7C3AED;--accent2:#EC4899;--deep:#1A0A2E;--card:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.1);--text:#F0EAF8;--muted:rgba(240,234,248,0.5);}\n';
-  html += 'body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}\n';
-  html += '.pv-wrap{text-align:center;max-width:500px;width:100%;}\n';
-  html += '.pv-wrap h2{font-size:16px;margin-bottom:4px;}\n';
-  html += '.pv-wrap .sub{font-size:11px;color:var(--muted);margin-bottom:16px;}\n';
-  html += '.pv-board{position:relative;width:100%;overflow:auto;}\n';
-  html += '.pv-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:4px;text-align:left;font-size:11px;}\n';
-  html += '.pv-item{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--card);border-radius:6px;margin-bottom:3px;font-size:11px;}\n';
-  html += '</style>\n<' + '/head>\n<body>\n';
-  html += '<div class="pv-wrap">\n';
-  html += '<h2>' + escHtml(config.title) + '</h2>\n';
-  html += '<p class="sub">' + config.blocks.length + ' 个 Block</p>\n';
-
-  // 渲染每个 Block 的预览
-  var blocks = config.blocks || [];
-  for (var i = 0; i < blocks.length; i++) {
-    var b = blocks[i];
-    if (b.type === 'board') {
-      html += renderBoardPreview(b);
-    } else if (b.type === 'collection') {
-      html += renderCollectionPreview(b);
-    } else if (b.type === 'rule') {
-      html += renderRulePreview(b);
-    } else if (b.type === 'player') {
-      html += renderPlayerPreview(b);
-    } else if (b.type === 'theme') {
-      html += renderThemePreview(b);
-    } else if (b.type === 'store') {
-      html += renderStorePreview(b);
-    } else {
-      html += '<div class="pv-card"><b>' + b.label + '</b> <span style="color:var(--muted)">(' + b.type + ')</span></div>\n';
-    }
-  }
-
-  html += '</div>\n<' + '/body>\n<' + '/html>';
-  return html;
-}
-
-function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function renderBoardPreview(b) {
-  var c = b.config || {};
-  var cells = c.cells || [];
-  var html = '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">🗺️ ' + b.label + ' (' + cells.length + '格)</div>';
-  html += '<div class="pv-board" style="position:relative;min-height:200px;max-height:300px;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,0.2);overflow:hidden">';
-  if (cells.length > 0) {
-    // 计算比例缩放
-    var maxX = 0, maxY = 0;
-    for (var j = 0; j < cells.length; j++) { if (cells[j].x+100>maxX) maxX=cells[j].x+100; if (cells[j].y+60>maxY) maxY=cells[j].y+60; }
-    var scale = Math.min(1, 280 / Math.max(maxX, 1));
-    html += '<div style="position:relative;width:' + (maxX*scale+20) + 'px;height:' + (maxY*scale+20) + 'px;transform:scale(0.8);transform-origin:top left">';
-    var tC = { start:'rgba(34,197,94,0.25)',property:'rgba(124,58,237,0.18)',chance:'rgba(245,200,66,0.18)',destiny:'rgba(236,72,153,0.18)',jail:'rgba(239,68,68,0.18)',shop:'rgba(59,130,246,0.18)',event:'rgba(34,211,238,0.18)',tax:'rgba(251,146,60,0.18)' };
-    for (var k = 0; k < Math.min(cells.length, 30); k++) {
-      var cd = cells[k];
-      html += '<div style="position:absolute;left:'+cd.x+'px;top:'+cd.y+'px;min-width:60px;padding:3px 5px;border-radius:6px;background:'+(tC[cd.type]||'var(--card)')+';border:1px solid rgba(255,255,255,0.1);font-size:8px;text-align:center">';
-      html += '<span style="font-size:14px">'+(cd.icon||'')+'</span><br>'+(cd.name||'');
-      html += '</div>';
-    }
-    html += '</div>';
-  }
-  html += '</div>';
-  return html;
-}
-
-function renderCollectionPreview(b) {
-  var cards = (b.config && b.config.cards) || [];
-  var html = '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">🎲 ' + b.label + ' (' + cards.length + '张)</div>';
-  for (var i = 0; i < Math.min(cards.length, 6); i++) {
-    html += '<div class="pv-item"><span style="font-size:14px">🃏</span><span>' + (cards[i].title || '卡#'+i) + '</span></div>';
-  }
-  if (cards.length > 6) html += '<div style="font-size:10px;color:var(--muted)">... 还有 ' + (cards.length-6) + ' 张</div>';
-  return html;
-}
-
-function renderRulePreview(b) {
-  var vars = (b.config && b.config.variables) || [];
-  var html = '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">📐 ' + b.label + '</div>';
-  html += '<div class="pv-card">';
-  for (var i = 0; i < vars.length; i++) {
-    html += '<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px"><span>' + vars[i].label + '</span><span style="color:var(--gold)">' + vars[i].value + '</span></div>';
-  }
-  html += '</div>';
-  return html;
-}
-
-function renderPlayerPreview(b) {
-  var c = b.config || {};
-  var players = c.players || [];
-  var html = '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">👥 ' + b.label + ' (' + players.length + '人)</div>';
-  for (var i = 0; i < players.length; i++) {
-    var p = players[i];
-    html += '<div class="pv-item"><span style="font-size:14px">'+(p.emoji||'🎮')+'</span><span>'+p.name+'</span>'+(p.isAI?' <span style="color:var(--muted);font-size:9px">AI</span>':'')+'</div>';
-  }
-  return html;
-}
-
-function renderThemePreview(b) {
-  var c = b.config || {};
-  return '<div class="pv-card" style="text-align:center"><div style="width:100%;height:24px;border-radius:6px;background:linear-gradient(135deg,'+(c.accent||'#7C3AED')+','+(c.accent2||'#EC4899')+');margin-bottom:6px"></div><span style="font-size:11px">🎨 '+(c.preset||'主题')+'</span></div>';
-}
-
-function renderStorePreview(b) {
-  var items = (b.config && b.config.items) || [];
-  var html = '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">🏪 ' + b.label + ' (' + items.length + '件)</div>';
-  for (var i = 0; i < Math.min(items.length, 5); i++) {
-    html += '<div class="pv-item"><span>'+(items[i].icon||'📦')+'</span><span style="flex:1">'+items[i].name+'</span><span style="color:var(--gold)">💰'+items[i].cost+'</span></div>';
-  }
-  return html;
-}
-
-// ============ 属性面板核心 ============
-function getSelectedBlock() {
-  if (!editor.selectedBlockId) return null;
-  for (var i = 0; i < editor.blocks.length; i++) {
-    if (editor.blocks[i].id === editor.selectedBlockId) return editor.blocks[i];
-  }
-  return null;
-}
-
-function updateBlockConfig(key, value) {
-  var block = getSelectedBlock();
-  if (!block) return;
-  var cfg = {}; cfg[key] = value;
-  updateBlock(block.id, cfg);
-}
-
-function updateListItem(listKey, index, field, value) {
-  var block = getSelectedBlock();
-  if (!block) return;
-  var items = (block.config[listKey] || []).slice();
-  if (index >= items.length) return;
-  items[index] = { ...items[index] };
-  items[index][field] = value;
-  var cfg = {}; cfg[listKey] = items;
-  updateBlock(block.id, cfg);
-}
-
-function removeListItem(listKey, index) {
-  var block = getSelectedBlock();
-  if (!block) return;
-  var items = (block.config[listKey] || []).slice();
-  items.splice(index, 1);
-  var cfg = {}; cfg[listKey] = items;
-  updateBlock(block.id, cfg);
-}
-
-function addListItem(listKey, template) {
-  var block = getSelectedBlock();
-  if (!block) return;
-  var items = (block.config[listKey] || []).slice();
-  items.push(JSON.parse(JSON.stringify(template)));
-  var cfg = {}; cfg[listKey] = items;
-  updateBlock(block.id, cfg);
-}
-
-// ============ 属性面板渲染 ============
-function renderPropertyPanel() {
-  var body = document.getElementById('propBody');
-
-  // ─── 地图 Block：如果选中了格子，显示格子编辑器 ───
-  if (_selectedCellId && _boardEditor) {
-    var cell = _boardEditor.getCell(_selectedCellId);
-    if (cell) {
-      renderCellPropertyPanel(body, cell);
-      return;
-    }
-  }
-
-  var block = getSelectedBlock();
-  if (!block) {
-    body.innerHTML = '<div class="prop-empty">👈 点击左侧 Block<br>编辑其属性</div>';
-    return;
-  }
-  var schema = BlockRegistry.getSchema(block.type);
-  if (!schema) {
-    body.innerHTML = '<div class="prop-empty">无编辑 Schema: ' + block.type + '</div>';
-    return;
-  }
-
-  var bid = block.id;
-  var templates = schema.templates || [];
-  var html = '<div style="margin-bottom:12px;font-size:15px;font-weight:800">' + schema.icon + ' ' + schema.label + '</div>';
-
-  // 地图 Block 路径顺序面板
-  if (block.type === 'board') {
-    var cells = block.config.cells || [];
-    html += '<div style="margin-bottom:12px;padding:10px;background:rgba(124,58,237,0.06);border-radius:10px;border:1px rgba(124,58,237,0.2)">';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
-    html += '<span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px">路径顺序</span>';
-    html += '<span style="font-size:10px;color:var(--muted)">拖拽排序 | 共 ' + cells.length + ' 格</span>';
-    html += '</div>';
-    html += '<div class="path-order-list" id="pathOrderList" style="max-height:260px;overflow-y:auto;font-size:11px">';
-    html += renderPathOrderList(block);
-    html += '</div></div>';
-  }
-
-  if (templates.length > 0) {
-    html += '<div style="margin-bottom:14px;padding:10px;background:rgba(124,58,237,0.06);border-radius:10px;border:1px dashed rgba(124,58,237,0.2)">';
-    html += '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">快速配置</div>';
-    html += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
-    for (var t = 0; t < Math.min(templates.length, 4); t++) {
-      var tmpl = templates[t];
-      html += '<button class="tpl-chip" onclick="applyTemplate(\'' + bid + '\',' + t + ')" title="' + (tmpl.desc || '') + '">' + tmpl.name + '</button>';
-    }
-    html += '</div></div>';
-  }
-  html += '<div class="prop-field"><label>名称</label>';
-  html += '<input value="' + esc(block.label) + '" onchange="updateBlock(\'' + bid + '\',{label:this.value});renderBlockList();"></div>';
-
-  // 核心配置区
-  var fields = schema.fields || [];
-  for (var f = 0; f < fields.length; f++) {
-    var field = fields[f];
-    html += renderField(block, field);
-  }
-
-  // 删除 Block 按钮
-  html += '<div style="margin-top:20px;padding-top:12px;border-top:1px solid var(--border)">';
-  html += '<button class="btn btn-danger btn-sm" onclick="removeBlock(\'' + bid + '\')" style="width:100%">删除此 Block</button>';
-  html += '</div>';
-
-  body.innerHTML = html;
-}
-
-function renderCellPropertyPanel(body, cell) {
-  var TYPE_OPTS = ['start','property','chance','destiny','jail','event','shop','tax'];
-  var html = '<div style="font-size:12px;color:var(--muted);margin-bottom:4px;cursor:pointer" onclick="_selectedCellId=null;renderPropertyPanel();">← 返回 Block 属性</div>';
-  html += '<div style="margin-bottom:12px;font-size:15px;font-weight:800">' + (cell.icon||'📌') + ' 编辑格子</div>';
-
-  // 路径位置
-  var pathIdx = -1;
-  if (_boardEditor) {
-    var cfg = _boardEditor.getConfig();
-    pathIdx = (cfg.pathOrder || []).indexOf(cell.id);
-  }
-  html += '<div class="prop-field"><label>路径位置</label>';
-  html += '<div style="display:flex;gap:4px;align-items:center">';
-  html += '<button class="btn btn-outline btn-sm" onclick="_boardEditor.movePathUp(\'' + cell.id + '\');_selectedCellId=\'' + cell.id + '\';renderPropertyPanel();" title="前移" style="width:auto">↑</button>';
-  html += '<span style="flex:1;text-align:center;font-size:14px;font-weight:700">' + (pathIdx >= 0 ? '#' + pathIdx : '-') + '</span>';
-  html += '<button class="btn btn-outline btn-sm" onclick="_boardEditor.movePathDown(\'' + cell.id + '\');_selectedCellId=\'' + cell.id + '\';renderPropertyPanel();" title="后移" style="width:auto">↓</button>';
-  html += '</div></div>';
-
-  // 类型
-  html += '<div class="prop-field"><label>类型</label><select onchange="updateCellField(\'' + cell.id + '\',\'type\',this.value)">';
-  for (var i = 0; i < TYPE_OPTS.length; i++) {
-    html += '<option value="' + TYPE_OPTS[i] + '"' + (cell.type===TYPE_OPTS[i]?' selected':'') + '>' + TYPE_OPTS[i] + '</option>';
-  }
-  html += '</select></div>';
-
-  // 名称
-  html += '<div class="prop-field"><label>名称</label><input value="' + esc(cell.name||'') + '" onchange="updateCellField(\'' + cell.id + '\',\'name\',this.value)"></div>';
-
-  // 图标
-  html += '<div class="prop-field"><label>图标</label><input value="' + esc(cell.icon||'') + '" onchange="updateCellField(\'' + cell.id + '\',\'icon\',this.value)"></div>';
-
-  // 价格（仅地产）
-  if (cell.type === 'property') {
-    html += '<div class="prop-field"><label>价格</label><input type="number" value="' + (cell.price||0) + '" onchange="updateCellField(\'' + cell.id + '\',\'price\',parseInt(this.value)||0)"></div>';
-  }
-
-  // 删除格子
-  html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">';
-  html += '<button class="btn btn-danger btn-sm" onclick="deleteBoardCell(\'' + cell.id + '\')" style="width:100%">删除此格子</button>';
-  html += '</div>';
-
-  body.innerHTML = html;
-}
-
-function updateCellField(cellId, key, value) {
-  if (_boardEditor) {
-    var updates = {}; updates[key] = value;
-    _boardEditor.updateCell(cellId, updates);
-    renderPropertyPanel();
-  }
-}
-
-function renderPathOrderList(block) {
-  var cells = block.config.cells || [];
-  var pathOrder = block.config.pathOrder || [];
-  var html = '';
-  for (var i = 0; i < pathOrder.length; i++) {
-    var cid = pathOrder[i];
-    var cell = null;
-    for (var j = 0; j < cells.length; j++) { if (cells[j].id === cid) { cell = cells[j]; break; } }
-    if (!cell) continue;
-    html += '<div class="path-order-item" draggable="true" data-cell-id="' + cid + '" data-idx="' + i + '"';
-    html += ' style="display:flex;align-items:center;gap:6px;padding:5px 8px;margin-bottom:2px;border-radius:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);cursor:grab;transition:background 0.15s"';
-    html += ' ondragstart="pathDragStart(event)" ondragover="pathDragOver(event)" ondrop="pathDrop(event,\'' + cid + '\')"';
-    html += ' onclick="selectBoardCell(\'' + cid + '\')">';
-    html += '<span style="font-size:10px;font-weight:700;color:var(--accent);width:16px;text-align:center">' + i + '</span>';
-    html += '<span style="font-size:14px;width:20px;text-align:center">' + (cell.icon || '📌') + '</span>';
-    html += '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">' + (cell.name || '?') + '</span>';
-    html += '<button style="width:20px;height:20px;border:none;background:rgba(124,58,237,0.15);color:var(--accent);cursor:pointer;border-radius:4px;font-size:10px" onclick="event.stopPropagation();movePathItem(\'' + cid + '\',-1)" title="前移">▲</button>';
-    html += '<button style="width:20px;height:20px;border:none;background:rgba(124,58,237,0.15);color:var(--accent);cursor:pointer;border-radius:4px;font-size:10px" onclick="event.stopPropagation();movePathItem(\'' + cid + '\',1)" title="后移">▼</button>';
-    html += '</div>';
-  }
-  return html || '<div style="color:var(--muted);font-size:11px;text-align:center;padding:8px">暂无格子</div>';
-}
-
-function selectBoardCell(cellId) {
-  _selectedCellId = cellId;
-  if (_boardEditor) _boardEditor.selectCell(cellId);
-  renderPropertyPanel();
-}
-
-function movePathItem(cellId, dir) {
-  if (_boardEditor) {
-    if (dir < 0) _boardEditor.movePathUp(cellId);
-    else _boardEditor.movePathDown(cellId);
-    renderPropertyPanel();
+// ==================== 模式切换 ====================
+function setMode(mode){
+  editor.mode = mode;
+  document.querySelectorAll('.topbar-mode-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.mode===mode); });
+  if(mode === 'edit'){
+    document.getElementById('boardContainer').style.display = 'block';
+    document.getElementById('previewFrame').style.display = 'none';
+    if(editorAPI) editorAPI.fitView();
+  } else {
+    document.getElementById('boardContainer').style.display = 'none';
+    document.getElementById('previewFrame').style.display = 'block';
     renderPreview();
   }
 }
 
-var _pathDragFrom = null;
-function pathDragStart(e) {
-  _pathDragFrom = e.target.closest('.path-order-item');
-  if (_pathDragFrom) {
-    _pathDragFrom.style.opacity = '0.4';
-    e.dataTransfer.effectAllowed = 'move';
+// ==================== 管理器面板 ====================
+document.getElementById('managerBar').addEventListener('click', function(e){
+  var btn = e.target.closest('[data-panel]');
+  if(!btn) return;
+  document.querySelectorAll('.manager-item').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  openPanel(btn.dataset.panel);
+});
+
+function openPanel(panelId){
+  _openPanel = panelId;
+  var title = '', body = '';
+  var block = findBlockByType(panelId==='board'?'board':panelId);
+
+  switch(panelId){
+    case 'board':
+      title='🗺️ 地图'; body=renderBoardPanel(block); break;
+    case 'collection':
+      title='🎲 卡牌管理'; body=renderCollectionPanel(); break;
+    case 'rule':
+      title='📐 规则设置'; body=renderRulePanel(block); break;
+    case 'player':
+      title='👥 玩家设置'; body=renderPlayerPanel(block); break;
+    case 'store':
+      title='🏪 商店管理'; body=renderStorePanel(block); break;
+    case 'effect':
+      title='⚡ 事件管理'; body=renderEffectPanel(block); break;
+    case 'theme':
+      title='🎨 主题设置'; body=renderThemePanel(block); break;
   }
+
+  document.getElementById('panelTitle').textContent = title;
+  document.getElementById('panelBody').innerHTML = body;
+  document.getElementById('managerPanel').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
 }
-function pathDragOver(e) {
-  e.preventDefault();
-  var item = e.target.closest('.path-order-item');
-  if (item && item !== _pathDragFrom) {
-    item.style.borderColor = 'var(--accent)';
-  }
+
+function closePanel(){
+  document.getElementById('managerPanel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+  _openPanel = null;
+  document.querySelectorAll('.manager-item').forEach(function(b){ b.classList.remove('active'); });
 }
-function pathDrop(e, targetId) {
-  e.preventDefault();
-  var items = document.querySelectorAll('.path-order-item');
-  for (var i = 0; i < items.length; i++) { items[i].style.borderColor = 'var(--border)'; }
-  if (_pathDragFrom) {
-    _pathDragFrom.style.opacity = '1';
-    var fromId = _pathDragFrom.dataset.cellId;
-    if (fromId !== targetId && _boardEditor) {
-      // 移动 fromId 到 targetId 的位置
-      var cfg = _boardEditor.getConfig();
-      var po = cfg.pathOrder || [];
-      var fromIdx = po.indexOf(fromId);
-      var toIdx = po.indexOf(targetId);
-      if (fromIdx >= 0 && toIdx >= 0 && fromIdx !== toIdx) {
-        // 重新排序：把 fromId 移到 targetId 之前
-        var newOrder = [];
-        for (var j = 0; j < po.length; j++) {
-          if (j === toIdx) newOrder.push(fromId);
-          if (po[j] !== fromId) newOrder.push(po[j]);
-        }
-        _boardEditor.setConfig({ cells: cfg.cells, pathOrder: newOrder });
-        renderPropertyPanel();
-        renderPreview();
-      }
+
+// ==================== 面板渲染 ====================
+function renderBoardPanel(block){
+  var cells = (block&&block.config.cells)||[];
+  return '<div class="mgr-section"><div class="mgr-section-title">地图信息</div>'+
+    '<div class="mgr-item"><span class="mgr-item-icon">📊</span><span class="mgr-item-name">格子总数</span><span class="mgr-item-meta">'+cells.length+' 格</span></div>'+
+    '<div class="mgr-item"><span class="mgr-item-icon">🔗</span><span class="mgr-item-name">路径节点</span><span class="mgr-item-meta">'+((block&&block.config.pathOrder)||[]).length+' 个</span></div>'+
+    '</div>'+
+    '<div class="mgr-section"><div class="mgr-section-title">操作提示</div>'+
+    '<div style="font-size:11px;color:var(--muted);line-height:1.8">'+
+    '🖱️ 双击空白处添加格子<br>'+
+    '🖱️ 拖拽移动格子<br>'+
+    '🖱️ 右键格子打开菜单<br>'+
+    '⌨️ Shift+点击多选<br>'+
+    '⌨️ 方向键微调位置<br>'+
+    '⌨️ Delete 删除选中格子<br>'+
+    '⌨️ Ctrl+Z/Y 撤销重做<br>'+
+    '⌨️ 空格+拖拽平移画布<br>'+
+    '🖱️ 滚轮缩放<br>'+
+    '</div></div>';
+}
+
+function renderCollectionPanel(){
+  var html = '';
+  var collections = findBlocksByType('collection');
+  for(var i=0; i<collections.length; i++){
+    var b = collections[i];
+    var cards = (b.config&&b.config.cards)||[];
+    html += '<div class="mgr-section"><div class="mgr-section-title">'+b.label+' ('+cards.length+'张)</div>';
+    for(var j=0; j<cards.length; j++){
+      var c = cards[j];
+      html += '<div class="mgr-item" onclick="editCard(\''+b.id+'\','+j+')">'+
+        '<span class="mgr-item-icon">🃏</span><span class="mgr-item-name">'+esc(c.title||'卡#'+j)+'</span>'+
+        '<button class="mgr-item-del" onclick="event.stopPropagation();removeCard(\''+b.id+'\','+j+')">×</button></div>';
     }
+    html += '<button class="mgr-add-btn" onclick="addCard(\''+b.id+'\')">+ 添加卡牌</button></div>';
   }
-  _pathDragFrom = null;
+  return html || '<div style="color:var(--muted);font-size:12px;text-align:center;padding:20px">暂无卡牌Block<br>在地图编辑器中添加机会卡/命运卡</div>';
 }
 
-function deleteBoardCell(cellId) {
-  if (_boardEditor) {
-    _boardEditor.deleteCell(cellId);
-    _selectedCellId = null;
-    renderPropertyPanel();
-  }
-}
-
-function renderField(block, field) {
-  var val = block.config[field.key];
-  var html = '<div class="prop-field"><label>' + field.label + '</label>';
-  switch (field.type) {
-    case 'number':
-      html += '<input type="number" value="' + (val != null ? val : '') + '" min="' + (field.min || '') + '" max="' + (field.max || '') + '" onchange="updateBlockConfig(\'' + field.key + '\',parseInt(this.value)||0)">';
-      break;
-    case 'text':
-      html += '<input type="text" value="' + esc(val || '') + '" onchange="updateBlockConfig(\'' + field.key + '\',this.value)">';
-      break;
-    case 'color':
-      html += '<div style="display:flex;align-items:center;gap:8px">';
-      html += '<input type="color" value="' + esc(val || '#7C3AED') + '" onchange="updateBlockConfig(\'' + field.key + '\',this.value)" style="width:40px;height:32px;border:none;cursor:pointer">';
-      html += '<span style="font-size:12px;color:var(--muted)">' + esc(val || '#7C3AED') + '</span>';
-      html += '</div>';
-      break;
-    case 'select':
-      html += '<select onchange="updateBlockConfig(\'' + field.key + '\',this.value)">';
-      (field.options || []).forEach(function(o) {
-        html += '<option value="' + o + '"' + (val === o ? ' selected' : '') + '>' + o + '</option>';
-      });
-      html += '</select>';
-      break;
-    case 'cell-list': html += renderCellEditor(block, field.key); break;
-    case 'card-list': html += renderCardEditor(block, field.key); break;
-    case 'variable-list': html += renderVarEditor(block, field.key); break;
-    case 'store-item-list': html += renderStoreEditor(block, field.key); break;
-    case 'building-list': html += renderBuildingEditor(block, field.key); break;
-    case 'effect-list': html += renderEffectEditor(block, field.key); break;
-    case 'piece-list': html += renderPieceEditor(block, field.key); break;
-    case 'board-editor': html += '<span style="font-size:11px;color:var(--muted)">在中间画布上编辑</span>'; break;
-    case 'hidden': return html;
-    default: html += '<span style="font-size:11px;color:var(--muted)">编辑类型 ' + field.type + ' 待实现</span>';
-  }
-  html += '</div>';
-  return html;
-}
-
-// ============ 专用编辑器 ============
-
-// 格子编辑器 — 可编辑每个格子的名称/图标/类型/价格
-function renderCellEditor(block, key) {
-  var cells = block.config[key] || [];
-  var types = ['start','property','chance','destiny','jail','shop','event','tax','empty'];
-  var html = '<div class="ed-list">';
-  for (var i = 0; i < cells.length; i++) {
-    var c = cells[i];
-    html += '<div class="ed-item" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:6px 8px;background:var(--card);border-radius:8px;margin-bottom:6px">';
-    html += '<span style="font-size:11px;color:var(--muted);width:24px">#' + c.index + '</span>';
-    html += '<input value="' + esc(c.icon || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'icon\',this.value)" style="width:32px;font-size:16px;text-align:center;padding:2px" title="图标">';
-    html += '<input value="' + esc(c.name || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'name\',this.value)" style="flex:1;min-width:60px;font-size:11px;padding:3px 6px" title="名称">';
-    html += '<select onchange="updateListItem(\'' + key + '\',' + i + ',\'type\',this.value)" style="width:72px;font-size:10px;padding:3px">';
-    types.forEach(function(t) { html += '<option value="' + t + '"' + (c.type === t ? ' selected' : '') + '>' + t + '</option>'; });
-    html += '</select>';
-    if (c.type === 'property') {
-      html += '<input type="number" value="' + (c.price || 0) + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'price\',parseInt(this.value)||0)" style="width:56px;font-size:10px;padding:3px" title="价格" placeholder="价格">';
-    }
-    html += '<button onclick="removeListItem(\'' + key + '\',' + i + ')" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--red);cursor:pointer;font-size:14px;line-height:1" title="删除">×</button>';
-    html += '</div>';
-  }
-  html += '</div>';
-  html += '<button class="ed-add" onclick="addListItem(\'' + key + '\',{index:' + cells.length + ',type:\'property\',name:\'新地产\',icon:\'🏠\',price:200})">+ 添加格子</button>';
-  return html;
-}
-
-// 卡牌编辑器 — 可编辑每张卡的标题和效果
-function renderCardEditor(block, key) {
-  var cards = block.config[key] || [];
-  var html = '<div class="ed-list">';
-  for (var i = 0; i < cards.length; i++) {
-    var c = cards[i];
-    html += '<div class="ed-item" style="display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:6px 8px;background:var(--card);border-radius:8px;margin-bottom:4px">';
-    html += '<span style="font-size:18px;width:24px;text-align:center">🃏</span>';
-    html += '<input value="' + esc(c.title || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'title\',this.value)" style="flex:1;min-width:80px;font-size:11px;padding:3px 6px" placeholder="卡牌标题">';
-    html += '<input type="number" value="' + (c.effect ? (c.effect.gold || '') : '') + '" onchange="var e=(this.value||0);updateListItem(\'' + key + '\',' + i + ',\'effect\',{gold:' + (parseInt(c.effect && c.effect.gold) || 0) + '})" style="width:50px;font-size:10px;padding:3px" placeholder="金币" title="金币效果" disabled>';
-    html += '<button onclick="removeListItem(\'' + key + '\',' + i + ')" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--red);cursor:pointer;font-size:14px;line-height:1">×</button>';
-    html += '</div>';
-  }
-  html += '</div>';
-  html += '<button class="ed-add" onclick="addListItem(\'' + key + '\',{id:\'c' + Date.now() + '\',title:\'新卡牌\',effect:{}})">+ 添加卡牌</button>';
-  return html;
-}
-
-// 变量编辑器
-function renderVarEditor(block, key) {
-  var vars = block.config[key] || [];
-  var html = '<div class="ed-list">';
-  for (var i = 0; i < vars.length; i++) {
+function renderRulePanel(block){
+  var vars = (block&&block.config.variables)||[];
+  var html = '';
+  for(var i=0; i<vars.length; i++){
     var v = vars[i];
-    html += '<div class="ed-item" style="display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:6px 8px;background:var(--card);border-radius:8px;margin-bottom:4px">';
-    html += '<input value="' + esc(v.label || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'label\',this.value)" style="flex:1;min-width:60px;font-size:11px;padding:3px 6px" placeholder="名称">';
-    html += '<input type="number" value="' + (v.value || 0) + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'value\',parseInt(this.value)||0)" style="width:56px;font-size:10px;padding:3px" placeholder="值">';
-    html += '<button onclick="removeListItem(\'' + key + '\',' + i + ')" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--red);cursor:pointer;font-size:14px;line-height:1">×</button>';
-    html += '</div>';
+    html += '<div class="mgr-item" onclick="editVariable(\''+(block?block.id:'')+'\','+i+')">'+
+      '<span class="mgr-item-icon">🔢</span><span class="mgr-item-name">'+esc(v.label)+'</span>'+
+      '<span class="mgr-item-meta">'+v.value+'</span></div>';
+  }
+  return html || '<div style="color:var(--muted);font-size:12px;text-align:center;padding:20px">暂无规则</div>';
+}
+
+function renderPlayerPanel(block){
+  var players = (block&&block.config.players)||[];
+  var html = '<div class="mgr-section"><div class="mgr-section-title">玩家列表</div>';
+  for(var i=0; i<players.length; i++){
+    var p = players[i];
+    html += '<div class="mgr-item" onclick="editPlayer(\''+(block?block.id:'')+'\','+i+')">'+
+      '<span class="mgr-item-icon">'+(p.emoji||'🎮')+'</span><span class="mgr-item-name">'+esc(p.name)+'</span>'+
+      (p.isAI?'<span class="mgr-item-meta">🤖 AI</span>':'')+
+      '<span class="mgr-item-meta">💰'+(block&&block.config.initialGold)||1500+'</span></div>';
   }
   html += '</div>';
-  html += '<button class="ed-add" onclick="addListItem(\'' + key + '\',{key:\'v' + Date.now() + '\',label:\'新变量\',value:0,min:0,max:100})">+ 添加变量</button>';
+  if(block){
+    html += '<div class="mgr-field"><label>初始金币</label><input type="number" value="'+(block.config.initialGold||1500)+'" onchange="updateBlockCfg(\'player\',{initialGold:parseInt(this.value)||1500});markDirty()"></div>';
+    html += '<div class="mgr-field-row"><div class="mgr-field"><label>最少玩家</label><input type="number" value="'+(block.config.minPlayers||2)+'" onchange="updateBlockCfg(\'player\',{minPlayers:parseInt(this.value)||2})"></div><div class="mgr-field"><label>最多玩家</label><input type="number" value="'+(block.config.maxPlayers||4)+'" onchange="updateBlockCfg(\'player\',{maxPlayers:parseInt(this.value)||4})"></div></div>';
+  }
   return html;
 }
 
-// 商店编辑器
-function renderStoreEditor(block, key) {
-  var items = block.config[key] || [];
-  var html = '<div class="ed-list">';
-  for (var i = 0; i < items.length; i++) {
+function renderStorePanel(block){
+  var items = (block&&block.config.items)||[];
+  var html = '';
+  for(var i=0; i<items.length; i++){
     var it = items[i];
-    html += '<div class="ed-item" style="display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:6px 8px;background:var(--card);border-radius:8px;margin-bottom:4px">';
-    html += '<span style="font-size:16px;width:24px;text-align:center">' + (it.effect && it.effect.icon ? it.effect.icon : '🏪') + '</span>';
-    html += '<input value="' + esc(it.name || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'name\',this.value)" style="flex:1;min-width:60px;font-size:11px;padding:3px 6px" placeholder="商品名">';
-    html += '<input type="number" value="' + (it.cost || 0) + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'cost\',parseInt(this.value)||0)" style="width:56px;font-size:10px;padding:3px" placeholder="价格">';
-    html += '<button onclick="removeListItem(\'' + key + '\',' + i + ')" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--red);cursor:pointer;font-size:14px;line-height:1">×</button>';
-    html += '</div>';
+    html += '<div class="mgr-item">'+
+      '<span class="mgr-item-icon">'+(it.icon||'📦')+'</span><span class="mgr-item-name">'+esc(it.name)+'</span>'+
+      '<span class="mgr-item-meta">💰'+it.cost+'</span>'+
+      '<button class="mgr-item-del" onclick="removeStoreItem(\''+(block?block.id:'')+'\','+i+')">×</button></div>';
   }
-  html += '</div>';
-  html += '<button class="ed-add" onclick="addListItem(\'' + key + '\',{id:\'it' + Date.now() + '\',name:\'新商品\',cost:100,effect:{}})">+ 添加商品</button>';
+  html += '<button class="mgr-add-btn" onclick="addStoreItem(\''+(block?block.id:'')+'\')">+ 添加商品</button>';
   return html;
 }
 
-// 建筑编辑器
-function renderBuildingEditor(block, key) {
-  var buildings = block.config[key] || [];
-  var html = '<div class="ed-list">';
-  for (var i = 0; i < buildings.length; i++) {
-    var b = buildings[i];
-    html += '<div class="ed-item" style="display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:6px 8px;background:var(--card);border-radius:8px;margin-bottom:4px">';
-    html += '<input value="' + esc(b.name || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'name\',this.value)" style="flex:1;min-width:60px;font-size:11px;padding:3px 6px" placeholder="建筑名">';
-    html += '<input type="number" value="' + (b.cost || 0) + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'cost\',parseInt(this.value)||0)" style="width:56px;font-size:10px;padding:3px" placeholder="费用">';
-    html += '<button onclick="removeListItem(\'' + key + '\',' + i + ')" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--red);cursor:pointer;font-size:14px;line-height:1">×</button>';
-    html += '</div>';
-  }
-  html += '</div>';
-  html += '<button class="ed-add" onclick="addListItem(\'' + key + '\',{id:\'b' + Date.now() + '\',name:\'新建筑\',cost:500,level:1})">+ 添加建筑</button>';
-  return html;
-}
-
-// 效果编辑器
-function renderEffectEditor(block, key) {
-  var effects = block.config[key] || [];
-  var actions = ['add_gold','deduct_gold','skip_turns','move','draw_card','swap_position','lucky_draw','shop_reward','luck_bonus'];
-  var triggers = ['land_on','pass_start','before_roll','game_end'];
-  var html = '<div class="ed-list">';
-  for (var i = 0; i < effects.length; i++) {
+function renderEffectPanel(block){
+  var effects = (block&&block.config.effects)||[];
+  var html = '';
+  for(var i=0; i<effects.length; i++){
     var ef = effects[i];
-    html += '<div class="ed-item" style="display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:6px 8px;background:var(--card);border-radius:8px;margin-bottom:4px">';
-    html += '<select onchange="updateListItem(\'' + key + '\',' + i + ',\'trigger\',this.value)" style="font-size:10px;padding:3px;width:80px">';
-    triggers.forEach(function(t) { html += '<option value="' + t + '"' + (ef.trigger === t ? ' selected' : '') + '>' + t + '</option>'; });
-    html += '</select>';
-    html += '<select onchange="updateListItem(\'' + key + '\',' + i + ',\'action\',this.value)" style="font-size:10px;padding:3px;width:80px">';
-    actions.forEach(function(a) { html += '<option value="' + a + '"' + (ef.action === a ? ' selected' : '') + '>' + a + '</option>'; });
-    html += '</select>';
-    html += '<input type="number" value="' + (ef.value || 0) + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'value\',parseInt(this.value)||0)" style="width:48px;font-size:10px;padding:3px" title="值">';
-    html += '<button onclick="removeListItem(\'' + key + '\',' + i + ')" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--red);cursor:pointer;font-size:14px;line-height:1">×</button>';
-    html += '</div>';
+    html += '<div class="mgr-item">'+
+      '<span class="mgr-item-icon">⚡</span><span class="mgr-item-name">'+esc(ef.trigger||'')+' → '+esc(ef.action||'')+'</span>'+
+      '<span class="mgr-item-meta">'+(ef.value||'')+'</span></div>';
   }
-  html += '</div>';
-  html += '<button class="ed-add" onclick="addListItem(\'' + key + '\',{id:\'e' + Date.now() + '\',trigger:\'land_on\',action:\'add_gold\',value:0})">+ 添加效果</button>';
+  return html || '<div style="color:var(--muted);font-size:12px;text-align:center;padding:20px">暂无事件效果</div>';
+}
+
+function renderThemePanel(block){
+  var cfg = (block&&block.config)||{};
+  var presets = ['暗紫','暗金','暗绿','暗蓝','经典都市','赛博朋克','童话王国'];
+  var html = '<div class="mgr-section"><div class="mgr-section-title">预设主题</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">';
+  for(var i=0; i<presets.length; i++){
+    html += '<button class="mgr-item" style="flex-direction:column;padding:10px 6px" onclick="updateBlockCfg(\'theme\',{preset:\''+presets[i]+'\'});markDirty();closePanel()"><span style="font-size:22px">🎨</span><span style="font-size:10px">'+presets[i]+'</span></button>';
+  }
+  html += '</div></div>';
+  html += '<div class="mgr-field"><label>强调色</label><input type="color" value="'+(cfg.accent||'#7C3AED')+'" onchange="updateBlockCfg(\'theme\',{accent:this.value});markDirty()"></div>';
+  html += '<div class="mgr-field"><label>辅助色</label><input type="color" value="'+(cfg.accent2||'#EC4899')+'" onchange="updateBlockCfg(\'theme\',{accent2:this.value});markDirty()"></div>';
   return html;
 }
 
-// 棋子编辑器
-function renderPieceEditor(block, key) {
-  var pieces = block.config[key] || [];
-  var html = '<div class="ed-list">';
-  for (var i = 0; i < pieces.length; i++) {
-    var p = pieces[i];
-    html += '<div class="ed-item" style="display:flex;gap:3px;align-items:center;padding:6px 8px;background:var(--card);border-radius:8px;margin-bottom:4px">';
-    html += '<input value="' + esc(p.emoji || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'emoji\',this.value)" style="width:36px;font-size:18px;text-align:center;padding:2px" title="图标">';
-    html += '<input value="' + esc(p.name || '') + '" onchange="updateListItem(\'' + key + '\',' + i + ',\'name\',this.value)" style="flex:1;min-width:60px;font-size:11px;padding:3px 6px" placeholder="名称">';
-    html += '<input value="' + esc(p.color || '') + '" type="color" onchange="updateListItem(\'' + key + '\',' + i + ',\'color\',this.value)" style="width:32px;height:28px;border:none;cursor:pointer" title="颜色">';
-    html += '<label style="font-size:10px;display:flex;align-items:center;gap:2px"><input type="checkbox" ' + (p.isAI ? 'checked' : '') + ' onchange="updateListItem(\'' + key + '\',' + i + ',\'isAI\',this.checked)">AI</label>';
-    html += '<button onclick="removeListItem(\'' + key + '\',' + i + ')" style="width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--red);cursor:pointer;font-size:14px;line-height:1">×</button>';
-    html += '</div>';
-  }
-  html += '</div>';
-  html += '<button class="ed-add" onclick="addListItem(\'' + key + '\',{id:\'p' + Date.now() + '\',name:\'新玩家\',emoji:\'🎮\',color:\'#7C3AED\',isAI:false})">+ 添加棋子</button>';
-  return html;
+// ==================== 卡牌编辑弹窗 ====================
+function editCard(blockId, idx){
+  var block = findBlockById(blockId);
+  if(!block) return;
+  var card = (block.config.cards||[])[idx];
+  if(!card) return;
+  var html = '<div class="mgr-section"><div class="mgr-section-title">编辑卡牌</div>'+
+    '<div class="mgr-field"><label>标题</label><input id="cardTitle" value="'+esc(card.title||'')+'"></div>'+
+    '<div class="mgr-field-row"><div class="mgr-field"><label>权重</label><input id="cardWeight" type="number" value="'+(card.weight||1)+'"></div>'+
+    '<div class="mgr-field"><label>金币效果</label><input id="cardGold" type="number" value="'+(card.effect&&card.effect.gold||0)+'"></div></div>'+
+    '<div class="mgr-field-row"><div class="mgr-field"><label>移动效果</label><input id="cardMove" type="number" value="'+(card.effect&&card.effect.move||0)+'"></div>'+
+    '<div class="mgr-field"><label>跳过回合</label><select id="cardSkip"><option value="0"'+(card.effect&&card.effect.skip?'':' selected')+'>否</option><option value="1"'+(card.effect&&card.effect.skip?' selected':'')+'>是</option></select></div></div>'+
+    '<button class="btn btn-primary" onclick="saveCard(\''+blockId+'\','+idx+')" style="width:100%">💾 保存</button></div>';
+  document.getElementById('panelBody').innerHTML = html;
 }
 
-// HTML 转义辅助
-
-function applyTemplate(blockId, tplIdx) {
-  var block = null;
-  for (var i = 0; i < editor.blocks.length; i++) {
-    if (editor.blocks[i].id === blockId) { block = editor.blocks[i]; break; }
+// ==================== Block 操作 ====================
+function findBlockByType(type){
+  for(var i=0; i<editor.blocks.length; i++){
+    if(editor.blocks[i].type===type) return editor.blocks[i];
   }
-  if (!block) return;
-  var schema = BlockRegistry.getSchema(block.type);
-  var tmpl = (schema && schema.templates) ? schema.templates[tplIdx] : null;
-  if (!tmpl) return;
-  // 合并模板配置（保留 fields 里已有的 key，覆盖/新增模板的 key）
-  var merged = JSON.parse(JSON.stringify(block.config));
-  for (var k in tmpl.config) {
-    if (tmpl.config.hasOwnProperty(k)) merged[k] = tmpl.config[k];
+  return null;
+}
+function findBlocksByType(type){
+  return editor.blocks.filter(function(b){return b.type===type;});
+}
+function findBlockById(id){
+  for(var i=0; i<editor.blocks.length; i++){
+    if(editor.blocks[i].id===id) return editor.blocks[i];
   }
-  updateBlock(blockId, merged);
-  showToast('✅ 已应用: ' + tmpl.name);
+  return null;
+}
+function updateBlockCfg(type, cfg){
+  var block = findBlockByType(type);
+  if(!block) return;
+  for(var k in cfg){ if(cfg.hasOwnProperty(k)) block.config[k] = cfg[k]; }
+  if(type==='board' && editorAPI){
+    editorAPI.setConfig(block.config);
+  }
+}
+// 特殊处理：卡牌增删
+function addCard(blockId){
+  var block = findBlockById(blockId);
+  if(!block) return;
+  if(!block.config.cards) block.config.cards = [];
+  block.config.cards.push({title:'新卡牌',weight:1,effect:{}});
+  markDirty();
+  openPanel('collection');
+}
+function removeCard(blockId, idx){
+  var block = findBlockById(blockId);
+  if(!block) return;
+  block.config.cards.splice(idx, 1);
+  markDirty();
+  openPanel('collection');
+}
+function saveCard(blockId, idx){
+  var block = findBlockById(blockId);
+  if(!block) return;
+  var card = block.config.cards[idx];
+  card.title = document.getElementById('cardTitle').value;
+  card.weight = parseInt(document.getElementById('cardWeight').value)||1;
+  if(!card.effect) card.effect = {};
+  card.effect.gold = parseInt(document.getElementById('cardGold').value)||0;
+  card.effect.move = parseInt(document.getElementById('cardMove').value)||0;
+  card.effect.skip = document.getElementById('cardSkip').value === '1';
+  markDirty();
+  openPanel('collection');
+}
+function addStoreItem(blockId){
+  var block = findBlockById(blockId);
+  if(!block) return;
+  if(!block.config.items) block.config.items = [];
+  block.config.items.push({id:'item_'+Date.now().toString(36),name:'新商品',cost:100});
+  markDirty();
+  openPanel('store');
+}
+function removeStoreItem(blockId, idx){
+  var block = findBlockById(blockId);
+  if(!block) return;
+  block.config.items.splice(idx,1);
+  markDirty();
+  openPanel('store');
 }
 
-function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+// ==================== 预览 ====================
+function renderPreview(){
+  var iframe = document.getElementById('previewFrame');
+  var cfg = {game_type:editor.gameType,title:editor.title,blocks:editor.blocks};
+  var json = JSON.stringify(cfg).replace(/</g,'\\u003c');
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>'+
+    '*{margin:0;padding:0;box-sizing:border-box}'+
+    ':root{--gold:#F5C842;--bg:#0A0A1A;--accent:#7C3AED;--accent2:#EC4899;--deep:#12122A;--card:rgba(255,255,255,0.05);--border:rgba(255,255,255,0.08);--text:#E0DCF0;--muted:rgba(224,220,240,0.5)}'+
+    'body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px}'+
+    '.pv-wrap{width:100%;max-width:500px}'+
+    '.pv-board{position:relative;width:100%;min-height:300px;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,0.2);overflow:hidden}'+
+    '.pv-cell{position:absolute;min-width:50px;padding:3px 5px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);font-size:8px;text-align:center;display:flex;flex-direction:column;align-items:center}'+
+    '.pv-item{display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--card);border-radius:6px;margin-bottom:3px;font-size:10px}'+
+    '</style></head><body><div class="pv-wrap">'+
+    '<h2 style="font-size:15px;margin-bottom:8px">'+esc(editor.title)+'</h2>';
 
-// ========= 保存 & 发布 =========
-async function saveConfig() {
-  var player = GameSupabase.getCurrentPlayer();
-  if (!player) {
-    GameAuth.requireLogin(function() { saveConfig(); });
-    return;
-  }
-
-  document.getElementById('btnSave').disabled = true;
-  document.getElementById('btnSave').textContent = '保存中…';
-
-  var payload = {
-    user_id: player.id,
-    game_type: editor.gameType,
-    title: editor.title,
-    blocks: editor.blocks,
-    is_public: false,
-  };
-
-  var result;
-  if (editor.configId) {
-    result = await GHSupabase
-      .from('user_configs')
-      .update({ ...payload, updated_at: new Date().toISOString() })
-      .eq('id', editor.configId)
-      .select('*')
-      .single();
-  } else {
-    result = await GHSupabase
-      .from('user_configs')
-      .insert(payload)
-      .select('*')
-      .single();
-  }
-
-  document.getElementById('btnSave').disabled = false;
-  document.getElementById('btnSave').textContent = '💾 保存';
-
-  if (result.error) {
-    showToast('❌ 保存失败: ' + result.error.message);
-    return;
-  }
-
-  editor.configId = result.data.id;
-  editor.isDirty = false;
-  updateSaveStatus();
-  showToast('✅ 已保存\n\nID: ' + result.data.id);
-}
-
-async function publishConfig() {
-  if (!editor.configId || editor.isDirty) {
-    await saveConfig();
-  }
-  if (!editor.configId) return;
-
-  document.getElementById('btnPublish').disabled = true;
-  document.getElementById('btnPublish').textContent = '发布中…';
-
-  // 如果已有 share_slug，直接使用
-  if (editor.shareSlug) {
-    var shareUrl = location.origin + '/play.html?config=' + editor.shareSlug;
-    showToast('🎉 分享链接 (已发布)\n\n' + shareUrl);
-    navigator.clipboard && navigator.clipboard.writeText(shareUrl);
-    document.getElementById('btnPublish').disabled = false;
-    document.getElementById('btnPublish').textContent = '🚀 发布';
-    return;
-  }
-
-  var slug = Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 4);
-
-  var result = await GHSupabase
-    .from('user_configs')
-    .update({
-      is_published: true,
-      share_slug: slug,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', editor.configId)
-    .select('*')
-    .single();
-
-  document.getElementById('btnPublish').disabled = false;
-  document.getElementById('btnPublish').textContent = '🚀 发布';
-
-  if (result.error) {
-    showToast('❌ 发布失败: ' + result.error.message);
-    return;
-  }
-
-  editor.shareSlug = slug;
-  var shareUrl = location.origin + '/play.html?config=' + slug;
-  showToast('🎉 已发布！链接已复制到剪贴板\n\n' + shareUrl);
-  navigator.clipboard && navigator.clipboard.writeText(shareUrl);
-}
-
-// ========= AI 助手 =========
-async function askAI() {
-  var input = document.getElementById('aiInput');
-  var prompt = input.value.trim();
-  if (!prompt) return;
-
-  input.disabled = true;
-  document.getElementById('btnAI').disabled = true;
-  document.getElementById('btnAI').textContent = '思考中…';
-  showToast('🤖 AI 正在分析: ' + prompt);
-
-  try {
-    var result = await GHSupabase.functions.invoke('ai-config', {
-      body: {
-        prompt: prompt,
-        gameType: editor.gameType,
-        currentBlocks: editor.blocks,
-      },
-    });
-
-    if (result.error) throw result.error;
-
-    var data = result.data;
-    // 应用 patches
-    if (data.patches) {
-      for (var i = 0; i < data.patches.length; i++) {
-        var patch = data.patches[i];
-        updateBlock(patch.blockId, patch.config);
+  var blocks = editor.blocks;
+  for(var i=0; i<blocks.length; i++){
+    var b = blocks[i];
+    if(b.type==='board'){
+      var cells = b.config.cells||[];
+      html += '<div style="font-size:10px;color:var(--muted);margin:8px 0 4px">🗺️ '+b.label+' ('+cells.length+'格)</div>';
+      html += '<div class="pv-board" style="position:relative;min-height:200px;max-height:280px">';
+      var tC={start:'rgba(34,197,94,0.25)',property:'rgba(124,58,237,0.2)',chance:'rgba(245,200,66,0.2)',destiny:'rgba(236,72,153,0.2)',jail:'rgba(239,68,68,0.2)',shop:'rgba(59,130,246,0.2)',event:'rgba(34,211,238,0.2)',tax:'rgba(251,146,60,0.2)'};
+      for(var j=0; j<Math.min(cells.length,24); j++){
+        var c = cells[j];
+        html += '<div class="pv-cell" style="left:'+(c.x*0.35)+'px;top:'+(c.y*0.35)+'px;background:'+(tC[c.type]||'var(--card)')+'">'+
+          '<span style="font-size:14px">'+(c.icon||'')+'</span>'+(c.name||'')+'</div>';
       }
-    }
-    // 应用 newBlocks
-    if (data.newBlocks) {
-      for (var j = 0; j < data.newBlocks.length; j++) {
-        var nb = data.newBlocks[j];
-        var block = BlockRegistry.createBlock(nb.type, nb.config);
-        if (block) {
-          editor.blocks = editor.blocks.concat([block]);
-        }
+      html += '</div>';
+    } else if(b.type==='collection'){
+      var cards = b.config.cards||[];
+      html += '<div style="font-size:10px;color:var(--muted);margin:8px 0 4px">🎲 '+b.label+' ('+cards.length+'张)</div>';
+      for(var k=0; k<Math.min(cards.length,4); k++){
+        html += '<div class="pv-item"><span>🃏</span><span>'+(cards[k].title||'卡#'+k)+'</span></div>';
       }
+      if(cards.length>4) html += '<div style="font-size:9px;color:var(--muted)">... 还有'+(cards.length-4)+'张</div>';
+    } else if(b.type==='player'){
+      var players = b.config.players||[];
+      html += '<div style="font-size:10px;color:var(--muted);margin:8px 0 4px">👥 '+players.length+'名玩家 初始💰'+(b.config.initialGold||1500)+'</div>';
     }
-
-    editor.isDirty = true;
-    updateSaveStatus();
-    renderAll();
-    showToast('✅ AI 已完成修改\n\n' + (data.explanation || ''));
-    input.value = '';
-  } catch (e) {
-    showToast('❌ AI 请求失败: ' + (e.message || '网络错误'));
   }
-
-  input.disabled = false;
-  document.getElementById('btnAI').disabled = false;
-  document.getElementById('btnAI').textContent = '发送';
+  html += '</div></body></html>';
+  var blob = new Blob([html],{type:'text/html'});
+  if(iframe._prevUrl) URL.revokeObjectURL(iframe._prevUrl);
+  iframe._prevUrl = URL.createObjectURL(blob);
+  iframe.src = iframe._prevUrl;
 }
 
-// ========= 数据加载 =========
-async function loadConfig(configId) {
-  try {
-    var result = await GHSupabase.from('user_configs').select('*').eq('id', configId).single();
-    if (result.error) throw result.error;
-    applyLoadedConfig(result.data);
-  } catch (e) {
-    showToast('❌ 加载失败: ' + e.message);
-  }
-}
-
-async function forkConfig(configId) {
-  try {
-    var result = await GHSupabase.from('user_configs').select('*').eq('id', configId).single();
-    if (result.error) throw result.error;
-    var data = result.data;
-    editor.blocks = JSON.parse(JSON.stringify(data.blocks));
-    editor.title = (data.title || '未命名') + ' (Fork)';
-    editor.configId = null;
-    editor.shareSlug = null;
-    document.getElementById('titleInput').value = editor.title;
-    renderAll();
-    showToast('🍴 已 Fork: ' + data.title);
-  } catch (e) {
-    showToast('❌ Fork 失败: ' + e.message);
-  }
-}
-
-function applyLoadedConfig(data) {
-  editor.blocks = data.blocks || [];
-  editor.title = data.title || '未命名大富翁';
-  editor.configId = data.id;
-  editor.shareSlug = data.share_slug;
-  editor.isDirty = false;
-  document.getElementById('titleInput').value = editor.title;
-  updateSaveStatus();
-  renderAll();
-  showToast('📂 已加载: ' + editor.title);
-}
-
-// ========= 工具函数 =========
-function updateSaveStatus() {
+// ==================== 保存/发布 ====================
+function markDirty(){ editor.isDirty=true; updateSaveStatus(); }
+function updateSaveStatus(){
   var el = document.getElementById('saveStatus');
-  if (editor.isDirty) {
-    el.innerHTML = '<span class="topbar-dot unsaved"></span>未保存';
+  el.innerHTML = '<span class="topbar-dot '+(editor.isDirty?'unsaved':'saved')+'"></span>'+(editor.isDirty?'未保存':'就绪');
+}
+function onTitleChange(){ editor.title = document.getElementById('titleInput').value; markDirty(); }
+
+async function saveConfig(){
+  var player = GameSupabase.getCurrentPlayer();
+  if(!player){ showToast('请先登录'); return; }
+  var payload = {user_id:player.id,game_type:editor.gameType,title:editor.title,blocks:editor.blocks,is_public:false};
+  var r;
+  if(editor.configId){
+    r = await GHSupabase.from('user_configs').update({...payload,updated_at:new Date().toISOString()}).eq('id',editor.configId).select('*').single();
   } else {
-    el.innerHTML = '<span class="topbar-dot saved"></span>已保存';
+    r = await GHSupabase.from('user_configs').insert(payload).select('*').single();
   }
+  if(r.error){ showToast('保存失败: '+r.error.message); return; }
+  editor.configId = r.data.id; editor.isDirty = false; updateSaveStatus();
+  showToast('✅ 已保存');
 }
 
-function showToast(msg) {
-  var el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(el._timer);
-  el._timer = setTimeout(function() { el.classList.remove('show'); }, 3000);
+async function publishConfig(){
+  if(!editor.configId) await saveConfig();
+  if(!editor.configId) return;
+  var slug = Math.random().toString(36).slice(2,10);
+  var r = await GHSupabase.from('user_configs').update({is_published:true,share_slug:slug,updated_at:new Date().toISOString()}).eq('id',editor.configId);
+  if(r.error){ showToast('发布失败: '+r.error.message); return; }
+  editor.shareSlug = slug;
+  var url = location.origin+'/play.html?config='+slug;
+  showToast('🎉 已发布！链接已复制');
+  navigator.clipboard && navigator.clipboard.writeText(url);
 }
 
+function switchGame(){
+  if(editor.isDirty && !confirm('切换游戏类型将丢失未保存的修改。确定继续？')) return;
+  editor.gameType = document.getElementById('gameType').value;
+  editor.blocks = BlockRegistry.getDefaults(editor.gameType);
+  editor.isDirty = false; editor.configId = null;
+  updateSaveStatus();
+  initMapEditor();
+  closePanel();
+}
 
+// ==================== 工具 ====================
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2000);
+}
+
+// 键盘快捷键
+document.addEventListener('keydown', function(e){
+  if(e.ctrlKey && e.key==='s'){ e.preventDefault(); saveConfig(); }
+});
 </script>
-
-<!-- Block 选择器 -->
-<div class="block-type-overlay" id="blockTypeOverlay" onclick="if(event.target===this)hideBlockPicker()">
-  <div class="block-type-grid">
-    <h3>🧩 选择要添加的 Block</h3>
-    <div class="sub">每种 Block 代表一种游戏元素，点击即可添加到左侧列表</div>
-    <div class="block-type-cards" id="blockTypeCards"></div>
-    <button class="block-type-close" onclick="hideBlockPicker()">取消</button>
-  </div>
-</div>
 </body>
 </html>
