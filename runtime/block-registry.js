@@ -371,6 +371,14 @@ const BlockRegistry = (() => {
   ];
 
   // ─── API ───
+  const SCRATCH_CARD_DEFAULTS = [
+    { id:'blk_prizes', type:'collection', label:'奖品', config:{ drawMode:'weighted', cards:[
+      {id:'s1',title:'一等奖 iPhone',weight:5},{id:'s2',title:'二等奖 耳机',weight:10},
+      {id:'s3',title:'三等奖 优惠券',weight:25},{id:'s4',title:'谢谢参与',weight:60},
+    ]}},
+    { id:'blk_theme', type:'theme', label:'视觉主题', config:{ preset:'暗金' } },
+  ];
+
   function getDefaults(gameType) {
     var games = {
       monopoly:       MONOPOLY_DEFAULTS,
@@ -381,6 +389,7 @@ const BlockRegistry = (() => {
       match3:         MATCH3_DEFAULTS,
       'flying-chess': FLYING_CHESS_DEFAULTS,
       'truth-or-dare': TRUTH_OR_DARE_DEFAULTS,
+      'scratch-card':  SCRATCH_CARD_DEFAULTS,
     };
     var defaults = games[gameType];
     return defaults ? JSON.parse(JSON.stringify(defaults)) : [];
