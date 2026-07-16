@@ -82,6 +82,7 @@ body {
 }
 .loading-spinner { font-size:40px; animation:spin 1s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
+@keyframes pointerBounce { 0%,100% { transform:translateX(-50%) translateY(0); } 50% { transform:translateX(-50%) translateY(4px); } }
 .loading-text { font-size:14px; color:var(--muted); }
 
 /* 移动端适配 */
@@ -132,6 +133,9 @@ body {
 
 <script src="https://cdn.jsdelivr.net/npm/spin-wheel@5/dist/spin-wheel-iife.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="runtime/effects/particles.js"></script>
+<script src="runtime/effects/sound.js"></script>
+<script src="runtime/effects/juice.js"></script>
 <script src="supabase.js"></script>
 <script src="runtime/block-registry.js"></script>
 <script src="runtime/core/theme.js"></script>
