@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GameHub 编辑器优化调研报告</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0A0A1A;--card:#12122A;--border:rgba(255,255,255,0.08);--accent:#7C3AED;--accent2:#EC4899;--gold:#F5C842;--text:#E0DCF0;--muted:rgba(224,220,240,0.5);--green:#22C55E;--red:#EF4444}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:1100px;margin:0 auto;padding:40px 20px}
+h1{font-size:36px;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-size:14px;color:var(--muted);margin-bottom:40px}
+h2{font-size:24px;font-weight:700;margin:48px 0 20px;padding-bottom:8px;border-bottom:2px solid var(--accent);display:flex;align-items:center;gap:10px}
+h3{font-size:18px;font-weight:700;margin:24px 0 12px}
+p{font-size:14px;color:var(--muted);margin-bottom:12px}
+
+/* 竞品卡片 */
+.competitor-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin:20px 0}
+.comp-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;transition:transform .2s,border-color .2s}
+.comp-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.comp-card .name{font-size:20px;font-weight:800;margin-bottom:4px}
+.comp-card .tagline{font-size:12px;color:var(--gold);margin-bottom:12px}
+.comp-card .stars{font-size:13px;color:var(--muted);margin-bottom:12px}
+.comp-card ul{list-style:none;font-size:13px}
+.comp-card li{padding:4px 0;color:var(--muted)}
+.comp-card li::before{content:'+ ';color:var(--green);font-weight:700}
+
+/* 对比表 */
+.compare-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13px}
+.compare-table th{background:var(--accent);color:#fff;padding:12px 14px;text-align:left;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:0.5px}
+.compare-table td{padding:10px 14px;border-bottom:1px solid var(--border)}
+.compare-table tr:nth-child(even) td{background:rgba(255,255,255,0.02)}
+.compare-table .check{color:var(--green);font-weight:700}
+.compare-table .cross{color:var(--red)}
+.compare-table .warn{color:var(--gold)}
+
+/* 模式卡片 */
+.pattern-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:20px 0}
+.pattern-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.pattern-card .num{font-size:32px;font-weight:900;color:var(--accent);opacity:.3;line-height:1}
+.pattern-card .ptitle{font-size:15px;font-weight:700;margin:8px 0 4px}
+.pattern-card .psource{font-size:11px;color:var(--gold);margin-bottom:8px}
+.pattern-card .pdesc{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* Before/After */
+.ba-section{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+.ba-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
+.ba-before{border-left:3px solid var(--red)}
+.ba-after{border-left:3px solid var(--green)}
+.ba-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.ba-before .ba-label{color:var(--red)}
+.ba-after .ba-label{color:var(--green)}
+
+/* ASCII 布局图 */
+.layout-diagram{background:#0D0D1F;border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0;font-family:'SF Mono','Fira Code',monospace;font-size:11px;line-height:1.3;color:var(--muted);overflow-x:auto;white-space:pre}
+
+/* 标签 */
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin:2px}
+.tag-green{background:rgba(34,197,94,.15);color:var(--green)}
+.tag-red{background:rgba(239,68,68,.15);color:var(--red)}
+.tag-gold{background:rgba(245,200,66,.15);color:var(--gold)}
+.tag-purple{background:rgba(124,58,237,.15);color:var(--accent)}
+
+/* 优先级矩阵 */
+.priority-matrix{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:20px 0}
+.priority-matrix .pm-cell{padding:12px 14px;background:var(--card);font-size:12px}
+.priority-matrix .pm-header{background:var(--accent);color:#fff;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.5px}
+.priority-matrix .pm-high{color:var(--red);font-weight:700}
+.priority-matrix .pm-mid{color:var(--gold)}
+
+.summary-box{background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(236,72,153,.1));border:1px solid rgba(124,58,237,.3);border-radius:16px;padding:24px;margin:32px 0}
+.summary-box h3{color:var(--accent2);margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>GameHub 编辑器优化调研报告</h1>
+<p class="subtitle">2026-07-16 · 5大竞品分析 · 6个优化方向 · 优先级矩阵</p>
+
+<!-- ====== 1. 竞品分析 ====== -->
+<h2>📊 一、竞品分析</h2>
+<p>调研了5个在「游戏创作」和「可视化编辑器」领域最具参考价值的竞品。</p>
+
+<div class="competitor-grid">
+  <div class="comp-card">
+    <div class="name">🎮 GDevelop</div>
+    <div class="tagline">最像 GameHub 该有的样子</div>
+    <div class="stars">开源 · 免费 · 事件驱动 · 跨平台导出</div>
+    <ul>
+      <li>对象拖放到场景画布, 属性直接改</li>
+      <li>事件系统: "当X→执行Y" 可视化逻辑</li>
+      <li>行为组件: 旋转/弹跳/收集等预设</li>
+      <li>编辑+预览同一视图, 不切换模式</li>
+      <li>模板市场: Remix 社区模板</li>
+    </ul>
+  </div>
+
+  <div class="comp-card">
+    <div class="name">🏗️ Construct 3</div>
+    <div class="tagline">15% 网页游戏市场份额</div>
+    <div class="stars">浏览器原生 · 事件表 · 实时协作</div>
+    <ul>
+      <li>事件表编辑器: 条件→动作表格</li>
+      <li>Z轴图层管理, 支持拖拽排序</li>
+      <li>实时多人协作编辑</li>
+      <li>行为系统 + 物理引擎集成</li>
+      <li>一键发布 HTML5 游戏</li>
+    </ul>
+  </div>
+
+  <div class="comp-card">
+    <div class="name">🧩 Scratch</div>
+    <div class="tagline">教育领域王者，积木式编程</div>
+    <div class="stars">MIT · 社区7000万+项目 · Fork文化</div>
+    <ul>
+      <li>积木块编程: 拖代码块拼逻辑</li>
+      <li>即时反馈: 改完立刻看到效果</li>
+      <li>社区 Remix: Fork→改编→发布</li>
+      <li>极低学习门槛</li>
+      <li>精灵+舞台+脚本 三角色模型</li>
+    </ul>
+  </div>
+
+  <div class="comp-card">
+    <div class="name">🎨 Figma</div>
+    <div class="tagline">设计工具标杆</div>
+    <div class="stars">组件库 · 自动布局 · 协作 · AI</div>
+    <ul>
+      <li>组件变体: 一个组件多状态切换</li>
+      <li>自动布局: 响应式自适应</li>
+      <li>实时协作: 多人同时编辑</li>
+      <li>AI 辅助设计生成</li>
+    </ul>
+  </div>
+
+  <div class="comp-card">
+    <div class="name">🎰 Playgama</div>
+    <div class="tagline">网页游戏分发平台</div>
+    <div class="stars">300M+月活 · 1000+开发者</div>
+    <ul>
+      <li>SDK一次集成, 分发14+平台</li>
+      <li>广告/排行榜/成就内置</li>
+      <li>支持所有主流引擎</li>
+      <li>90% 收入分成</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ====== 2. 功能对比 ====== -->
+<h2>📋 二、GameHub vs 竞品 功能对比</h2>
+
+<table class="compare-table">
+<tr><th>功能</th><th>GameHub 现状</th><th>GDevelop</th><th>Construct 3</th><th>Scratch</th><th>目标</th></tr>
+<tr><td>可视化编辑器</td><td><span class="warn">Canvas地图</span></td><td class="check">✓ 场景画布</td><td class="check">✓ 布局编辑器</td><td class="check">✓ 舞台</td><td>组件画布</td></tr>
+<tr><td>事件/逻辑编辑</td><td><span class="cross">JSON表单</span></td><td class="check">✓ 事件表</td><td class="check">✓ 事件表</td><td class="check">✓ 积木块</td><td>可视化事件</td></tr>
+<tr><td>实时预览</td><td><span class="warn">需切换模式</span></td><td class="check">✓ 同视图</td><td class="check">✓ 同视图</td><td class="check">✓ 即时</td><td>编辑预览合一</td></tr>
+<tr><td>组件/行为库</td><td><span class="cross">无</span></td><td class="check">✓ 行为系统</td><td class="check">✓ 行为+物理</td><td class="check">✓ 积木库</td><td>可拖拽组件</td></tr>
+<tr><td>模板市场</td><td><span class="cross">无</span></td><td class="check">✓</td><td class="check">✓</td><td class="check">✓ 7000万+</td><td>模板+Fork</td></tr>
+<tr><td>一键发布</td><td><span class="warn">保存+发布</span></td><td class="check">✓ 跨平台</td><td class="check">✓ HTML5</td><td class="check">✓ Web</td><td>即时分享</td></tr>
+<tr><td>撤销/重做</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td>-</td></tr>
+<tr><td>响应式适配</td><td><span class="warn">部分</span></td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td>自动适配</td></tr>
+</table>
+
+<!-- ====== 3. 五大优化模式 ====== -->
+<h2>💡 三、5 个核心优化模式</h2>
+
+<div class="pattern-grid">
+  <div class="pattern-card">
+    <div class="num">01</div>
+    <div class="ptitle">组件画布</div>
+    <div class="psource">来源: GDevelop + Figma</div>
+    <div class="pdesc">把游戏组件（转盘/卡片/骰子/棋盘）变成可拖拽的视觉元素。用户把它们拖到画布上，直接在画布上调整属性，而不是左边列表+右边 JSON 表单。</div>
+  </div>
+  <div class="pattern-card">
+    <div class="num">02</div>
+    <div class="ptitle">可视化事件编辑器</div>
+    <div class="psource">来源: Construct 3 + Scratch</div>
+    <div class="pdesc">用「当___发生 → 执行___」的视觉卡片替代 JSON 配置。例如卡片「当玩家踩到地产 → 扣金币」。逻辑可见、可理解、可调试。</div>
+  </div>
+  <div class="pattern-card">
+    <div class="num">03</div>
+    <div class="ptitle">编辑预览合一</div>
+    <div class="psource">来源: GDevelop + Figma</div>
+    <div class="pdesc">取消编辑/预览模式切换。画布上直接操作，右边就是实时运行的游戏。改了颜色→游戏里立刻变色。拖了组件→游戏里立刻出现。</div>
+  </div>
+  <div class="pattern-card">
+    <div class="num">04</div>
+    <div class="ptitle">模板 + Fork 市场</div>
+    <div class="psource">来源: Scratch + GDevelop</div>
+    <div class="pdesc">预制 20-30 个高质量游戏模板。用户选一个，改改文案图片就发布。Fork 别人的游戏，改编后发布。社区驱动的创作飞轮。</div>
+  </div>
+  <div class="pattern-card">
+    <div class="num">05</div>
+    <div class="ptitle">行为组件库</div>
+    <div class="psource">来源: GDevelop</div>
+    <div class="pdesc">把常见游戏行为做成可复用的预设：旋转动画、弹跳效果、计分系统、倒计时、金币增减。拖一个行为到组件上，自动获得该能力。</div>
+  </div>
+</div>
+
+<!-- ====== 4. 布局对比 ====== -->
+<h2>🏗️ 四、编辑器布局对比</h2>
+
+<h3>当前 GameHub（三栏→全屏地图+底部栏）</h3>
+<div class="layout-diagram">
+┌──────────────────────────────────────────────┐
+│  🎮GameHub  │ [大富翁 ▼] │ 标题... │ 💾 📤 ↩ ↪  │
+├──────────────────────────────────────────────┤
+│                                              │
+│            Canvas 地图编辑器（全屏）            │
+│                                              │
+├──────────────────────────────────────────────┤
+│  🗺️地图  🎲卡牌  📐规则  👥玩家  🏪商店  ⚡事件  🎨主题  │
+└──────────────────────────────────────────────┘
+问题: 底部栏像浏览器标签页, 不是「创作工具」的感觉
+</div>
+
+<h3>GDevelop 风格（推荐改进方向）</h3>
+<div class="layout-diagram">
+┌─────────────────────────────────────────────────────────┐
+│  🎮 GameHub  │  未命名大富翁  │  [▶ 预览] [💾保存] [📤发布] │
+├────────────┬────────────────────────────────┬───────────┤
+│  📦 组件库  │                                │  ⚙️ 属性    │
+│            │                                │           │
+│  🎡 转盘   │      游戏画布（编辑=预览）        │  名称: ___ │
+│  🎲 卡片   │                                │  颜色: 🎨  │
+│  🎯 骰子   │     拖拽组件到这里              │  大小: ▬▬  │
+│  🏠 地产   │     直接看到效果                │           │
+│  💰 金币   │     实时可交互                  │           │
+│  ⚡ 事件   │                                │           │
+│  🚩 起点   │                                │           │
+│            │                                │           │
+│  [+] 导入  │                                │           │
+├────────────┴────────────────────────────────┴───────────┤
+│  💬 模板市场  │  📋 事件管理器  │  ⚡ 行为  │  🤖 AI助手   │
+└─────────────────────────────────────────────────────────┘
+</div>
+
+<!-- ====== 5. Before/After ====== -->
+<h2>🔄 五、关键体验 Before / After</h2>
+
+<h3>1. 添加一个奖品</h3>
+<div class="ba-section">
+  <div class="ba-box ba-before">
+    <div class="ba-label">❌ 现在</div>
+    <p style="font-size:13px">
+    点击底部「卡牌」→ 右侧滑出面板 → 找到「机会卡」→ 点击「添加卡牌」→ 弹出编辑框 → 填标题/权重/金币 → 保存 → 关闭面板
+    </p>
+    <span class="tag tag-red">7步操作</span>
+    <span class="tag tag-red">无法看到效果</span>
+  </div>
+  <div class="ba-box ba-after">
+    <div class="ba-label">✅ 改进后</div>
+    <p style="font-size:13px">
+    从左侧组件库拖一个「卡片」到画布上 → 双击改文字 → 完成
+    </p>
+    <span class="tag tag-green">2步操作</span>
+    <span class="tag tag-green">实时看到效果</span>
+  </div>
+</div>
+
+<h3>2. 修改游戏规则</h3>
+<div class="ba-section">
+  <div class="ba-box ba-before">
+    <div class="ba-label">❌ 现在</div>
+    <p style="font-size:13px">
+    底部「规则」→ 看到变量列表 → 找到 initialGold → 输入数字 → 关闭面板 → 不知道改了什么
+    </p>
+    <span class="tag tag-red">变量名不直观</span>
+    <span class="tag tag-red">无预览</span>
+  </div>
+  <div class="ba-box ba-after">
+    <div class="ba-label">✅ 改进后</div>
+    <p style="font-size:13px">
+    右侧属性面板始终可见。选中「玩家」组件 → 直接拖滑块「初始金币: 1500」→ 实时看到数值变化
+    </p>
+    <span class="tag tag-green">直观滑块</span>
+    <span class="tag tag-green">实时预览</span>
+  </div>
+</div>
+
+<!-- ====== 6. 优先级矩阵 ====== -->
+<h2>⚡ 六、实施优先级矩阵</h2>
+
+<div class="priority-matrix">
+  <div class="pm-cell pm-header">优先级</div>
+  <div class="pm-cell pm-header">方向</div>
+  <div class="pm-cell pm-header">效果</div>
+  <div class="pm-cell pm-header">工作量</div>
+
+  <div class="pm-cell pm-high">P0 立即</div>
+  <div class="pm-cell"><b>组件画布</b><br><span style="font-size:10px;color:var(--muted)">左侧组件库, 拖到画布上编辑</span></div>
+  <div class="pm-cell">解决「不知道怎么开始」<br>解决「编辑不直观」</div>
+  <div class="pm-cell">3-5天</div>
+
+  <div class="pm-cell pm-high">P0 立即</div>
+  <div class="pm-cell"><b>编辑预览合一</b><br><span style="font-size:10px;color:var(--muted)">取消模式切换, 同视图预览</span></div>
+  <div class="pm-cell">解决「改了看不到效果」</div>
+  <div class="pm-cell">1-2天</div>
+
+  <div class="pm-cell pm-mid">P1 本周</div>
+  <div class="pm-cell"><b>模板市场</b><br><span style="font-size:10px;color:var(--muted)">20+预制模板, 一键Fork</span></div>
+  <div class="pm-cell">解决「不知道做什么」<br>拉新留存核心</div>
+  <div class="pm-cell">2-3天</div>
+
+  <div class="pm-cell pm-mid">P1 本周</div>
+  <div class="pm-cell"><b>行为组件库</b><br><span style="font-size:10px;color:var(--muted)">旋转/弹跳/计数等预设行为</span></div>
+  <div class="pm-cell">解决「不会配效果」<br>降低创作门槛</div>
+  <div class="pm-cell">2-3天</div>
+
+  <div class="pm-cell">P2 下周</div>
+  <div class="pm-cell"><b>可视化事件编辑器</b><br><span style="font-size:10px;color:var(--muted)">当X→执行Y 卡片式编辑</span></div>
+  <div class="pm-cell">替代 JSON 表单<br>最彻底的体验升级</div>
+  <div class="pm-cell">5-7天</div>
+</div>
+
+<!-- ====== 7. 建议 ====== -->
+<div class="summary-box">
+  <h3>🎯 建议: 先做 P0，验证方向再推进</h3>
+  <p style="color:var(--text);font-size:14px">
+    <b>第一步（P0）:</b> 组件画布 + 编辑预览合一。把现在的底部管理器栏升级为「左侧组件库 + 右侧属性面板 + 中间实时画布」的三栏布局。这不是回到旧版——旧版是 Block 列表+JSON表单+iframe预览，新版是<b>可拖拽的游戏组件 + 画布实时编辑 + 右侧视觉属性面板</b>。
+  </p>
+  <p style="color:var(--text);font-size:14px">
+    <b>验证标准:</b> 用户能否在 30 秒内从零创建一个转盘游戏并看到它转起来？
+  </p>
+  <p style="color:var(--text);font-size:14px">
+    <b>第二步（P1）:</b> 模板市场 + 行为组件。提供「起点」而非「空白画布」。
+  </p>
+  <p style="color:var(--text);font-size:14px">
+    <b>第三步（P2）:</b> 可视化事件编辑器。这是长期方向，需要等前两步验证后再投入。
+  </p>
+</div>
+
+</div>
+</body>
+</html>
