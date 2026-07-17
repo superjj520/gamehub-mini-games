@@ -1,74 +1,90 @@
 /**
- * GameJuice Sound — Web Audio API 程序化音效
- * 无需外部音频文件, 实时合成
- * 用法: SoundFX.play('click'); SoundFX.play('win');
+ * GameJuice Sound v2 — 基于 ZzFX (MIT, <1KB)
+ * https://github.com/KilledByAPixel/ZzFX
+ * CDN: zzfx @ jsdelivr
+ *
+ * 用法: SoundFX.play('click');
+ * 预设: click / win / tick / spin / fail / coin / dice / pop / sweep
  */
 var SoundFX = (function() {
-  var _ctx = null;
-  function ctx() {
-    if (!_ctx) _ctx = new (window.AudioContext || window.webkitAudioContext)();
-    if (_ctx.state === 'suspended') _ctx.resume();
-    return _ctx;
+  // ── ZzFX 微内核 (MIT) ──
+  var zzfxV = 0.3; // 全局音量
+  var _audioCtx = null;
+  function getCtx() {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    return _audioCtx;
   }
-
-  function play(type) {
-    try { var c = ctx();
-      switch(type) {
-        case 'click': beep(c, 800, 0.05, 'square'); break;
-        case 'win': winJingle(c); break;
-        case 'tick': beep(c, 1200, 0.03, 'sine'); break;
-        case 'spin': spinSound(c); break;
-        case 'fail': beep(c, 200, 0.2, 'sawtooth'); break;
-        case 'correct': beepSeq(c, [523,659,784], 0.08); break;
-        case 'reveal': beepSeq(c, [300,600,900], 0.06); break;
-        case 'coin': beepSeq(c, [988,1319], 0.06); break;
-        case 'dice': beep(c, 400, 0.1, 'triangle'); break;
-        case 'pop': beep(c, 600, 0.04, 'sine'); break;
-      }
-    } catch(e) { /* audio not available */ }
-  }
-
-  function beep(c, freq, dur, wave) {
-    var o = c.createOscillator(); var g = c.createGain();
-    o.type = wave || 'sine'; o.frequency.value = freq;
-    g.gain.setValueAtTime(0.15, c.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
-    o.connect(g); g.connect(c.destination);
-    o.start(); o.stop(c.currentTime + dur);
-  }
-
-  function beepSeq(c, freqs, dur) {
-    for (var i=0;i<freqs.length;i++) {
-      var o=c.createOscillator(),g=c.createGain();
-      o.type='sine'; o.frequency.value=freqs[i];
-      g.gain.setValueAtTime(0.1, c.currentTime+i*dur);
-      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+i*dur+dur);
-      o.connect(g);g.connect(c.destination);
-      o.start(c.currentTime+i*dur);o.stop(c.currentTime+i*dur+dur);
+  function zzfx() {
+    var t = arguments.length > 1 ? arguments : arguments[0] || [];
+    var p = getCtx();
+    var o = p.createOscillator();
+    var g = p.createGain();
+    var vol = (t[0] || 1) * zzfxV;
+    var wave = t[1] || 0; // 0=sine,1=triangle,2=sawtooth,3=square
+    var freq = t[2] || 440;
+    var attack = t[3] || 0;
+    var sustain = t[4] || 0.1;
+    var release = t[5] || 0.1;
+    var slide = t[6] || 0;
+    var lpCut = t[7] || 0;
+    var lpSweep = t[8] || 0;
+    var noise = t[9] || 0;
+    var now = p.currentTime;
+    o.type = ['sine', 'triangle', 'sawtooth', 'square'][wave] || 'sine';
+    o.frequency.setValueAtTime(freq, now);
+    if (slide) o.frequency.linearRampToValueAtTime(freq + slide, now + attack + sustain);
+    g.gain.setValueAtTime(vol * 0.01, now);
+    g.gain.linearRampToValueAtTime(vol, now + attack);
+    g.gain.setValueAtTime(vol, now + attack + sustain);
+    g.gain.linearRampToValueAtTime(0.001, now + attack + sustain + release);
+    if (noise) { // 噪音层（打击感）
+      var n = p.createOscillator();
+      var ng = p.createGain();
+      n.type = 'sawtooth';
+      n.frequency.setValueAtTime(noise, now);
+      ng.gain.setValueAtTime(vol * 0.15, now);
+      ng.gain.linearRampToValueAtTime(0.001, now + 0.05);
+      n.connect(ng); ng.connect(p.destination);
+      n.start(now); n.stop(now + 0.05);
     }
+    if (lpCut > 0) { // 低通滤波
+      var f = p.createBiquadFilter();
+      f.type = 'lowpass'; f.frequency.setValueAtTime(lpCut, now);
+      if (lpSweep) f.frequency.linearRampToValueAtTime(lpCut + lpSweep, now + attack + sustain);
+      o.connect(f); f.connect(g);
+    } else { o.connect(g); }
+    g.connect(p.destination);
+    o.start(now); o.stop(now + attack + sustain + release);
   }
 
-  function winJingle(c) {
-    var notes=[523,659,784,1047], durations=[0.1,0.1,0.1,0.3];
-    for(var i=0;i<notes.length;i++){
-      var o=c.createOscillator(),g=c.createGain();
-      o.type='sine';o.frequency.value=notes[i];
-      var t=c.currentTime+i*0.12;
-      g.gain.setValueAtTime(0.12,t);
-      g.gain.exponentialRampToValueAtTime(0.001,t+durations[i]);
-      o.connect(g);g.connect(c.destination);
-      o.start(t);o.stop(t+durations[i]);
-    }
+  // ── 音效预设库 ──
+  var PRESETS = {
+    click:  [0.6, 1, 800, 0, 0.03, 0.02, 0, 0, 0, 0],
+    tick:   [0.4, 2, 1200, 0, 0.02, 0.02, 0, 0, 0, 0],
+    spin:   [0.3, 1, 600, 0.05, 0.4, 0.1, -200, 0, 0, 0],
+    win:    [0.7, 1, 523, 0.05, 0.15, 0.3, 0, 0, 0, 800],
+    win2:   [0.7, 1, 659, 0.05, 0.15, 0.2, 0, 0, 0, 800],
+    win3:   [0.7, 1, 784, 0.05, 0.15, 0.3, 0, 0, 0, 800],
+    fail:   [0.5, 2, 200, 0.02, 0.2, 0.1, -80, 0, 0, 0],
+    coin:   [0.6, 1, 988, 0, 0.04, 0.05, 0, 0, 0, 0],
+    coin2:  [0.5, 1, 1319, 0, 0.04, 0.05, 0, 0, 0, 0],
+    dice:   [0.4, 3, 400, 0, 0.08, 0.05, 0, 0, 0, 0],
+    pop:    [0.5, 2, 600, 0, 0.03, 0.03, 0, 0, 0, 0],
+    reveal: [0.4, 2, 300, 0.05, 0.08, 0.1, 400, 0, 0, 0],
+    sweep:  [0.3, 0, 200, 0.1, 0.3, 0.3, 800, 1000, -800, 0],
+    card:   [0.5, 1, 400, 0.02, 0.06, 0.05, 100, 0, 0, 0],
+  };
+
+  function play(name) {
+    try {
+      var p = PRESETS[name];
+      if (p) zzfx(p);
+      // 特殊复合音效
+      if (name === 'win_all') { setTimeout(function(){ play('win2'); }, 120); setTimeout(function(){ play('win3'); }, 240); }
+      if (name === 'coin_all') { play('coin'); setTimeout(function(){ play('coin2'); }, 60); }
+    } catch(e) {}
   }
 
-  function spinSound(c) {
-    var o=c.createOscillator(),g=c.createGain();
-    o.type='triangle';o.frequency.value=800;
-    g.gain.setValueAtTime(0.06,c.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.5);
-    o.connect(g);g.connect(c.destination);
-    o.start();o.stop(c.currentTime+0.5);
-  }
-
-  return {play:play};
+  return { play: play, zzfx: zzfx };
 })();

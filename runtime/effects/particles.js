@@ -1,85 +1,86 @@
 /**
- * GameJuice Particles — 轻量 Canvas 粒子系统
- * 支持: 彩带(confetti)、星星(sparkle)、爆炸(burst)、金币雨
+ * GameJuice Particles v2 — canvas-confetti 优先 / DOM 粒子兜底
+ * CDN: canvas-confetti @ jsdelivr (全局 confetti)
  * 用法: Particles.fire(container, 'confetti');
  */
 var Particles = (function() {
-  var _activeEmitters = [];
-
-  function fire(container, type, opts) {
+  function fire(type, opts) {
     opts = opts || {};
-    var count = opts.count || 60;
-    var colors = opts.colors || ['#F5C842','#EC4899','#7C3AED','#22C55E','#3B82F6','#F97316'];
-    var emitters = [];
-    for (var i = 0; i < count; i++) {
-      emitters.push(createParticle(container, type, colors, opts));
+    // 优先使用 canvas-confetti（如果已加载）
+    if (typeof confetti !== 'undefined') {
+      fireWithConfetti(type, opts);
+    } else {
+      fireDOM(type, opts);
     }
-    _activeEmitters.push({emitters:emitters,container:container});
-    if (!_activeEmitters[0] || _activeEmitters.length === 1) startLoop();
   }
 
-  function createParticle(container, type, colors, opts) {
-    var el = document.createElement('div');
-    var size = (opts.sizeMin||4) + Math.random() * (opts.sizeMax||8);
-    var color = colors[Math.floor(Math.random() * colors.length)];
-    var shapes = type==='burst' ? ['circle'] : ['rect','circle','rect','circle'];
-    var shape = shapes[Math.floor(Math.random()*shapes.length)];
-
-    el.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;' +
-      'width:'+size+'px;height:'+size+'px;' +
-      'background:'+color+';' +
-      (shape==='circle'?'border-radius:50%;':'') +
-      'left:'+(opts.x||container.clientWidth/2)+'px;top:'+(opts.y||container.clientHeight/2)+'px;';
-
-    var angle = Math.random() * Math.PI * 2;
-    var velocity = 2 + Math.random() * 6;
-    var life = 1;
-    var gravity = type==='confetti'?0.03:0.05;
-    var drag = 0.97;
-    var rotation = Math.random() * 360;
-    var rotationSpeed = (Math.random() - 0.5) * 15;
-
-    container.appendChild(el);
-
-    return {
-      el:el, vx:Math.cos(angle)*velocity, vy:Math.sin(angle)*velocity - 3,
-      life:1, decay:0.008 + Math.random()*0.012, gravity:gravity, drag:drag,
-      rotation:rotation, rotationSpeed:rotationSpeed, size:size
+  // ── canvas-confetti 版本 ──
+  function fireWithConfetti(type, opts) {
+    var defaults = {
+      particleCount: opts.count || 80,
+      spread: opts.spread || 70,
+      origin: { x: opts.x || 0.5, y: opts.y || 0.5 },
+      colors: opts.colors || ['#F5C842', '#EC4899', '#7C3AED', '#22C55E', '#F97316', '#3B82F6'],
+      disableForReducedMotion: true,
+      startVelocity: 30,
+      decay: 0.9,
+      ticks: 60,
     };
-  }
 
-  function startLoop() {
-    function tick() {
-      var allDone = true;
-      for (var i = _activeEmitters.length-1; i >= 0; i--) {
-        var emitter = _activeEmitters[i];
-        var anyAlive = false;
-        for (var j = emitter.emitters.length-1; j >= 0; j--) {
-          var p = emitter.emitters[j];
-          p.life -= p.decay;
-          if (p.life <= 0) { p.el.remove(); emitter.emitters.splice(j,1); continue; }
-          anyAlive = true;
-          p.vy += p.gravity;
-          p.vx *= p.drag; p.vy *= p.drag;
-          p.rotation += p.rotationSpeed;
-          var l = parseFloat(p.el.style.left) + p.vx;
-          var t = parseFloat(p.el.style.top) + p.vy;
-          p.el.style.left = l + 'px'; p.el.style.top = t + 'px';
-          p.el.style.transform = 'rotate('+p.rotation+'deg)';
-          p.el.style.opacity = p.life;
-        }
-        if (!anyAlive) _activeEmitters.splice(i,1);
-        else allDone = false;
-      }
-      if (!allDone) requestAnimationFrame(tick);
+    if (type === 'confetti') {
+      // 左右两侧爆发
+      confetti(Object.assign({}, defaults, { angle: 60, spread: 55, origin: { x: 0, y: opts.y || 0.4 } }));
+      confetti(Object.assign({}, defaults, { angle: 120, spread: 55, origin: { x: 1, y: opts.y || 0.4 } }));
+    } else if (type === 'burst') {
+      confetti(defaults);
+    } else if (type === 'stars') {
+      confetti(Object.assign({}, defaults, {
+        particleCount: opts.count || 40,
+        spread: 100,
+        shapes: ['star'],
+        colors: ['#F5C842'],
+        scalar: 0.8,
+      }));
+    } else if (type === 'coins') {
+      confetti(Object.assign({}, defaults, {
+        particleCount: opts.count || 50,
+        spread: 90,
+        colors: ['#F5C842', '#F59E0B', '#FDE68A'],
+        startVelocity: 25, gravity: 1.5, scalar: 1.2, ticks: 80,
+      }));
     }
-    requestAnimationFrame(tick);
   }
 
-  // 快捷方法
-  function confetti(container, opts) { fire(container, 'confetti', opts); }
-  function burst(container, opts) { fire(container, 'burst', opts); }
-  function stars(container, count) { fire(container, 'confetti', {count:count||30,colors:['#F5C842'],sizeMin:2,sizeMax:5}); }
+  // ── DOM 粒子兜底 ──
+  function fireDOM(type, opts) {
+    opts = opts || {};
+    var count = opts.count || 40;
+    var colors = opts.colors || ['#F5C842', '#EC4899', '#7C3AED', '#22C55E'];
+    var particles = [];
+    for (var i = 0; i < count; i++) {
+      var el = document.createElement('div');
+      var color = colors[Math.floor(Math.random() * colors.length)];
+      el.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;width:6px;height:6px;background:' + color + ';border-radius:50%;left:50%;top:50%;opacity:1;';
+      document.body.appendChild(el);
+      var angle = Math.random() * Math.PI * 2;
+      var v = 2 + Math.random() * 5;
+      particles.push({ el: el, vx: Math.cos(angle) * v, vy: Math.sin(angle) * v - 2, life: 1, decay: 0.01 + Math.random() * 0.02 });
+    }
+    (function tick() {
+      var alive = false;
+      for (var i = particles.length - 1; i >= 0; i--) {
+        var p = particles[i];
+        p.life -= p.decay;
+        if (p.life <= 0) { p.el.remove(); particles.splice(i, 1); continue; }
+        alive = true;
+        p.vy += 0.05;
+        p.el.style.left = (parseFloat(p.el.style.left) + p.vx) + 'px';
+        p.el.style.top = (parseFloat(p.el.style.top) + p.vy) + 'px';
+        p.el.style.opacity = p.life;
+      }
+      if (alive) requestAnimationFrame(tick);
+    })();
+  }
 
-  return {fire:fire, confetti:confetti, burst:burst, stars:stars};
+  return { fire: fire };
 })();
