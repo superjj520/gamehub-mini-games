@@ -57,8 +57,8 @@ main .bg-glow{position:absolute;inset:0;pointer-events:none;display:flex;align-i
 main .bg-glow div{width:min(600px,80vw);height:min(600px,80vw);border-radius:50%;filter:blur(80px);opacity:.25}
 .chips{display:flex;gap:8px;margin-bottom:16px;z-index:1}
 .chip{padding:4px 12px;border:1px solid rgba(255,255,255,.08);border-radius:16px;font-size:10px;color:var(--text-secondary);font-family:var(--font-mono);background:rgba(255,255,255,.03)}
-.wheel-stage{position:relative;z-index:1}
-.wheel-stage svg{display:block;max-width:90vw;max-height:60vh}
+.wheel-stage{position:relative;z-index:1;display:flex;align-items:center;justify-content:center}
+.wheel-stage svg{display:block;width:min(500px,85vw);height:auto}
 .spin-btn{margin-top:20px;padding:16px 56px;border:none;border-radius:16px;font-family:var(--font-display);font-size:18px;font-weight:800;letter-spacing:.06em;cursor:pointer;transition:all .15s;z-index:1}
 .spin-btn:active{transform:scale(.95)}
 .spin-btn:disabled{opacity:.5;cursor:not-allowed}
