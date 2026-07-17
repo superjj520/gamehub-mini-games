@@ -45,7 +45,11 @@ var WheelGame = (function() {
       'background:radial-gradient(circle at 40% 35%,#FDE68A,#F5C842 40%,#B8860B);' +
       'box-shadow:0 0 20px rgba(245,200,66,0.4),inset 0 2px 3px rgba(255,255,255,0.3);' +
       'display:flex;align-items:center;justify-content:center;font-size:22px;';
-    center.textContent = '⭐';
+    var crownImg = document.createElement('img');
+    crownImg.src = 'assets/kenney/board-game-icons/Vector/Icons/crown_b.svg';
+    crownImg.style.cssText = 'width:28px;height:28px;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.3))';
+    crownImg.onerror = function(){ this.style.display='none'; center.textContent = '★'; };
+    center.appendChild(crownImg);
     _wrap.appendChild(center);
 
     // ── 转盘主体 (spin-wheel) ──
@@ -58,7 +62,7 @@ var WheelGame = (function() {
       itemLabelStrokeWidth:1, lineColor:'rgba(255,255,255,0.2)', lineWidth:1.5,
       rotationSpeedMax:500, rotationResistance:-50,
       onRest: onWin,
-      onSpin: function(){ SoundFX.play('spin'); }
+      onSpin: function(){ if(typeof KenneyAudio!=='undefined') KenneyAudio.play('diceShuffle'); else SoundFX.play('spin'); }
     });
 
     // ── 中奖弹窗容器 ──
@@ -122,8 +126,13 @@ var WheelGame = (function() {
     // 粒子
     Particles.fire(isBig ? 'confetti' : 'burst', {count: isBig ? 120 : 50, colors: isBig ? undefined : ['#F5C842','#F59E0B']});
 
-    // 音效
-    SoundFX.play(isBig ? 'win_all' : 'win');
+    // 音效: Kenney 真实录音优先, ZzFX 兜底
+    if (typeof KenneyAudio !== 'undefined') {
+      KenneyAudio.play('chipsCollide');
+      setTimeout(function(){ KenneyAudio.play('diceThrow'); }, 150);
+    } else {
+      SoundFX.play(isBig ? 'win_all' : 'win');
+    }
 
     // 震动
     Juice.vibrate(isBig ? 'win' : 'medium');
