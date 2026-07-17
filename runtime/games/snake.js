@@ -35,7 +35,7 @@ var SnakeGame = (function() {
     if(nx<0||nx>=20||ny<0||ny>=20){ gameOver(); return; }
     for(var i=0;i<_state.snake.length;i++){ if(_state.snake[i].x===nx&&_state.snake[i].y===ny){gameOver();return;} }
     _state.snake.unshift({x:nx,y:ny});
-    if(nx===_state.food.x&&ny===_state.food.y){ _state.score+=10; placeFood(); }
+    if(nx===_state.food.x&&ny===_state.food.y){ _state.score+=10; placeFood(); SoundFX.play('pop'); try{navigator.vibrate(5);}catch(e){} }
     else _state.snake.pop();
     draw();
     if(_ctx&&_ctx.engine) _ctx.engine.emit('game:state',{score:_state.score});
@@ -61,6 +61,7 @@ var SnakeGame = (function() {
 
   function gameOver(){
     _state.over=true; if(_loop){clearInterval(_loop);_loop=null;}
+    SoundFX.play('fail'); try{navigator.vibrate([15,30,15]);}catch(e){}
     if(_ctx&&_ctx.engine) _ctx.engine.emit('game:status','游戏结束! 得分:'+_state.score);
   }
 

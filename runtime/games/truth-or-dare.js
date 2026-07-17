@@ -43,6 +43,8 @@ var TruthOrDareGame = (function() {
     var card = _truths[Math.floor(Math.random()*_truths.length)];
     card.icon = card.icon||'💬';
     render(card);
+    if(typeof KenneyAudio!=='undefined') KenneyAudio.play('cardPlace'); else SoundFX.play('card');
+    try{navigator.vibrate(8);}catch(e){}
     if(_ctx&&_ctx.engine) _ctx.engine.emit('game:status','真心话: '+card.title);
   }
 
@@ -50,6 +52,8 @@ var TruthOrDareGame = (function() {
     var card = _dares[Math.floor(Math.random()*_dares.length)];
     card.icon = card.icon||'🎯';
     render(card);
+    if(typeof KenneyAudio!=='undefined') KenneyAudio.play('cardSlide'); else SoundFX.play('card');
+    try{navigator.vibrate(12);}catch(e){}
     if(_ctx&&_ctx.engine) _ctx.engine.emit('game:status','大冒险: '+card.title);
   }
 

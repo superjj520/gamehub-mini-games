@@ -47,8 +47,8 @@ var QuizGame = (function() {
         _state.answered=true;
         var idx=parseInt(this.dataset.idx);
         var correct=idx===q.answer;
-        if(correct){ this.style.background='rgba(34,197,94,0.15)'; this.style.borderColor='#22C55E'; _state.score+=10; }
-        else { this.style.background='rgba(239,68,68,0.15)'; this.style.borderColor='#EF4444'; _el.querySelector('.quiz-opt[data-idx="'+q.answer+'"]').style.background='rgba(34,197,94,0.15)'; _el.querySelector('.quiz-opt[data-idx="'+q.answer+'"]').style.borderColor='#22C55E'; }
+        if(correct){ this.style.background='rgba(34,197,94,0.15)'; this.style.borderColor='#22C55E'; _state.score+=10; SoundFX.play('correct'); try{navigator.vibrate(10);}catch(e){} }
+        else { this.style.background='rgba(239,68,68,0.15)'; this.style.borderColor='#EF4444'; _el.querySelector('.quiz-opt[data-idx="'+q.answer+'"]').style.background='rgba(34,197,94,0.15)'; _el.querySelector('.quiz-opt[data-idx="'+q.answer+'"]').style.borderColor='#22C55E'; SoundFX.play('fail'); try{navigator.vibrate([10,30,10]);}catch(e){} }
         if(_ctx&&_ctx.engine) _ctx.engine.emit('game:state',{score:_state.score,total:_state.total,current:_state.current+1});
         setTimeout(function(){ _state.current++; renderQuestion(); },800);
       });
@@ -56,8 +56,11 @@ var QuizGame = (function() {
   }
 
   function showResult(){
+    var isHigh = _state.score>=_state.total*6;
+    if(isHigh && typeof confetti!=='undefined') confetti({particleCount:80,spread:70,origin:{y:.6},disableForReducedMotion:true});
+    if(isHigh && typeof KenneyAudio!=='undefined') KenneyAudio.play('diceThrow'); else if(isHigh) SoundFX.play('win');
     _el.innerHTML = '<div style="text-align:center;padding:40px 20px"><div style="font-size:40px;margin-bottom:10px">'+
-      (_state.score>=_state.total*6?'🏆':_state.score>=_state.total*3?'👍':'💪')+'</div>'+
+      (isHigh?'🏆':_state.score>=_state.total*3?'👍':'💪')+'</div>'+
       '<div style="font-size:20px;font-weight:700;margin-bottom:8px">得分: '+_state.score+'/'+(_state.total*10)+'</div>'+
       '<div style="font-size:13px;color:var(--muted)">共答'+_state.total+'题</div></div>';
     if(_ctx&&_ctx.engine) _ctx.engine.emit('game:status','答题结束! 得分:'+_state.score);

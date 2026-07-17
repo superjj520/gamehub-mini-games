@@ -38,8 +38,9 @@ var Game2048 = (function() {
     e.preventDefault();
     var old=JSON.stringify(_state.grid);
     for(var r=0;r<4;r++){ var line=extractLine(dir,r); var merged=mergeLine(line); setLine(dir,r,merged); }
-    if(JSON.stringify(_state.grid)!==old){ moved=true; addRandom(); render(); }
-    if(isGameOver()){ _state.gameOver=true; if(_ctx&&_ctx.engine) _ctx.engine.emit('game:status','游戏结束! 得分:'+_state.score); }
+    if(JSON.stringify(_state.grid)!==old){ moved=true; addRandom(); render(); SoundFX.play('tick'); try{navigator.vibrate(5);}catch(e){} }
+    if(isGameOver()){ _state.gameOver=true; SoundFX.play('fail'); if(_ctx&&_ctx.engine) _ctx.engine.emit('game:status','游戏结束! 得分:'+_state.score); }
+    if(_state.score>0 && _state.score%128===0){ try{if(typeof confetti!=='undefined') confetti({particleCount:30,spread:60,origin:{y:.7},disableForReducedMotion:true});}catch(e){} }
     if(_ctx&&_ctx.engine) _ctx.engine.emit('game:state',{score:_state.score,gameOver:_state.gameOver});
   }
 

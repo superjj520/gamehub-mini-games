@@ -64,7 +64,10 @@ var ScratchCardGame = (function() {
       var clear = 0;
       for(var i=3;i<data.length;i+=4){ if(data[i]===0) clear++; }
       if(clear/data.length*4 > 0.5){
-        if(_ctx&&_ctx.engine) _ctx.engine.emit('game:status','🎉 恭喜: '+prize.title);
+        if(typeof confetti!=='undefined') confetti({particleCount:60,spread:50,origin:{y:.6},colors:['#F5C842','#EC4899','#7C3AED','#22C55E'],disableForReducedMotion:true});
+        if(typeof KenneyAudio!=='undefined'){KenneyAudio.play('chipsCollide');setTimeout(function(){KenneyAudio.play('cardSlide');},120);}else SoundFX.play('win');
+        try{navigator.vibrate(30);}catch(e){}
+        if(_ctx&&_ctx.engine) _ctx.engine.emit('game:status','恭喜: '+prize.title);
       }
     }
 
