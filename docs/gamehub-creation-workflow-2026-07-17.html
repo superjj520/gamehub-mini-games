@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GameHub 游戏创建流程分析</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#0A0A1A;color:#E0DCF0;line-height:1.7;padding:40px 20px}
+.container{max-width:1000px;margin:0 auto}
+h1{font-size:32px;font-weight:900;margin-bottom:8px;background:linear-gradient(135deg,#F5C842,#EC4899,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:22px;font-weight:800;margin:48px 0 16px;padding-bottom:8px;border-bottom:2px solid #7C3AED}
+h3{font-size:16px;font-weight:700;margin:24px 0 8px;color:#A78BFA}
+.subtitle{color:rgba(224,220,240,0.5);margin-bottom:40px}
+p{color:rgba(224,220,240,0.7);margin-bottom:8px}
+
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}
+th{background:#7C3AED;color:#fff;padding:12px 14px;text-align:left;font-weight:700;font-size:12px;text-transform:uppercase}
+td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.06);vertical-align:top}
+tr:nth-child(even) td{background:rgba(255,255,255,0.01)}
+
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.tag-y{background:rgba(34,197,94,.15);color:#22C55E}
+.tag-n{background:rgba(239,68,68,.15);color:#EF4444}
+.tag-m{background:rgba(245,200,66,.15);color:#F5C842}
+.tag-c{background:rgba(124,58,237,.15);color:#A78BFA}
+
+.card{background:#12122A;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:20px;margin:16px 0}
+.card-title{font-size:16px;font-weight:800;margin-bottom:8px}
+
+.flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:20px 0}
+.flow-step{background:#12122A;border:1px solid rgba(124,58,237,0.2);border-radius:12px;padding:16px 20px;text-align:center;min-width:120px}
+.flow-step .num{font-size:28px;font-weight:900;color:rgba(124,58,237,0.3);line-height:1}
+.flow-step .label{font-size:13px;font-weight:600;margin:4px 0}
+.flow-step .who{font-size:10px;color:rgba(224,220,240,0.5)}
+.flow-arrow{font-size:20px;color:#7C3AED}
+
+.resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin:16px 0}
+.resource-card{background:#12122A;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px}
+.resource-card .name{font-weight:700;margin-bottom:4px}
+.resource-card .link{font-size:11px;color:#7C3AED;word-break:break-all}
+.resource-card .desc{font-size:11px;color:rgba(224,220,240,0.5);margin-top:6px}
+
+.summary{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(245,200,66,.08));border:1px solid rgba(124,58,237,.2);border-radius:16px;padding:28px;margin:32px 0}
+.summary h3{color:#F5C842;margin-top:0}
+</style>
+</head><body><div class="container">
+
+<h1>GameHub 游戏创建流程 & 品质维度分析</h1>
+<p class="subtitle">2026-07-17 · 基于 Kenney.nl 素材 + 开源组件 · 零付费方案</p>
+
+<!-- ====== 一、品质维度：谁做、是否必须 ====== -->
+<h2>一、14个品质维度 — 谁负责、是否必须</h2>
+
+<table>
+<tr><th>#</th><th>维度</th><th>谁做</th><th>必须?</th><th>说明</th></tr>
+<tr>
+  <td>1</td><td><b>视觉质感</b><br><span style="font-size:10px;color:#999">渐变/阴影/光泽</span></td>
+  <td><span class="tag tag-c">Claude (CSS)</span></td>
+  <td><span class="tag tag-y">必须</span></td>
+  <td>CSS radial-gradient 可做金属感。专业级需要 Figma 设计稿导出 SVG</td>
+</tr>
+<tr>
+  <td>2</td><td><b>图标素材</b><br><span style="font-size:10px;color:#999">奖品/按钮/装饰</span></td>
+  <td><span class="tag tag-m">Kenney + 你提供</span></td>
+  <td><span class="tag tag-y">必须</span></td>
+  <td><b>Kenney Board Game Icons</b> (250个CC0), <b>Board Game Pack</b> (卡片/骰子)<br>特殊图标需要你提供或 AI 生成</td>
+</tr>
+<tr>
+  <td>3</td><td><b>字体排版</b></td>
+  <td><span class="tag tag-c">Claude (CSS)</span></td>
+  <td><span class="tag tag-y">必须</span></td>
+  <td>Google Fonts Outfit + 字重系统。已做完</td>
+</tr>
+<tr>
+  <td>4</td><td><b>动效动画</b></td>
+  <td><span class="tag tag-c">Claude (CSS + JS)</span></td>
+  <td><span class="tag tag-m">高优先</span></td>
+  <td>CSS @keyframes 做基础动画。Lottie 可做复杂动画但需要 AE 导出的 JSON</td>
+</tr>
+<tr>
+  <td>5</td><td><b>粒子特效</b></td>
+  <td><span class="tag tag-c">canvas-confetti</span></td>
+  <td><span class="tag tag-y">必须</span></td>
+  <td>已集成 CDN。永远不需要自己做粒子</td>
+</tr>
+<tr>
+  <td>6</td><td><b>音效设计</b></td>
+  <td><span class="tag tag-m">Kenney Casino Audio + ZzFX</span></td>
+  <td><span class="tag tag-m">高优先</span></td>
+  <td>ZzFX 做 UI 音效(点击/成功)<br><b>Kenney Casino Audio</b> (54个CC0) 做真实音效(转动/硬币/骰子)</td>
+</tr>
+<tr>
+  <td>7</td><td><b>触觉反馈</b></td>
+  <td><span class="tag tag-c">navigator.vibrate</span></td>
+  <td><span class="tag tag-n">可选</span></td>
+  <td>免费 API，已集成。非必须但加分</td>
+</tr>
+<tr>
+  <td>8</td><td><b>间距节奏</b></td>
+  <td><span class="tag tag-c">设计系统</span></td>
+  <td><span class="tag tag-y">必须</span></td>
+  <td>design-system.css 已定义令牌。Claude 执行</td>
+</tr>
+<tr>
+  <td>9</td><td><b>色彩体系</b></td>
+  <td><span class="tag tag-c">设计系统</span></td>
+  <td><span class="tag tag-y">必须</span></td>
+  <td>已做完。品牌紫+暖金强调</td>
+</tr>
+<tr>
+  <td>10</td><td><b>状态覆盖</b></td>
+  <td><span class="tag tag-c">Claude (JS)</span></td>
+  <td><span class="tag tag-y">必须</span></td>
+  <td>loading/empty/error/success 四个状态</td>
+</tr>
+<tr>
+  <td>11</td><td><b>文案质量</b></td>
+  <td><span class="tag tag-c">Claude</span></td>
+  <td><span class="tag tag-m">高优先</span></td>
+  <td>Claude 直接生成。不需要外部工具</td>
+</tr>
+<tr>
+  <td>12</td><td><b>背景氛围</b></td>
+  <td><span class="tag tag-c">Claude (CSS) + 你提供素材</span></td>
+  <td><span class="tag tag-n">可选</span></td>
+  <td>CSS 渐变/光晕能做基础。纹理图需要设计稿或素材</td>
+</tr>
+<tr>
+  <td>13</td><td><b>连贯过渡</b></td>
+  <td><span class="tag tag-c">Claude (CSS)</span></td>
+  <td><span class="tag tag-m">高优先</span></td>
+  <td>CSS transition + ease 曲线。不需要外部工具</td>
+</tr>
+<tr>
+  <td>14</td><td><b>无障碍</b></td>
+  <td><span class="tag tag-c">Claude</span></td>
+  <td><span class="tag tag-y">必须</span></td>
+  <td>reduced-motion / 对比度 / 触控目标</td>
+</tr>
+</table>
+
+<div class="summary">
+<h3>结论: 14个维度中，11个 Claude 直接能做，1个需要素材(Kenney免费)，2个需要你提供</h3>
+<p>需要你做的: 图标素材(如果Kenney的250个不够用)、背景纹理(如果CSS不够)。</p>
+<p>其他全部: Claude + 开源组件 + 免费素材。零付费、零API Key、零外部模型。</p>
+</div>
+
+<!-- ====== 二、游戏创建流程分析 ====== -->
+<h2>二、游戏创建流程 & 每步需要什么</h2>
+
+<div class="flow">
+  <div class="flow-step"><div class="num">1</div><div class="label">选择游戏类型</div><div class="who">用户操作</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="num">2</div><div class="label">配置内容</div><div class="who">编辑器</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="num">3</div><div class="label">预览效果</div><div class="who">实时渲染</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="num">4</div><div class="label">发布分享</div><div class="who">Supabase</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="num">5</div><div class="label">玩家游玩</div><div class="who">品质组件</div></div>
+</div>
+
+<table>
+<tr><th>阶段</th><th>需要什么</th><th>谁提供</th><th>状态</th></tr>
+<tr>
+  <td><b>1. 游戏组件层</b><br><span style="font-size:10px;color:#999">每个游戏的核心逻辑+渲染</span></td>
+  <td>9 个游戏模块 (wheel/snake/2048/quiz/...)</td>
+  <td><span class="tag tag-c">Claude 写代码</span><br><span class="tag tag-m">开源库 (spin-wheel)</span></td>
+  <td><span class="tag tag-y">已完成 6/9</span></td>
+</tr>
+<tr>
+  <td><b>2. 品质效果层</b><br><span style="font-size:10px;color:#999">粒子/音效/震动/动画</span></td>
+  <td>particles.js (canvas-confetti)<br>sound.js (ZzFX)<br>juice.js (vibrate/CSS)</td>
+  <td><span class="tag tag-c">Claude 集成</span><br><span class="tag tag-m">开源库</span></td>
+  <td><span class="tag tag-y">已完成</span></td>
+</tr>
+<tr>
+  <td><b>3. 视觉素材层</b><br><span style="font-size:10px;color:#999">图标/纹理/字体</span></td>
+  <td>Kenney Board Game Icons (250 CC0)<br>Kenney Board Game Pack (卡片/骰子)<br>Outfit 字体 (Google Fonts)</td>
+  <td><span class="tag tag-m">Kenney 下载</span><br><span class="tag tag-c">Claude 集成</span></td>
+  <td><span class="tag tag-y">素材就绪</span><br><span class="tag tag-n">待集成</span></td>
+</tr>
+<tr>
+  <td><b>4. 音效素材层</b><br><span style="font-size:10px;color:#999">真实音效文件</span></td>
+  <td>Kenney Casino Audio (54 CC0 WAV)<br>Kenney Interface Sounds (CC0 WAV)</td>
+  <td><span class="tag tag-m">Kenney 下载</span><br><span class="tag tag-c">Claude 集成</span></td>
+  <td><span class="tag tag-y">素材就绪</span><br><span class="tag tag-n">待集成</span></td>
+</tr>
+<tr>
+  <td><b>5. 设计系统层</b><br><span style="font-size:10px;color:#999">颜色/间距/圆角/阴影/字体令牌</span></td>
+  <td>design-system.css (220行, 已建)</td>
+  <td><span class="tag tag-c">Claude 创建</span></td>
+  <td><span class="tag tag-y">已完成</span></td>
+</tr>
+<tr>
+  <td><b>6. 配置编辑器层</b><br><span style="font-size:10px;color:#999">游戏内容可视化编辑</span></td>
+  <td>builder-v2.html (需升级)<br>底部内容管理器栏<br>每个内容类型独立编辑面板</td>
+  <td><span class="tag tag-c">Claude 写代码</span></td>
+  <td><span class="tag tag-m">部分完成</span></td>
+</tr>
+<tr>
+  <td><b>7. 发布/分享层</b><br><span style="font-size:10px;color:#999">保存到 Supabase + 生成链接</span></td>
+  <td>supabase.js + user_configs 表</td>
+  <td><span class="tag tag-c">Claude 写代码</span></td>
+  <td><span class="tag tag-m">部分完成</span></td>
+</tr>
+</table>
+
+<!-- ====== 三、可用资源清单 ====== -->
+<h2>三、Kenney 免费素材清单 (全部 CC0 免版权)</h2>
+
+<div class="resource-grid">
+  <div class="resource-card">
+    <div class="name">🎰 Board Game Pack</div>
+    <div class="link">kenney.nl/assets/boardgame-pack</div>
+    <div class="desc">490 个文件: 棋子(7色×3风格) + 扑克牌(正反面) + 骰子(红白2色) + 筹码。SVG/PNG格式。</div>
+  </div>
+  <div class="resource-card">
+    <div class="name">🎲 Board Game Icons</div>
+    <div class="link">kenney.nl/assets/board-game-icons</div>
+    <div class="desc">250 个 SVG/PNG 图标: 卡牌、骰子、行动、资源、得分、设置等全部棋盘游戏 UI 元素。</div>
+  </div>
+  <div class="resource-card">
+    <div class="name">🔊 Casino Audio</div>
+    <div class="link">kenney.nl/assets/category:Audio</div>
+    <div class="desc">54 个 WAV: 卡牌洗牌/发牌、骰子滚动、筹码堆叠、轮盘转动。真实录音。</div>
+  </div>
+  <div class="resource-card">
+    <div class="name">🎛 Interface Sounds</div>
+    <div class="link">kenney.nl/assets/category:Audio</div>
+    <div class="desc">UI 音效: 按钮点击、悬停、成功、错误、通知、切换。直接替换 ZzFX。</div>
+  </div>
+  <div class="resource-card">
+    <div class="name">🎵 Music Jingles</div>
+    <div class="link">kenney.nl/assets/category:Audio</div>
+    <div class="desc">简短 BGM: 胜利/失败/循环背景音乐。适合游戏开场/结束。</div>
+  </div>
+  <div class="resource-card">
+    <div class="name">⌨ Input Prompts</div>
+    <div class="link">kenney.nl/assets</div>
+    <div class="desc">键盘/手柄按键图标。适合做操作提示("按空格开始")。</div>
+  </div>
+</div>
+
+<!-- ====== 四、总结 ====== -->
+<h2>四、总结: 需要你做的只有两件事</h2>
+
+<div class="summary">
+<h3>你需要做的:</h3>
+<p>1. <b>下载 Kenney 素材</b> — 去 kenney.nl 下载 Board Game Pack + Board Game Icons + Casino Audio + Interface Sounds。解压放到项目 assets/ 目录。</p>
+<p>2. <b>确定图标准则</b> — 告诉我是用 Kenney 的 250 个图标，还是你需要更特定风格的。</p>
+
+<h3 style="margin-top:20px">我做的:</h3>
+<p>素材到位后，我负责: 替换所有 emoji 图标为 SVG、集成真实音效替换 ZzFX 合成音、用卡片/骰子素材美化游戏组件、升级 builder-v2 编辑器。</p>
+</div>
+
+</div></body></html>
