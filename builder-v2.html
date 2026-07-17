@@ -511,7 +511,7 @@ function onTitleChange(){ editor.title = document.getElementById('titleInput').v
 
 async function saveConfig(){
   var player = GameSupabase.getCurrentPlayer();
-  if(!player){ showToast('请先登录'); return; }
+  if(!player){ showToast('请先登录 — 点击右下角登录按钮'); GameAuth._showLogin(); return; }
   var payload = {user_id:player.id,game_type:editor.gameType,title:editor.title,blocks:editor.blocks,is_public:false};
   var r;
   if(editor.configId){
