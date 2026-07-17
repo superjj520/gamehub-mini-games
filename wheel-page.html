@@ -5,106 +5,97 @@
 <title>幸运转盘 · GameHub</title>
 <link rel="stylesheet" href="design-system.css">
 <style>
-body{background:var(--surface-0);height:100dvh;display:flex;overflow:hidden}
+body{background:#050508;height:100dvh;display:flex;overflow:hidden}
 a{color:var(--brand-light);text-decoration:none}
 
-/* 布局 */
 .layout{display:flex;flex:1;min-height:0}
-.sidebar{width:320px;flex-shrink:0;border-right:1px solid var(--border-subtle);background:var(--surface-1);display:flex;flex-direction:column;overflow:hidden}
-.sidebar-header{padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between}
-.sidebar-title{font-family:var(--font-display);font-size:16px;font-weight:700}
-.sidebar-count{font-size:11px;color:var(--text-tertiary)}
-.option-list{flex:1;overflow-y:auto;padding:var(--space-3)}
-.option-item{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);margin-bottom:4px;border-radius:var(--radius-md);background:var(--surface-2);border:1px solid var(--border-subtle);transition:all .15s}
-.option-item:hover{border-color:var(--border-default)}
-.option-color{width:14px;height:14px;border-radius:4px;flex-shrink:0}
-.option-input{flex:1;border:none;background:transparent;color:var(--text-primary);font-family:var(--font-body);font-size:13px;outline:none;min-width:0}
-.option-input:focus{color:var(--text-white)}
-.option-del{width:24px;height:24px;border:none;background:transparent;color:var(--text-tertiary);cursor:pointer;border-radius:4px;font-size:14px;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .15s}
-.option-item:hover .option-del{opacity:1}
-.option-del:hover{background:rgba(239,68,68,.1);color:var(--error)}
-.add-option-btn{width:100%;padding:var(--space-2);border:1px dashed var(--border-accent);background:rgba(124,58,237,.04);color:var(--brand-light);border-radius:var(--radius-md);font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;margin-top:4px}
-.add-option-btn:hover{background:rgba(124,58,237,.1);border-color:var(--brand)}
+/* 左侧面板 - 紫色调 */
+.sidebar{width:380px;flex-shrink:0;border-right:1px solid rgba(124,58,237,.15);background:#0C0A18;display:flex;flex-direction:column;overflow:hidden}
+.sidebar-head{padding:20px 24px;border-bottom:1px solid rgba(124,58,237,.12)}
+.sidebar-title{font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--text-primary)}
+.sidebar-desc{font-size:12px;color:var(--text-tertiary);margin-top:2px}
+.option-list{flex:1;overflow-y:auto;padding:12px 16px}
+.option-row{display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:6px;border-radius:12px;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.08);transition:all .15s}
+.option-row:hover{border-color:rgba(124,58,237,.2);background:rgba(124,58,237,.1)}
+.option-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;cursor:pointer;border:2px solid rgba(255,255,255,.1);transition:all .15s}
+.option-dot:hover{border-color:rgba(255,255,255,.3)}
+.option-text{flex:1;border:none;background:transparent;color:var(--text-primary);font-family:var(--font-body);font-size:14px;outline:none;min-width:0}
+.option-text:focus{color:#fff}
+.option-text::placeholder{color:var(--text-tertiary)}
+.option-x{width:26px;height:26px;border:none;background:transparent;color:var(--text-tertiary);cursor:pointer;border-radius:50%;font-size:16px;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .15s}
+.option-row:hover .option-x{opacity:1}
+.option-x:hover{background:rgba(239,68,68,.12);color:var(--error)}
+.add-btn{width:100%;padding:10px;margin-top:4px;border:1px dashed rgba(124,58,237,.2);background:rgba(124,58,237,.04);color:var(--brand-light);border-radius:10px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.add-btn:hover{background:rgba(124,58,237,.1);border-color:rgba(124,58,237,.35)}
 
-.sidebar-footer{padding:var(--space-3) var(--space-5);border-top:1px solid var(--border-subtle);display:flex;gap:var(--space-2)}
-.sidebar-footer button{flex:1}
+/* 底部工具栏 */
+.sidebar-foot{padding:12px 20px;border-top:1px solid rgba(124,58,237,.12);display:flex;gap:8px}
+.sidebar-foot button{flex:1;padding:10px;border-radius:10px;border:none;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-reset{background:rgba(255,255,255,.04);color:var(--text-secondary)}
+.btn-reset:hover{background:rgba(255,255,255,.08);color:var(--text-primary)}
+.btn-preset{background:rgba(124,58,237,.1);color:var(--brand-light)}
+.btn-preset:hover{background:rgba(124,58,237,.18)}
 
-/* 主题选择器 */
-.theme-row{display:flex;gap:6px;padding:var(--space-2) var(--space-5);overflow-x:auto}
-.theme-dot{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0}
-.theme-dot:hover{transform:scale(1.15)}
-.theme-dot.active{border-color:var(--text-white);box-shadow:0 0 8px rgba(255,255,255,.2)}
+/* 主题色点 */
+.theme-strip{display:flex;gap:8px;padding:12px 20px;overflow-x:auto;border-bottom:1px solid rgba(124,58,237,.06)}
+.theme-dot{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0}
+.theme-dot:hover{transform:scale(1.2)}
+.theme-dot.on{border-color:#fff;box-shadow:0 0 10px rgba(255,255,255,.25)}
 
-/* 主区域 */
-.main-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:20px}
-.main-bg{position:absolute;inset:0;pointer-events:none}
-.main-bg-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(600px,120vw);height:min(600px,120vw);border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.08) 0%,rgba(245,158,11,.04) 45%,transparent 70%);animation:pulseGlow 4s ease-in-out infinite}
-.main-title{font-family:var(--font-display);font-size:clamp(22px,4vw,32px);font-weight:900;text-align:center;margin-bottom:4px;background:linear-gradient(135deg,#F5C842,#FDE68A,#F59E0B);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.main-sub{font-size:13px;color:var(--text-tertiary);text-align:center;margin-bottom:24px;font-family:var(--font-display)}
-.wheel-container{width:min(360px,80vw);height:min(360px,80vw);position:relative;border-radius:50%;padding:8px;background:radial-gradient(circle at 45% 35%,#4B3878,#1E1240 55%,#0D0620);box-shadow:0 0 0 4px rgba(124,58,237,.18),0 0 80px rgba(124,58,237,.06),0 0 160px rgba(124,58,237,.02),inset 0 2px 0 rgba(255,255,255,.03);animation:wheelEnter .5s var(--ease-bounce) both}
-.wheel-pointer{position:absolute;top:-14px;left:50%;transform:translateX(-50%);z-index:10;width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:30px solid var(--gold);filter:drop-shadow(0 3px 8px rgba(0,0,0,.5))drop-shadow(0 0 12px rgba(245,200,66,.5));animation:ptrBounce .8s ease-in-out infinite}
-.result-area{min-height:40px;margin-top:20px;text-align:center;font-family:var(--font-display);font-size:20px;font-weight:800;transition:all .3s var(--ease-bounce)}
-.spin-btn{margin-top:12px;padding:16px 64px;border:none;border-radius:var(--radius-full);background:linear-gradient(180deg,#A855F7,#7C3AED 50%,#5B21B6);color:#fff;font-family:var(--font-display);font-size:18px;font-weight:700;letter-spacing:.04em;cursor:pointer;box-shadow:0 4px 28px rgba(124,58,237,.4),inset 0 1px 0 rgba(255,255,255,.1);transition:all .15s var(--ease-out);min-height:56px;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
+/* 右侧主区域 */
+.main-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.main-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 65% 50%,rgba(197,160,89,.04) 0%,rgba(124,58,237,.03) 40%,transparent 70%)}
+.main-title{font-family:var(--font-display);font-size:28px;font-weight:900;text-align:center;background:linear-gradient(135deg,#F5C842,#FDE68A,#E5B83C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.main-sub{font-size:13px;color:var(--text-tertiary);text-align:center;margin-bottom:20px;font-family:var(--font-display)}
+.wheel-wrap{width:min(380px,78vw);height:min(380px,78vw);position:relative;border-radius:50%;padding:10px;background:radial-gradient(circle at 45% 35%,#3D2A1A,#1A1008 50%,#0A0500);box-shadow:0 0 0 5px rgba(197,160,89,.15),0 0 100px rgba(197,160,89,.05),inset 0 2px 0 rgba(255,255,255,.02)}
+.wheel-pointer{position:absolute;top:-16px;left:50%;transform:translateX(-50%);z-index:20;width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:36px solid #F5C842;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6))drop-shadow(0 0 16px rgba(245,200,66,.4));animation:ptrBounce .9s ease-in-out infinite}
+.result-area{min-height:44px;margin-top:16px;text-align:center;font-family:var(--font-display);font-size:20px;font-weight:800;transition:all .3s var(--ease-bounce);color:var(--text-primary)}
+.spin-btn{margin-top:10px;padding:18px 72px;border:none;border-radius:var(--radius-full);background:linear-gradient(180deg,#C9A44B,#A07828 50%,#7A5A1A);color:#1A0E00;font-family:var(--font-display);font-size:18px;font-weight:800;letter-spacing:.06em;cursor:pointer;box-shadow:0 6px 30px rgba(197,160,89,.3),inset 0 1px 0 rgba(255,255,255,.15);transition:all .15s var(--ease-out);min-height:58px;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent}
 .spin-btn:active{transform:scale(.95)}
 .spin-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.spin-btn .shine{position:absolute;top:-60%;left:-70%;width:60%;height:220%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);transform:skewX(-20deg);animation:btnShine 3s ease-in-out infinite}
+.spin-btn .shine{position:absolute;top:-60%;left:-70%;width:60%;height:220%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transform:skewX(-20deg);animation:btnShine 3.5s ease-in-out infinite}
 
 /* 弹窗 */
-.modal-overlay{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.modal-overlay{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .modal-overlay.show{display:flex}
-.modal-card{background:linear-gradient(160deg,#1E1A3A,#12122A);border:1px solid rgba(245,200,66,.25);border-radius:24px;padding:36px 28px;text-align:center;max-width:340px;width:88vw;box-shadow:0 12px 60px rgba(0,0,0,.6),0 0 80px rgba(245,200,66,.08);transform:scale(.8);transition:transform .3s var(--ease-bounce)}
+.modal-card{background:linear-gradient(155deg,#1E1A2E,#12101E);border:1px solid rgba(245,200,66,.2);border-radius:28px;padding:40px 32px;text-align:center;max-width:360px;width:88vw;box-shadow:0 16px 64px rgba(0,0,0,.7),0 0 100px rgba(245,200,66,.08);transform:scale(.85);transition:transform .3s var(--ease-bounce)}
 .modal-overlay.show .modal-card{transform:scale(1)}
-.modal-icon{font-size:64px;margin-bottom:12px}
+.modal-icon{font-size:72px;margin-bottom:16px}
 .modal-label{font-family:var(--font-display);font-size:14px;font-weight:600;color:var(--text-secondary);margin-bottom:4px}
-.modal-prize{font-family:var(--font-display);font-size:26px;font-weight:900;margin-bottom:24px;background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.modal-prize{font-family:var(--font-display);font-size:28px;font-weight:900;margin-bottom:28px;background:linear-gradient(135deg,#F5C842,#FDE68A,#F59E0B);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 
-/* 动画 */
-@keyframes wheelEnter{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
-@keyframes ptrBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
-@keyframes pulseGlow{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}}
-@keyframes btnShine{0%{left:-70%}60%{left:130%}100%{left:130%}}
-@keyframes spinPulse{0%,100%{box-shadow:0 0 0 4px rgba(124,58,237,.18),0 0 80px rgba(124,58,237,.06) inset}50%{box-shadow:0 0 0 8px rgba(245,200,66,.12),0 0 120px rgba(245,200,66,.08)}}
-
-@media(max-width:768px){
-  .layout{flex-direction:column-reverse}
-  .sidebar{width:100%;max-height:35dvh;border-right:none;border-top:1px solid var(--border-subtle)}
-  .main-area{padding:12px}
-  .wheel-container{width:min(280px,75vw);height:min(280px,75vw)}
-  .spin-btn{padding:14px 48px;font-size:16px}
-}
+@keyframes ptrBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
+@keyframes btnShine{0%{left:-70%}55%{left:130%}100%{left:130%}}
+@media(max-width:768px){.layout{flex-direction:column-reverse}.sidebar{width:100%;max-height:40dvh}.wheel-wrap{width:min(280px,72vw);height:min(280px,72vw)}.spin-btn{padding:16px 56px;font-size:16px}}
 </style>
 </head>
 <body>
 
 <div class="layout">
-  <!-- 左侧: 选项编辑 -->
   <div class="sidebar">
-    <div class="sidebar-header">
-      <span class="sidebar-title">选项列表</span>
-      <span class="sidebar-count" id="optCount">6项</span>
+    <div class="sidebar-head">
+      <div class="sidebar-title">选项列表</div>
+      <div class="sidebar-desc" id="optCount">6 个选项</div>
     </div>
-    <div class="theme-row" id="themeRow"></div>
+    <div class="theme-strip" id="themeStrip"></div>
     <div class="option-list" id="optionList"></div>
-    <button class="add-option-btn" onclick="addOption()">+ 添加选项</button>
+    <button class="add-btn" onclick="addOption()">+ 添加选项</button>
+    <div class="sidebar-foot">
+      <button class="btn-reset" onclick="usePreset('food')">🍜 吃什么</button>
+      <button class="btn-preset" onclick="usePreset('drink')">🥤 喝什么</button>
+    </div>
   </div>
 
-  <!-- 右侧: 转盘 -->
   <div class="main-area">
-    <div class="main-bg"><div class="main-bg-glow"></div></div>
-    <div class="main-title">幸运转盘</div>
+    <div class="main-bg"></div>
+    <div class="main-title" id="wheelTitle">今天吃什么</div>
     <div class="main-sub">点击转盘或按钮开始抽选</div>
-    <div class="wheel-container" id="wheelWrap">
-      <div class="wheel-pointer"></div>
-    </div>
+    <div class="wheel-wrap" id="wheelWrap"><div class="wheel-pointer"></div></div>
     <div class="result-area" id="result"></div>
-    <button class="spin-btn" id="spinBtn" onclick="doSpin()">
-      开始抽选
-      <div class="shine"></div>
-    </button>
+    <button class="spin-btn" id="spinBtn" onclick="doSpin()">开始抽选<div class="shine"></div></button>
   </div>
 </div>
 
-<!-- 中奖弹窗 -->
 <div class="modal-overlay" id="winModal">
   <div class="modal-card">
     <div class="modal-icon" id="winIcon">🎉</div>
@@ -122,95 +113,78 @@ a{color:var(--brand-light);text-decoration:none}
 <script src="runtime/effects/kenney-audio.js"></script>
 
 <script>
-// ═══ 主题预设 ═══
-var THEMES = [
-  {name:'默认',colors:['#EF4444','#7C3AED','#22C55E','#F59E0B','#3B82F6','#EC4899','#F97316','#06B6D4','#84CC16','#6366F1','#E11D48','#8B5CF6']},
-  {name:'暖色',colors:['#EF4444','#F97316','#F59E0B','#EAB308','#84CC16','#22C55E','#14B8A6','#EC4899','#E11D48','#DC2626','#EA580C','#CA8A04']},
-  {name:'冷色',colors:['#3B82F6','#6366F1','#8B5CF6','#A855F7','#06B6D4','#0EA5E9','#2563EB','#7C3AED','#4F46E5','#0284C7','#0891B2','#4338CA']},
+var THEMES=[
+  {name:'金橙',colors:['#E74C3C','#E67E22','#F1C40F','#2ECC71','#3498DB','#9B59B6','#E91E63','#00BCD4','#FF9800','#8BC34A','#FF5722','#673AB7']},
+  {name:'暖色',colors:['#EF4444','#F97316','#F59E0B','#EAB308','#84CC16','#22C55E','#EC4899','#DC2626','#EA580C','#CA8A04','#A3E635','#D946EF']},
+  {name:'冷色',colors:['#3B82F6','#6366F1','#8B5CF6','#A855F7','#06B6D4','#0EA5E9','#2563EB','#7C3AED','#4F46E5','#0891B2','#2DD4BF','#818CF8']},
   {name:'糖果',colors:['#F472B6','#FB923C','#FBBF24','#A3E635','#34D399','#22D3EE','#818CF8','#C084FC','#FB7185','#FDA4AF','#FDE68A','#A7F3D0']},
-  {name:'暗金',colors:['#B8860B','#DAA520','#F5C842','#8B6914','#CD853F','#D2691E','#A0522D','#BDB76B','#6B8E23','#808000','#556B2F','#8B4513']},
+  {name:'暗金',colors:['#B8860B','#DAA520','#CD853F','#D2691E','#A0522D','#8B4513','#BDB76B','#808000','#6B8E23','#556B2F','#BC8F8F','#C5A35A']},
   {name:'霓虹',colors:['#FF0080','#7928CA','#00DFD8','#FF4D4D','#007CF0','#00FF88','#FFD700','#FF1493','#00BFFF','#7FFF00','#FF4500','#9400D3']},
 ];
-var _currentTheme = 0;
-var _options = [
-  {title:'吃火锅',color:'#EF4444'},{title:'吃日料',color:'#7C3AED'},
-  {title:'点外卖',color:'#22C55E'},{title:'自己做饭',color:'#F59E0B'},
-  {title:'不吃减肥',color:'#3B82F6'},{title:'随便',color:'#EC4899'},
-];
-var _wheel = null, _spinning = false;
+var PRESETS={
+  food:{title:'今天吃什么',options:['火锅','日料','烧烤','麻辣烫','汉堡','披萨','沙拉','拉面','早茶','饺子']},
+  drink:{title:'喝什么',options:['奶茶','咖啡','可乐','果汁','啤酒','白开水','柠檬茶','奶昔']},
+};
+var _theme=0,_options=[],_wheel=null,_spinning=false;
 
-// ═══ 初始化 ═══
 (function init(){
+  usePreset('food');
   buildThemeDots();
-  renderOptions();
-  buildWheel();
 })();
 
 function buildThemeDots(){
-  var html='';
-  for(var i=0;i<THEMES.length;i++){
-    html+='<div class="theme-dot'+(i===_currentTheme?' active':'')+'" style="background:'+THEMES[i].colors[0]+'" onclick="switchTheme('+i+')" title="'+THEMES[i].name+'"></div>';
-  }
-  document.getElementById('themeRow').innerHTML=html;
+  var h='';
+  for(var i=0;i<THEMES.length;i++)
+    h+='<div class="theme-dot'+(i===_theme?' on':'')+'" style="background:'+THEMES[i].colors[0]+'" onclick="switchTheme('+i+')" title="'+THEMES[i].name+'"></div>';
+  document.getElementById('themeStrip').innerHTML=h;
 }
 
-function switchTheme(i){
-  _currentTheme=i;
-  buildThemeDots();
-  // 给每个选项分配新主题色
-  for(var j=0;j<_options.length;j++) _options[j].color=THEMES[i].colors[j%THEMES[i].colors.length];
-  renderOptions();
-  buildWheel();
+function switchTheme(i){_theme=i;buildThemeDots();assignColors();buildWheel();renderOptions();}
+function assignColors(){for(var j=0;j<_options.length;j++)_options[j].color=THEMES[_theme].colors[j%THEMES[_theme].colors.length];}
+
+function usePreset(key){
+  var p=PRESETS[key];_options=p.options.map(function(o,i){return{title:o,color:THEMES[0].colors[i%THEMES[0].colors.length]};});
+  _theme=0;assignColors();
+  document.getElementById('wheelTitle').textContent=p.title;
+  renderOptions();buildWheel();buildThemeDots();
 }
 
-// ═══ 选项管理 ═══
 function renderOptions(){
-  var html='';
+  var h='';
   for(var i=0;i<_options.length;i++){
     var o=_options[i];
-    html+='<div class="option-item">'+
-      '<input type="color" class="option-color" value="'+o.color+'" onchange="updateOptionColor('+i+',this.value)" style="width:14px;height:14px;padding:0;border:none;cursor:pointer" title="颜色">'+
-      '<input class="option-input" value="'+esc(o.title)+'" onchange="updateOption('+i+',this.value)" placeholder="输入选项">'+
-      '<button class="option-del" onclick="removeOption('+i+')" title="删除">×</button></div>';
+    h+='<div class="option-row">'+
+      '<input type="color" class="option-dot" value="'+o.color+'" onchange="updateColor('+i+',this.value)" title="颜色" style="background:'+o.color+'">'+
+      '<input class="option-text" value="'+esc(o.title)+'" onchange="updateTitle('+i+',this.value)" placeholder="输入选项">'+
+      '<button class="option-x" onclick="removeOption('+i+')">×</button></div>';
   }
-  document.getElementById('optionList').innerHTML=html;
-  document.getElementById('optCount').textContent=_options.length+'项';
+  document.getElementById('optionList').innerHTML=h;
+  document.getElementById('optCount').textContent=_options.length+' 个选项';
 }
 
 function addOption(){
-  var colors=THEMES[_currentTheme].colors;
-  _options.push({title:'新选项',color:colors[_options.length%colors.length]});
-  renderOptions();buildWheel();
+  var c=THEMES[_theme].colors[_options.length%THEMES[_theme].colors.length];
+  _options.push({title:'新选项',color:c});renderOptions();buildWheel();
 }
+function removeOption(i){if(_options.length<=2)return;_options.splice(i,1);renderOptions();buildWheel();}
+function updateTitle(i,v){_options[i].title=v;}
+function updateColor(i,v){_options[i].color=v;buildWheel();}
 
-function removeOption(i){
-  if(_options.length<=2)return;
-  _options.splice(i,1);
-  renderOptions();buildWheel();
-}
-
-function updateOption(i,val){_options[i].title=val;}
-function updateOptionColor(i,val){_options[i].color=val;buildWheel();}
-
-// ═══ 转盘 ═══
 function buildWheel(){
   if(_wheel){_wheel.remove();_wheel=null;}
-  var wrap=document.getElementById('wheelWrap');
   var items=_options.map(function(o){return{label:o.title||'?',backgroundColor:o.color};});
-  _wheel=new spinWheel.Wheel(wrap,{
-    items:items,radius:.80,itemLabelRadius:.66,itemLabelRadiusMax:.32,
+  _wheel=new spinWheel.Wheel(document.getElementById('wheelWrap'),{
+    items:items,radius:.78,itemLabelRadius:.65,itemLabelRadiusMax:.3,
     itemLabelFontSizeMax:12,itemLabelColors:['#fff'],itemLabelStrokeColor:'rgba(0,0,0,.5)',
-    itemLabelStrokeWidth:1.5,lineColor:'rgba(255,255,255,.12)',lineWidth:2,
+    itemLabelStrokeWidth:1.5,lineColor:'rgba(255,255,255,.1)',lineWidth:2,
     rotationSpeedMax:550,rotationResistance:-45,
-    onRest:onWin,
-    onSpin:function(){_spinning=true},
+    onRest:onWin,onSpin:function(){_spinning=true},
   });
 }
 
 function doSpin(){
   if(!_wheel||_spinning)return;
-  document.getElementById('spinBtn').disabled=true;
-  document.getElementById('spinBtn').textContent='转动中...';
+  var b=document.getElementById('spinBtn');b.disabled=true;b.textContent='转动中...';
   document.getElementById('result').textContent='';
   SoundFX.play('click');Juice.vibrate('light');
   if(typeof KenneyAudio!=='undefined')KenneyAudio.play('diceShuffle');
@@ -219,42 +193,22 @@ function doSpin(){
 
 function onWin(e){
   _spinning=false;
-  var prize=_options[e.currentIndex];if(!prize)prize={title:'?',color:'#7C3AED'};
-  var btn=document.getElementById('spinBtn');btn.disabled=false;btn.textContent='再来一次';
-
-  // 彩带
-  if(typeof confetti!=='undefined'){
-    confetti({particleCount:100,spread:70,origin:{y:.5},colors:['#F5C842','#EC4899','#7C3AED','#22C55E'],disableForReducedMotion:true});
-  }
-
-  // 音效
-  if(typeof KenneyAudio!=='undefined'){KenneyAudio.play('chipsCollide');setTimeout(function(){KenneyAudio.play('diceThrow');},100);}
-  else SoundFX.play('win');
-
-  // 震动
+  var p=_options[e.currentIndex];if(!p)p={title:'?',color:'#7C3AED'};
+  var b=document.getElementById('spinBtn');b.disabled=false;b.textContent='再来一次';
+  if(typeof confetti!=='undefined')confetti({particleCount:100,spread:70,origin:{y:.5},colors:['#F5C842','#EC4899','#7C3AED','#22C55E'],disableForReducedMotion:true});
+  if(typeof KenneyAudio!=='undefined'){KenneyAudio.play('chipsCollide');setTimeout(function(){KenneyAudio.play('diceThrow');},100);}else SoundFX.play('win');
   Juice.vibrate('medium');
-
-  // 显示结果
-  var r=document.getElementById('result');
-  r.textContent='→ '+prize.title;
-  r.style.color=prize.color;
+  var r=document.getElementById('result');r.textContent='→ '+p.title;r.style.color=p.color;
   r.style.transform='scale(0)';r.style.opacity='0';
   requestAnimationFrame(function(){r.style.transform='scale(1)';r.style.opacity='1';});
-
-  // 弹窗
-  showModal(prize);
+  showModal(p);
 }
 
-function showModal(prize){
-  var m=document.getElementById('winModal');
-  document.getElementById('winText').textContent=prize.title;
-  m.classList.add('show');
+function showModal(p){
+  document.getElementById('winText').textContent=p.title;
+  document.getElementById('winModal').classList.add('show');
 }
-
-function closeModal(){
-  document.getElementById('winModal').classList.remove('show');
-}
-
+function closeModal(){document.getElementById('winModal').classList.remove('show');}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 </script>
 </body>
