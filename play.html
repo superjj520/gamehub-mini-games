@@ -4,109 +4,117 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="pageTitle">GameHub · 大富翁</title>
+<link rel="stylesheet" href="design-system.css">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-:root {
-  --gold:#F5C842; --bg:#0D0720; --accent:#7C3AED; --accent2:#EC4899;
-  --deep:#1A0A2E; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1);
-  --text:#F0EAF8; --muted:rgba(240,234,248,0.5);
-}
-body {
-  touch-action:manipulation;
-  font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
-  background:var(--bg); color:var(--text);
-  min-height:100vh; display:flex; flex-direction:column;
-}
+body { touch-action:manipulation; min-height:100dvh; display:flex; flex-direction:column; overflow:hidden; }
+a { color: var(--brand-light); text-decoration: none; }
 
 /* 顶栏 */
 .topbar {
   display:flex; align-items:center; justify-content:space-between;
-  padding:0 16px; height:48px; border-bottom:1px solid var(--border);
-  background:rgba(13,7,32,0.97); flex-shrink:0; gap:12px;
+  padding:0 var(--space-5); height:52px; border-bottom:1px solid var(--border-subtle);
+  background: var(--surface-1); flex-shrink:0; z-index:100;
 }
-.topbar-title { font-size:15px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.topbar-badge { font-size:11px; padding:3px 8px; border-radius:12px; background:rgba(124,58,237,0.2); color:var(--accent); flex-shrink:0; }
+.topbar-left { display:flex; align-items:center; gap: var(--space-3); }
+.topbar-logo { font-family: var(--font-display); font-size:18px; font-weight:800; color: var(--text-primary); }
+.topbar-logo span { color: var(--gold); }
+.topbar-title { font-family: var(--font-display); font-size:15px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.topbar-badge { font-size:11px; padding:2px 10px; border-radius: var(--radius-full); background: rgba(124,58,237,0.15); color: var(--brand-light); flex-shrink:0; }
 
 /* 游戏区 */
-.game-area { flex:1; display:flex; min-height:0; }
-.game-board {
-  flex:1; padding:12px; display:flex;
-  align-items:center; justify-content:center; overflow:auto;
-}
-.game-board-inner { width:100%; max-width:560px; }
+.game-area { flex:1; display:flex; min-height:0; overflow:hidden; }
+.game-board { flex:1; padding: var(--space-5); display:flex; align-items:center; justify-content:center; overflow:auto; }
+.game-board-inner { width:100%; max-width:580px; }
 
 /* 侧面板 */
 .game-panel {
-  width:280px; border-left:1px solid var(--border);
-  padding:12px; overflow-y:auto; background:rgba(255,255,255,0.02);
-  display:flex; flex-direction:column; gap:12px;
+  width:300px; border-left:1px solid var(--border-subtle);
+  padding: var(--space-4); overflow-y:auto; background: var(--surface-1);
+  display:flex; flex-direction:column; gap: var(--space-4); flex-shrink:0;
 }
-.panel-section { /* no extra */ }
-.panel-label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.panel-label { font-size:10px; font-weight:700; color: var(--text-tertiary); text-transform:uppercase; letter-spacing:0.08em; margin-bottom: var(--space-2); }
 
 .player-card {
-  background:var(--card); border:1px solid var(--border); border-radius:10px;
-  padding:10px 12px; margin-bottom:6px; transition:border-color 0.3s;
+  background: var(--surface-2); border:1px solid var(--border-subtle); border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4); margin-bottom: var(--space-2);
+  transition: all var(--duration-normal);
 }
-.player-card.active { border-color:var(--gold); box-shadow:0 0 8px rgba(245,200,66,0.15); }
-.player-card-header { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
-.player-emoji { font-size:20px; }
-.player-name { font-size:13px; font-weight:700; flex:1; }
-.player-ai-badge { font-size:10px; color:var(--muted); }
-.player-stats { font-size:11px; color:var(--muted); display:flex; gap:12px; flex-wrap:wrap; }
+.player-card.active { border-color: var(--gold); box-shadow:0 0 12px rgba(245,200,66,0.12); background: var(--surface-3); }
+.player-card-header { display:flex; align-items:center; gap: var(--space-2); margin-bottom:2px; }
+.player-emoji { font-size:22px; }
+.player-name { font-size:13px; font-weight:700; font-family: var(--font-display); flex:1; }
+.player-ai-badge { font-size:10px; color: var(--text-tertiary); }
+.player-stats { font-size:11px; color: var(--text-secondary); display:flex; gap: var(--space-3); flex-wrap:wrap; }
 
 .btn {
-  touch-action:manipulation;
-  padding:12px 16px; border-radius:10px; border:none;
-  font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;
-  transition:opacity 0.2s,transform 0.1s; width:100%;
-  min-height:44px;
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  padding:12px 20px; border-radius: var(--radius-md); border:none;
+  font-family: var(--font-body); font-size:14px; font-weight:700; cursor:pointer;
+  transition: all var(--duration-fast) var(--ease-out); width:100%; min-height:44px;
+  -webkit-tap-highlight-color:transparent;
 }
 .btn:active { transform:scale(0.97); }
 .btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
-.btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; }
-.btn-secondary { background:var(--card); border:1px solid var(--border); color:var(--text); margin-top:4px; }
-.btn-danger { background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#EF4444; margin-top:4px; }
+.btn-primary { background:linear-gradient(135deg,var(--brand),#A855F7); color:#fff; box-shadow:0 2px 8px rgba(124,58,237,0.25); }
+.btn-primary:hover:not(:disabled) { box-shadow:0 4px 16px rgba(124,58,237,0.4); transform:translateY(-1px); }
+.btn-secondary { background:var(--surface-3); border:1px solid var(--border-default); color:var(--text-primary); margin-top:var(--space-1); }
+.btn-secondary:hover:not(:disabled) { border-color:var(--border-strong); background:var(--surface-4); }
+.btn-danger { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:var(--error); margin-top:var(--space-1); }
 
-/* 状态栏 */
 .status-bar {
-  padding:10px 16px; border-top:1px solid var(--border);
-  background:rgba(255,255,255,0.02); font-size:13px;
-  text-align:center; flex-shrink:0; min-height:40px;
+  padding:var(--space-3) var(--space-5); border-top:1px solid var(--border-subtle);
+  background:var(--surface-1); font-size:13px; color:var(--text-secondary);
+  text-align:center; flex-shrink:0; min-height:44px; font-family:var(--font-display);
 }
 
 /* 加载 */
 .loading {
   display:flex; align-items:center; justify-content:center;
-  height:100vh; flex-direction:column; gap:12px;
+  height:100dvh; flex-direction:column; gap:var(--space-4);
+  background:var(--surface-0);
 }
-.loading-spinner { font-size:40px; animation:spin 1s linear infinite; }
-@keyframes spin { to { transform:rotate(360deg); } }
-@keyframes pointerBounce { 0%,100% { transform:translateX(-50%) translateY(0); } 50% { transform:translateX(-50%) translateY(4px); } }
-.loading-text { font-size:14px; color:var(--muted); }
+.loading-spinner {
+  width:48px; height:48px; border:3px solid var(--border-default);
+  border-top-color:var(--brand); border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+.loading-text { font-size:14px; color:var(--text-tertiary); font-family:var(--font-display); }
+@keyframes spin { to{transform:rotate(360deg);} }
+@keyframes pointerBounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(4px)} }
 
-/* 移动端适配 */
-@media (max-width:768px) {
+/* 游戏切换栏 */
+.game-switcher {
+  display:flex; gap:2px; padding:var(--space-2) var(--space-3);
+  background:var(--surface-1); border-top:1px solid var(--border-subtle);
+  overflow-x:auto; flex-shrink:0; z-index:90;
+}
+.game-switcher button {
+  flex-shrink:0; padding:8px 14px; border:none; border-radius:var(--radius-full);
+  font-family:var(--font-body); font-size:12px; font-weight:600; cursor:pointer;
+  background:transparent; color:var(--text-secondary);
+  transition:all var(--duration-fast) var(--ease-out); min-height:36px;
+}
+.game-switcher button:hover { background:var(--surface-3); color:var(--text-primary); }
+.game-switcher button.active { background:var(--brand); color:#fff; box-shadow:0 2px 8px rgba(124,58,237,0.3); }
+
+@media(max-width:768px) {
   .game-area { flex-direction:column; }
-  .game-panel { width:100%; border-left:none; border-top:1px solid var(--border); max-height:35dvh; flex-shrink:0; }
-  .game-board { min-height:40dvh; }
+  .game-panel { width:100%; border-left:none; border-top:1px solid var(--border-subtle); max-height:38dvh; flex-shrink:0; }
+  .game-board { min-height:38dvh; }
 }
-/* 无障碍：尊重用户减少动画偏好 */
-@media (prefers-reduced-motion:reduce) {
-  *, *::before, *::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
-}
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;} }
 </style>
 </head>
 <body>
 
 <div id="loading" class="loading">
-  <div class="loading-spinner">🎮</div>
-  <div class="loading-text">加载游戏配置中…</div>
+  <div class="loading-spinner"></div>
+  <div class="loading-text">加载游戏配置中</div>
 </div>
 
-<div id="app" style="display:none;flex-direction:column;min-height:100vh">
+<div id="app" style="display:none;flex-direction:column;min-height:100dvh">
   <div class="topbar">
-    <div class="topbar-title" id="gameTitle">—</div>
+    <div class="topbar-title" id="gameTitle">GameHub</div>
     <div class="topbar-badge" id="gameType">大富翁</div>
   </div>
   <div class="game-area">
@@ -115,20 +123,20 @@ body {
     </div>
     <div class="game-panel" id="sidePanel">
       <div class="panel-section">
-        <div class="panel-label">👥 玩家</div>
+        <div class="panel-label">玩家</div>
         <div id="playerList"></div>
       </div>
       <div class="panel-section" id="btnSection">
-        <button class="btn btn-primary" id="btnRoll" onclick="MonopolyGame.rollDice()">🎲 掷骰子</button>
-        <button class="btn btn-secondary" id="btnBuy" onclick="MonopolyGame.buyProperty()">🏠 购买地产</button>
+        <button class="btn btn-primary" id="btnRoll" onclick="MonopolyGame.rollDice()">掷骰子</button>
+        <button class="btn btn-secondary" id="btnBuy" onclick="MonopolyGame.buyProperty()">购买地产</button>
       </div>
       <div class="panel-section">
-        <div class="panel-label">📋 最近事件</div>
-        <div id="eventLog" style="font-size:11px;color:var(--muted);line-height:1.8;"></div>
+        <div class="panel-label">最近事件</div>
+        <div id="eventLog" style="font-size:11px;color:var(--text-tertiary);line-height:1.8;"></div>
       </div>
     </div>
   </div>
-  <div class="status-bar" id="statusBar">准备开始…</div>
+  <div class="status-bar" id="statusBar">准备开始</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/spin-wheel@5/dist/spin-wheel-iife.js"></script>
@@ -177,45 +185,31 @@ var GAME_MAP = {
   var slug = params.get('config');
   var configId = params.get('cid');
 
-  // ─── 无分享链接时使用默认配置 ───
   if (!slug && !configId) {
     var gameType = params.get('game') || 'monopoly';
     var gameInfo = GAME_MAP[gameType] || GAME_MAP['monopoly'];
     document.getElementById('pageTitle').textContent = 'GameHub · ' + gameInfo.name;
     var config = {
-      id: 'default',
-      game_type: gameType,
+      id: 'default', game_type: gameType,
       title: gameInfo.name + '（默认配置）',
       blocks: BlockRegistry.getDefaults(gameType),
     };
-    // 添加游戏选择器
     addGameSwitcher(gameType);
     startGame(config);
     return;
   }
 
-  // ─── 从 Supabase 加载 ───
   try {
     var query = GHSupabase.from('user_configs').select('*');
-    if (slug) {
-      query = query.eq('share_slug', slug);
-    } else {
-      query = query.eq('id', configId);
-    }
+    if (slug) query = query.eq('share_slug', slug);
+    else query = query.eq('id', configId);
     var result = await query.single();
     if (result.error) throw result.error;
     var config = result.data;
-
-    // 更新游玩次数（静默）
-    GHSupabase.from('user_configs')
-      .update({ plays_count: (config.plays_count || 0) + 1 })
-      .eq('id', config.id)
-      .then(function(){}).catch(function(){});
-
+    GHSupabase.from('user_configs').update({ plays_count: (config.plays_count||0)+1 }).eq('id',config.id).then(function(){}).catch(function(){});
     startGame(config);
-  } catch (e) {
-    document.getElementById('loading').innerHTML =
-      '<div style="font-size:40px">❌</div><div class="loading-text">加载失败: ' + e.message + '</div>';
+  } catch(e) {
+    document.getElementById('loading').innerHTML = '<div style="font-size:40px;margin-bottom:8px">!</div><div class="loading-text">加载失败: '+e.message+'</div>';
   }
 })();
 
@@ -227,112 +221,77 @@ function startGame(config) {
   document.getElementById('gameTitle').textContent = config.title || gameInfo.name;
   document.getElementById('gameType').textContent = gameInfo.name;
 
-  if (!gameInfo.module) {
-    document.getElementById('statusBar').textContent = '❌ 不支持: ' + config.game_type;
-    return;
-  }
+  if (!gameInfo.module) { document.getElementById('statusBar').textContent = '不支持: '+config.game_type; return; }
+  document.getElementById('statusBar').textContent = '游戏初始化中';
 
-  document.getElementById('statusBar').textContent = '🎮 游戏初始化中…';
-
-  // 通用事件监听
-  GameEngine.on('game:state', function(gs) {
-    renderGenericState(config.game_type, gs);
-  });
-  GameEngine.on('game:status', function(msg) {
-    document.getElementById('statusBar').textContent = msg;
-  });
-  // 兼容大富翁专用事件
-  GameEngine.on('monopoly:state', function(gs) {
-    renderMonopolyState(gs);
-  });
-  GameEngine.on('monopoly:status', function(msg) {
-    document.getElementById('statusBar').textContent = msg;
-  });
+  GameEngine.on('game:state', function(gs){ renderGenericState(config.game_type, gs); });
+  GameEngine.on('game:status', function(msg){ document.getElementById('statusBar').textContent = msg; });
+  GameEngine.on('monopoly:state', function(gs){ renderMonopolyState(gs); });
+  GameEngine.on('monopoly:status', function(msg){ document.getElementById('statusBar').textContent = msg; });
 
   var container = document.getElementById('boardContainer');
-  // 非棋盘游戏需要全屏容器
-  if (config.game_type === 'wheel' || config.game_type === 'truth-or-dare') {
-    container.style.maxWidth = '100%';
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.alignItems = 'center';
+  if (config.game_type==='wheel'||config.game_type==='truth-or-dare') {
+    container.style.maxWidth='100%'; container.style.display='flex'; container.style.flexDirection='column'; container.style.alignItems='center';
   }
 
-  GameEngine.init(config, container, gameInfo.module).catch(function(e) {
-    document.getElementById('statusBar').textContent = '❌ 启动失败: ' + e.message;
-    console.error(e);
-  });
+  GameEngine.init(config, container, gameInfo.module).catch(function(e){ document.getElementById('statusBar').textContent='启动失败: '+e.message; });
 
-  // 根据游戏类型显示/隐藏按钮
   var btnSection = document.getElementById('btnSection');
-  if (config.game_type === 'monopoly') {
-    btnSection.innerHTML = '<button class="btn btn-primary" id="btnRoll" onclick="MonopolyGame.rollDice()">🎲 掷骰子</button><button class="btn btn-secondary" id="btnBuy" onclick="MonopolyGame.buyProperty()">🏠 购买地产</button>';
-  } else if (config.game_type === 'flying-chess') {
-    btnSection.innerHTML = '<button class="btn btn-primary" onclick="FlyingChessGame.rollDice()">🎲 掷骰子</button>';
-  } else if (config.game_type === 'wheel') {
-    btnSection.innerHTML = '<button class="btn btn-primary" id="spinBtn" onclick="WheelGame.spin()">🎡 开始抽奖</button>';
-  } else if (config.game_type === 'truth-or-dare') {
-    btnSection.innerHTML = '<button class="btn btn-primary" onclick="TruthOrDareGame.pickTruth()" style="margin-bottom:4px">💬 真心话</button><button class="btn btn-secondary" onclick="TruthOrDareGame.pickDare()" style="margin-bottom:4px">🎯 大冒险</button><button class="btn btn-danger" onclick="TruthOrDareGame.skip()">⏭️ 跳过</button>';
-  } else {
-    btnSection.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center">使用键盘/触屏操作</div>';
-  }
+  if (config.game_type==='monopoly')
+    btnSection.innerHTML = '<button class="btn btn-primary" id="btnRoll" onclick="MonopolyGame.rollDice()">掷骰子</button><button class="btn btn-secondary" id="btnBuy" onclick="MonopolyGame.buyProperty()">购买地产</button>';
+  else if (config.game_type==='flying-chess')
+    btnSection.innerHTML = '<button class="btn btn-primary" onclick="FlyingChessGame.rollDice()">掷骰子</button>';
+  else if (config.game_type==='wheel')
+    btnSection.innerHTML = '<button class="btn btn-primary" id="spinBtn" onclick="WheelGame.spin()">开始抽奖</button>';
+  else if (config.game_type==='truth-or-dare')
+    btnSection.innerHTML = '<button class="btn btn-primary" onclick="TruthOrDareGame.pickTruth()" style="margin-bottom:4px">真心话</button><button class="btn btn-secondary" onclick="TruthOrDareGame.pickDare()" style="margin-bottom:4px">大冒险</button><button class="btn btn-danger" onclick="TruthOrDareGame.skip()">跳过</button>';
+  else
+    btnSection.innerHTML = '<div style="font-size:12px;color:var(--text-tertiary);text-align:center">键盘 / 触屏操作</div>';
 }
 
 function renderGenericState(gameType, gs) {
-  var logEl = document.getElementById('eventLog');
-  var playerEl = document.getElementById('playerList');
-  if (gs.score !== undefined) {
-    playerEl.innerHTML = '<div class="player-card"><div class="player-card-header"><span style="font-size:20px">🏆</span><span class="player-name">得分</span></div><div class="player-stats"><span style="font-size:24px;font-weight:800">' + gs.score + '</span></div></div>';
-  }
-  if (gs.gameOver) {
-    document.getElementById('btnRoll').disabled = true;
-  }
+  if (gs.score !== undefined)
+    document.getElementById('playerList').innerHTML = '<div class="player-card"><div class="player-card-header"><span style="font-size:20px">&#127942;</span><span class="player-name">得分</span></div><div class="player-stats"><span style="font-size:24px;font-weight:800">'+gs.score+'</span></div></div>';
+  if (gs.gameOver) document.getElementById('btnRoll').disabled = true;
 }
 
 function renderMonopolyState(gameState) {
-  var html = '';
-  var players = gameState.players || [];
-  for (var i = 0; i < players.length; i++) {
-    var p = players[i];
-    var activeClass = (i === gameState.currentPlayer && !gameState.gameOver) ? ' active' : '';
-    html += '<div class="player-card' + activeClass + '"><div class="player-card-header">';
-    html += '<span class="player-emoji">' + p.emoji + '</span><span class="player-name">' + p.name + '</span>';
-    if (p.isAI) html += '<span class="player-ai-badge">🤖 AI</span>';
-    html += '</div><div class="player-stats">';
-    html += '<span>💰 ' + p.gold + '</span><span>📍 ' + (p.position+1) + '</span><span>🔄 第' + (p.laps+1) + '圈</span>';
-    if (p.properties && p.properties.length > 0) html += '<span>🏠 ×' + p.properties.length + '</span>';
+  var html = '', players = gameState.players || [];
+  for (var i=0;i<players.length;i++) {
+    var p = players[i], ac = (i===gameState.currentPlayer&&!gameState.gameOver)?' active':'';
+    html += '<div class="player-card'+ac+'"><div class="player-card-header"><span class="player-emoji">'+p.emoji+'</span><span class="player-name">'+p.name+'</span>';
+    if (p.isAI) html += '<span class="player-ai-badge">AI</span>';
+    html += '</div><div class="player-stats"><span>'+p.gold+'</span><span>#'+(p.position+1)+'</span><span>'+p.laps+'圈</span>';
+    if (p.properties&&p.properties.length>0) html += '<span> x'+p.properties.length+'</span>';
     html += '</div></div>';
   }
   document.getElementById('playerList').innerHTML = html;
   document.getElementById('btnRoll').disabled = gameState.gameOver;
-  var logHtml = '';
-  var log = gameState.log || [];
-  for (var j = 0; j < log.length; j++) logHtml += '<div>' + log[j] + '</div>';
-  document.getElementById('eventLog').innerHTML = logHtml || '<div style="opacity:0.5">游戏即将开始…</div>';
+  var logHtml = '', log = gameState.log || [];
+  for (var j=0;j<log.length;j++) logHtml += '<div>'+log[j]+'</div>';
+  document.getElementById('eventLog').innerHTML = logHtml || '<div style="opacity:0.5">游戏即将开始</div>';
 }
 
 function addGameSwitcher(currentGame) {
   var games = [
-    {key:'monopoly',name:'大富翁',icon:'🎰'},{key:'wheel',name:'大转盘',icon:'🎡'},
-    {key:'scratch-card',name:'刮刮乐',icon:'💳'},{key:'quiz',name:'答题',icon:'🧠'},
-    {key:'game-2048',name:'2048',icon:'🔢'},{key:'snake',name:'贪吃蛇',icon:'🐍'},
-    {key:'truth-or-dare',name:'真心话大冒险',icon:'🤝'},{key:'flying-chess',name:'飞行棋',icon:'✈️'},
-    {key:'match3',name:'消消乐',icon:'💎'},
+    {key:'monopoly',name:'大富翁',icon:'&#127920;'},{key:'wheel',name:'大转盘',icon:'&#127922;'},
+    {key:'scratch-card',name:'刮刮乐',icon:'&#127923;'},{key:'quiz',name:'答题',icon:'&#129504;'},
+    {key:'game-2048',name:'2048',icon:'&#128290;'},{key:'snake',name:'贪吃蛇',icon:'&#128013;'},
+    {key:'truth-or-dare',name:'真心话',icon:'&#129309;'},{key:'flying-chess',name:'飞行棋',icon:'&#9992;'},
+    {key:'match3',name:'消消乐',icon:'&#128142;'},
   ];
   var bar = document.createElement('div');
-  bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:200;display:flex;gap:2px;padding:6px 8px;background:rgba(10,10,26,0.97);border-top:1px solid rgba(255,255,255,0.08);overflow-x:auto;-webkit-overflow-scrolling:touch;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);';
+  bar.className = 'game-switcher';
   for (var i=0;i<games.length;i++){
     (function(g){
       var btn = document.createElement('button');
-      btn.textContent = g.icon+' '+g.name;
-      btn.style.cssText = 'flex-shrink:0;padding:6px 10px;border:none;border-radius:8px;font-size:11px;font-family:inherit;cursor:pointer;white-space:nowrap;transition:all .15s;min-height:44px;'+
-        (g.key===currentGame?'background:var(--accent,#7C3AED);color:#fff;box-shadow:0 2px 8px rgba(124,58,237,.3);':'background:transparent;color:var(--muted);');
-      btn.addEventListener('click',function(){ location.href = '?game='+g.key; });
+      btn.innerHTML = g.icon + ' ' + g.name;
+      if (g.key===currentGame) btn.classList.add('active');
+      btn.addEventListener('click',function(){ location.href='?game='+g.key; });
       bar.appendChild(btn);
     })(games[i]);
   }
-  document.body.appendChild(bar);
-  document.body.style.paddingBottom = '56px';
+  document.getElementById('app').appendChild(bar);
 }
 </script>
 </body>
