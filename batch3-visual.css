@@ -1,0 +1,88 @@
+/* GameHub 休闲小游戏批次 3：统一视觉层 */
+:root {
+  --batch-bg: #0D0720;
+  --batch-panel: color-mix(in srgb, var(--surface-2) 84%, #0D0720 16%);
+  --batch-line: rgba(255,255,255,.09);
+  --batch-cyan: #67E8F9;
+  --batch-pink: #F472B6;
+}
+
+body.batch3-page {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(124,58,237,.22), transparent 38rem),
+    radial-gradient(circle at 100% 70%, rgba(236,72,153,.08), transparent 30rem),
+    var(--batch-bg);
+  color: var(--text-primary);
+}
+
+.batch3-nav {
+  position: sticky; top: 0; z-index: 1000;
+  display: flex; align-items: center; gap: var(--space-6);
+  min-height: 64px; padding: var(--space-3) var(--space-6);
+  background: rgba(13,7,32,.88); border-bottom: 1px solid var(--batch-line);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+}
+.batch3-nav a { text-decoration: none; color: inherit; }
+.batch3-logo { font: 900 22px/1 var(--font-display); letter-spacing: -.04em; white-space: nowrap; }
+.batch3-logo span { color: var(--gold); }
+.batch3-links { display: flex; align-items: center; gap: var(--space-1); margin-left: auto; }
+.batch3-link { padding: 8px 14px; border-radius: var(--radius-full); color: var(--text-secondary) !important; font: 600 13px var(--font-display); transition: all var(--duration-fast) var(--ease-out); }
+.batch3-link:hover, .batch3-link.active { color: var(--gold) !important; background: var(--surface-3); }
+.batch3-nav .batch3-game { color: var(--brand-light) !important; border: 1px solid var(--border-accent); }
+.batch3-page > .nav { display: none !important; }
+
+.batch3-page .main { position: relative; min-height: calc(100dvh - 64px); background: transparent; }
+.batch3-page .panel-left, .batch3-page .panel-right { background: rgba(255,255,255,.018); border-color: var(--batch-line); }
+.batch3-page .panel-center, .batch3-page .game-center { background: transparent; }
+.batch3-page .card, .batch3-page .game-hud, .batch3-page .statusbar, .batch3-page .game-status-bar {
+  background: var(--batch-panel); border-color: var(--batch-line); border-radius: var(--radius-lg);
+  box-shadow: 0 18px 45px rgba(0,0,0,.18);
+}
+.batch3-page .card-title, .batch3-page .panel-title { color: var(--text-primary); }
+.batch3-page button, .batch3-page .btn-start, .batch3-page .btn-main, .batch3-page .btn-primary { font-family: var(--font-body); }
+.batch3-page .game-name, .batch3-page .game-title, .batch3-page .overlay-title {
+  font-family: var(--font-display); text-shadow: 0 0 28px rgba(245,200,66,.18);
+}
+.batch3-page .game-subtitle, .batch3-page .game-hint { color: var(--text-secondary); }
+
+/* 每种游戏保留一个有辨识度的“道具动势”。 */
+.batch3-cup .cup-body { transform-origin: 50% 90%; animation: batch-cup 2.8s ease-in-out infinite; }
+.batch3-cup .ball { animation: batch-ball 2.2s ease-in-out infinite; filter: drop-shadow(0 0 8px var(--batch-cyan)); }
+.batch3-claw .claw-arm { transform-origin: 50% 0; animation: batch-claw 3.2s ease-in-out infinite; }
+.batch3-claw .dolls-area { box-shadow: inset 0 -18px 34px rgba(236,72,153,.12); }
+.batch3-coins .basket-body { animation: batch-basket 2.4s ease-in-out infinite; }
+.batch3-coins .game-header { box-shadow: 0 0 34px rgba(245,200,66,.12); }
+.batch3-fruit .canvas-wrap::after { content: '✦  ✧  ✦'; position: absolute; inset: 16% 10%; color: rgba(244,114,182,.55); font-size: 22px; letter-spacing: 2.5rem; pointer-events: none; animation: batch-spark 1.8s ease-in-out infinite; }
+.batch3-flip .board { perspective: 900px; filter: drop-shadow(0 20px 28px rgba(124,58,237,.2)); }
+.batch3-flip .board > * { transition: transform .45s var(--ease-bounce), filter .25s; }
+.batch3-link .board-wrap { filter: drop-shadow(0 0 24px rgba(103,232,249,.12)); }
+.batch3-link .board-svg { animation: batch-link 4s ease-in-out infinite; }
+.batch3-jump .canvas-wrap { box-shadow: inset 0 -40px 60px rgba(103,232,249,.12), 0 0 42px rgba(124,58,237,.16); }
+.batch3-jump .charge-bar-fill { box-shadow: 0 0 12px var(--batch-cyan); }
+.batch3-sling .canvas-wrap { box-shadow: inset 0 0 60px rgba(244,114,182,.1), 0 0 40px rgba(124,58,237,.16); }
+.batch3-sling .stone-bar { animation: batch-aim 1.6s ease-in-out infinite; }
+.batch3-ring .rings-display { filter: drop-shadow(0 0 12px rgba(103,232,249,.35)); animation: batch-ring 2.5s ease-in-out infinite; }
+.batch3-ring .aim-hint { color: var(--batch-cyan); }
+.batch3-egg .egg-shell { animation: batch-egg 2.4s ease-in-out infinite; }
+.batch3-egg .egg-grid { filter: drop-shadow(0 0 28px rgba(245,200,66,.12)); }
+
+@keyframes batch-cup { 0%,100% { transform: rotate(0) translateY(0); } 50% { transform: rotate(-4deg) translateY(-5px); } }
+@keyframes batch-ball { 0%,100% { transform: translate(0,0); } 50% { transform: translate(14px,-12px); } }
+@keyframes batch-claw { 0%,100% { transform: rotate(0); } 45% { transform: rotate(4deg); } 70% { transform: rotate(-3deg); } }
+@keyframes batch-basket { 0%,100% { transform: translateX(-8px); } 50% { transform: translateX(8px); } }
+@keyframes batch-spark { 0%,100% { opacity: .12; transform: scale(.9) rotate(-6deg); } 50% { opacity: .8; transform: scale(1.1) rotate(6deg); } }
+@keyframes batch-link { 0%,100% { opacity: .8; } 50% { opacity: 1; filter: drop-shadow(0 0 8px var(--batch-cyan)); } }
+@keyframes batch-aim { 0%,100% { transform: translateX(-3px); } 50% { transform: translateX(3px); } }
+@keyframes batch-ring { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-5px) rotate(2deg); } }
+@keyframes batch-egg { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-6px) rotate(1deg); } }
+
+@media (max-width: 768px) {
+  .batch3-nav { gap: var(--space-3); padding: var(--space-3) var(--space-4); }
+  .batch3-links { gap: 0; overflow-x: auto; margin-left: 0; }
+  .batch3-link { padding: 7px 9px; font-size: 12px; white-space: nowrap; }
+  .batch3-page .main { min-height: calc(100dvh - 58px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .batch3-page * { animation: none !important; }
+}

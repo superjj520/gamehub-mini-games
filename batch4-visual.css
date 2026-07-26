@@ -1,0 +1,88 @@
+/* GameHub 前端批次 4：经典游戏统一视觉层 */
+:root {
+  --bg: #0D0720;
+  --deep: var(--surface-1);
+  --card: rgba(255,255,255,.055);
+  --border: var(--border-default);
+  --text: var(--text-primary);
+  --muted: var(--text-tertiary);
+  --accent: var(--brand);
+  --accent2: #EC4899;
+}
+
+body {
+  background:
+    radial-gradient(circle at 50% -10%, rgba(124,58,237,.16), transparent 36rem),
+    var(--bg);
+}
+
+.nav {
+  min-height: 64px;
+  padding: 12px clamp(16px, 4vw, 40px) !important;
+  background: rgba(13,7,32,.88) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,.2);
+}
+.nav-logo { font-family: var(--font-display) !important; letter-spacing: -.04em !important; }
+.nav-logo span:first-of-type { color: var(--text-primary); }
+.nav-badge { box-shadow: 0 0 18px rgba(124,58,237,.3); }
+.nav-links-wrap, .nav-tabs-wrap { display: none !important; }
+.batch4-links {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  flex: 1; margin: 0 24px;
+}
+.batch4-links a {
+  color: var(--text-secondary); text-decoration: none; white-space: nowrap;
+  padding: 8px 13px; border-radius: var(--radius-full);
+  font-size: 13px; transition: all var(--duration-fast) var(--ease-out);
+}
+.batch4-links a:hover, .batch4-links a:focus-visible {
+  color: var(--text-white); background: rgba(255,255,255,.08); outline: none;
+}
+.batch4-links a[href="index.html"] { color: var(--gold); }
+.nav-right { gap: 8px !important; }
+.nav-quick-links { display: flex !important; gap: 6px !important; }
+.nav-quick-links a { color: var(--text-secondary) !important; border-color: var(--border-default) !important; }
+
+.main { min-height: calc(100vh - 64px) !important; }
+.panel-left, .panel-right {
+  background: rgba(255,255,255,.018) !important;
+  border-color: var(--border-subtle) !important;
+}
+.panel-center { background: var(--deep) !important; }
+.card {
+  background: linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.03)) !important;
+  border-color: var(--border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--duration-normal) var(--ease-out), transform var(--duration-normal) var(--ease-out);
+}
+.card:hover { border-color: var(--border-strong) !important; transform: translateY(-1px); }
+.card-title { color: var(--text-primary); }
+.card-title .dot, .dot { box-shadow: 0 0 10px currentColor; }
+button, .btn, .option-btn, .btn-option, .btn-opt, .diff-btn, .time-btn, .level-btn, .opt-btn {
+  font-family: var(--font-body) !important;
+  transition: transform var(--duration-fast) var(--ease-bounce), box-shadow var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out) !important;
+}
+button:hover, .btn:hover, .option-btn:hover, .btn-option:hover, .btn-opt:hover, .diff-btn:hover, .time-btn:hover, .level-btn:hover, .opt-btn:hover { transform: translateY(-1px); }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--brand-light); outline-offset: 3px; }
+canvas, .game-board, [class*="board"], [class*="grid"] {
+  filter: drop-shadow(0 0 18px rgba(124,58,237,.12));
+}
+.mobile-tabs { border-color: var(--border-subtle) !important; background: rgba(13,7,32,.92) !important; }
+
+/* 经典游戏的共同反馈：保留原有状态类，仅增强其出现时的视觉重量。 */
+[class*="selected"], [class*="active"], [class*="hit"], [class*="success"], [class*="complete"], [class*="cleared"] {
+  animation: batch4-pop var(--duration-normal) var(--ease-bounce);
+}
+@keyframes batch4-pop { 0% { transform: scale(.96); } 70% { transform: scale(1.025); } 100% { transform: scale(1); } }
+@media (max-width: 760px) {
+  .batch4-links { justify-content: flex-start; overflow-x: auto; margin: 0 10px; scrollbar-width: none; }
+  .batch4-links::-webkit-scrollbar { display: none; }
+  .batch4-links a { padding: 7px 10px; font-size: 12px; }
+  .nav-right .status-text { display: none; }
+  .nav-quick-links a { padding: 5px 8px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

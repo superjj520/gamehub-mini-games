@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GameHub · 活动数据后台</title>
+<link rel="stylesheet" href="design-system.css">
+<script src="runtime/bridge.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase.js"></script>
 <style>
@@ -43,7 +45,13 @@ tr:last-child td { border-bottom:none; }
 .action-btn:hover { border-color:rgba(124,58,237,0.5); }
 </style>
 </head>
-<body>
+<body class="batch5-page">
+<header class="gh-nav" aria-label="GameHub 主导航">
+  <a class="gh-nav-logo" href="index.html"><span class="gh-nav-mark">◆</span><span>Game<span>Hub</span></span></a>
+  <nav class="gh-nav-links">
+    <a href="index.html">首页</a><a href="leaderboard.html">排行榜</a><a href="shop.html">商城</a><a href="profile.html">个人中心</a>
+  </nav>
+</header>
 
 <div id="login-page">
   <div class="login-box">

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GameHub · 创作工坊</title>
 <link rel="stylesheet" href="design-system.css">
+<script src="runtime/bridge.js" defer></script>
 <style>
 body{touch-action:manipulation;font-family:var(--font-body);background:var(--surface-0);color:var(--text-primary);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 @supports(height:100dvh){body{height:100dvh}}
@@ -90,7 +91,13 @@ body{touch-action:manipulation;font-family:var(--font-body);background:var(--sur
 }
 </style>
 </head>
-<body>
+<body class="batch5-page">
+<header class="gh-nav" aria-label="GameHub 主导航">
+  <a class="gh-nav-logo" href="index.html"><span class="gh-nav-mark">◆</span><span>Game<span>Hub</span></span></a>
+  <nav class="gh-nav-links">
+    <a href="index.html">首页</a><a href="leaderboard.html">排行榜</a><a href="shop.html">商城</a><a href="profile.html">个人中心</a>
+  </nav>
+</header>
 
 <!-- 顶栏 -->
 <div class="topbar">

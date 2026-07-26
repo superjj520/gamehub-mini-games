@@ -19,7 +19,7 @@
   --gold-light:   #FDE68A;
 
   /* 表面 */
-  --surface-0:    #06060E;
+  --surface-0:    #0D0720;
   --surface-1:    #0C0C1A;
   --surface-2:    #121224;
   --surface-3:    #1A1A30;
@@ -217,4 +217,87 @@ h3 { font-family: var(--font-display); font-weight: 700; font-size: 18px; line-h
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ── 批次 5 统一导航 ── */
+.batch5-page {
+  background: #0D0720;
+}
+
+.gh-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: 0 clamp(16px, 4vw, 40px);
+  background: rgba(13, 7, 32, .92);
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: 0 10px 30px rgba(3, 1, 12, .18);
+  backdrop-filter: blur(18px);
+}
+
+.gh-nav-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+  color: var(--text-primary);
+  font: 800 17px/1 var(--font-display);
+  letter-spacing: -.04em;
+  text-decoration: none;
+}
+
+.gh-nav-logo > span:last-child > span { color: var(--gold); }
+.gh-nav-mark {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  color: #1A0A2E;
+  font-size: 11px;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  border-radius: 8px;
+  box-shadow: 0 0 16px rgba(245, 200, 66, .25);
+}
+
+.gh-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.gh-nav-links::-webkit-scrollbar { display: none; }
+.gh-nav-links a {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font: 600 13px/1 var(--font-body);
+  text-decoration: none;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+.gh-nav-links a:hover,
+.gh-nav-links a:focus-visible {
+  color: var(--text-primary);
+  background: rgba(124, 58, 237, .14);
+  border-color: var(--border-accent);
+  outline: none;
+}
+.gh-nav-links a:first-child { color: var(--gold-light); }
+.gh-nav ~ .nav { display: none !important; }
+
+/* 后台保留工作区侧栏，同时避开统一顶栏 */
+.batch5-page:has(.sidebar) .sidebar { top: 58px; min-height: calc(100vh - 58px); }
+.batch5-page:has(.sidebar) .main-content,
+.batch5-page:has(.sidebar) .content { padding-top: 58px; }
+
+@media (max-width: 640px) {
+  .gh-nav { gap: 10px; padding-inline: 14px; }
+  .gh-nav-links a { padding-inline: 10px; font-size: 12px; }
 }
