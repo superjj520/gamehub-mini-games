@@ -4,20 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GameHub · 游戏包装器</title>
+<link rel="stylesheet" href="design-system.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-:root{--gold:#F5C842;--bg:#0D0720;--accent:#7C3AED;--accent2:#EC4899;--border:rgba(255,255,255,0.1);--text:#F0EAF8;--muted:rgba(240,234,248,0.5);}
-body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;display:flex;flex-direction:column;touch-action:manipulation;}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:44px;border-bottom:1px solid var(--border);background:rgba(13,7,32,0.97);flex-shrink:0;}
+:root{--bg:var(--surface-0);--accent:var(--brand);--border:var(--border-default);--text:var(--text-primary);--muted:var(--text-tertiary);}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100dvh;display:flex;flex-direction:column;touch-action:manipulation;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 var(--space-5);height:52px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--surface-1) 94%,transparent);backdrop-filter:blur(12px);flex-shrink:0;}
 .topbar-title{font-size:14px;font-weight:700;}
 .topbar-link{font-size:12px;color:var(--muted);text-decoration:none;}
-.game-frame{flex:1;width:100%;border:none;}
+.game-frame{flex:1;width:100%;border:none;background:var(--surface-0);opacity:0;animation:frameIn var(--duration-slow) var(--ease-out) .15s forwards;}
 .config-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-top:1px solid var(--border);background:rgba(255,255,255,0.02);overflow-x:auto;flex-shrink:0;flex-wrap:wrap;}
 .config-bar label{font-size:12px;color:var(--muted);white-space:nowrap;}
 .config-bar select,.config-bar input{background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 8px;font-size:12px;font-family:inherit;outline:none;min-width:60px;min-height:44px;}
 .config-bar select:focus,.config-bar input:focus{border-color:var(--accent);}
-.config-bar button{padding:8px 16px;border-radius:6px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;min-height:44px;}
-.loading{display:flex;align-items:center;justify-content:center;height:100dvh;font-size:14px;color:var(--muted);}
+.config-bar button{padding:8px 16px;border-radius:var(--radius-md);border:none;background:linear-gradient(135deg,var(--brand),var(--brand-light));color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;min-height:44px;}
+.loading{display:flex;align-items:center;justify-content:center;height:100dvh;flex-direction:column;gap:var(--space-3);font-size:14px;color:var(--muted);background:var(--surface-0);}
+.loading::after{content:'';width:180px;height:3px;border-radius:var(--radius-full);background:linear-gradient(90deg,transparent,var(--gold),transparent);background-size:200% 100%;animation:shimmer 1.2s linear infinite;}
+@keyframes frameIn{to{opacity:1}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
 </style>
 </head>
@@ -37,6 +40,7 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="runtime/bridge.js"></script>
 <script src="supabase.js"></script>
 <script>
 (function() {

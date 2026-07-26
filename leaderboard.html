@@ -4,23 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>小游戏中台 · 好友排行榜</title>
+<link rel="stylesheet" href="design-system.css">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
     --gold:    #F5C842;
-    --bg:      #0D0720;
-    --accent:  #7C3AED;
+    --bg:      var(--surface-0);
+    --accent:  var(--brand);
     --accent2: #EC4899;
-    --deep:    #1A0A2E;
-    --card:    rgba(255,255,255,0.05);
-    --border:  rgba(255,255,255,0.1);
-    --text:    #F0EAF8;
-    --muted:   rgba(240,234,248,0.5);
+    --deep:    var(--surface-1);
+    --card:    color-mix(in srgb,var(--surface-2) 78%,transparent);
+    --border:  var(--border-default);
+    --text:    var(--text-primary);
+    --muted:   var(--text-tertiary);
     --silver:  #C0C8D8;
     --bronze:  #CD7F32;
-    --green:   #22C55E;
-    --red:     #EF4444;
+    --green:   var(--success);
+    --red:     var(--error);
   }
 
   body {
@@ -508,6 +509,16 @@
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+  /* 使用设计系统统一排行页的层级、导航与前三名强调色。 */
+  .nav { background: color-mix(in srgb,var(--surface-1) 94%,transparent); height: 60px; }
+  .nav-tab.active { background: var(--surface-3); color: var(--gold); }
+  .card, .rank-item, .podium-item { border-radius: var(--radius-lg); }
+  .rank-item { background: var(--surface-2); border-color: var(--border-subtle); }
+  .rank-item:hover, .rank-item.is-me { border-color: var(--border-accent); background: var(--surface-3); }
+  .podium-1 .podium-stand { box-shadow: 0 0 24px color-mix(in srgb,var(--gold) 22%,transparent); }
+  .podium-2 .podium-stand { box-shadow: 0 0 20px rgba(192,200,216,.12); }
+  .podium-3 .podium-stand { box-shadow: 0 0 20px rgba(205,127,50,.12); }
+  @media (max-width:768px) { .nav { padding: 0 var(--space-4); } .nav-tabs { gap: 0; } }
 </style>
 <link rel="stylesheet" href="mobile.css">
 </head>
@@ -1509,6 +1520,7 @@ function toggleSound() {
   if (icon) icon.textContent = on ? '🔊' : '🔇';
 }
 
+<script src="runtime/bridge.js"></script>
 <script src="sound.js"></script>
 <script src="share.js"></script>
 <script src="leaderboard.js"></script>

@@ -4,22 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>小游戏中台 · 积分商城</title>
+<link rel="stylesheet" href="design-system.css">
 <link rel="stylesheet" href="mobile.css">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
     --gold:    #F5C842;
-    --bg:      #0D0720;
-    --accent:  #7C3AED;
+    --bg:      var(--surface-0);
+    --accent:  var(--brand);
     --accent2: #EC4899;
-    --deep:    #1A0A2E;
-    --card:    rgba(255,255,255,0.05);
-    --border:  rgba(255,255,255,0.1);
-    --text:    #F0EAF8;
-    --muted:   rgba(240,234,248,0.5);
-    --green:   #22C55E;
-    --red:     #EF4444;
+    --deep:    var(--surface-1);
+    --card:    color-mix(in srgb,var(--surface-2) 78%,transparent);
+    --border:  var(--border-default);
+    --text:    var(--text-primary);
+    --muted:   var(--text-tertiary);
+    --green:   var(--success);
+    --red:     var(--error);
   }
 
   body {
@@ -242,6 +243,14 @@
   }
   .empty-state-icon { font-size: 40px; margin-bottom: 10px; }
   .empty-state-text { font-size: 13px; }
+  /* 商品卡片使用统一的表面、圆角和按钮 Token。 */
+  .nav { background: color-mix(in srgb,var(--surface-1) 94%,transparent); height: 60px; }
+  .nav-tab.active { background: var(--surface-3); color: var(--gold); }
+  .goods-card { border-radius: var(--radius-lg); background: var(--surface-2); border-color: var(--border-subtle); }
+  .goods-card:hover { border-color: var(--border-accent); box-shadow: var(--shadow-md); }
+  .goods-btn, .coin-btn-primary, .modal-btn-confirm { background: linear-gradient(135deg,var(--brand),var(--brand-light)); }
+  .goods-btn { min-height: 44px; border-radius: var(--radius-md); }
+  @media (max-width:600px) { .coin-banner { padding: var(--space-5) var(--space-4); align-items:flex-start; flex-direction:column; } .coin-actions { width:100%; } .coin-actions .coin-btn { flex:1; } .shop-body { padding: var(--space-5) var(--space-4) 96px; } .goods-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--space-3); } .goods-card { padding: var(--space-4) var(--space-3); } }
 </style>
 </head>
 <body>
@@ -340,6 +349,7 @@
   </button>
 </div>
 
+<script src="runtime/bridge.js"></script>
 <script src="sound.js"></script>
 <script src="share.js"></script>
 <script src="leaderboard.js"></script>

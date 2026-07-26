@@ -4,19 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>小游戏中台 · 个人中心</title>
+<link rel="stylesheet" href="design-system.css">
 <link rel="stylesheet" href="mobile.css">
 <style>
   /* ─── CSS 变量 ───────────────────────────────────────────── */
   :root {
     --gold:    #F5C842;
-    --bg:      #0D0720;
-    --accent:  #7C3AED;
+    --bg:      var(--surface-0);
+    --accent:  var(--brand);
     --accent2: #EC4899;
-    --deep:    #1A0A2E;
-    --card:    rgba(255,255,255,0.05);
-    --border:  rgba(255,255,255,0.1);
-    --text:    #F0EAF8;
-    --muted:   rgba(240,234,248,0.5);
+    --deep:    var(--surface-1);
+    --card:    color-mix(in srgb,var(--surface-2) 78%,transparent);
+    --border:  var(--border-default);
+    --text:    var(--text-primary);
+    --muted:   var(--text-tertiary);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -657,6 +658,13 @@
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
+  /* 个人资料页统一使用设计系统表面与交互反馈。 */
+  .nav { background: color-mix(in srgb,var(--surface-1) 94%,transparent); height: 60px; }
+  .nav-tab.active { background: var(--surface-3); color: var(--gold); }
+  .profile-card, .section-card, .feature-item, .achievement-card { border-radius: var(--radius-lg); }
+  .profile-card { border-color: var(--border-accent); box-shadow: var(--shadow-lg); }
+  .feature-item:hover, .achievement-card:hover { border-color: var(--border-accent); background: var(--surface-3); }
+  @media (max-width:600px) { .nav { padding: 0 var(--space-4); } .page { padding: var(--space-5) var(--space-4) 96px; } .profile-card { padding: var(--space-8) var(--space-4); } .profile-stats { gap: var(--space-5); } }
 </style>
 </head>
 <body>
@@ -861,6 +869,7 @@
 <div id="profile-toast"></div>
 
 <!-- ─── 脚本 ─────────────────────────────────────────────────── -->
+<script src="runtime/bridge.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
 <script src="sound.js"></script>

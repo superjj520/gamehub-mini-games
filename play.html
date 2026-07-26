@@ -15,6 +15,8 @@ a { color: var(--brand-light); text-decoration: none; }
   padding:0 var(--space-5); height:52px; border-bottom:1px solid var(--border-subtle);
   background: var(--surface-1); flex-shrink:0; z-index:100;
 }
+.topbar-home { color:var(--text-secondary); text-decoration:none; font-size:13px; padding:7px 12px; border:1px solid var(--border-default); border-radius:var(--radius-full); transition:all var(--duration-fast) var(--ease-out); }
+.topbar-home:hover { color:var(--gold); border-color:var(--border-accent); background:var(--surface-3); }
 .topbar-left { display:flex; align-items:center; gap: var(--space-3); }
 .topbar-logo { font-family: var(--font-display); font-size:18px; font-weight:800; color: var(--text-primary); }
 .topbar-logo span { color: var(--gold); }
@@ -78,6 +80,7 @@ a { color: var(--brand-light); text-decoration: none; }
   border-top-color:var(--brand); border-radius:50%;
   animation:spin 0.8s linear infinite;
 }
+.loading::after { content:''; width:min(220px,60vw); height:3px; border-radius:var(--radius-full); background:linear-gradient(90deg,transparent,var(--gold),var(--brand-light),transparent); background-size:200% 100%; animation:shimmer 1.2s linear infinite; }
 .loading-text { font-size:14px; color:var(--text-tertiary); font-family:var(--font-display); }
 @keyframes spin { to{transform:rotate(360deg);} }
 @keyframes pointerBounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(4px)} }
@@ -101,6 +104,8 @@ a { color: var(--brand-light); text-decoration: none; }
   .game-area { flex-direction:column; }
   .game-panel { width:100%; border-left:none; border-top:1px solid var(--border-subtle); max-height:38dvh; flex-shrink:0; }
   .game-board { min-height:38dvh; }
+  .topbar { padding:0 var(--space-3); }
+  .topbar-title { max-width:52vw; }
 }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;} }
 </style>
@@ -114,7 +119,7 @@ a { color: var(--brand-light); text-decoration: none; }
 
 <div id="app" style="display:none;flex-direction:column;min-height:100dvh">
   <div class="topbar">
-    <div class="topbar-title" id="gameTitle">GameHub</div>
+    <div class="topbar-left"><a class="topbar-home" href="index.html">GameHub</a><div class="topbar-title" id="gameTitle">GameHub</div></div>
     <div class="topbar-badge" id="gameType">大富翁</div>
   </div>
   <div class="game-area">
@@ -140,6 +145,7 @@ a { color: var(--brand-light); text-decoration: none; }
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/spin-wheel@5/dist/spin-wheel-iife.js"></script>
+<script src="runtime/bridge.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1/dist/confetti.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="runtime/effects/particles.js"></script>
