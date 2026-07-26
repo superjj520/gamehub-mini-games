@@ -156,6 +156,15 @@
   }
   .game-subtitle { color: var(--muted); font-size: 14px; margin-top: 6px; }
 
+  .wheel-readout { width: min(420px, 78vw); display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: -12px 0 16px; }
+  .readout-cell { position: relative; overflow: hidden; padding: 8px 10px; border: 1px solid rgba(139,92,246,.24); border-radius: 10px; background: linear-gradient(135deg, rgba(22,12,48,.94), rgba(10,8,27,.88)); box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+  .readout-cell::after { content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,.06) 50%, transparent 80%); transform: translateX(-120%); animation: readoutSweep 5s ease-in-out infinite; pointer-events: none; }
+  .readout-label { display: block; color: var(--muted); font-size: 9px; letter-spacing: .08em; }
+  .readout-value { display: block; margin-top: 3px; color: #FDE68A; font: 700 12px/1.1 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; }
+  .readout-value.is-live { color: #34D399; }
+  .readout-value.is-busy { color: #FB7185; }
+  @keyframes readoutSweep { 0%,55% { transform: translateX(-120%); } 80%,100% { transform: translateX(120%); } }
+
   .wheel-container { position: relative; width: min(420px, 72vh, 78vw); aspect-ratio: 1; flex-shrink: 0; }
   .wheel-glow {
     position: absolute; inset: -20px;
@@ -320,6 +329,7 @@
     .nav > div[style*="活动"] { display: none; }
     .game-center { min-height: calc(100svh - 120px); padding: 24px 16px 16px; }
     .game-title-area { margin-bottom: 24px; }
+    .wheel-readout { width: min(360px, 84vw); margin-top: -4px; }
     .wheel-container { width: min(360px, 84vw); }
     .spin-btn { width: 64px; height: 64px; }
     .chance-display { margin-top: 20px; }
@@ -328,7 +338,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .wheel-glow, .modal-emoji, .confetti-piece { animation: none; }
+    .wheel-glow, .modal-emoji, .confetti-piece, .readout-cell::after { animation: none; }
   }
 </style>
 <link rel="stylesheet" href="mobile.css">
@@ -425,6 +435,12 @@
     <div class="game-title-area">
       <div class="game-name" id="gameTitle">夏日大转盘</div>
       <div class="game-subtitle" id="gameSubtitle">转动命运，赢取大奖</div>
+    </div>
+
+    <div class="wheel-readout" aria-label="转盘实时状态">
+      <div class="readout-cell"><span class="readout-label">奖池状态</span><span class="readout-value is-live" id="readoutPool">奖池就绪</span></div>
+      <div class="readout-cell"><span class="readout-label">当前中奖率</span><span class="readout-value" id="readoutRate">0%</span></div>
+      <div class="readout-cell"><span class="readout-label">运行状态</span><span class="readout-value is-live" id="readoutState">待命中</span></div>
     </div>
 
     <div class="wheel-container">
@@ -676,6 +692,7 @@ function spin() {
   spinning = true; dailyRemain--;
   document.getElementById('spinBtn').disabled = true;
   document.querySelector('.wheel-container').classList.add('is-spinning');
+  setReadoutState('正在减速', true);
 
   // Godot Bridge 未接入时保留日志占位，页面仍使用本地模拟结果完成演示。
   if (window.GameHubBridge?.send) {
@@ -728,6 +745,7 @@ function spin() {
       if (typeof GameUser !== 'undefined') GameUser.addCoins(_prizeScore > 0 ? Math.max(10, Math.floor(_prizeScore / 20)) : 2, '大转盘');
     }
     updateStats(); updateChance(); addLog(PRIZES[resultIdx]); updateDist();
+    setReadoutState('已锁定', false);
     setTimeout(() => {
       showModal(PRIZES[resultIdx]);
       document.getElementById('spinBtn').disabled = false;
@@ -739,7 +757,18 @@ function spin() {
 function updateStats() {
   document.getElementById('statTotal').textContent = totalSpins;
   document.getElementById('statWin').textContent = winSpins;
-  document.getElementById('statRate').textContent = totalSpins > 0 ? Math.round(winSpins/totalSpins*100)+'%' : '0%';
+  const rate = totalSpins > 0 ? Math.round(winSpins/totalSpins*100) : 0;
+  document.getElementById('statRate').textContent = rate + '%';
+  const readout = document.getElementById('readoutRate');
+  if (readout) readout.textContent = rate + '%';
+}
+
+function setReadoutState(label, busy) {
+  const state = document.getElementById('readoutState');
+  if (!state) return;
+  state.textContent = label;
+  state.classList.toggle('is-busy', Boolean(busy));
+  state.classList.toggle('is-live', !busy);
 }
 
 function updateChance() {

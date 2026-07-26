@@ -219,6 +219,83 @@ h3 { font-family: var(--font-display); font-weight: 700; font-size: 18px; line-h
   }
 }
 
+/* ── GameHub 2.0：实时街机视觉层 ── */
+:root {
+  --gh2-cyan: #47F1D0;
+  --gh2-pink: #FF6078;
+  --gh2-yellow: #FFD166;
+  --gh2-violet: #8E7DFF;
+  --gh2-ink: #070914;
+  --gh2-panel: #0D1120;
+  --gh2-line: #252C47;
+}
+
+.gh2-home {
+  background:
+    radial-gradient(circle at 82% 10%, rgba(142,125,255,.12), transparent 28%),
+    var(--gh2-ink);
+}
+.gh2-home::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .16;
+  background-image: linear-gradient(rgba(71,241,208,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(71,241,208,.05) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: linear-gradient(to bottom, #000, transparent 85%);
+}
+.gh2-home .nav {
+  border-bottom-color: var(--gh2-line);
+  background: rgba(7,9,20,.9);
+}
+.gh2-home .nav-logo span { color: var(--gh2-cyan); }
+.gh2-home .nav-tab.active { color: var(--gh2-cyan); background: rgba(71,241,208,.08); }
+.gh2-home .hero {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 64px 24px 32px;
+  text-align: left;
+}
+.gh2-home .hero h1 { display: inline-block; background: linear-gradient(135deg, #F5F7FF 38%, var(--gh2-yellow), var(--gh2-pink)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.gh2-home .hero p { max-width: 620px; }
+.gh2-home .container { max-width: 1200px; }
+.gh2-home .section-title { color: var(--gh2-cyan); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+.gh2-home .game-card { border-color: var(--gh2-line); background: linear-gradient(145deg, rgba(17,23,42,.95), rgba(9,12,25,.95)); }
+.gh2-home .game-card:hover { border-color: var(--gh2-cyan); box-shadow: 0 0 24px rgba(71,241,208,.12); }
+.gh2-home .tool-card { border-color: var(--gh2-line); background: rgba(13,17,32,.88); }
+.gh2-home .footer { border-top-color: var(--gh2-line); }
+
+.gh2-game-shell {
+  background: var(--gh2-ink);
+}
+.gh2-game-shell .topbar {
+  background: rgba(7,9,20,.94);
+  border-bottom-color: var(--gh2-line);
+}
+.gh2-game-shell .topbar-home,
+.gh2-game-shell .topbar-link {
+  border-color: var(--gh2-line);
+  color: var(--gh2-cyan);
+}
+.gh2-game-shell .game-panel,
+.gh2-game-shell .game-switcher {
+  background: rgba(13,17,32,.96);
+  border-color: var(--gh2-line);
+}
+.gh2-game-shell .player-card,
+.gh2-game-shell .game-switcher button {
+  border-color: var(--gh2-line);
+}
+.gh2-game-shell .player-card.active,
+.gh2-game-shell .game-switcher button.active {
+  border-color: var(--gh2-cyan);
+  background: rgba(71,241,208,.08);
+  color: var(--gh2-cyan);
+  box-shadow: 0 0 18px rgba(71,241,208,.1);
+}
+.gh2-game-shell .status-bar { background: rgba(7,9,20,.96); border-color: var(--gh2-line); }
+
 /* ── 批次 5 统一导航 ── */
 .batch5-page {
   background: #0D0720;
