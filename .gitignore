@@ -6,3 +6,23 @@ supabase/.temp/
 
 # Node
 node_modules/
+
+# Godot
+.godot/
+godot/.godot/
+godot/.godot/
+export/
+exports/
+
+# 本地环境与测试产物
+.env
+.env.*
+!.env.example
+screenshots/
+test-report.json
+playwright-report/
+test-results/
+
+# 编辑器
+.vscode/settings.json
+.idea/

@@ -1,0 +1,39 @@
+name: GameHub 质量检查
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: JavaScript 语法检查
+        run: npm run check
+
+      - name: 安装 Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: 关键页面冒烟测试
+        run: npm run test:smoke
