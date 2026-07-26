@@ -521,8 +521,19 @@
   }
 </style>
 <link rel="stylesheet" href="mobile.css">
+<link rel="stylesheet" href="design-system.css">
+<link rel="stylesheet" href="batch3-visual.css">
 </head>
-<body>
+<body class="batch3-egg batch3-page">
+<nav class="batch3-nav" aria-label="主导航">
+  <a class="batch3-logo" href="index.html">Game<span>Hub</span></a>
+  <div class="batch3-links">
+    <a class="batch3-link" href="index.html">首页</a>
+    <a class="batch3-link" href="leaderboard.html">排行榜</a>
+    <a class="batch3-link" href="shop.html">商城</a>
+    <a class="batch3-link" href="profile.html">个人中心</a>
+  </div>
+</nav>
 
 <!-- 导航 -->
 <nav class="nav">
@@ -1191,5 +1202,6 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="runtime/bridge.js"></script>
 </body>
 </html>
