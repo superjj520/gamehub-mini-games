@@ -397,8 +397,10 @@
   .particle-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 199; }
 </style>
 <link rel="stylesheet" href="mobile.css">
+<link rel="stylesheet" href="design-system.css">
+<link rel="stylesheet" href="lucky-draw-upgrades.css">
 </head>
-<body>
+<body class="draw-slot-machine">
 
 <!-- 导航 -->
 <nav class="nav">
@@ -1150,6 +1152,8 @@ function toggleSound() {
   if (icon) icon.textContent = on ? '🔊' : '🔇';
 }
 
+<script src="runtime/bridge.js"></script>
+<script src="lucky-draw-upgrades.js"></script>
 <script src="sound.js"></script>
 <script src="share.js"></script>
 <script src="leaderboard.js"></script>

@@ -439,8 +439,10 @@
   .footer-ver { color: var(--muted); }
 </style>
 <link rel="stylesheet" href="mobile.css">
+<link rel="stylesheet" href="design-system.css">
+<link rel="stylesheet" href="lucky-draw-upgrades.css">
 </head>
-<body>
+<body class="draw-scratch-card">
 
 <!-- 顶部导航 -->
 <nav class="nav">
@@ -1132,6 +1134,8 @@ function toggleSound() {
   if (icon) icon.textContent = on ? '🔊' : '🔇';
 }
 
+<script src="runtime/bridge.js"></script>
+<script src="lucky-draw-upgrades.js"></script>
 <script src="sound.js"></script>
 <script src="share.js"></script>
 <script src="leaderboard.js"></script>

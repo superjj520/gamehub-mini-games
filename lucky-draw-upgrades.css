@@ -1,0 +1,100 @@
+/* 抽奖类游戏批次 2：统一视觉覆盖层 */
+:root {
+  --game-bg: #0D0720;
+  --game-panel: color-mix(in srgb, var(--surface-2) 88%, #0D0720);
+  --game-panel-strong: color-mix(in srgb, var(--surface-3) 78%, #0D0720);
+  --game-line: rgba(255,255,255,.1);
+  --game-muted: var(--text-secondary);
+}
+
+html, body { background: var(--game-bg) !important; }
+body { font-family: var(--font-body) !important; color: var(--text-primary) !important; }
+a { color: inherit; }
+.nav {
+  min-height: 64px !important; padding: var(--space-4) var(--space-6) !important;
+  gap: var(--space-4) !important; background: rgba(13,7,32,.86) !important;
+  border-bottom: 1px solid var(--border-subtle) !important; backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+.nav-logo { font-family: var(--font-display) !important; font-size: 22px !important; font-weight: 900 !important; letter-spacing: -.03em !important; }
+.nav-logo span { color: var(--gold) !important; }
+.nav-tabs { display: flex !important; flex: 0 1 auto !important; gap: var(--space-1) !important; margin: 0 0 0 auto !important; overflow: visible !important; }
+.nav-tab { padding: 7px var(--space-4) !important; border-radius: var(--radius-full) !important; font-family: var(--font-display) !important; font-size: 13px !important; font-weight: 600 !important; color: var(--text-secondary) !important; }
+.nav-tab:hover, .nav-tab.active { background: var(--surface-3) !important; color: var(--gold) !important; }
+.nav-badge, .nav-right, .nav-quick-links { display: none !important; }
+.main { background: radial-gradient(circle at 50% 36%, rgba(124,58,237,.08), transparent 42%) !important; }
+.panel-left, .panel-right { background: rgba(255,255,255,.018) !important; border-color: var(--border-subtle) !important; }
+.card, .config-card, .result-card, .stat-box, .stat-card, .guarantee-counter, .best-score-card {
+  background: var(--game-panel) !important; border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-lg) !important; box-shadow: var(--shadow-sm);
+}
+.game-center, .panel-mid { position: relative; isolation: isolate; }
+.game-center::before, .panel-mid::before {
+  content: ''; position: absolute; inset: 8% 12%; z-index: -1; pointer-events: none;
+  background: radial-gradient(circle, rgba(124,58,237,.12), transparent 66%); filter: blur(12px);
+}
+button, .btn-primary, .btn-secondary, .start-btn, .spin-btn, .shake-btn, .draw-btn, .btn-spin {
+  font-family: var(--font-body) !important; border-radius: var(--radius-md) !important;
+}
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--gold) !important; outline-offset: 3px; }
+
+/* 扭蛋：机器呼吸、蛋舱旋转和出蛋光束 */
+.draw-gashapon .machine-wrap { filter: drop-shadow(0 18px 30px rgba(0,0,0,.35)); }
+.draw-gashapon .machine-header { background: linear-gradient(135deg, var(--brand-dark), var(--brand)) !important; box-shadow: 0 0 28px rgba(124,58,237,.28); }
+.draw-gashapon .machine-body { animation: gashaponBreath 3s ease-in-out infinite; border-color: rgba(167,139,250,.42) !important; }
+.draw-gashapon .ball-tank { box-shadow: inset 0 0 28px rgba(124,58,237,.22), 0 0 24px rgba(124,58,237,.18); }
+@keyframes gashaponBreath { 50% { transform: translateY(-3px); box-shadow: 0 18px 48px rgba(124,58,237,.2); } }
+
+/* 盲盒：开盖时加一束稀有度光，卡牌光泽沿边缘扫过 */
+.draw-blind-box .box-wrap { filter: drop-shadow(0 22px 30px rgba(0,0,0,.36)); }
+.draw-blind-box .box-lid.open { box-shadow: 0 -8px 42px rgba(245,200,66,.28); }
+.draw-blind-box .box-glow { background: radial-gradient(circle, rgba(245,200,66,.34), rgba(167,139,250,.12) 42%, transparent 72%) !important; }
+.draw-blind-box .card-SSR, .draw-blind-box .card-SP { animation: rarityPulse 2.4s ease-in-out infinite; }
+@keyframes rarityPulse { 50% { box-shadow: 0 0 24px rgba(236,72,153,.42); } }
+
+/* 刮刮乐：银灰涂层保留触感，中奖状态追加金色闪光 */
+.draw-scratch-card .scratch-wrapper { box-shadow: 0 20px 48px rgba(0,0,0,.34), 0 0 0 1px rgba(245,200,66,.16); }
+.draw-scratch-card .scratch-prize::after { content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 18%, rgba(255,255,255,.25) 46%, transparent 65%) !important; background-size: 240% 100% !important; animation: scratchSheen 3.4s linear infinite; }
+.draw-scratch-card .scratch-glow { filter: blur(5px); }
+@keyframes scratchSheen { from { background-position: 160% 0; } to { background-position: -80% 0; } }
+
+/* 号码球：球面高光与摇号阶段的空间感 */
+.draw-lottery-ball .current-ball, .draw-lottery-ball .result-ball-sm, .draw-lottery-ball .hist-ball, .draw-lottery-ball .history-ball-mini { box-shadow: inset -7px -9px 12px rgba(0,0,0,.32), inset 5px 5px 7px rgba(255,255,255,.45), 0 8px 16px rgba(0,0,0,.25); }
+.draw-lottery-ball .ball-grid.shuffling .ball { animation: ballRoll .55s var(--ease-bounce) infinite alternate; }
+@keyframes ballRoll { to { transform: translateY(-10px) rotate(12deg); } }
+
+/* 幸运数字：开奖滚动数字与机械等待态 */
+.draw-lucky-number .rolling-num { text-shadow: 0 0 22px rgba(245,200,66,.34); }
+.draw-lucky-number .rolling-num.rolling { animation: numberRoll .16s linear infinite; }
+@keyframes numberRoll { 50% { transform: translateY(-5px); filter: blur(1px); } }
+
+/* 红包雨：深红主体叠加金色粒子亮点 */
+.draw-red-packet-rain .game-center { overflow: hidden; }
+.draw-red-packet-rain .red-packet { filter: drop-shadow(0 8px 12px rgba(239,68,68,.24)); }
+.draw-red-packet-rain .red-packet.gold, .draw-red-packet-rain .red-packet.diamond { box-shadow: 0 0 20px rgba(245,200,66,.4); }
+.draw-red-packet-rain .coin-float { animation-duration: 1.8s !important; }
+
+/* 老虎機：滚轮玻璃舱、中奖线和灯带 */
+.draw-slot-machine .slot-machine-wrap { box-shadow: 0 22px 44px rgba(0,0,0,.45), 0 0 0 1px rgba(245,200,66,.2); }
+.draw-slot-machine .reels-container { background: linear-gradient(90deg, rgba(124,58,237,.14), rgba(245,200,66,.1), rgba(236,72,153,.14)) !important; }
+.draw-slot-machine .win-line.show { box-shadow: 0 0 18px var(--gold); height: 3px; }
+.draw-slot-machine .light { animation: slotLight 1.2s ease-in-out infinite alternate; }
+@keyframes slotLight { to { opacity: .42; transform: scale(.78); } }
+
+/* 骰子：增加透视、落地冲击与震动反馈 */
+.draw-shake-dice .dice-stage { perspective: 900px; }
+.draw-shake-dice .dice-wrap { filter: drop-shadow(0 18px 18px rgba(0,0,0,.3)); }
+.draw-shake-dice .dice { transform-style: preserve-3d; }
+.draw-shake-dice .dice-stage.shaking { animation: diceImpact .42s var(--ease-bounce); }
+@keyframes diceImpact { 25% { transform: translateX(-8px) rotate(-2deg); } 50% { transform: translateX(8px) rotate(2deg); } 75% { transform: translateX(-4px); } }
+
+@media (max-width: 768px) {
+  .nav { padding: var(--space-3) var(--space-4) !important; }
+  .nav-tabs { display: none !important; }
+  .nav-logo { font-size: 20px !important; }
+  .main { display: block !important; min-height: calc(100dvh - 60px) !important; height: auto !important; }
+  .game-center, .panel-mid { min-height: calc(100dvh - 60px) !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .draw-gashapon .machine-body, .draw-blind-box .card-SSR, .draw-blind-box .card-SP, .draw-scratch-card .scratch-prize::after, .draw-slot-machine .light { animation: none !important; }
+}
