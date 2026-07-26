@@ -59,9 +59,17 @@ var BoardGameEngine = (function() {
       if (!this._listeners[event]) this._listeners[event] = [];
       this._listeners[event].push(fn);
     };
+    game.off = function(event, fn) {
+      if (!this._listeners[event]) return;
+      this._listeners[event] = this._listeners[event].filter(function(f) { return f !== fn; });
+    };
     game._emit = function(event, data) {
       var fns = this._listeners[event] || [];
       for (var i = 0; i < fns.length; i++) { fns[i](data); }
+      // ─── 自动桥接到 GameHubBridge ───
+      if (window.GameHubBridge && GameHubBridge.send) {
+        GameHubBridge.send('engine:' + event, data);
+      }
     };
 
     // 查找阶段配置

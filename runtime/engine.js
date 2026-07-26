@@ -32,6 +32,10 @@ const GameEngine = (() => {
     for (var i = 0; i < fns.length; i++) {
       try { fns[i](data); } catch (e) { console.warn('[Engine] 事件处理错误:', event, e); }
     }
+    // ─── 自动桥接到 GameHubBridge ───
+    if (typeof GameHubBridge !== 'undefined' && GameHubBridge.send) {
+      try { GameHubBridge.send('engine:' + event, data); } catch (e) {}
+    }
   }
 
   // ─── 初始化 ───
