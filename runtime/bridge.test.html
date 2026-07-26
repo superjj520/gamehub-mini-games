@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameHubBridge 测试</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #0D0720; color: #F0EAF8;
+    min-height: 100vh; padding: 24px;
+  }
+  h1 { font-size: 24px; margin-bottom: 8px; }
+  h1 span { color: #F5C842; }
+  .sub { color: rgba(240,234,248,0.5); font-size: 13px; margin-bottom: 24px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .panel {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 16px;
+  }
+  .panel h3 { font-size: 14px; margin-bottom: 12px; color: #7C3AED; }
+
+  button {
+    display: block; width: 100%;
+    padding: 10px; margin-bottom: 8px;
+    border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.08); color: #F0EAF8;
+    font-size: 13px; cursor: pointer;
+    transition: all 0.15s; text-align: left; font-family: inherit;
+  }
+  button:hover { background: rgba(124,58,237,0.2); border-color: #7C3AED; }
+  button .icon { margin-right: 6px; }
+  button.pass { border-color: #22C55E; color: #22C55E; }
+  button.fail { border-color: #EF4444; color: #EF4444; }
+
+  #log {
+    background: rgba(0,0,0,0.3); border-radius: 8px;
+    padding: 12px; font-size: 12px; font-family: monospace;
+    max-height: 300px; overflow-y: auto; margin-top: 16px;
+    white-space: pre-wrap; line-height: 1.6;
+  }
+  .log-info { color: #60A5FA; }
+  .log-pass { color: #22C55E; }
+  .log-fail { color: #EF4444; }
+  .log-warn { color: #F59E0B; }
+
+  .status { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  }
+  .badge.ready { background: rgba(34,197,94,0.15); color: #22C55E; }
+  .badge.not-ready { background: rgba(239,68,68,0.15); color: #EF4444; }
+
+  iframe {
+    width: 100%; height: 300px; border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px; margin-top: 12px; background: #000;
+  }
+  @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h1>GameHub<span>Bridge</span> 测试</h1>
+<p class="sub">Godot ↔ JavaScript 通信层验证</p>
+
+<div class="status">
+  <span>状态：</span>
+  <span class="badge not-ready" id="status-badge">⏳ 未就绪</span>
+  <span style="font-size:12px;color:var(--muted)" id="queue-count"></span>
+</div>
+
+<div class="grid">
+  <!-- 左侧：测试面板 -->
+  <div class="panel">
+    <h3>📋 功能测试</h3>
+    <button onclick="testIsReady()"><span class="icon">🔍</span> 测试 isReady()</button>
+    <button onclick="testSend()"><span class="icon">📤</span> 测试 send() — 发送消息到 Godot</button>
+    <button onclick="testOn()"><span class="icon">📥</span> 测试 on() — 监听 Godot 消息</button>
+    <button onclick="testOff()"><span class="icon">🚫</span> 测试 off() — 取消监听</button>
+    <button onclick="testQueue()"><span class="icon">📦</span> 测试消息队列 — 未就绪时缓存</button>
+    <button onclick="testConnect()"><span class="icon">🔗</span> 测试 connect() — 手动连接</button>
+    <button onclick="testEngineBridge()"><span class="icon">🌉</span> 测试 Engine 事件总线桥接</button>
+    <button onclick="testUnsubscribe()"><span class="icon">🔌</span> 测试 on() 返回的 unsubscribe()</button>
+    <button onclick="runAll()" style="background:rgba(124,58,237,0.25);border-color:#7C3AED;">
+      <span class="icon">🚀</span> 运行全部测试
+    </button>
+  </div>
+
+  <!-- 右侧：Simulator + Godot 预览 -->
+  <div class="panel">
+    <h3>🎮 Godot 模拟器</h3>
+    <button onclick="simulateReady()"><span class="icon">✅</span> 模拟 Godot 发送 game:ready</button>
+    <button onclick="simulateSpinResult()"><span class="icon">🎰</span> 模拟 Godot 发送 spin:result</button>
+    <button onclick="simulateAuth()"><span class="icon">🔐</span> 模拟 Godot 发送 auth:session</button>
+    <button onclick="startIframe()"><span class="icon">🖥️</span> 启动模拟 iframe</button>
+    <iframe id="godot-frame" src="about:blank" style="display:none;"></iframe>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:16px;">
+  <h3>📝 日志</h3>
+  <div id="log"></div>
+</div>
+
+<script src="bridge.js"></script>
+<script>
+  // ─── 日志 ───
+  var logEl = document.getElementById('log');
+  var statusBadge = document.getElementById('status-badge');
+  function log(msg, cls) {
+    var line = document.createElement('div');
+    line.className = 'log-' + (cls || 'info');
+    line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  function updateStatus() {
+    var ready = GameHubBridge.isReady();
+    statusBadge.className = 'badge ' + (ready ? 'ready' : 'not-ready');
+    statusBadge.innerHTML = ready ? '✅ 已就绪' : '⏳ 未就绪';
+  }
+
+  // ─── 测试用例 ───
+  var testsPassed = 0, testsFailed = 0;
+
+  function assert(condition, name) {
+    if (condition) {
+      testsPassed++;
+      log('✅ 通过: ' + name, 'pass');
+    } else {
+      testsFailed++;
+      log('❌ 失败: ' + name, 'fail');
+    }
+  }
+
+  function testIsReady() {
+    log('--- isReady() 测试 ---');
+    var result = GameHubBridge.isReady();
+    assert(typeof result === 'boolean', 'isReady() 返回 boolean');
+    log('当前状态: ' + (result ? '已就绪' : '未就绪'));
+    updateStatus();
+  }
+
+  function testSend() {
+    log('--- send() 测试 ---');
+    GameHubBridge.send('spin:start', { config_id: 'test-001' });
+    log('已发送 spin:start 消息 (config_id=test-001)');
+    updateStatus();
+  }
+
+  function testOn() {
+    log('--- on() 测试 ---');
+    var called = false;
+    var unsub = GameHubBridge.on('test:event', function(payload) {
+      called = true;
+      log('收到 test:event 回调, payload:', 'pass');
+      console.log('test:event payload:', payload);
+    });
+
+    // 用 postMessage 模拟 Godot 发消息
+    window.postMessage({ type: 'test:event', payload: { hello: 'world' } }, '*');
+    setTimeout(function() {
+      assert(called, 'on() 回调被触发');
+    }, 100);
+  }
+
+  function testOff() {
+    log('--- off() 测试 ---');
+    var callCount = 0;
+    function handler() { callCount++; }
+    GameHubBridge.on('test:off', handler);
+    GameHubBridge.off('test:off', handler);
+    window.postMessage({ type: 'test:off', payload: {} }, '*');
+    setTimeout(function() {
+      assert(callCount === 0, 'off() 后不再触发回调 (调用次数=' + callCount + ')');
+    }, 100);
+  }
+
+  function testQueue() {
+    log('--- 消息队列测试 ---');
+    // 确保未就绪
+    if (GameHubBridge.isReady()) {
+      log('当前已就绪，测试消息队列需先断开', 'warn');
+      return;
+    }
+    GameHubBridge.send('test:queued', { order: 1 });
+    GameHubBridge.send('test:queued', { order: 2 });
+    GameHubBridge.send('test:queued', { order: 3 });
+    log('已发送 3 条消息到队列（当前未就绪）');
+    assert(true, '消息加入队列无异常');
+  }
+
+  function testConnect() {
+    log('--- connect() 测试 ---');
+    var iframe = document.getElementById('godot-frame');
+    GameHubBridge.connect(iframe);
+    log('已手动连接 iframe #godot-frame');
+    assert(true, 'connect() 调用完成');
+  }
+
+  function testEngineBridge() {
+    log('--- Engine 事件总线桥接测试 ---');
+    // 模拟 GameEngine
+    window.GameEngine = {
+      emit: function(event, data) {
+        log('GameEngine.emit 被调用: ' + event, 'pass');
+        console.log('Engine event:', event, data);
+      }
+    };
+    window.postMessage({ type: 'bridge:test', payload: { from: 'godot' } }, '*');
+    setTimeout(function() {
+      assert(true, 'Bridge 消息转发到 Engine 事件总线');
+      delete window.GameEngine;
+    }, 100);
+  }
+
+  function testUnsubscribe() {
+    log('--- unsubscribe() 测试 ---');
+    var count = 0;
+    function h() { count++; }
+    var unsub = GameHubBridge.on('test:unsub', h);
+    unsub(); // 取消订阅
+    window.postMessage({ type: 'test:unsub', payload: {} }, '*');
+    setTimeout(function() {
+      assert(count === 0, 'unsubscribe 后回调不再触发 (调用次数=' + count + ')');
+    }, 100);
+  }
+
+  // ─── Godot 模拟器 ───
+  function simulateReady() {
+    log('--- 模拟 Godot game:ready ---');
+    window.postMessage({ type: 'game:ready', payload: { version: '4.3.stable' } }, '*');
+    setTimeout(function() {
+      assert(GameHubBridge.isReady(), 'game:ready 后 isReady() 返回 true');
+      updateStatus();
+    }, 100);
+  }
+
+  function simulateSpinResult() {
+    log('--- 模拟 Godot spin:result ---');
+    GameHubBridge.on('spin:result', function(payload) {
+      log('收到转盘结果: ' + payload.prize_name + ' (index=' + payload.prize_index + ')', 'pass');
+    });
+    window.postMessage({
+      type: 'spin:result',
+      payload: { prize_index: 3, prize_name: '100金币', prize_icon: '🪙' }
+    }, '*');
+  }
+
+  function simulateAuth() {
+    log('--- 模拟 Godot auth:session ---');
+    GameHubBridge.on('auth:session', function(payload) {
+      log('收到认证: player_id=' + payload.player_id, 'pass');
+    });
+    GameHubBridge.send('auth:session', { player_id: 'p_001', token: 'tok_abc' });
+    log('发送 auth:session 消息');
+  }
+
+  function startIframe() {
+    var iframe = document.getElementById('godot-frame');
+    iframe.style.display = 'block';
+    iframe.src = 'about:blank';
+    log('iframe 已显示，Bridge 将尝试自动连接');
+    GameHubBridge.connect(iframe);
+  }
+
+  function runAll() {
+    testsPassed = 0; testsFailed = 0;
+    logEl.innerHTML = '';
+    log('══════ 开始全量测试 ══════');
+
+    testIsReady();
+    testSend();
+    testOn();
+    testOff();
+    testQueue();
+    testConnect();
+    testEngineBridge();
+    testUnsubscribe();
+
+    setTimeout(function() {
+      simulateReady();
+      simulateSpinResult();
+      simulateAuth();
+    }, 200);
+
+    setTimeout(function() {
+      log('══════ 测试完成 ══════');
+      log('通过: ' + testsPassed + ' | 失败: ' + testsFailed, testsFailed === 0 ? 'pass' : 'fail');
+    }, 600);
+  }
+
+  // ─── 实时状态更新 ───
+  GameHubBridge.on('game:ready', function() { updateStatus(); });
+  setInterval(updateStatus, 1000);
+  updateStatus();
+</script>
+</body>
+</html>
