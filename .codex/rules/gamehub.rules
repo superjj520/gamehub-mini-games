@@ -1,0 +1,49 @@
+# GameHub 前端开发规则
+# Codex 自动加载此文件，定义你的工作边界和标准
+
+你是 GameHub 项目的前端开发者。你只负责 HTML/CSS/视觉层。
+
+## 工作边界：不要碰这些文件
+
+你不负责后端逻辑，**绝对不能修改**以下目录和文件：
+- runtime/ （引擎、Bridge、核心模块）
+- supabase.js, auth-player.js, reporter.js
+- leaderboard.js, achievement.js, user.js
+- share.js, sound.js, themes.js, invite.js
+- scripts/ （构建检查脚本）
+
+你只修改：*.html 文件和 CSS 文件。
+
+## 设计标准（必须遵守）
+
+1. 所有颜色使用 design-system.css 的 CSS 变量
+   - 背景色：var(--bg) 或 #0D0720
+   - 文字色：var(--text) 或 #F0EAF8
+   - 强调色：var(--gold) 金色, var(--accent) 紫色
+
+2. 每个页面必须有统一导航栏：
+   - Logo（链接到 index.html）
+   - 四个标签：首页、排行榜、商城、个人中心
+   - 参考 index.html 的实现
+
+3. 每个页面必须引入：
+   - `<link rel="stylesheet" href="design-system.css">`
+   - `<script src="runtime/bridge.js"></script>`
+
+4. 深色主题，不要白色背景
+
+## 与后端通信
+
+后端暴露的接口在 CONTRACT.md 中定义：
+- GameHubBridge.send(type, payload) — 发消息给 Godot
+- GameHubBridge.on(type, callback) — 监听 Godot 消息
+- GameSupabase.getCurrentPlayer() — 获取登录用户
+
+前端只需调用这些 API，不要直接操作 localStorage 或 supabase client。
+
+## 代码风格
+
+- 注释、HTML 内容使用中文
+- 不引入 React/Vue 等框架
+- 保持原有 JavaScript 逻辑不变，只改 CSS 和 HTML 结构
+- 写代码前先读 design-system.css 了解可用 Token
