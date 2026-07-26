@@ -16,6 +16,58 @@ const GameSupabase = (() => {
   const PLAYER_EMAIL_KEY  = 'gh_player_email';
   const PLAYER_LEGACY_KEY = 'gh_player_phone'; // 旧版兼容
 
+  // ─── 通用错误处理 ───
+  /** 安全执行 Supabase 查询，自动捕获错误并降级 */
+  async function safeQuery(promise, fallback, label) {
+    try {
+      var result = await promise;
+      if (result.error) {
+        console.warn('[Supabase] ' + (label || '查询') + ' 错误:', result.error.message);
+        return fallback !== undefined ? fallback : null;
+      }
+      return result.data;
+    } catch (e) {
+      console.warn('[Supabase] ' + (label || '查询') + ' 异常:', e.message);
+      return fallback !== undefined ? fallback : null;
+    }
+  }
+
+  // ─── 排行榜 ───
+  /** 获取游戏排行榜 */
+  async function getLeaderboard(gameId, limit) {
+    limit = limit || 20;
+    return safeQuery(
+      GHSupabase.from('leaderboard')
+        .select('*')
+        .eq('game_id', gameId)
+        .order('score', { ascending: false })
+        .limit(limit),
+      [],
+      '排行榜查询'
+    );
+  }
+
+  /** 提交分数 */
+  async function submitScore(gameId, score, meta) {
+    var player = getCurrentPlayer();
+    if (!player) return { success: false, reason: '未登录' };
+
+    return safeQuery(
+      GHSupabase.from('leaderboard').upsert({
+        game_id: gameId,
+        player_id: player.id,
+        player_name: player.phone,
+        score: score,
+        meta: meta || {},
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'game_id,player_id' }),
+      { success: false, reason: '提交失败' },
+      '分数提交'
+    );
+  }
+
+  // ─── 玩家信息 ───
+
   /** 获取当前登录玩家信息，未登录返回 null */
   function getCurrentPlayer() {
     // 优先读 email key，再读旧 phone key
@@ -58,5 +110,5 @@ const GameSupabase = (() => {
     return new URLSearchParams(location.search).get('cid') || null;
   }
 
-  return { getCurrentPlayer, isLoggedIn, getPlayerToken, setPlayerSession, logout, getCampaignId };
+  return { getCurrentPlayer, isLoggedIn, getPlayerToken, setPlayerSession, logout, getCampaignId, safeQuery, getLeaderboard, submitScore };
 })();
