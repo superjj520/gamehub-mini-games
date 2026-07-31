@@ -321,6 +321,16 @@ h3 { font-family: var(--font-display); font-weight: 700; font-size: 18px; line-h
 .gh-toast-success { border-color: rgba(71,241,208,.6); }
 .gh-toast-warning { border-color: rgba(255,209,102,.6); }
 .gh-toast-error { border-color: rgba(255,96,120,.6); }
+.gh-toast-info { border-color: rgba(142,125,255,.6); }
+.gh2-home :focus-visible,
+.gh2-game-shell :focus-visible {
+  outline: 2px solid var(--gh2-cyan);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gh-toast { transition: none; }
+  .page-enter { animation: none; }
+}
 
 /* ── 批次 5 统一导航 ── */
 .batch5-page {
