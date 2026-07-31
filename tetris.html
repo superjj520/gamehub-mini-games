@@ -1308,6 +1308,7 @@ function rotate() {
 
 /* 硬降落：直接落到底部 */
 function hardDrop() {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:action', { gameId: 'tetris', action: 'hard-drop' });
   let dy = 0;
   while (!collides(current, 0, dy + 1)) dy++;
   current.y += dy;
@@ -1474,6 +1475,7 @@ function darken(hex, amt) {
    游戏主流程
 ──────────────────────────────────────────── */
 function startGame() {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:start', { gameId: 'tetris', source: 'start-game' });
   // 重置所有状态
   initBoard();
   score = 0; level = 1; lines = 0; levelLines = 0;
@@ -1552,6 +1554,7 @@ function restartGame() {
 
 function gameOver() {
   gameState = 'over';
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'tetris', score: score, result: '游戏结束' });
   stopDropTimer();
   stopTimerBar();
   saveBest();
@@ -1932,5 +1935,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/tetris-adapter.js"></script>
 </body>
 </html>

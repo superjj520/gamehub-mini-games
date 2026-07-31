@@ -1368,6 +1368,7 @@ function startCountdown() {
 
 // ─── 开始游戏 ───
 function startGame() {
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:start', { gameId: 'whack-mole' });
   if (gameState.running) return;
 
   // 读取当前配置
@@ -1422,6 +1423,7 @@ function startGame() {
 
 // ─── 结束游戏 ───
 function endGame() {
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:result', { gameId: 'whack-mole', score: state.score });
   gameState.running = false;
 
   // 清理定时器
@@ -1608,5 +1610,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/whack-mole-adapter.js"></script>
 </body>
 </html>

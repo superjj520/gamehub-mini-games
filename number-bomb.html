@@ -930,6 +930,7 @@ function toggleSwitch(el) {
    开始游戏
 ============================================================ */
 function startGame() {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:start', { gameId: 'number-bomb', source: 'start-game' });
   // 读取玩家名字
   const inputs = document.querySelectorAll('.player-name-input');
   const names = [...inputs].map((inp, i) => inp.value.trim() || `玩家${i+1}`);
@@ -1025,6 +1026,7 @@ function randInt(min, max) {
 ============================================================ */
 function submitGuess() {
   if (!gameState.running) return;
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:action', { gameId: 'number-bomb', action: 'guess' });
 
   const input = document.getElementById('guess-input');
   const val = parseInt(input.value);
@@ -1081,6 +1083,7 @@ function submitGuess() {
 ============================================================ */
 function triggerExplosion(loserName) {
   gameState.running = false;
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'number-bomb', score: gameState.roundCount * 50 || 0, result: loserName + ' 踩雷' });
 
   // 排行榜 + 成就 + 奖励
   if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'数字炸弹',score:gameState.roundCount*50||0,result:'第'+gameState.roundCount+'局结束'});
@@ -1405,5 +1408,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/number-bomb-adapter.js"></script>
 </body>
 </html>

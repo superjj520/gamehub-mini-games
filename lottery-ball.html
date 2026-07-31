@@ -1061,6 +1061,7 @@ function lightenColor(hex, amount) {
    ========================================= */
 function handleStart() {
   if (state.spinning) return;
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:start', { gameId: 'lottery-ball' });
 
   // 已达到目标数量，提示
   if (state.drawn.length >= state.drawCount) {
@@ -1184,6 +1185,7 @@ function updateCurrentBall(num, color, prize) {
 /* 结束摇号 */
 function finishSpinning() {
   state.spinning = false;
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:result', { gameId: 'lottery-ball', drawn: state.drawn.slice() });
   document.getElementById('machineBody').classList.remove('spinning');
   setButtonState(false);
 
@@ -1537,5 +1539,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/lottery-ball-adapter.js"></script>
 </body>
 </html>

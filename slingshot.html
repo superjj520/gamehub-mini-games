@@ -1520,6 +1520,7 @@ function onPointerUp(e) {
 // ── 开始游戏 ──
 function startGame() {
   GAME.running = true;
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:start', { gameId: 'slingshot' });
   GAME.currentLevel = 1;
   GAME.clearedLevels = 0;
   GAME.score = 0;
@@ -1554,6 +1555,7 @@ function startLevel(level) {
 function showLevelClear() {
   GAME.clearedLevels = Math.max(GAME.clearedLevels, GAME.currentLevel);
   GAME.running = false;
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:result', { gameId: 'slingshot', score: GAME.score, level: GAME.currentLevel, success: true });
 
   const isLast = GAME.currentLevel >= CONFIG.totalLevels;
 
@@ -1600,6 +1602,7 @@ function showLevelClear() {
 // ── 游戏结束（石子耗尽未全清） ──
 function showGameOver() {
   GAME.running = false;
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:result', { gameId: 'slingshot', score: GAME.score, level: GAME.currentLevel, success: false });
 
   const overlay = document.getElementById('overlay');
   overlay.classList.remove('hidden');
@@ -1873,5 +1876,12 @@ function toggleSound() {
 <script src="user.js"></script>
 <script src="themes.js"></script>
 <script src="runtime/bridge.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/slingshot-adapter.js"></script>
 </body>
 </html>

@@ -801,6 +801,7 @@ function revealAll() {
   ctx.fillStyle = 'rgba(0,0,0,1)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   state.isRevealed = true;
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:result', { gameId: 'scratch-card', prize: state.currentPrize });
   updateProgress(1);
   document.getElementById('scratchPrize').classList.add('revealed');
   setTimeout(showModal, 600);
@@ -883,6 +884,7 @@ function resetCard() {
   state.isScratching = false;
   isMouseDown = false;
   state.todayUsed++;
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:start', { gameId: 'scratch-card' });
   document.getElementById('usedCount').textContent = state.todayUsed + ' 次';
 
   // 抽奖
@@ -1142,5 +1144,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/scratch-card-adapter.js"></script>
 </body>
 </html>

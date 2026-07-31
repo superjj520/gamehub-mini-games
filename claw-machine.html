@@ -1135,6 +1135,7 @@ function setSpeed(name) {
 
 // ─── 投币开始 ───
 function startGame() {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:start', { gameId: 'claw-machine', source: 'start-game' });
   const limit = parseInt(document.getElementById('dailyLimit').value) || 10;
   state.maxChances = limit;
 
@@ -1249,6 +1250,7 @@ function applyClawArm() {
 // ─── 下爪按钮 ───
 function grabClaw() {
   if (state.phase !== 'moving') return;
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:action', { gameId: 'claw-machine', action: 'grab' });
   state.phase = 'dropping';
   document.getElementById('btnGrab').disabled = true;
   document.getElementById('clawFingers').classList.remove('gripping');
@@ -1371,6 +1373,7 @@ function dropToTray() {
 // ─── 回合结束 ───
 function finishRound(won) {
   state.phase = 'done';
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'claw-machine', score: won ? (state.totalWins || 1) * 100 : 0, result: won ? '抓到了' : '没抓到' });
   document.getElementById('btnCoin').disabled = state.chances <= 0;
   document.getElementById('btnGrab').disabled = true;
 
@@ -1624,5 +1627,12 @@ function toggleSound() {
 <script src="user.js"></script>
 <script src="themes.js"></script>
 <script src="runtime/bridge.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/claw-machine-adapter.js"></script>
 </body>
 </html>

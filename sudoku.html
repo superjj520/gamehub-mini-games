@@ -1158,6 +1158,7 @@ function shuffled81() {
 
 // 开始新游戏
 function startNewGame() {
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:start', { gameId: 'sudoku' });
   // 停止旧计时器
   clearInterval(State.timerInterval);
 
@@ -1432,6 +1433,7 @@ function collectPrizes() {
 
 // 游戏失败
 function gameOver(reason) {
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:result', { gameId: 'sudoku', success: false, reason: reason });
   clearInterval(State.timerInterval);
   State.running = false;
 
@@ -1896,5 +1898,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/sudoku-adapter.js"></script>
 </body>
 </html>

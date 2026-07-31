@@ -860,6 +860,7 @@ let bestTime = { easy: null, normal: null, hard: null };
 
 /** 读取左侧配置并重置游戏 */
 function restartGame() {
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:start', { gameId: 'minesweeper' });
   // 读取礼物参数
   giftRate   = parseInt(document.getElementById('giftRate').value) / 100;
   giftTarget = parseInt(document.getElementById('giftTarget').value);
@@ -1167,6 +1168,7 @@ function checkWin() {
 /** 触发胜利 */
 function triggerWin() {
   gameState = 'win';
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:result', { gameId: 'minesweeper', success: true, time: elapsedSec });
   stopTimer();
   document.getElementById('faceBtn').textContent = '😎';
 
@@ -1217,6 +1219,7 @@ function triggerWin() {
 /** 触发失败 */
 function triggerLose() {
   gameState = 'lose';
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:result', { gameId: 'minesweeper', success: false, time: elapsedSec });
   stopTimer();
   document.getElementById('faceBtn').textContent = '😵';
 
@@ -1476,5 +1479,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/minesweeper-adapter.js"></script>
 </body>
 </html>

@@ -1023,6 +1023,7 @@ function selectTime(el) {
    游戏主流程
 ==================================================== */
 function startGame() {
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:start', { gameId: 'puzzle' });
   // 停止上一局
   stopTimer();
   clearBoard();
@@ -1387,6 +1388,7 @@ function formatTime(sec) {
 function onTimeUp() {
   stopTimer();
   STATE.running = false;
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:result', { gameId: 'puzzle', success: false, placed: STATE.placedCount });
   // 锁定所有未归位碎片
   STATE.pieces.forEach(pd => {
     if (!pd.placed) {
@@ -1417,6 +1419,7 @@ function showTimeUpModal() {
 function onGameComplete() {
   stopTimer();
   STATE.running = false;
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:result', { gameId: 'puzzle', success: true, elapsed: STATE.elapsed });
   STATE.gamesFinished++;
 
   // 排行榜 + 成就 + 奖励
@@ -1644,5 +1647,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/puzzle-adapter.js"></script>
 </body>
 </html>

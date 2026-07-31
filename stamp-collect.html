@@ -1203,6 +1203,7 @@ function renderStampBook(area) {
 
 // ─── 抽卡逻辑 ───
 function drawCard() {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:start', { gameId: 'stamp-collect', source: 'draw-card' });
   const set = state.currentPage;
   const total = state.cardsPerSet;
 
@@ -1245,6 +1246,7 @@ function drawCard() {
   const key = getCardKey(set, pickedIdx);
   const cardName = getCardName(set, pickedIdx);
   const isRare = isRareCard(set, pickedIdx);
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'stamp-collect', score: isRare ? 100 : 20, result: cardName });
 
   // 标记收集
   state.collections[key] = true;
@@ -1578,5 +1580,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/stamp-collect-adapter.js"></script>
 </body>
 </html>

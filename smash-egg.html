@@ -855,6 +855,11 @@ function smashEgg(idx) {
     return;
   }
 
+  if (window.GameHubEventBus) {
+    window.GameHubEventBus.emit('game:start', { gameId: 'smash-egg', source: 'smash-egg' });
+    window.GameHubEventBus.emit('game:action', { gameId: 'smash-egg', action: 'smash', index: idx });
+  }
+
   isAnimating = true;
   smashed[idx] = true;
   chancesLeft--;
@@ -916,6 +921,7 @@ function smashEgg(idx) {
   // 5. 弹出中奖弹窗
   setTimeout(() => {
     isAnimating = false;
+    if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'smash-egg', score: prize.win ? 100 : 0, result: prize.name });
     showModal(idx, prize);
   }, 1200);
 }
@@ -1203,5 +1209,12 @@ function toggleSound() {
 <script src="user.js"></script>
 <script src="themes.js"></script>
 <script src="runtime/bridge.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/smash-egg-adapter.js"></script>
 </body>
 </html>

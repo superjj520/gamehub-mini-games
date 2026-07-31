@@ -803,6 +803,7 @@ function buildPegs() {
 ═══════════════════════════════════════════ */
 function startGame() {
   if(gameState.running) return;
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:start', { gameId: 'pinball' });
   gameState.running     = true;
   gameState.ballInFly   = false;
   gameState.usedBalls   = 0;
@@ -1283,6 +1284,7 @@ function updateRightPanel() {
 function showResult() {
   if(rafId) cancelAnimationFrame(rafId);
   gameState.running = false;
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:result', { gameId: 'pinball', score: gameState.score });
 
   // 更新历史最高分
   if(gameState.score > gameState.bestScore) {
@@ -1367,5 +1369,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/pinball-adapter.js"></script>
 </body>
 </html>

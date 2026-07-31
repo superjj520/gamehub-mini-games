@@ -823,6 +823,7 @@ function getResult() {
 function startSpin() {
   if (running || dailyRemain <= 0) return;
   running = true;
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:start', { gameId: 'nine-grid' });
   dailyRemain--;
   document.getElementById('startBtn').disabled = true;
 
@@ -898,6 +899,7 @@ function startSpin() {
           // 弹窗
           setTimeout(() => {
             showModal(PRIZES[resultIdx]);
+            if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:result', { gameId: 'nine-grid', prize: PRIZES[resultIdx], index: resultIdx });
             running = false;
             if (dailyRemain > 0) {
               document.getElementById('startBtn').disabled = false;
@@ -1107,5 +1109,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/nine-grid-adapter.js"></script>
 </body>
 </html>

@@ -1409,6 +1409,7 @@ function drawStartScreen() {
    游戏控制
    ══════════════════════════════════════════════════════ */
 function startGame() {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:start', { gameId: 'fishing', source: 'start-game' });
   closeModal();
   if (state.rafID) cancelAnimationFrame(state.rafID);
   clearInterval(state.timerID);
@@ -1453,6 +1454,7 @@ function tickTimer() {
 
 function endGame() {
   clearInterval(state.timerID);
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'fishing', score: state.score, result: '时间结束' });
   clearTimeout(state.biteTimer);
   closeOverlay();
   state.phase = 'ended';
@@ -1767,5 +1769,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/fishing-adapter.js"></script>
 </body>
 </html>

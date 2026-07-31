@@ -296,6 +296,32 @@ h3 { font-family: var(--font-display); font-weight: 700; font-size: 18px; line-h
 }
 .gh2-game-shell .status-bar { background: rgba(7,9,20,.96); border-color: var(--gh2-line); }
 
+.gh-toast-host {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2000;
+  display: grid;
+  gap: 8px;
+  pointer-events: none;
+}
+.gh-toast {
+  min-width: 220px;
+  padding: 11px 14px;
+  border: 1px solid var(--gh2-line);
+  border-radius: 10px;
+  background: rgba(13,17,32,.96);
+  color: var(--text-primary);
+  box-shadow: 0 12px 32px rgba(0,0,0,.35), 0 0 20px rgba(71,241,208,.08);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+.gh-toast.is-visible { opacity: 1; transform: translateY(0); }
+.gh-toast-success { border-color: rgba(71,241,208,.6); }
+.gh-toast-warning { border-color: rgba(255,209,102,.6); }
+.gh-toast-error { border-color: rgba(255,96,120,.6); }
+
 /* ── 批次 5 统一导航 ── */
 .batch5-page {
   background: #0D0720;

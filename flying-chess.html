@@ -1221,6 +1221,8 @@ function rollDice() {
     return;
   }
 
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:start', { gameId: 'flying-chess', source: 'roll-dice' });
+
   state.rolling = true;
   state.rollsToday++;
   state.statRolls++;
@@ -1377,6 +1379,7 @@ function triggerFinish() {
   updateUI();
   addLog('finish', '🏁', `<strong>通关！</strong> 用了 ${state.statRolls} 步抵达终点`, TOTAL);
   updateStatusBar('🎊 通关！');
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'flying-chess', score: 1000, result: '通关' });
   document.getElementById('rollBtn').disabled = true;
 
   setTimeout(() => {
@@ -1602,5 +1605,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/flying-chess-adapter.js"></script>
 </body>
 </html>

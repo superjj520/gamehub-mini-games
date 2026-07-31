@@ -1115,6 +1115,7 @@ function selectLevel(idx) {
    开始游戏（初始化当前关卡）
 ───────────────────────────────────────────── */
 function startGame() {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:start', { gameId: 'sokoban', source: 'start-game' });
   const lv = LEVELS[currentLevelIdx];
   gameState = deepCopyMap(lv.map);
 
@@ -1191,6 +1192,7 @@ function findPlayer() {
 ───────────────────────────────────────────── */
 function move(dr, dc) {
   if (!gameActive) return;
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:action', { gameId: 'sokoban', action: 'move', direction: [dr, dc] });
 
   const [pr, pc] = findPlayer();
   const nr = pr + dr;   // 目标位置（玩家下一步）
@@ -1278,6 +1280,7 @@ function checkWin() {
       if (gameState[r][c] === BOX) return;
     }
   }
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'sokoban', score: Math.max(0, 1000 - steps), result: '通关' });
   // 全部通关
   gameActive = false;
   const idx = currentLevelIdx;
@@ -1652,5 +1655,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/sokoban-adapter.js"></script>
 </body>
 </html>

@@ -1186,6 +1186,7 @@ function gameLoop() {
    ════════════════════════════════ */
 function movePlayer(dir) {
   if (state !== STATE.PLAYING) return;
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:action', { gameId: 'maze', action: 'move', direction: dir });
 
   const { x, y } = player;
   const cell_obj = maze[y][x];
@@ -1231,6 +1232,7 @@ function movePlayer(dir) {
    游戏控制
    ════════════════════════════════ */
 function startGame() {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:start', { gameId: 'maze', source: 'start-game' });
   clearInterval(timerInterval);
   if (animFrame) cancelAnimationFrame(animFrame);
 
@@ -1324,6 +1326,7 @@ function tickTimer() {
 /* ─── 胜利 ─── */
 function winGame() {
   state = STATE.WIN;
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'maze', score: score, result: '通关' });
   clearInterval(timerInterval);
 
   // 排行榜 + 成就 + 奖励
@@ -1691,5 +1694,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/maze-adapter.js"></script>
 </body>
 </html>

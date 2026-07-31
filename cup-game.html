@@ -978,6 +978,7 @@ function swapCups(posA, posB, speed) {
 /* ─── 阶段1：开始游戏 ─── */
 async function startGame() {
   if (STATE.phase !== 'idle') return;
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:start', { gameId: 'cup-game', source: 'start-game' });
   STATE.phase = 'reveal';
   document.getElementById('btn-start').disabled = true;
 
@@ -1002,6 +1003,7 @@ async function startGame() {
 
 /* ─── 一轮完整流程 ─── */
 async function playRound() {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:action', { gameId: 'cup-game', action: 'play-round' });
   if (STATE.lives <= 0) { endGame(); return; }
 
   // 重置杯子到初始位置（无动画）
@@ -1198,6 +1200,7 @@ function showStreakBanner(msg) {
 /* ─── 游戏结束 ─── */
 function endGame() {
   STATE.phase = 'gameover';
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'cup-game', score: STATE.score, result: '游戏结束' });
   const rate = STATE.totalGuess > 0
     ? Math.round(STATE.correctGuess / STATE.totalGuess * 100) : 0;
   setBanner('游戏结束 🎮', `总分 ${STATE.score} 分  猜中率 ${rate}%  最高连胜 ${STATE.bestStreak}`);
@@ -1297,5 +1300,12 @@ function toggleSound() {
 <script src="user.js"></script>
 <script src="themes.js"></script>
 <script src="runtime/bridge.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/cup-game-adapter.js"></script>
 </body>
 </html>

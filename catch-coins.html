@@ -1020,6 +1020,7 @@ function setDuration(sec, btn) {
 
 // ─── 开始游戏 ───
 function startGame() {
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:start', { gameId: 'catch-coins' });
   // 重置状态
   state.score = 0;
   state.timeLeft = cfg.duration;
@@ -1536,6 +1537,7 @@ function refreshBestScore() {
 
 // ─── 结束游戏 ───
 function endGame() {
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:result', { gameId: 'catch-coins', score: state.score });
   state.running = false;
   if (state.rafId) cancelAnimationFrame(state.rafId);
 
@@ -1647,5 +1649,12 @@ function toggleSound() {
 <script src="user.js"></script>
 <script src="themes.js"></script>
 <script src="runtime/bridge.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/catch-coins-adapter.js"></script>
 </body>
 </html>

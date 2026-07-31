@@ -690,6 +690,7 @@ function getResult() {
 function spin() {
   if (spinning || dailyRemain <= 0) return;
   spinning = true; dailyRemain--;
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:spin:start', { gameId: 'wheel' });
   document.getElementById('spinBtn').disabled = true;
   document.querySelector('.wheel-container').classList.add('is-spinning');
   setReadoutState('正在减速', true);
@@ -746,6 +747,7 @@ function spin() {
     }
     updateStats(); updateChance(); addLog(PRIZES[resultIdx]); updateDist();
     setReadoutState('已锁定', false);
+    if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:spin:result', { gameId: 'wheel', prize: PRIZES[resultIdx], index: resultIdx });
     setTimeout(() => {
       showModal(PRIZES[resultIdx]);
       document.getElementById('spinBtn').disabled = false;
@@ -914,5 +916,11 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/wheel-adapter.js"></script>
 </body>
 </html>

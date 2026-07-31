@@ -1235,6 +1235,7 @@ function shuffle(arr) {
 async function startDraw() {
   if (isDrawing) return;
   if (selectedRed.size !== 6 || selectedBlue === null) return;
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:start', { gameId: 'lucky-number', source: 'start-draw' });
 
   isDrawing = true;
   roundCount++;
@@ -1345,6 +1346,7 @@ async function startDraw() {
   const resultText = prizeIdx >= 0
     ? `${prizeName}（红球${redMatchCount}个+蓝球${blueMatch ? 1 : 0}个）`
     : `未中奖（红球${redMatchCount}个+蓝球${blueMatch ? 1 : 0}个）`;
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'lucky-number', score: score, result: resultText });
 
   if (typeof GameLeaderboard !== 'undefined' && GameLeaderboard.submitAndNotify) {
     GameLeaderboard.submitAndNotify({ game: '幸运数字', score: score, result: resultText });
@@ -1537,5 +1539,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/lucky-number-adapter.js"></script>
 </body>
 </html>

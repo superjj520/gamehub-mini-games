@@ -1081,6 +1081,7 @@ function drawPattern(ctx, size, style) {
    点击方块移动逻辑
 ============================== */
 function onTileClick(idx) {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:action', { gameId: 'sliding-puzzle', action: 'move', index: idx });
   if (!state.running) {
     // 允许直接点击开始
     startGame(true);
@@ -1156,6 +1157,7 @@ function flashTile(idx) {
 
 /* 开始 / 重新开始游戏 */
 function startGame(silent) {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:start', { gameId: 'sliding-puzzle', source: 'start-game' });
   stopTimer();
 
   const shuffleSteps = DIFF_SHUFFLE[state.diff];
@@ -1239,6 +1241,7 @@ function formatTime(secs) {
    完成游戏
 ============================== */
 function onWin() {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'sliding-puzzle', score: state.steps || 500, result: '完成' });
   stopTimer();
   state.running = false;
 
@@ -1631,5 +1634,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/sliding-puzzle-adapter.js"></script>
 </body>
 </html>

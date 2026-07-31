@@ -1136,6 +1136,7 @@ function pickByRarity(rarity) {
 function draw(count) {
   if (state.isAnimating) return;
   state.isAnimating = true;
+  if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:start', { gameId: 'blind-box', count: count });
 
   // 禁用按钮
   document.getElementById('btnSingle').disabled = true;
@@ -1183,6 +1184,7 @@ function draw(count) {
 
       // 排行榜 / 成就 / 经验金币
       const result_name = best.name;
+      if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:result', { gameId: 'blind-box', prizes: results, best: best });
       const prize_score = best.rarity === 'SP' ? 300 : best.rarity === 'SSR' ? 200 : best.rarity === 'SR' ? 100 : 50;
       if (typeof GameLeaderboard !== 'undefined') GameLeaderboard.submitAndNotify({game:'盲盒',score:prize_score||50,result:result_name});
       if (typeof GameAchievement !== 'undefined') GameAchievement.trigger('spin',1);
@@ -1397,5 +1399,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/blind-box-adapter.js"></script>
 </body>
 </html>

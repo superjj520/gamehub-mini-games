@@ -872,6 +872,7 @@ function setupMotion() {
 
 // ─── 核心：触发摇动 ───
 function triggerShake() {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:start', { gameId: 'shake', source: 'trigger-shake' });
   if (STATE.isPlaying) return;
   if (STATE.isCoolingDown) return;
   if (STATE.dailyUsed >= STATE.daily) {
@@ -929,6 +930,7 @@ function decidePrize() {
 
 // ─── 揭示结果 ───
 function revealPrize(prize) {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'shake', score: prize.isWin ? 50 : 0, result: prize.name });
   const screen = document.getElementById('phoneScreen');
   const screenIcon = document.getElementById('screenIcon');
   const screenGuide = document.getElementById('screenGuide');
@@ -1143,5 +1145,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/shake-adapter.js"></script>
 </body>
 </html>

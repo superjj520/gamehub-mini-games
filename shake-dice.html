@@ -1036,6 +1036,7 @@ function getFaceAngles(face) {
 // 摇骰子主逻辑
 // ───────────────────────────────────────────────
 function shakeDice() {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:start', { gameId: 'shake-dice', source: 'shake-dice' });
   if (state.rolling || state.usedToday >= state.dailyLimit) return;
   state.rolling = true;
   document.getElementById('shakeBtn').disabled = true;
@@ -1143,6 +1144,7 @@ function finishRoll(d1, d2, sum) {
   state.distCounts[sum] = (state.distCounts[sum] || 0) + 1;
 
   const result = getResult(sum);
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'shake-dice', score: sum, result: result.label });
   if (result.win) state.totalWins++;
 
   // 显示总点数
@@ -1261,5 +1263,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/shake-dice-adapter.js"></script>
 </body>
 </html>

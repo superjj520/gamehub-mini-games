@@ -1186,6 +1186,7 @@ function drawPrize() {
 ══════════════════════════════ */
 function startOpen() {
   if (isAnimating) return;
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:start', { gameId: 'gift-box', source: 'start-open' });
   maxTimes = parseInt(document.getElementById('maxTimes').value) || 3;
   if (openCount >= maxTimes) return;
 
@@ -1215,6 +1216,7 @@ function startOpen() {
     setTimeout(() => {
       // 抽奖
       const prize = drawPrize();
+      if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'gift-box', score: prize.tier <= 2 ? 50 : 0, result: prize.name });
 
       // 扣减库存
       if (stock[prize.id] > 0 && stock[prize.id] !== 9999) stock[prize.id]--;
@@ -1497,5 +1499,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/gift-box-adapter.js"></script>
 </body>
 </html>

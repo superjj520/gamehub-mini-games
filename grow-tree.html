@@ -1564,6 +1564,7 @@ function renderStageProgress(curStageId, energy) {
 
 /** 执行行为，增加能量 */
 function doAction(type) {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:action', { gameId: 'grow-tree', action: type });
   const waterLimit = parseInt(document.getElementById('waterLimit').value) || 5;
   let add = 0;
   let msg = '';
@@ -1620,6 +1621,7 @@ function doAction(type) {
 
 /** 收获果实 */
 function doHarvest() {
+  if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'grow-tree', score: state.energy || 0, result: '收获' });
   document.getElementById('harvestPrizeName').textContent = getPrize(6);
   document.getElementById('harvestModal').classList.add('show');
 }
@@ -1835,5 +1837,12 @@ function toggleSound() {
 <script src="achievement.js"></script>
 <script src="user.js"></script>
 <script src="themes.js"></script>
+<script src="app/data/game-catalog.js"></script>
+<script src="app/services/event-bus.js"></script>
+<script src="app/games/game-contract.js"></script>
+<script src="app/games/game-registry.js"></script>
+<script src="app/shell/app-shell.js"></script>
+<script src="app/games/legacy-adapter.js"></script>
+<script src="app/games/grow-tree-adapter.js"></script>
 </body>
 </html>
