@@ -231,7 +231,8 @@ function startGame(config) {
 
   var gameInfo = GAME_MAP[config.game_type] || { name: config.game_type, module: null };
   document.getElementById('gameTitle').textContent = config.title || gameInfo.name;
-  document.getElementById('gameType').textContent = gameInfo.name;
+  var catalogMeta = window.GameHubCatalog && window.GameHubCatalog.get(config.game_type);
+  document.getElementById('gameType').textContent = catalogMeta ? catalogMeta.category + ' · ' + catalogMeta.status : gameInfo.name;
 
   if (!gameInfo.module) { document.getElementById('statusBar').textContent = '不支持: '+config.game_type; return; }
   document.getElementById('statusBar').textContent = '游戏初始化中';
@@ -285,21 +286,21 @@ function renderMonopolyState(gameState) {
 }
 
 function addGameSwitcher(currentGame) {
-  var games = [
-    {key:'monopoly',name:'大富翁',icon:'&#127920;'},{key:'wheel',name:'大转盘',icon:'&#127922;'},
-    {key:'scratch-card',name:'刮刮乐',icon:'&#127923;'},{key:'quiz',name:'答题',icon:'&#129504;'},
-    {key:'game-2048',name:'2048',icon:'&#128290;'},{key:'snake',name:'贪吃蛇',icon:'&#128013;'},
-    {key:'truth-or-dare',name:'真心话',icon:'&#129309;'},{key:'flying-chess',name:'飞行棋',icon:'&#9992;'},
-    {key:'match3',name:'消消乐',icon:'&#128142;'},
-  ];
+  var currentMeta = window.GameHubCatalog && window.GameHubCatalog.get(currentGame);
+  var games = currentMeta ? window.GameHubCatalog.byCategory(currentMeta.category) : window.GameHubCatalog.all;
+  games = games.slice(0, 8);
   var bar = document.createElement('div');
   bar.className = 'game-switcher';
+  bar.setAttribute('aria-label', currentMeta ? '切换' + currentMeta.category + '游戏' : '切换游戏');
   for (var i=0;i<games.length;i++){
     (function(g){
       var btn = document.createElement('button');
+      btn.type = 'button';
       btn.innerHTML = g.icon + ' ' + g.name;
-      if (g.key===currentGame) btn.classList.add('active');
-      btn.addEventListener('click',function(){ location.href='?game='+g.key; });
+      btn.title = g.name + ' · ' + g.status;
+      btn.setAttribute('aria-label', g.name + '，' + g.status);
+      if (g.id===currentGame) btn.classList.add('active');
+      btn.addEventListener('click',function(){ location.href='?game='+g.id; });
       bar.appendChild(btn);
     })(games[i]);
   }
