@@ -76,6 +76,25 @@ a{text-decoration:none;color:inherit}
 </section>
 
 <div class="container">
+  <div class="gh-game-command" aria-label="游戏筛选工具">
+    <div class="gh-command-heading">
+      <span class="gh-command-kicker">GAME DECK / 01</span>
+      <span class="gh-command-count" id="gameCount">显示 0 款</span>
+    </div>
+    <div class="gh-command-row">
+      <label class="gh-game-search">
+        <span aria-hidden="true">⌕</span>
+        <input id="gameSearch" type="search" placeholder="搜索游戏、玩法或类型" autocomplete="off">
+      </label>
+      <div class="gh-filter-list" id="gameFilters" role="tablist" aria-label="游戏类型">
+        <button class="gh-filter is-active" type="button" data-filter="all" role="tab" aria-selected="true">全部</button>
+        <button class="gh-filter" type="button" data-filter="抽奖" role="tab" aria-selected="false">抽奖</button>
+        <button class="gh-filter" type="button" data-filter="竞技" role="tab" aria-selected="false">竞技</button>
+        <button class="gh-filter" type="button" data-filter="益智" role="tab" aria-selected="false">益智</button>
+        <button class="gh-filter" type="button" data-filter="动作" role="tab" aria-selected="false">动作</button>
+      </div>
+    </div>
+  </div>
   <div class="section-title">游戏</div>
   <div class="games-grid">
     <a class="game-card" href="wheel-page.html">
@@ -123,6 +142,11 @@ a{text-decoration:none;color:inherit}
       <div class="name">消消乐</div>
       <div class="desc">三连消除，闯关得分</div>
     </a>
+  </div>
+  <div class="gh-game-empty" id="gameEmpty" hidden>
+    <span class="gh-empty-signal">NO MATCH / 204</span>
+    <strong>没有找到这组玩法</strong>
+    <span>换个关键词，或者切回“全部”继续探索。</span>
   </div>
 </div>
 
