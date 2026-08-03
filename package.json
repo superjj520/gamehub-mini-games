@@ -12,6 +12,7 @@
     "test:architecture": "node --test tests/architecture/*.test.mjs",
     "test:platform": "node --test tests/platform/*.test.mjs",
     "test:games": "node --test games/*/tests/*.test.mjs",
+    "test:e2e": "node scripts/platform-e2e.mjs",
     "check:boundaries": "node scripts/check-platform-boundaries.mjs",
     "test:smoke": "node scripts/smoke-test.mjs"
   },

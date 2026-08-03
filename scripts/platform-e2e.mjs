@@ -1,0 +1,11 @@
+import { createServer } from 'node:http';
+import { readFile } from 'node:fs/promises';
+import { join, normalize } from 'node:path';
+import { chromium } from 'playwright';
+const root = process.cwd(), port = 4174;
+const server = createServer(async (req, res) => { try { const path = normalize(join(root, new URL(req.url, 'http://x').pathname.replace(/^\//, '') || 'index.html')); if (!path.startsWith(root)) throw Error(); res.end(await readFile(path)); } catch { res.statusCode = 404; res.end(); } });
+await new Promise((resolve) => server.listen(port, resolve));
+const browser = await chromium.launch({ headless: true }); const page = await browser.newPage();
+await page.goto(`http://127.0.0.1:${port}/create-v2.html`); await page.locator('#preview').click(); await page.getByRole('button', { name: '开始抽奖' }).click();
+if (!(await page.locator('#message').textContent()).includes('结果：')) throw new Error('新版大转盘未产生结果');
+await browser.close(); server.close(); console.log('新版创建与游玩端到端测试通过');
