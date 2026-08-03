@@ -7,7 +7,6 @@
     var href = card.getAttribute('href') || '';
     var queryGame = new URLSearchParams(href.split('?')[1] || '').get('game');
     if (queryGame) return GameHubCatalog.get(queryGame);
-    if (href.indexOf('wheel-page') >= 0) return GameHubCatalog.get('wheel');
     return GameHubCatalog.all.find(function (game) { return href.indexOf(game.file) >= 0; }) || null;
   }
   cards.forEach(function (card) {

@@ -178,6 +178,11 @@ body{touch-action:manipulation;font-family:var(--font-body);background:var(--sur
 <script src="runtime/icons.js"></script>
 <script src="runtime/core/theme.js?v=2"></script>
 <script src="runtime/core/board-builder.js?v=3"></script>
+<script src="app/platform/game-contracts.js"></script>
+<script src="app/platform/game-registry-v2.js"></script>
+<script src="app/platform/config-store.js"></script>
+<script src="app/platform/manifests/wheel.js"></script>
+<script src="app/platform/bootstrap.js"></script>
 
 <script>
 // ==================== 编辑器核心 ====================
@@ -519,12 +524,24 @@ function onTitleChange(){ editor.title = document.getElementById('titleInput').v
 async function saveConfig(){
   var player = GameSupabase.getCurrentPlayer();
   if(!player){ showToast('请先登录 — 点击右下角登录按钮'); GameAuth._showLogin(); return; }
-  var payload = {user_id:player.id,game_type:editor.gameType,title:editor.title,blocks:editor.blocks,is_public:false};
+  var envelope = {type:editor.gameType,version:1,payload:{blocks:editor.blocks}};
+  var registration = window.GameHubGameRegistryV2 && window.GameHubGameRegistryV2.get(editor.gameType);
+  if(registration){
+    try { envelope = GameHubContracts.normalizeEnvelope(envelope, registration.manifest); }
+    catch(error) { showToast('配置未通过：'+error.message); return; }
+  }
+  var stored = GameHubConfigStore.create({registry:GameHubGameRegistryV2}).toWritePayload(envelope);
+  var payload = Object.assign({user_id:player.id,title:editor.title,is_public:false},stored);
   var r;
   if(editor.configId){
     r = await GHSupabase.from('user_configs').update({...payload,updated_at:new Date().toISOString()}).eq('id',editor.configId).select('*').single();
   } else {
     r = await GHSupabase.from('user_configs').insert(payload).select('*').single();
+  }
+  if(r.error && /config_version|config_payload/i.test(r.error.message||'')){
+    var legacyPayload = {user_id:player.id,game_type:editor.gameType,title:editor.title,blocks:editor.blocks,is_public:false};
+    if(editor.configId) r = await GHSupabase.from('user_configs').update({...legacyPayload,updated_at:new Date().toISOString()}).eq('id',editor.configId).select('*').single();
+    else r = await GHSupabase.from('user_configs').insert(legacyPayload).select('*').single();
   }
   if(r.error){ showToast('保存失败: '+r.error.message); return; }
   editor.configId = r.data.id; editor.isDirty = false; updateSaveStatus();

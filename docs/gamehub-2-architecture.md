@@ -55,6 +55,14 @@ styles/
 
 ## 游戏统一协议
 
+### 配置与运行时边界
+
+每个发布游戏使用 `{ type, version, payload }` 作为可分享配置。`type` 是玩法类型，`version` 用于迁移历史配置，`payload` 只包含创作者设定；动画进度、上次结果和本局状态不能进入配置。正式分享继续使用 Supabase 的 `share_slug`，URL 只携带 `game` 与 `config` 引用。
+
+每个玩法必须提供 manifest：默认配置、校验、迁移函数与创建/游玩入口。平台提供统一 CreatorShell 与 PlayerShell；游戏只提供专属编辑器、引擎和玩家表现。
+
+当前迁移状态：`wheel-page.html`、`wheel.html`、`game-wrapper.html?game=wheel` 都是旧入口，后续仅保留兼容跳转；新增入口必须从版本化注册表解析。
+
 每个游戏不再决定自己的页面壳，只负责游戏内容和状态：
 
 ```js

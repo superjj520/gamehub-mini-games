@@ -178,6 +178,11 @@ a { color: var(--brand-light); text-decoration: none; }
 <script src="app/services/event-bus.js"></script>
 <script src="app/shell/app-shell.js"></script>
 <script src="app/shell/game-session.js"></script>
+<script src="app/platform/game-contracts.js"></script>
+<script src="app/platform/game-registry-v2.js"></script>
+<script src="app/platform/config-store.js"></script>
+<script src="app/platform/manifests/wheel.js"></script>
+<script src="app/platform/bootstrap.js"></script>
 
 <script>
 var GAME_MAP = {
@@ -207,7 +212,7 @@ var GAME_MAP = {
       blocks: BlockRegistry.getDefaults(gameType),
     };
     addGameSwitcher(gameType);
-    startGame(config);
+    startGame(normalizeGameConfig(config));
     return;
   }
 
@@ -219,11 +224,22 @@ var GAME_MAP = {
     if (result.error) throw result.error;
     var config = result.data;
     GHSupabase.from('user_configs').update({ plays_count: (config.plays_count||0)+1 }).eq('id',config.id).then(function(){}).catch(function(){});
-    startGame(config);
+    startGame(normalizeGameConfig(config));
   } catch(e) {
     document.getElementById('loading').innerHTML = '<div style="font-size:40px;margin-bottom:8px">!</div><div class="loading-text">加载失败: '+e.message+'</div>';
   }
 })();
+
+function normalizeGameConfig(config) {
+  var registration = window.GameHubGameRegistryV2 && window.GameHubGameRegistryV2.get(config.game_type);
+  if (!registration || !window.GameHubConfigStore) return config;
+  var store = window.GameHubConfigStore.create({ registry: window.GameHubGameRegistryV2 });
+  var envelope = store.normalizeRecord(config);
+  config.blocks = envelope.payload.blocks || [];
+  config.config_version = envelope.version;
+  config.config_payload = envelope.payload;
+  return config;
+}
 
 function startGame(config) {
   document.getElementById('loading').style.display = 'none';

@@ -9,6 +9,10 @@
   "scripts": {
     "check": "node scripts/check-project.mjs",
     "test": "npm run check",
+    "test:architecture": "node --test tests/architecture/*.test.mjs",
+    "test:platform": "node --test tests/platform/*.test.mjs",
+    "test:games": "node --test games/*/tests/*.test.mjs",
+    "check:boundaries": "node scripts/check-platform-boundaries.mjs",
     "test:smoke": "node scripts/smoke-test.mjs"
   },
   "repository": {

@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>小游戏中台 · 大转盘</title>
 <link rel="stylesheet" href="design-system.css">
+<script>
+// 旧游玩入口统一交给通用玩家壳；保留原查询参数，避免历史链接失效。
+(function () {
+  var params = new URLSearchParams(location.search);
+  params.set('game', 'wheel');
+  location.replace('play-v2.html?' + params.toString());
+}());
+</script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 

@@ -1,7 +1,7 @@
 // GameHub 统一游戏目录：页面只读取这里的元数据，不再各自维护游戏入口。
 (function (root) {
   var catalog = [
-    { id:'wheel', name:'大转盘', category:'抽奖', icon:'🎡', accent:'#FF6078', status:'热门', file:'wheel.html' },
+    { id:'wheel', name:'大转盘', category:'抽奖', icon:'🎡', accent:'#FF6078', status:'热门', file:'play-v2.html?game=wheel' },
     { id:'red-packet-rain', name:'红包雨', category:'反应', icon:'🧧', accent:'#47F1D0', status:'进行中', file:'red-packet-rain.html' },
     { id:'nine-grid', name:'九宫格', category:'抽奖', icon:'✦', accent:'#8E7DFF', status:'新上线', file:'nine-grid.html' },
     { id:'shake-dice', name:'摇骰子', category:'竞技', icon:'🎲', accent:'#FFD166', status:'多人', file:'shake-dice.html' },
