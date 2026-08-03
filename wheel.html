@@ -438,9 +438,9 @@
     </div>
 
     <div class="wheel-readout" aria-label="转盘实时状态">
-      <div class="readout-cell"><span class="readout-label">奖池状态</span><span class="readout-value is-live" id="readoutPool">奖池就绪</span></div>
+      <div class="readout-cell"><span class="readout-label">奖池状态</span><span class="readout-value is-live" id="readoutPool" aria-live="polite">奖池就绪</span></div>
       <div class="readout-cell"><span class="readout-label">当前中奖率</span><span class="readout-value" id="readoutRate">0%</span></div>
-      <div class="readout-cell"><span class="readout-label">运行状态</span><span class="readout-value is-live" id="readoutState">待命中</span></div>
+      <div class="readout-cell"><span class="readout-label">运行状态</span><span class="readout-value is-live" id="readoutState" aria-live="polite">等待开始</span></div>
     </div>
 
     <div class="wheel-container">
@@ -457,7 +457,7 @@
       </svg>
       <canvas id="wheelCanvas" width="340" height="340"></canvas>
       <div class="spin-btn-wrap">
-        <button class="spin-btn" id="spinBtn" onclick="spin()">
+        <button class="spin-btn" id="spinBtn" aria-label="开始转动大转盘" onclick="spin()">
           <span>开始</span><span>抽奖</span>
         </button>
       </div>
@@ -688,12 +688,22 @@ function getResult() {
 }
 
 function spin() {
-  if (spinning || dailyRemain <= 0) return;
+  if (spinning) return;
+  if (dailyRemain <= 0) {
+    setReadoutState('今日次数用完', false);
+    if (window.GameHubFeedback) window.GameHubFeedback.toast('今日转盘次数已用完', { tone: 'warning', duration: 1600 });
+    return;
+  }
   spinning = true; dailyRemain--;
   if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:spin:start', { gameId: 'wheel' });
+  if (window.GameHubEventBus) {
+    window.GameHubEventBus.emit('game:start', { gameId: 'wheel', source: 'spin' });
+    window.GameHubEventBus.emit('game:action', { gameId: 'wheel', action: 'spin' });
+  }
   document.getElementById('spinBtn').disabled = true;
   document.querySelector('.wheel-container').classList.add('is-spinning');
-  setReadoutState('正在减速', true);
+  document.getElementById('readoutPool').textContent = '奖池锁定';
+  setReadoutState('抽奖进行中', true);
 
   // Godot Bridge 未接入时保留日志占位，页面仍使用本地模拟结果完成演示。
   if (window.GameHubBridge?.send) {
@@ -746,8 +756,10 @@ function spin() {
       if (typeof GameUser !== 'undefined') GameUser.addCoins(_prizeScore > 0 ? Math.max(10, Math.floor(_prizeScore / 20)) : 2, '大转盘');
     }
     updateStats(); updateChance(); addLog(PRIZES[resultIdx]); updateDist();
+    document.getElementById('readoutPool').textContent = '奖池就绪';
     setReadoutState('已锁定', false);
     if (window.GameHubApp?.events) window.GameHubApp.events.emit('game:spin:result', { gameId: 'wheel', prize: PRIZES[resultIdx], index: resultIdx });
+    if (window.GameHubEventBus) window.GameHubEventBus.emit('game:result', { gameId: 'wheel', score: _prizeScore, result: _prize.name });
     setTimeout(() => {
       showModal(PRIZES[resultIdx]);
       document.getElementById('spinBtn').disabled = false;
