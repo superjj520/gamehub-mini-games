@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import wheelConfig from '../config.js';
 import wheelPlayer from '../player.js';
+import wheelEditor from '../editor.js';
 
 test('玩家组件按奖项数量渲染 SVG 扇区', () => {
   const config = wheelConfig.normalizeConfig({ prizes: [{ name: 'A', weight: 1 }, { name: 'B', weight: 1 }] });
@@ -9,4 +10,11 @@ test('玩家组件按奖项数量渲染 SVG 扇区', () => {
   assert.match(html, /data-wheel-sector="0"/);
   assert.match(html, /data-wheel-sector="1"/);
   assert.match(html, /class="wheel-svg"/);
+});
+
+test('编辑器修改奖项后派发规范化配置', () => {
+  const defaultConfig = wheelConfig.createDefaultConfig();
+  const next = wheelEditor.updatePrize(defaultConfig, 0, { name: '咖啡券', weight: 2 });
+  assert.equal(next.prizes[0].name, '咖啡券');
+  assert.equal(next.prizes[0].weight, 2);
 });
