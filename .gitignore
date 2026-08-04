@@ -6,6 +6,7 @@ supabase/.temp/
 
 # Node
 node_modules/
+.worktrees/
 
 # Godot
 .godot/
