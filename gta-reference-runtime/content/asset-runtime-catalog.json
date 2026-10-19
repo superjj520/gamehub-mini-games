@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "policy": "optional_release_asset_with_graybox_fallback",
+  "slots": [
+    {"id": "player-character", "category": "characters", "root_name": "Visual", "scene_path": "res://assets/characters/original-procedural-office-characters/original_player_candidate.tscn", "fallback_policy": "procedural_graybox", "candidate_only": true},
+    {"id": "office-npc-set", "category": "characters", "root_name": "Visual", "scene_path": "res://assets/characters/original-procedural-office-characters/original_office_npc_candidate.tscn", "fallback_policy": "procedural_graybox", "candidate_only": true},
+    {"id": "city-crowd-set", "category": "characters", "root_name": "Visual", "scene_path": "res://assets/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.tscn", "fallback_policy": "procedural_graybox", "candidate_only": true},
+    {"id": "three-wheel-vehicle", "category": "vehicles", "root_name": "Visual", "scene_path": "res://assets/vehicles/three-wheel-delivery/three_wheel_delivery_candidate.tscn", "fallback_policy": "procedural_graybox", "candidate_only": true},
+    {"id": "office-environment-kit", "category": "environment", "root_name": "Visual", "scene_path": "res://content/candidates/original_office_visual_runtime_candidate.tscn", "fallback_policy": "procedural_graybox", "candidate_only": true},
+    {"id": "city-environment-kit", "category": "environment", "root_name": "Visual", "scene_path": "res://assets/environment/original-procedural-city-environment/original_city_environment_candidate.tscn", "fallback_policy": "procedural_graybox", "candidate_only": true},
+    {"id": "interaction-props", "category": "props", "root_name": "Visual", "scene_path": "res://assets/props/original-procedural-interaction-props/original_interaction_props_candidate.tscn", "fallback_policy": "procedural_graybox", "candidate_only": true},
+    {"id": "final-audio-library", "category": "audio", "root_name": "Audio", "scene_path": "", "fallback_policy": "procedural_graybox"}
+  ]
+}

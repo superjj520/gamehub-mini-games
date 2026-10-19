@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_visual_rejected",
+  "product_name": "新时代觉醒者",
+  "capture_id": "city-11-v9",
+  "reference_frame": "reference-evidence/video-1/city-11.jpg",
+  "candidate_package": {
+    "sha256": "24fabeae2983c16ffe42c0ae3809feaaf51a5ea71391ac818d9a86fcfb3435ac",
+    "file_count": 315
+  },
+  "source": {
+    "sha256": "eef75fe2e8fbd6b30ad2306564182486451345e915baf886bb44a63dcd2802f0",
+    "file_count": 227
+  },
+  "capture": {
+    "method": "visible_graphics_window",
+    "resolution": [1280, 720],
+    "rendering_driver": "opengl3",
+    "profile": "city_full_candidate",
+    "camera": {
+      "distance": 8.0,
+      "height": 3.6,
+      "shoulder_offset_x": 0.35,
+      "player_z": 13.1800003051758,
+      "back_alley_view": true,
+      "back_alley_hidden_mesh_count": 0
+    },
+    "visual_status": "unverified",
+    "manual_visual_decision": "reject_for_reference_fidelity",
+    "image_path": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-11-v9.png",
+    "image_sha256": "962d5255ef259bd6263f9403533162fc578876647569a6ba6cb7b4d83d6bd72d",
+    "image_dimensions": [1280, 720]
+  },
+  "comparison_findings": [
+    "后场仓储纯色墙已替换为已登记的原创写实仓储立面卡，材质层级和门面语义明显改善。",
+    "专用中远景相机已生效，仓储立面不再占满整个视口。",
+    "候选城市远景仍存在自动命名的程序化盒体与拼接式窗格，空间层次和遮挡关系仍未达到参考视频。",
+    "玩家与三轮车在当前固定构图中仍未形成可签收的主体关系，不能视为视觉通过。"
+  ],
+  "release_allowed": false,
+  "next_gates": [
+    "重做 city-11 周边建筑节点层级，替换自动命名盒体而不是继续依赖运行时隐藏。",
+    "重新标定玩家、载具、门面和道路的相对构图。",
+    "与 city-01、city-08 一起重新进行逐帧视觉签收。"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "status": "graphical_capture_failed",
+  "failure_kind": "timeout",
+  "generated_at": "2026-10-16T15:24:20.784Z",
+  "process": {
+    "pid": 5448,
+    "timeout_seconds": 45,
+    "godot_bin": "/opt/homebrew/bin/godot"
+  },
+  "source": {
+    "sha256": "1f53a80e9e9059762c769fb8d5e0cb7208749af0a0f56fe9f4126fdf4d14e7a5",
+    "file_count": 263
+  },
+  "log_path": "/tmp/新时代觉醒者-graphical-probe.log",
+  "command": "/opt/homebrew/bin/godot --path gta-reference-runtime --scene res://tests/reference_capture_runner.tscn --display-driver macos --audio-driver Dummy --rendering-driver opengl3 --rendering-method gl_compatibility --single-window --windowed --resolution 1280x720 --log-file /tmp/新时代觉醒者-graphical-probe.log --quit-after 12000 --user-data-dir /var/folders/tq/g_n75q2x54s2w9ylj9vfmh140000gn/T//新时代觉醒者-godot-user-data-5444",
+  "policy": "失败记录只用于诊断，不构成 PNG、视觉验收或发布证据"
+}

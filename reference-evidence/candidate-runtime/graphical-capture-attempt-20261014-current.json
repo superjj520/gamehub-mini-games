@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "capture_id": "current-source-background-20261014-125049",
+  "status": "graphical_capture_failed",
+  "failure_kind": "macos_graphics_service_timeout",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "method": "background_godot_visible_window",
+  "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+  "source_sha256": {
+    "runtime_source_fingerprint": "e7dd57e26d49b933dc7a359079d02446443e86f5204c3fdd83e34ccff95dc7a2",
+    "runtime_file_count": 235
+  },
+  "timeout_seconds": 45,
+  "exit_code": 124,
+  "image": null,
+  "observed_errors": [
+    "/Applications/Godot.app 缺少可执行文件，入口回退到本机 Godot 二进制",
+    "com.apple.hiservices-xpcservice 连接失效",
+    "45 秒有界等待到期后回收本次采集进程"
+  ],
+  "log_path": "/tmp/新时代觉醒者-reference-capture-background.log",
+  "next_action": "在可用桌面或 Windows 图形环境重新运行当前源视觉采集；不得把旧 PNG 重新绑定到当前源"
+}

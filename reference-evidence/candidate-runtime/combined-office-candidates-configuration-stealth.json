@@ -1,0 +1,62 @@
+{
+  "actors": {
+    "npc_position": [
+      0.699999988079071,
+      0.899999976158142,
+      -1.54999995231628
+    ],
+    "npc_present": true,
+    "npc_visible": true,
+    "player_position": [
+      -2.65000009536743,
+      1.00082683563232,
+      1.12940180301666
+    ],
+    "player_present": true,
+    "player_visible": true
+  },
+  "camera": {
+    "current": true,
+    "distance": 1.85,
+    "height": 1.42,
+    "orbit_pitch": -8,
+    "orbit_yaw": -58,
+    "shoulder_x": 0.5
+  },
+  "capture_profile": "stealth",
+  "environment": {
+    "desk_count": 10,
+    "elevator_card_present": true,
+    "elevator_card_visible": false,
+    "elevator_texture": "res://assets/environment/generated/office_elevator_lobby_v1_generated.png",
+    "graybox_fallback_present": false,
+    "video_backdrop_asset_source": "user_authorized_ai_video_frame_edit",
+    "video_backdrop_enabled": true,
+    "video_backdrop_rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+    "video_backdrop_texture": "res://assets/reference-video-candidate/office-02-video-playable-backdrop-v1.png",
+    "visual_collision_count": 10,
+    "visual_present": true,
+    "visual_script": "res://office_desk_composition.gd",
+    "workstation_card_present": true,
+    "workstation_card_visible": false,
+    "workstation_texture": "res://assets/environment/generated/office_workstation_row_v2_worker_generated.png"
+  },
+  "graphics_capture_performed": false,
+  "reason": "当前运行没有可用图形根纹理；本报告只证明办公室候选场景配置，不替代逐帧视觉验收。",
+  "reference_video_segment": "office-02",
+  "release_allowed": false,
+  "schema_version": 1,
+  "status": "candidate_configuration_validation_only",
+  "visual_status": "unverified",
+  "source_sha256": {
+    "player_character_glb": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+    "player_visual_candidate_gd": "fcb62a678192711ee2696d07b16dc6dd4f429c6ba51f8e939b2014f8c84db8b3",
+    "office_npc_atlas_glb": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+    "npc_retouch_candidate_gd": "cbdeef0e757b79723ebcb462047a0a5af1129518be1c742c8a5e73f248a8c808",
+    "office_desk_glb": "bebc7a127bcc102ae4b58fbbbf5ecea1c8c735c53b5cf322ff0196c70c6314be",
+    "office_composition_gd": "291709ab6069686fd8971d13ba14ce08903baa9d3bb49905bd8c0d448254ca14",
+    "office_video_playable_backdrop": "fd5e17d3ffcef102a8143bdc4140a9b81000f7f607a09888d8573a913a671c4b",
+    "capture_runner_mjs": "23ce88ca1bf7f731b49997ac73144337ddaa906f8d60a0536f1490e8fbaf3911"
+  },
+  "captured_at": "2026-10-19T07:59:00.989Z"
+}

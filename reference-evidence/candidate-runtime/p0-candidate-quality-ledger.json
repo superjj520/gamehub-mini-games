@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-19T08:02:21.117Z",
+  "status": "candidate_only_blocked_by_manual_visual_signoff",
+  "product": "新时代觉醒者",
+  "launch_scope": "office_vertical_slice",
+  "source": {
+    "sha256": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+    "file_count": 326
+  },
+  "policy": "本台账只汇总候选资产的可追溯性和未完成门禁，不把接入、静态检查或旧截图等同于最终资产、视觉签收或可发布状态。",
+  "capture_gate": {
+    "status": "blocked_by_graphics_capture",
+    "current_source_bound_pngs": 0,
+    "current_matrix_pngs": 0,
+    "required_matrix_pngs": 21,
+    "matrix_capture_session_valid": false,
+    "manual_visual_signoff_required": true,
+    "next_action": "在可用桌面或 Windows 图形环境运行视觉采集器，完成后记录当前采集会话；失败前不得更新旧 PNG 的源指纹"
+  },
+  "slots": [
+    {
+      "id": "player-character",
+      "category": "characters",
+      "priority": "P0_launch_office",
+      "candidate_count": 3,
+      "candidate_registry_ids": [
+        "player-character-p0-procedural-candidate",
+        "player-character-quaternius-cc0-candidate",
+        "player-character-makehuman-elegant-suit-atlas-candidate"
+      ],
+      "evidence_complete": true,
+      "integration_status": "verified_in_formal_internal_runtime_and_isolated_full_candidate",
+      "visual_status": "unverified",
+      "rights_status": "candidate_rights_recorded_not_release_signed",
+      "platform_status": "windows_target_device_pending",
+      "release_allowed": false,
+      "next_gate": "当前源非无头截图、逐段人工视觉验收、Windows 10/11 目标设备回归和最终权利签收"
+    },
+    {
+      "id": "office-npc-set",
+      "category": "characters",
+      "priority": "P0_launch_office",
+      "candidate_count": 3,
+      "candidate_registry_ids": [
+        "office-npc-p0-procedural-candidate",
+        "office-npc-quaternius-cc0-candidate",
+        "office-npc-makehuman-elegant-suit-skinned-512-atlas-candidate"
+      ],
+      "evidence_complete": true,
+      "integration_status": "verified_in_formal_internal_runtime_and_isolated_full_candidate",
+      "visual_status": "unverified",
+      "rights_status": "candidate_rights_recorded_not_release_signed",
+      "platform_status": "windows_target_device_pending",
+      "release_allowed": false,
+      "next_gate": "当前源非无头截图、逐段人工视觉验收、Windows 10/11 目标设备回归和最终权利签收"
+    },
+    {
+      "id": "office-environment-kit",
+      "category": "environment",
+      "priority": "P0_launch_office",
+      "candidate_count": 6,
+      "candidate_registry_ids": [
+        "office-desk-polyhaven-metal-cc0-candidate",
+        "office-polyhaven-five-desk-full-kit-candidate",
+        "office-elevator-hall-v1-generated-candidate",
+        "office-workstation-row-v1-generated-candidate",
+        "office-elevator-lobby-v1-generated-candidate",
+        "office-elevator-lobby-v2-generated-candidate"
+      ],
+      "evidence_complete": true,
+      "integration_status": "verified_in_formal_internal_runtime_and_isolated_full_candidate",
+      "visual_status": "unverified",
+      "rights_status": "candidate_rights_recorded_not_release_signed",
+      "platform_status": "windows_target_device_pending",
+      "release_allowed": false,
+      "next_gate": "当前源非无头截图、逐段人工视觉验收、Windows 10/11 目标设备回归和最终权利签收"
+    },
+    {
+      "id": "city-environment-kit",
+      "category": "environment",
+      "priority": "P0_city_extension",
+      "candidate_count": 10,
+      "candidate_registry_ids": [
+        "city-environment-original-procedural-v3-candidate",
+        "city-environment-original-only-procedural-v1-candidate",
+        "city-environment-quaternius-downtown-cc0-candidate",
+        "city-road-polyhaven-worn-asphalt-1k-candidate",
+        "urban-storefront-v2-generated-candidate",
+        "warehouse-backlot-facade-v1-generated-candidate",
+        "city-storefront-crowd-v1-generated-candidate",
+        "city-storefront-crowd-v2-generated-candidate",
+        "city-dusk-corner-storefront-v1-generated-candidate",
+        "city-drive-lane-dusk-v1-generated-candidate"
+      ],
+      "evidence_complete": true,
+      "integration_status": "verified_in_formal_internal_runtime_and_isolated_full_candidate",
+      "visual_status": "unverified",
+      "rights_status": "candidate_rights_recorded_not_release_signed",
+      "platform_status": "windows_target_device_pending",
+      "release_allowed": false,
+      "next_gate": "当前源非无头截图、逐段人工视觉验收、Windows 10/11 目标设备回归和最终权利签收"
+    },
+    {
+      "id": "three-wheel-vehicle",
+      "category": "vehicles",
+      "priority": "P0_launch_office",
+      "candidate_count": 4,
+      "candidate_registry_ids": [
+        "city-vehicle-three-wheel-delivery-glb-candidate",
+        "city-vehicle-three-wheel-delivery-atlas-candidate",
+        "city-vehicle-three-wheel-delivery-final-procedural-candidate",
+        "city-vehicle-three-wheel-delivery-original-wrapper-candidate"
+      ],
+      "evidence_complete": true,
+      "integration_status": "verified_in_formal_internal_runtime_and_isolated_full_candidate",
+      "visual_status": "unverified",
+      "rights_status": "candidate_rights_recorded_not_release_signed",
+      "platform_status": "windows_target_device_pending",
+      "release_allowed": false,
+      "next_gate": "当前源非无头截图、逐段人工视觉验收、Windows 10/11 目标设备回归和最终权利签收"
+    }
+  ],
+  "release_decision": {
+    "allowed": false,
+    "reason": "P0 候选尚未完成当前源非无头视觉采集，且仍未完成人工视觉签收、Windows 目标设备和最终权利门禁"
+  }
+}

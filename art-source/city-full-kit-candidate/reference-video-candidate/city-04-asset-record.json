@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "asset_id": "city-04-video-authored-backdrop-candidate-v1",
+  "status": "candidate_only",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "source": {
+    "kind": "user_authorized_ai_video_frame_edit",
+    "reference_video": "reference-evidence/video-1/video-1-china-gta-480.mp4",
+    "reference_frame": "reference-evidence/video-1/city-04.jpg",
+    "exact_frame": "reference-video-candidate/city-04-video-backdrop.jpg",
+    "playable_edit": "reference-video-candidate/city-04-video-playable-backdrop-v1.png",
+    "playable_edit_sha256": "d3adae985f26d88e1822a2f40dca5b6f256f05e50f1e15221f877916806d6f0"
+  },
+  "role": "city-04 免费鸡蛋任务的超市冲突室内背景候选",
+  "dynamic_overlay": [
+    "正式运行时玩家",
+    "正式冲突代理与冲突状态",
+    "正式 HUD、通缉等级和任务标题",
+    "正式碰撞、导航、输入、NPC 感知、失败状态和存档"
+  ],
+  "rights": {
+    "source_authorization": "user_authorized",
+    "final_rights_signoff": "pending",
+    "note": "原始 AI 参考视频及编辑背景只进入隔离候选运行时，不得直接进入发布包。"
+  },
+  "acceptance": {
+    "required": [
+      "真实图形窗口或 Windows 目标设备截图",
+      "city-04 逐帧背景、玩家、冲突代理、货架遮挡和 HUD 验收",
+      "最终资产权利签收"
+    ],
+    "blocking_until_complete": true
+  }
+}

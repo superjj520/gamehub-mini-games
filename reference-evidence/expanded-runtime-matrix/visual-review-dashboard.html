@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>新时代觉醒者·扩展视觉审阅</title>
+  <style>
+    :root { color-scheme: dark; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; }
+    body { margin: 0; background: #101722; color: #eef3fb; }
+    header { padding: 24px 28px; border-bottom: 1px solid #34445b; background: #172235; }
+    h1 { margin: 0 0 8px; font-size: 24px; } p { color: #afbdd0; line-height: 1.5; }
+    .warning { color: #ffd68c; } .meta { font-size: 12px; color: #8fa2bb; }
+    .summary { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 10px; margin-top: 18px; }
+    .summary div { padding: 12px; border: 1px solid #40516e; border-radius: 9px; background: #111b2d; }
+    .summary span, .summary small { display: block; color: #aebbd0; font-size: 12px; }
+    .summary strong { display: block; margin: 5px 0; color: #eef3fb; font-size: 22px; }
+    main { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px; padding: 20px; }
+    .card { padding: 14px; border: 1px solid #3b4d69; border-radius: 12px; background: #1b293e; }
+    .head { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    h2 { margin: 0; font-size: 16px; } .head span { color: #ffd68c; font-size: 12px; }
+    .area { color: #9cd0ff; font-size: 12px; } img, .missing { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain; background: #0b111b; border-radius: 6px; }
+    .missing { display: grid; place-items: center; color: #9aa8bc; } label { display: grid; gap: 5px; margin-top: 10px; font-size: 13px; }
+    textarea { color: #eef3fb; background: #0f1725; border: 1px solid #4a5e7d; border-radius: 6px; padding: 8px; font: inherit; resize: vertical; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>《新时代觉醒者》扩展视觉审阅</h1>
+    <p>当前扩展项 18 个；源指纹 f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 / 321 文件。</p>
+    <p class="warning">本面板只提供真实运行时帧和事件摘要；扩展视觉必须由人工逐项审阅、目标设备验证后才能通过。</p>
+    <section class="summary" aria-label="扩展场景完成度摘要">
+      <div><span>运行时结构</span><strong>18/18</strong><small>状态与反馈已接入</small></div>
+      <div><span>当前源图形帧</span><strong>0/18</strong><small>尚未完成真实窗口采集</small></div>
+      <div><span>人工视觉签收</span><strong>0/18</strong><small>逐项复核未开始</small></div>
+      <div><span>发布状态</span><strong>禁止</strong><small>视觉与资产门禁未满足</small></div>
+    </section>
+  </header>
+  <main>
+    <article class="card">
+      <div class="head"><h2>launcher-cold-boot</h2><span>unverified</span></div>
+      <p class="area">global · 启动与加载</p>
+      <p>冷启动进入第一屏</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/launcher-cold-boot.png" alt="launcher-cold-boot 当前扩展运行时帧">
+      <p class="meta">事件：无事件摘要</p>
+      <p class="meta">需要：runtime_screenshot、boot_trace、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>launcher-focus-navigation</h2><span>unverified</span></div>
+      <p class="area">global · 启动器输入</p>
+      <p>键盘/手柄焦点在办公室、城市和返回控件之间移动</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/launcher-focus-navigation.png" alt="launcher-focus-navigation 当前扩展运行时帧">
+      <p class="meta">事件：无事件摘要</p>
+      <p class="meta">需要：runtime_screenshot、input_trace、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>office-success-feedback</h2><span>unverified</span></div>
+      <p class="area">office · 办公室任务</p>
+      <p>准点下班成功、奖励和下一步提示</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/office-success-feedback.png" alt="office-success-feedback 当前扩展运行时帧">
+      <p class="meta">事件：camera_state、mission_state、hud_state、mission_completed、campaign_office_completed、audio_event、visual_capture_ready</p>
+      <p class="meta">需要：runtime_screenshot、mission_trace、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>office-search-loop</h2><span>unverified</span></div>
+      <p class="area">office · 办公室感知扩展</p>
+      <p>NPC 进入搜索、查看最后目击点并恢复巡查</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/office-search-loop.png" alt="office-search-loop 当前扩展运行时帧">
+      <p class="meta">事件：camera_state、mission_state、hud_state、perception_state、audio_event、npc_search_started、visual_capture_ready</p>
+      <p class="meta">需要：runtime_screenshot、perception_trace、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>office-failure-overlay</h2><span>unverified</span></div>
+      <p class="area">office · 失败与重试</p>
+      <p>失败原因、重试按钮和场景冻结</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/office-failure-overlay.png" alt="office-failure-overlay 当前扩展运行时帧">
+      <p class="meta">事件：camera_state、mission_state、hud_state、mission_failed、audio_event、visual_capture_ready</p>
+      <p class="meta">需要：runtime_screenshot、failure_trace、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>office-checkpoint-recovery</h2><span>unverified</span></div>
+      <p class="area">office · 存档恢复</p>
+      <p>从检查点恢复后，角色、NPC、镜头和 HUD 一致</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/office-checkpoint-recovery.png" alt="office-checkpoint-recovery 当前扩展运行时帧">
+      <p class="meta">事件：camera_state、mission_state、hud_state、input、checkpoint_loaded、audio_event、visual_capture_ready</p>
+      <p class="meta">需要：before_after_screenshots、checkpoint_trace、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>office-pause-overlay</h2><span>unverified</span></div>
+      <p class="area">office · 暂停与设置</p>
+      <p>暂停菜单覆盖、继续、重启和返回入口</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/office-pause-overlay.png" alt="office-pause-overlay 当前扩展运行时帧">
+      <p class="meta">事件：camera_state、mission_state、hud_state、visual_capture_ready</p>
+      <p class="meta">需要：runtime_screenshot、input_trace、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>office-resolution-variants</h2><span>unverified</span></div>
+      <p class="area">office · 分辨率适配</p>
+      <p>1280×720、960×540、1920×1080 的 HUD、镜头和交互提示</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/office-resolution-variants.png" alt="office-resolution-variants 当前扩展运行时帧">
+      <p class="meta">事件：camera_state、mission_state、hud_state、visual_capture_ready</p>
+      <p class="meta">需要：three_runtime_screenshots、layout_assertions、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>city-store-transition</h2><span>unverified</span></div>
+      <p class="area">city · 城市空间连续性</p>
+      <p>街道、店内、货架通道和出口连续切换</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/city-store-transition.png" alt="city-store-transition 当前扩展运行时帧">
+      <p class="meta">事件：camera_state、visual_profile、hud_state、mission_stage、audio_event、crowd_traffic_avoidance、input、visual_capture_ready</p>
+      <p class="meta">需要：runtime_screenshot、navigation_trace、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>city-crowd-variants</h2><span>unverified</span></div>
+      <p class="area">city · 原创人群扩展</p>
+      <p>配送员、上班族、买菜居民、街边摊主四类角色在开放道路分层出现；冲突对象具有独立警示轮廓</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/city-crowd-variants.png" alt="city-crowd-variants 当前扩展运行时帧">
+      <p class="meta">事件：camera_state、visual_profile、hud_state、mission_stage、audio_event、crowd_traffic_avoidance、visual_capture_ready</p>
+      <p class="meta">需要：runtime_screenshot、crowd_trace、performance_snapshot、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>city-traffic-near-miss</h2><span>unverified</span></div>
+      <p class="area">city · 交通与街道风险</p>
+      <p>行人、交通车辆、三轮车在十字路口近距离交错</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/city-traffic-near-miss.png" alt="city-traffic-near-miss 当前扩展运行时帧">
+      <p class="meta">事件：camera_state、visual_profile、hud_state、mission_stage、audio_event、crowd_traffic_avoidance、visual_capture_ready</p>
+      <p class="meta">需要：runtime_screenshot、traffic_trace、performance_snapshot、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>city-vehicle-damage-feedback</h2><span>unverified</span></div>
+      <p class="area">city · 载具反馈</p>
+      <p>上车、加速、碰撞、减速、下车和损伤/失败提示</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/city-vehicle-damage-feedback.png" alt="city-vehicle-damage-feedback 当前扩展运行时帧">
+      <p class="meta">事件：camera_state、visual_profile、hud_state、mission_stage、audio_event、crowd_traffic_avoidance、input、inventory_changed、conflict_encounter_armed、interaction、navigation、side_activity_unlocked、clerk_interaction、vehicle_driver、pedestrian_near_miss、wanted_level、vehicle_damage、visual_capture_ready</p>
+      <p class="meta">需要：runtime_screenshot、vehicle_trace、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>city-delivery-completion</h2><span>unverified</span></div>
+      <p class="area">city · 扩展任务收束</p>
+      <p>抵达新店、交付物品、奖励结算和街区状态更新</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/city-delivery-completion.png" alt="city-delivery-completion 当前扩展运行时帧">
+      <p class="meta">事件：camera_state、visual_profile、hud_state、mission_stage、audio_event、crowd_traffic_avoidance、input、inventory_changed、conflict_encounter_armed、interaction、navigation、side_activity_unlocked、clerk_interaction、neighborhood_entered、stock_loaded、stock_delivered、campaign_city_completed、mission_completed、vehicle_driver、visual_capture_ready</p>
+      <p class="meta">需要：runtime_screenshot、mission_trace、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>city-neighborhood-extension</h2><span>unverified</span></div>
+      <p class="area">city_expansion · 新街区</p>
+      <p>巷道、后场、仓储点和新的可读地标</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/city-neighborhood-extension.png" alt="city-neighborhood-extension 当前扩展运行时帧">
+      <p class="meta">事件：camera_state、visual_profile、hud_state、mission_stage、audio_event、crowd_traffic_avoidance、input、inventory_changed、conflict_encounter_armed、interaction、navigation、side_activity_unlocked、vehicle_driver、neighborhood_entered、visual_capture_ready</p>
+      <p class="meta">需要：runtime_screenshot、content_pack_trace、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>city-weather-lighting-extension</h2><span>unverified</span></div>
+      <p class="area">city_expansion · 时间与天气</p>
+      <p>白天、黄昏、雨后地面和室内外光照过渡</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/city-weather-lighting-extension.png" alt="city-weather-lighting-extension 当前扩展运行时帧">
+      <p class="meta">事件：camera_state、visual_profile、hud_state、mission_stage、audio_event、crowd_traffic_avoidance、input、inventory_changed、conflict_encounter_armed、interaction、navigation、side_activity_unlocked、clerk_interaction、vehicle_driver、pedestrian_near_miss、wanted_level、visual_capture_ready</p>
+      <p class="meta">需要：multiple_runtime_screenshots、lighting_config、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>global-audio-disabled-fallback</h2><span>unverified</span></div>
+      <p class="area">global · 反馈降级</p>
+      <p>关闭音频后，HUD、字幕和图标仍能表达关键反馈</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/global-audio-disabled-fallback.png" alt="global-audio-disabled-fallback 当前扩展运行时帧">
+      <p class="meta">事件：camera_state、mission_state、hud_state、visual_capture_ready</p>
+      <p class="meta">需要：before_after_screenshots、settings_trace、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>global-crash-recovery-prompt</h2><span>unverified</span></div>
+      <p class="area">global · 异常退出恢复</p>
+      <p>异常退出后启动器显示恢复提示，并能安全回到存档</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/global-crash-recovery-prompt.png" alt="global-crash-recovery-prompt 当前扩展运行时帧">
+      <p class="meta">事件：无事件摘要</p>
+      <p class="meta">需要：before_after_screenshots、session_trace、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article>
+
+    <article class="card">
+      <div class="head"><h2>global-missing-asset-blocked</h2><span>unverified</span></div>
+      <p class="area">global · 资产失败保护</p>
+      <p>正式资产缺失时显示可理解的阻断，不静默退回灰盒</p>
+      <img src="../../reference-evidence/expanded-runtime-matrix/global-missing-asset-blocked.png" alt="global-missing-asset-blocked 当前扩展运行时帧">
+      <p class="meta">事件：无事件摘要</p>
+      <p class="meta">需要：runtime_screenshot、asset_error_trace、manual_visual_review</p>
+      <label>人工差异记录<textarea rows="3" placeholder="记录构图、可读性、材质、状态反馈和返工项"></textarea></label>
+    </article></main>
+</body>
+</html>

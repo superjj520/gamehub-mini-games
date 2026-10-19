@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-11T11:25:00.000Z",
+  "reviewer": "Codex视觉复核",
+  "method": "manual_frame_review",
+  "reviewed_at": "2026-10-11T11:25:00.000Z",
+  "runtime_source_fingerprint": "9519a9e85e71ea9a5597886fc06c843a0a3f041b9c40fdf65efdbc81d257ce84",
+  "segments": [
+    {"id":"city-01","decision":"rejected","findings":["当前帧仍为低多边形城市灰盒与程序化人群；参考帧的真实街道、密集人群、店铺门头、材质和镜头层级未还原。"]},
+    {"id":"city-02","decision":"rejected","findings":["进店入口、人群遮挡和真实店内空间与参考帧不一致；当前角色比例、材质和交互构图仍需重做。"]},
+    {"id":"city-03","decision":"rejected","findings":["参考帧中的货架、商品陈列、室内灯光和玩家比例未被当前灰盒空间还原；缺少资产级店内细节。"]},
+    {"id":"city-04","decision":"rejected","findings":["当前帧仍使用低多边形货架与简化角色，参考帧的真实商品堆、室内空间、动作和灯光均未达到一致。"]},
+    {"id":"city-05","decision":"rejected","findings":["冲突场景缺少参考帧中的可辨识角色、道具、商品和空间层次；行为状态存在，但视觉主体层级不一致。"]},
+    {"id":"city-06","decision":"rejected","findings":["离店后的街区关系、角色动作、道具材质和任务反馈仍是灰盒表达，未达到参考帧的视觉语义。"]},
+    {"id":"city-07","decision":"rejected","findings":["当前城市画面的建筑、路面、人物材质和镜头比例明显偏离参考帧，无法进行100%逐帧签收。"]},
+    {"id":"city-08","decision":"rejected","findings":["三轮车、驾驶姿态、道路和后方建筑仍是候选/灰盒表现；参考帧要求的载具细节、人物坐姿和镜头距离未达标。"]},
+    {"id":"city-09","decision":"rejected","findings":["登记点、店铺门面、交互标识和街区材质未复现参考帧的真实细节；当前构图仍由简化几何主导。"]},
+    {"id":"city-10","decision":"rejected","findings":["色彩、建筑比例、路面材质、人群密度、载具与镜头构图均与参考帧不一致，不能以任务完成状态替代视觉验收。"]},
+    {"id":"city-11","decision":"rejected","findings":["靠近卷帘门的三轮车/交互构图未还原；当前画面被灰盒平台、简化门面和占位几何占据。"]},
+    {"id":"office-01","decision":"rejected","findings":["当前办公室为低多边形空间与简化人物；参考帧的写实工位、人物动作、暖色窗光、材质和肩后镜头未还原。"]},
+    {"id":"office-02","decision":"rejected","findings":["办公室工位布局、人物比例和摄像机跟随关系与参考帧不一致；资产级家具与角色表现仍缺失。"]},
+    {"id":"office-03","decision":"rejected","findings":["办公桌、显示器、文件和NPC关系仍由简化几何表达，参考帧的可辨识道具、材质与空间层次未达到要求。"]},
+    {"id":"office-04","decision":"rejected","findings":["当前办公室环境、角色服装、动画姿态和室内光照与参考视频存在结构性差异；HUD通过不代表视觉通过。"]},
+    {"id":"office-05","decision":"rejected","findings":["玻璃隔断、工位道具、办公空间层次和角色关系未准确呈现，当前截图仍是灰盒与简化角色。"]},
+    {"id":"office-06","decision":"rejected","findings":["移动/相遇状态的写实角色、服装、动画和室内细节未复现，当前画面不能达到100%视觉还原。"]},
+    {"id":"office-07","decision":"rejected","findings":["参考帧的楼梯/通道空间与当前办公室失败覆盖层构图不一致，地点、角色状态、镜头和UI层级均需返工。"]},
+    {"id":"office-08","decision":"rejected","findings":["办公室路线、光照、角色动画和遮挡关系未由当前灰盒准确复现；行为证据不能替代视觉签收。"]},
+    {"id":"office-09","decision":"rejected","findings":["NPC感知/搜索空间的角色、隔断、材质和镜头关系与参考帧明显不同，仍需资产级重做。"]},
+    {"id":"office-10","decision":"rejected","findings":["办公桌前角色动作和真实工位构图未还原；当前低多边形人物、家具、材质、灯光和镜头均不达标。"]}
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "status": "candidate_isolated_formal_runtime_graphical_capture_failed",
+  "capture_profile": "wide",
+  "image": {
+    "path": "reference-evidence/candidate-runtime/combined-office-candidates-formal-runtime-office-03.png",
+    "visual_status": "unverified",
+    "release_allowed": false
+  },
+  "candidate_ids": [
+    "player-character-makehuman-elegant-suit-atlas-candidate",
+    "office-npc-makehuman-elegant-suit-skinned-512-atlas-candidate",
+    "office-polyhaven-five-desk-full-kit-candidate",
+    "office-workstation-row-v1-generated-candidate",
+    "office-elevator-lobby-v1-generated-candidate",
+    "office-01-video-authored-backdrop-candidate-v1",
+    "office-02-video-authored-backdrop-candidate-v1",
+    "office-06-video-authored-backdrop-candidate-v1",
+    "office-10-video-authored-backdrop-candidate-v1",
+    "city-vehicle-three-wheel-delivery-atlas-candidate"
+  ],
+  "source_sha256": {
+    "player_character_glb": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+    "player_visual_candidate_gd": "7c134170b35d3b401ff0a8cef9fee66aa30f42ec7f906e94a5c7c6726c8c031f",
+    "office_npc_atlas_glb": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+    "npc_retouch_candidate_gd": "cbdeef0e757b79723ebcb462047a0a5af1129518be1c742c8a5e73f248a8c808",
+    "office_desk_glb": "bebc7a127bcc102ae4b58fbbbf5ecea1c8c735c53b5cf322ff0196c70c6314be",
+    "office_carpet_texture": "4a6cab846323e238c1a8d528d51c37769e0c68b42034fe679e3cabc7e05c969b",
+    "office_workstation_texture": "5905d08c367f00b5a44a9043f5177884e78839d22647112cb411969704d1b475",
+    "office_elevator_lobby_texture": "b3c0588b1281e8017606e7edbe4a9885471ef542cdb824c558777db9ff772ec1",
+    "office_video_playable_backdrop": "903082857fbd3a74c04f71d3f38ff498ab7e6b48042fe8f045d687e21b93408c",
+    "office_composition_gd": "291709ab6069686fd8971d13ba14ce08903baa9d3bb49905bd8c0d448254ca14",
+    "interaction_props_glb": "2c490b5e28df3171326434d1e763afc6c7fd6f1d1b464708419823a7fb715ec9",
+    "three_wheel_atlas_glb": "59706c3a50e7e66a6ca927c9976613cce86304e60e439c2458f2197bb949f085",
+    "capture_runner_mjs": "384e1ef1fafa80561923ca65a998dceaa45fe96e7ec43fdb6fed10f560c9391e"
+  },
+  "capture_options": {
+    "profile": "wide",
+    "backend": "visible_window",
+    "timeout_ms": 90000
+  },
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "failure_kind": "capture_error",
+  "failure": "办公室 wide 配置报告没有绑定用户授权视频帧候选背景：{\"desk_count\":10,\"elevator_card_present\":true,\"elevator_card_visible\":false,\"elevator_texture\":\"res://assets/environment/generated/office_elevator_lobby_v1_generated.png\",\"graybox_fallback_present\":false,\"video_backdrop_asset_source\":\"user_authorized_ai_video_frame_edit\",\"video_backdrop_enabled\":true,\"video_backdrop_rights_status\":\"user_authorized_candidate_rights_pending_final_signoff\",\"video_backdrop_texture\":\"res://assets/reference-video-candidate/office-02-video-playable-backdrop-v1.png\",\"visual_collision_count\":10,\"visual_present\":true,\"visual_script\":\"res://office_desk_composition.gd\",\"workstation_card_present\":true,\"workstation_card_visible\":false,\"workstation_texture\":\"res://assets/environment/generated/office_workstation_row_v2_worker_generated.png\"}",
+  "captured_at": "2026-10-18T13:20:36.741Z"
+}

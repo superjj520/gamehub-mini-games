@@ -1,0 +1,25 @@
+{
+  "id": "city-market-delivery-v1",
+  "version": 1,
+  "display_name": "街角夜市配送",
+  "targets": [
+    {"id": "accept_order", "label": "接取夜市订单", "position": [-4.8, 0.7, 1.2], "color": "e0a45d"},
+    {"id": "load_crates", "label": "装载夜市货箱", "position": [12.2, 0.7, -9.0], "color": "d18f63"},
+    {"id": "deliver_stock", "label": "送到街角夜市", "position": [7.6, 0.7, 8.4], "color": "7db6c8"},
+    {"id": "collect_reward", "label": "领取配送奖励", "position": [4.6, 0.7, 4.2], "color": "7d9bc8"}
+  ],
+  "stages": [
+    {"id": "accept_order", "objective": "接取夜市配送订单", "reward": 15, "stars": 1, "effects": {"add_items": [{"item_id": "night_order_ticket", "amount": 1}], "message": "订单已接取，前往后场装货"}},
+    {"id": "load_crates", "objective": "在后场装载夜市货箱", "reward": 25, "stars": 1, "requirements": [{"type": "item", "item_id": "night_order_ticket", "amount": 1, "failure_message": "需要先接取夜市订单"}], "effects": {"remove_items": [{"item_id": "night_order_ticket", "amount": 1}], "add_items": [{"item_id": "night_crate", "amount": 1}], "message": "货箱已装车，驶向街角夜市", "trace_events": [{"id": "night_stock_loaded", "payload": {"location": "后场仓储"}}], "audio_events": [{"id": "stock_loaded", "payload": {"location": "后场仓储"}}]}},
+    {"id": "deliver_stock", "objective": "将夜市货箱送到街角", "reward": 60, "stars": 1, "requirements": [{"type": "item", "item_id": "night_crate", "amount": 1, "failure_message": "需要先在后场装载货箱"}], "effects": {"remove_items": [{"item_id": "night_crate", "amount": 1}], "add_items": [{"item_id": "night_reward_token", "amount": 1}], "message": "货箱已送达，前往摊位领取奖励", "trace_events": [{"id": "night_stock_delivered", "payload": {"destination": "街角夜市"}}], "audio_events": [{"id": "stock_delivered", "payload": {"destination": "街角夜市"}}]}},
+    {"id": "collect_reward", "objective": "领取夜市配送奖励", "reward": 80, "stars": 2, "requirements": [{"type": "item", "item_id": "night_reward_token", "amount": 1, "failure_message": "需要先完成夜市配送"}], "effects": {"remove_items": [{"item_id": "night_reward_token", "amount": 1}], "message": "夜市配送完成，获得额外奖励", "trace_events": [{"id": "night_delivery_rewarded", "payload": {"destination": "街角夜市"}}], "audio_events": [{"id": "delivery_rewarded", "payload": {"destination": "街角夜市"}}]}}
+  ],
+  "runtime": {
+    "player": {"walk_speed": 4.2, "crouch_speed": 2.0},
+    "vehicle": {"max_speed": 8.5, "acceleration": 10.5, "braking": 14.0, "turn_speed": 1.8, "enter_radius": 2.5, "camera_distance": 5.2, "camera_height": 2.3, "camera_pitch_degrees": -12.0, "collision_damage_per_speed": 3.5, "driver_seat_offset": [0.0, 1.12, 0.18]},
+    "conflict": {"max_health": 100.0, "damage_per_second": 10.0, "opponent_max_health": 100.0, "player_attack_damage": 34.0, "defeat_bonus": 30, "dodge_window_seconds": 0.42, "dodge_cooldown_seconds": 0.70, "pursuit_speed": 1.8, "trigger_radius": 2.4, "damage_radius": 1.35, "escape_distance": 8.5, "escape_hold_seconds": 0.9, "escape_bonus": 20},
+    "wanted": {"max_level": 5, "decay_delay_seconds": 8.0, "decay_step_seconds": 4.0},
+    "neighborhood": {"enabled": true, "entry": [-4.0, 0.9, -4.0], "landmark": "后场仓储"},
+    "visual_profiles": {"default": "dusk", "supported": ["day", "dusk", "rain_after"]}
+  }
+}

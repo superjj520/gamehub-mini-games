@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "status": "internal_candidate_provenance_recorded",
+  "release_allowed": false,
+  "policy": "本记录只证明候选位图的文件身份、生成来源声明和当前发布禁用状态，不等于视觉验收、目标设备验收或最终权利签收。",
+  "assets": [
+    {
+      "asset_id": "original_generated_urban_storefront_v1",
+      "slot_id": "city-environment-kit",
+      "source_kind": "ai_generated_original_bitmap",
+      "generator": "内置图像生成工具",
+      "license": "项目原创候选；需在最终发布前完成权利与负责人签收",
+      "runtime_asset": "gta-reference-runtime/assets/environment/generated/urban_storefront_v1.png",
+      "runtime_sha256": "168af3a152f0e4beba7a993e8b40c000d9443610fcd4b5591b1d5b0e02688189",
+      "dimensions": [1536, 1024],
+      "intended_use": "城市街区远景背景卡候选",
+      "visual_status": "unverified",
+      "release_allowed": false,
+      "constraints": [
+        "无品牌标识",
+        "无可读文字",
+        "只承担视觉背景，不承担碰撞、导航、交互或任务逻辑",
+        "必须通过当前源码固定镜头截图和 Windows 目标设备验收"
+      ]
+    },
+    {
+      "asset_id": "original_generated_office_glass_partition_v1",
+      "slot_id": "office-environment-kit",
+      "source_kind": "ai_generated_original_bitmap",
+      "generator": "内置图像生成工具",
+      "license": "项目原创候选；需在最终发布前完成权利与负责人签收",
+      "runtime_asset": "gta-reference-runtime/assets/environment/generated/office_glass_partition_v1.png",
+      "runtime_sha256": "d875517e289f5f3e0f2e7327137d819ec9a21e693062c6b60db8fb0cd104d516",
+      "dimensions": [1774, 887],
+      "intended_use": "办公室玻璃隔断远景背景卡候选",
+      "visual_status": "unverified",
+      "release_allowed": false,
+      "constraints": [
+        "无品牌标识",
+        "无可读文字",
+        "只承担视觉背景，不承担碰撞、导航、交互或任务逻辑",
+        "必须通过当前源码固定镜头截图和 Windows 目标设备验收"
+      ]
+    },
+    {
+      "asset_id": "vehicle_driver_sprite_v1",
+      "slot_id": "three-wheel-vehicle",
+      "source_kind": "ai_generated_original_bitmap",
+      "generator": "内置图像生成工具",
+      "license": "项目原创候选；需在最终发布前完成权利与负责人签收",
+      "runtime_asset": "gta-reference-runtime/assets/vehicles/three-wheel-delivery/vehicle_driver_sprite_v1.png",
+      "runtime_sha256": "c3a41681ec6cab6cad102aef6845afb565f0043271a5a99df0c54ef93e86d040",
+      "dimensions": [1213, 1297],
+      "intended_use": "city-08 固定车尾跟拍的蓝色三轮车与红衣驾驶员透明候选",
+      "visual_status": "unverified",
+      "release_allowed": false,
+      "constraints": [
+        "无品牌标识",
+        "无可读文字",
+        "只承担 city-08 固定镜头视觉，不承担车辆控制、碰撞、驾驶挂点或任务逻辑",
+        "必须通过当前源码固定镜头和 Windows 目标设备验收"
+      ]
+    }
+  ]
+}

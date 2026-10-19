@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-13T08:07:18.000Z",
+  "reviewer": "Codex",
+  "method": "manual_frame_review",
+  "reviewed_at": "2026-10-13T08:07:18.000Z",
+  "runtime_source_fingerprint": "37d250e90a55be808a6168d2001f04bef4a788baf2f640a527dd9184e69a5b48",
+  "segments": [
+    {"id": "city-01", "decision": "rejected", "findings": ["当前人群为重复低模角色并发生明显身体穿插，主角比例和服装轮廓与参考帧不一致；店铺门头、背景层次和人群密度也未达到参考构图。"]},
+    {"id": "city-02", "decision": "unverified", "findings": []},
+    {"id": "city-03", "decision": "unverified", "findings": []},
+    {"id": "city-04", "decision": "unverified", "findings": []},
+    {"id": "city-05", "decision": "unverified", "findings": []},
+    {"id": "city-06", "decision": "unverified", "findings": []},
+    {"id": "city-07", "decision": "unverified", "findings": []},
+    {"id": "city-08", "decision": "rejected", "findings": ["参考帧是白天街道上的蓝色载货三轮车驾驶镜头；当前画面为雨夜/暖色散景环境，载具后部、主角上衣颜色、道路光照和街景时间状态均不一致。"]},
+    {"id": "city-09", "decision": "unverified", "findings": []},
+    {"id": "city-10", "decision": "unverified", "findings": []},
+    {"id": "city-11", "decision": "unverified", "findings": []},
+    {"id": "office-01", "decision": "rejected", "findings": ["参考帧是写实人物背包绕办公桌行走的近景；当前角色为明显程序化低模灰盒，人体比例、背包轮廓、办公桌材质和隔断构图均不一致。"]},
+    {"id": "office-02", "decision": "unverified", "findings": []},
+    {"id": "office-03", "decision": "unverified", "findings": []},
+    {"id": "office-04", "decision": "unverified", "findings": []},
+    {"id": "office-05", "decision": "unverified", "findings": []},
+    {"id": "office-06", "decision": "rejected", "findings": ["当前已修正为人物面对原创电梯厅的运行时构图，但角色比例、材质细节、交互提示和参考帧中的电梯厅标识仍不一致，尚不能签收。"]},
+    {"id": "office-07", "decision": "unverified", "findings": []},
+    {"id": "office-08", "decision": "unverified", "findings": []},
+    {"id": "office-09", "decision": "unverified", "findings": []},
+    {"id": "office-10", "decision": "unverified", "findings": []}
+  ]
+}

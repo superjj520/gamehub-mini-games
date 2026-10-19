@@ -1,0 +1,354 @@
+{
+  "schema_version": 1,
+  "status": "supplemental_scope_proposed",
+  "purpose": "覆盖两个参考视频未覆盖、但原创可上架产品必须验收的视觉状态",
+  "source_of_truth": "docs/expanded-content-plan.md",
+  "policy": "扩展内容不能用参考视频的 21 段验收替代；每项必须有真实运行时截图、事件证据、人工审阅和目标设备证据",
+  "behavior_evidence_path": "reference-evidence/expanded-runtime-matrix/behavior-evidence.json",
+  "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+  "entries": [
+    {
+      "id": "launcher-cold-boot",
+      "chapter": "global",
+      "content_area": "启动与加载",
+      "visual_state": "冷启动进入第一屏",
+      "required_capabilities": [
+        "launcher",
+        "session_journal"
+      ],
+      "required_evidence": [
+        "runtime_screenshot",
+        "boot_trace",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/launcher-cold-boot.png",
+      "review": null
+    },
+    {
+      "id": "launcher-focus-navigation",
+      "chapter": "global",
+      "content_area": "启动器输入",
+      "visual_state": "键盘/手柄焦点在办公室、城市和返回控件之间移动",
+      "required_capabilities": [
+        "focus_navigation",
+        "input_feedback"
+      ],
+      "required_evidence": [
+        "runtime_screenshot",
+        "input_trace",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/launcher-focus-navigation.png",
+      "review": null
+    },
+    {
+      "id": "office-success-feedback",
+      "chapter": "office",
+      "content_area": "办公室任务",
+      "visual_state": "准点下班成功、奖励和下一步提示",
+      "required_capabilities": [
+        "mission_success",
+        "reward_hud",
+        "next_step"
+      ],
+      "required_evidence": [
+        "runtime_screenshot",
+        "mission_trace",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/office-success-feedback.png",
+      "review": null
+    },
+    {
+      "id": "office-search-loop",
+      "chapter": "office",
+      "content_area": "办公室感知扩展",
+      "visual_state": "NPC 进入搜索、查看最后目击点并恢复巡查",
+      "required_capabilities": [
+        "npc_search",
+        "last_seen_marker",
+        "patrol_resume"
+      ],
+      "required_evidence": [
+        "runtime_screenshot",
+        "perception_trace",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/office-search-loop.png",
+      "review": null
+    },
+    {
+      "id": "office-failure-overlay",
+      "chapter": "office",
+      "content_area": "失败与重试",
+      "visual_state": "失败原因、重试按钮和场景冻结",
+      "required_capabilities": [
+        "failure_state",
+        "retry_overlay",
+        "input_lock"
+      ],
+      "required_evidence": [
+        "runtime_screenshot",
+        "failure_trace",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/office-failure-overlay.png",
+      "review": null
+    },
+    {
+      "id": "office-checkpoint-recovery",
+      "chapter": "office",
+      "content_area": "存档恢复",
+      "visual_state": "从检查点恢复后，角色、NPC、镜头和 HUD 一致",
+      "required_capabilities": [
+        "checkpoint_load",
+        "state_restore",
+        "camera_restore"
+      ],
+      "required_evidence": [
+        "before_after_screenshots",
+        "checkpoint_trace",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/office-checkpoint-recovery.png",
+      "review": null
+    },
+    {
+      "id": "office-pause-overlay",
+      "chapter": "office",
+      "content_area": "暂停与设置",
+      "visual_state": "暂停菜单覆盖、继续、重启和返回入口",
+      "required_capabilities": [
+        "pause_overlay",
+        "settings",
+        "scene_return"
+      ],
+      "required_evidence": [
+        "runtime_screenshot",
+        "input_trace",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/office-pause-overlay.png",
+      "review": null
+    },
+    {
+      "id": "office-resolution-variants",
+      "chapter": "office",
+      "content_area": "分辨率适配",
+      "visual_state": "1280×720、960×540、1920×1080 的 HUD、镜头和交互提示",
+      "required_capabilities": [
+        "responsive_hud",
+        "camera_safe_area"
+      ],
+      "required_evidence": [
+        "three_runtime_screenshots",
+        "layout_assertions",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/office-resolution-variants.png",
+      "review": null
+    },
+    {
+      "id": "city-store-transition",
+      "chapter": "city",
+      "content_area": "城市空间连续性",
+      "visual_state": "街道、店内、货架通道和出口连续切换",
+      "required_capabilities": [
+        "store_transition",
+        "camera_profile",
+        "occlusion"
+      ],
+      "required_evidence": [
+        "runtime_screenshot",
+        "navigation_trace",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/city-store-transition.png",
+      "review": null
+    },
+    {
+      "id": "city-crowd-variants",
+      "chapter": "city",
+      "content_area": "原创人群扩展",
+      "visual_state": "配送员、上班族、买菜居民、街边摊主四类角色在开放道路分层出现；冲突对象具有独立警示轮廓",
+      "required_capabilities": [
+        "crowd_variation",
+        "role_silhouette",
+        "lod",
+        "collision_readability"
+      ],
+      "required_evidence": [
+        "runtime_screenshot",
+        "crowd_trace",
+        "performance_snapshot",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/city-crowd-variants.png",
+      "review": null
+    },
+    {
+      "id": "city-traffic-near-miss",
+      "chapter": "city",
+      "content_area": "交通与街道风险",
+      "visual_state": "行人、交通车辆、三轮车在十字路口近距离交错",
+      "required_capabilities": [
+        "traffic_routes",
+        "collision_feedback",
+        "camera_readability"
+      ],
+      "required_evidence": [
+        "runtime_screenshot",
+        "traffic_trace",
+        "performance_snapshot",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/city-traffic-near-miss.png",
+      "review": null
+    },
+    {
+      "id": "city-vehicle-damage-feedback",
+      "chapter": "city",
+      "content_area": "载具反馈",
+      "visual_state": "上车、加速、碰撞、减速、下车和损伤/失败提示",
+      "required_capabilities": [
+        "vehicle_presentation",
+        "collision_feedback",
+        "driver_visibility"
+      ],
+      "required_evidence": [
+        "runtime_screenshot",
+        "vehicle_trace",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/city-vehicle-damage-feedback.png",
+      "review": null
+    },
+    {
+      "id": "city-delivery-completion",
+      "chapter": "city",
+      "content_area": "扩展任务收束",
+      "visual_state": "抵达新店、交付物品、奖励结算和街区状态更新",
+      "required_capabilities": [
+        "delivery_state",
+        "inventory_consume",
+        "reward_feedback"
+      ],
+      "required_evidence": [
+        "runtime_screenshot",
+        "mission_trace",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/city-delivery-completion.png",
+      "review": null
+    },
+    {
+      "id": "city-neighborhood-extension",
+      "chapter": "city_expansion",
+      "content_area": "新街区",
+      "visual_state": "巷道、后场、仓储点和新的可读地标",
+      "required_capabilities": [
+        "new_district",
+        "landmark_navigation",
+        "mission_entry"
+      ],
+      "required_evidence": [
+        "runtime_screenshot",
+        "content_pack_trace",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/city-neighborhood-extension.png",
+      "review": null
+    },
+    {
+      "id": "city-weather-lighting-extension",
+      "chapter": "city_expansion",
+      "content_area": "时间与天气",
+      "visual_state": "白天、黄昏、雨后地面和室内外光照过渡",
+      "required_capabilities": [
+        "lighting_profile",
+        "weather_profile",
+        "material_response"
+      ],
+      "required_evidence": [
+        "multiple_runtime_screenshots",
+        "lighting_config",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/city-weather-lighting-extension.png",
+      "review": null
+    },
+    {
+      "id": "global-audio-disabled-fallback",
+      "chapter": "global",
+      "content_area": "反馈降级",
+      "visual_state": "关闭音频后，HUD、字幕和图标仍能表达关键反馈",
+      "required_capabilities": [
+        "audio_toggle",
+        "fallback_feedback",
+        "accessibility"
+      ],
+      "required_evidence": [
+        "before_after_screenshots",
+        "settings_trace",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/global-audio-disabled-fallback.png",
+      "review": null
+    },
+    {
+      "id": "global-crash-recovery-prompt",
+      "chapter": "global",
+      "content_area": "异常退出恢复",
+      "visual_state": "异常退出后启动器显示恢复提示，并能安全回到存档",
+      "required_capabilities": [
+        "session_recovery",
+        "recovery_prompt",
+        "safe_resume"
+      ],
+      "required_evidence": [
+        "before_after_screenshots",
+        "session_trace",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/global-crash-recovery-prompt.png",
+      "review": null
+    },
+    {
+      "id": "global-missing-asset-blocked",
+      "chapter": "global",
+      "content_area": "资产失败保护",
+      "visual_state": "正式资产缺失时显示可理解的阻断，不静默退回灰盒",
+      "required_capabilities": [
+        "asset_forbid_fallback",
+        "error_feedback",
+        "safe_exit"
+      ],
+      "required_evidence": [
+        "runtime_screenshot",
+        "asset_error_trace",
+        "manual_visual_review"
+      ],
+      "visual_status": "unverified",
+      "capture_path": "reference-evidence/expanded-runtime-matrix/global-missing-asset-blocked.png",
+      "review": null
+    }
+  ],
+  "source_file_count": 321
+}

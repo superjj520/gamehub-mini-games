@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-10-14",
+  "review_type": "candidate_visual_gap_review",
+  "candidate_id": "makehuman-office-typing-candidate",
+  "status": "rejected",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "human_signoff": false,
+  "method": "本地候选运行时 PNG 与 video-2/office-10 参考帧对照",
+  "reference": {
+    "path": "reference-evidence/video-2/office-10.jpg",
+    "sha256": "1678b061d8b9a53018fdac61496fcf4985c0234fa2ca5acab80a2f0065f655b0"
+  },
+  "candidate_capture": {
+    "path": "reference-evidence/candidate-runtime/makehuman-office-typing-candidate/makehuman-office-typing.png",
+    "sha256": "6915a9a4a90db76bcedd405439e82195de869303f8d438cb0c48886ed29894ef",
+    "manifest": "reference-evidence/candidate-runtime/makehuman-office-typing-candidate/manifest.json",
+    "state": "typing_default",
+    "camera": "正式办公室场景，候选人物外置视觉状态，固定近景镜头",
+    "source_fingerprint": "5fb0f92adbc6abf01f5f4c9aca63652de6d137a1a7a81760d875789aaee44816",
+    "source_file_count": 233,
+    "candidate_package_sha256": "dd1fbe1af313b7d7852a18350bd9e9ef05e43e9fcf8d01a08e1a3a52db1f51ff",
+    "candidate_package_file_count": 323,
+    "capture_freshness": "stale_after_candidate_pose_update_and_contact_contract_update",
+    "updated_candidate_scripts": {
+      "player_visual": "72afcd891da70f3f497ae5d73cb51edc15000e043c2f9fd7a4c6f1e18c5746f4",
+      "capture_runner": "6be5c4a4a1cdf385b36162810166787e950ad6abd88606e0fa965b9a7b623384",
+      "candidate_playtest_runner": "6f7ede27e6991491e2cdad7889205877b82d4a9ae2497d4edbcac9ec94bdf8cd"
+    }
+  },
+  "positives": [
+    "真实 Skeleton3D 人物已经进入正式办公室运行时，角色比例、服装轮廓和办公空间深度明显优于原创低多边形灰盒。",
+    "候选状态已能表达坐姿前倾、双臂向桌面伸展和头部向下的打字意图。",
+    "办公室灯光、工位密度、电梯厅和隔断层次已经具备后续固定镜头优化基础。"
+  ],
+  "blocking_gaps": [
+    "本轮已加入腕部下压和手指分段弯曲，但当前主机无头渲染后端返回空纹理，未形成与新姿态绑定的有效 PNG；旧 PNG 不得证明新姿态通过。",
+    "双手被显示器和隔断部分遮挡，当前截图不能证明手指与键盘发生稳定接触；必须补充可见键盘接触镜头或手部动画证据。",
+    "骨骼姿态仍呈现臀部抬高、躯干前折的过渡姿势，不是参考帧中的自然坐姿；需要真实椅子支撑、髋部落座、膝盖角度和脚部落地。",
+    "参考帧是左侧肩后中近景，人物、桌面、显示器和隔断构成明确横向关系；当前镜头偏高偏远且被前景隔断遮挡，不能逐帧对齐。",
+    "当前候选使用办公室整套候选环境，最终角色服装、材质、动画权利和 Windows 目标设备表现仍未签收。"
+  ],
+  "next_gate": "制作一个可见键盘接触的侧后方固定镜头：先锁定椅子与髋部接触，再锁定前臂、手腕、手指与键盘的三点接触，最后按 office-10 的人物占比、显示器位置、桌面高度和隔断遮挡重新采集。通过用户视觉签收后，才能进入最终角色/动画资产制作。",
+  "decision": "rejected"
+}

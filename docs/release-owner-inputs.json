@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "product_name": "新时代觉醒者",
+  "status": "pending_owner_inputs",
+  "policy": "字段必须由产品负责人、发行负责人或法务确认；不得用默认值、临时邮箱或猜测日期解除发布门禁。",
+  "inputs": [
+    {
+      "id": "support_email",
+      "label": "客服邮箱",
+      "value": null,
+      "status": "pending_user_confirmation",
+      "required_before": ["store_submission", "privacy_policy", "public_test"],
+      "cannot_infer": true
+    },
+    {
+      "id": "privacy_policy_url",
+      "label": "正式隐私政策地址",
+      "value": null,
+      "status": "pending_user_confirmation",
+      "required_before": ["store_submission", "public_test"],
+      "cannot_infer": true
+    },
+    {
+      "id": "steam_app_id",
+      "label": "Steam 应用编号",
+      "value": null,
+      "status": "pending_publisher_setup",
+      "required_before": ["steam_upload", "steam_branch", "store_submission"],
+      "cannot_infer": true
+    },
+    {
+      "id": "age_rating_submission",
+      "label": "正式年龄分级提交结果",
+      "value": null,
+      "status": "pending_legal_review",
+      "required_before": ["store_submission"],
+      "cannot_infer": true
+    },
+    {
+      "id": "public_test_date",
+      "label": "公开测试日期",
+      "value": null,
+      "status": "pending_release_owner_confirmation",
+      "required_before": ["store_submission", "public_test"],
+      "cannot_infer": true
+    },
+    {
+      "id": "operating_entity",
+      "label": "运营主体与隐私责任主体",
+      "value": null,
+      "status": "pending_legal_review",
+      "required_before": ["privacy_policy", "store_submission"],
+      "cannot_infer": true
+    }
+  ],
+  "confirmed_baseline": {
+    "platform": "Steam Windows",
+    "region": "中国大陆",
+    "language": "简体中文",
+    "commercialization": "首发免费测试版，不接真实支付",
+    "copyright_boundary": "original_assets_only",
+    "reference_video_usage": "仅研发、抽帧、对照和内部优化，不进入发布包"
+  }
+}

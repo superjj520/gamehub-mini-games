@@ -1,0 +1,157 @@
+{
+	"evidence_boundary": "runtime_structure_and_state_only_not_framewise_visual_signoff",
+	"expected_count": 18,
+	"failures": [],
+	"generated_at": "2026-10-18T22:20:53",
+	"passed_count": 18,
+	"release_allowed": false,
+	"results": [
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "launcher-cold-boot",
+			"runtime_structure": "verified",
+			"scope": "global",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "launcher-focus-navigation",
+			"runtime_structure": "verified",
+			"scope": "global",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "global-crash-recovery-prompt",
+			"runtime_structure": "verified",
+			"scope": "global",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "office-success-feedback",
+			"runtime_structure": "verified",
+			"scope": "office",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "office-search-loop",
+			"runtime_structure": "verified",
+			"scope": "office",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "office-failure-overlay",
+			"runtime_structure": "verified",
+			"scope": "office",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "office-checkpoint-recovery",
+			"runtime_structure": "verified",
+			"scope": "office",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "office-pause-overlay",
+			"runtime_structure": "verified",
+			"scope": "office",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "global-audio-disabled-fallback",
+			"runtime_structure": "verified",
+			"scope": "global",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "office-resolution-variants",
+			"runtime_structure": "verified",
+			"scope": "office",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "global-missing-asset-blocked",
+			"runtime_structure": "verified",
+			"scope": "global",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "city-store-transition",
+			"runtime_structure": "verified",
+			"scope": "city",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "city-crowd-variants",
+			"runtime_structure": "verified",
+			"scope": "city",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "city-traffic-near-miss",
+			"runtime_structure": "verified",
+			"scope": "city",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "city-neighborhood-extension",
+			"runtime_structure": "verified",
+			"scope": "city_expansion",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "city-weather-lighting-extension",
+			"runtime_structure": "verified",
+			"scope": "city_expansion",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "city-vehicle-damage-feedback",
+			"runtime_structure": "verified",
+			"scope": "city",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		},
+		{
+			"current_source_graphical_capture": "unverified",
+			"id": "city-delivery-completion",
+			"runtime_structure": "verified",
+			"scope": "city",
+			"status": "passed",
+			"visual_acceptance": "unverified"
+		}
+	],
+	"schema_version": 1,
+	"status": "passed",
+	"visual_acceptance": "unverified"
+}

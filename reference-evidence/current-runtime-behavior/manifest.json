@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "status": "current_behavior_matrix_verified",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "source_fingerprint": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+  "source_file_count": 326,
+  "generated_at": "2026-10-19T07:58:07.801Z",
+  "captureless": true,
+  "segment_count": 21,
+  "policy": "该证据由当前源码真实创建 21 个场景并回放状态；不生成视觉 PNG，不替代 Windows 图形采集或人工视觉签收。",
+  "captures": []
+}

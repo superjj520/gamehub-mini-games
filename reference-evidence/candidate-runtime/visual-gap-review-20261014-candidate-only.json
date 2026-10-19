@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "status": "candidate_gap_review_only",
+  "reviewed_at": "2026-10-14",
+  "method": "本轮直接查看本地参考 JPG 与候选 PNG；候选图不绑定当前正式运行时源",
+  "purpose": "记录 P0 候选差异并排序返工，不升级正式视觉验收状态",
+  "acceptance_binding": {
+    "source_binding": "none",
+    "visual_status": "unverified",
+    "release_allowed": false,
+    "human_signoff_required": true,
+    "reason": "候选图仅作返工排序；正式当前源 PNG 仍为 0/21，正式视觉签收仍为 0/21"
+  },
+  "comparisons": [
+    {
+      "id": "office-01",
+      "reference": {
+        "path": "reference-evidence/video-2/office-01.jpg",
+        "bytes": 20296,
+        "sha256": "c7cc59ae818c6644f5252c015beb2337484554a5ef706b403f683ac59fef1aae",
+        "dimensions": "480x270"
+      },
+      "candidate": {
+        "path": "reference-evidence/candidate-runtime/combined-office-candidates-formal-runtime-close.png",
+        "bytes": 303386,
+        "sha256": "d094cf2aaf835cd9506194d6fc975f143cadd3b2a4bd3f559c4967c0928765c5",
+        "dimensions": "1280x720"
+      },
+      "observations": [
+        "参考帧是低肩位、近距离的第三人称视角，主角、背包与桌面关系占据画面主体，办公室整体偏暖且有人体轮廓和接触感。",
+        "候选画面已经能读出办公室密度、桌位、隔断和 HUD，但镜头仍更宽更高，灰盒体块与低细节角色抢占视觉，隔断压过了主角与桌面关系。",
+        "角色、桌沿、背包和地面的接触关系仍不可信，候选画面不能作为正式视觉通过证据。"
+      ],
+      "next_gate": "先完成最终主角/NPC 网格与动作，再校正肩后相机、隔断遮挡、接触阴影和桌面尺度；之后重新生成当前源真实窗口图。",
+      "decision": "rejected"
+    },
+    {
+      "id": "city-08",
+      "reference": {
+        "path": "reference-evidence/video-1/city-08.jpg",
+        "bytes": 17750,
+        "sha256": "c1f0203d92d5f856fd9c71060143311eda9d65921f412eea4cfa6af7cf195e1b",
+        "dimensions": "480x270"
+      },
+      "candidate": {
+        "path": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-08-v26.png",
+        "bytes": 414073,
+        "sha256": "7ecef55f3d70cb248cc03e2f0208b0969bfdbc4b97a102d1972fdecb9d8fadf5",
+        "dimensions": "1280x720"
+      },
+      "observations": [
+        "参考帧是黄昏连续街道中的驾驶段，蓝色三轮车位于画面下方中央，前方道路、建筑、交通和速度方向共同形成空间纵深。",
+        "候选画面已经能读出道路、车辆、HUD 和驾驶状态，但整体是明亮日间低模街区，车辆过大过近，街道纵深、远景连续性和交通速度层次不足。",
+        "低模角色、人群、车辆和建筑之间仍存在材质与尺度断层，驾驶员与座椅/车体接触也不可信，候选画面不能作为正式视觉通过证据。"
+      ],
+      "next_gate": "先补连续街道、远景楼群、交通密度和黄昏曝光，再校正三轮车车体/座位/车轮接地与驾驶相机拉距；之后重新生成当前源真实窗口图。",
+      "decision": "rejected"
+    }
+  ],
+  "formal_state_after_review": {
+    "current_source_visual_png": "0/21",
+    "expanded_visual_png": "0/18",
+    "manual_visual_signoff": "0/21",
+    "release_status": "internal_no_go"
+  }
+}

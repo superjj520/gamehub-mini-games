@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "status": "candidate_gap_review_only",
+  "reviewed_at": "2026-10-09",
+  "method": "本地文件可视化检查",
+  "purpose": "记录候选运行时画面与参考帧的可见差异，不升级视觉验收状态",
+  "acceptance_binding": {
+    "visual_matrix_bound": false,
+    "visual_status": "unverified",
+    "release_allowed": false,
+    "human_signoff_required": true,
+    "reason": "候选截图存在源文件变更后的陈旧记录，且尚未完成目标平台窗口采集和最终资产签收"
+  },
+  "comparisons": [
+    {
+      "segment": "office-06",
+      "reference": {
+        "path": "reference-evidence/video-2/office-06.jpg",
+        "sha256": "b2af317b68abf81be831e5f03da034160304c27e0b40fd0426ca8d5244280b84"
+      },
+      "candidate": {
+        "path": "reference-evidence/candidate-runtime/combined-office-candidates-formal-runtime-close.png",
+        "sha256": "c88ef18847cf445f4075080c6717375b554193dc328da55280c9394841fe7508",
+        "size": "1280x720",
+        "source_status": "stale_since_capture"
+      },
+      "observations": [
+        "候选画面保留了办公室第三人称肩后构图、工位/隔断遮挡和 NPC 同屏关系",
+        "候选办公室仍以低细节几何体为主，天花和墙体出现大面积未完成的暗色区域",
+        "候选角色更接近通用低细节人物，服装、面部、背包、姿态和动作节奏没有达到参考画面的可信度",
+        "参考画面中的电梯厅、门体、按钮、暖色材质和空间光照没有在候选画面中形成同等级的可读重点"
+      ],
+      "next_gate": "重新生成当前源指纹下的 office-06 目标平台截图，再进行角色、材质、灯光和镜头逐项人工签收"
+    },
+    {
+      "segment": "city-08",
+      "reference": {
+        "path": "reference-evidence/video-1/city-08.jpg",
+        "sha256": "c1f0203d92d5f856fd9c71060143311eda9d65921f412eea4cfa6af7cf195e1b"
+      },
+      "candidate": {
+        "path": "reference-evidence/candidate-runtime/city-storefront-candidate-city-08.png",
+        "sha256": "13542f17c586aa78eea423d79a13af3ff64ccb58646d94e324b302fe16193101",
+        "size": "1280x720",
+        "source_status": "historical_candidate_image_removed_after_current_capture_failed",
+        "available_in_workspace": false,
+        "current_capture_failure": "Parameter \"t\" is null; city-01 candidate screenshot was empty"
+      },
+      "observations": [
+        "候选画面已经建立街道、蓝色三轮车、道路、建筑和行人同屏的基本关系",
+        "候选道路和车辆位置可用于继续校准，但建筑、树木、行人和车辆仍是明显低多边形/灰盒表现",
+        "参考画面的沿街店铺立面、黄昏光照、材质细节和城市密度没有被候选画面还原",
+        "候选画面缺少足够的速度感、交通层次、橱窗/招牌细节和可辨识的原创城市资产"
+      ],
+      "next_gate": "重新生成当前源指纹下的 city-08 目标平台驾驶截图，再进行车辆、街道、交通、光照和镜头逐项人工签收"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_visual_rejected",
+  "capture_scope": "统一 Quaternius 城市建筑与 Quaternius 城市人群后的三段固定参考镜头",
+  "candidate_package_sha256": "a765588592c8c993278a2c9ba1fa9eb2d4501813919805c816c25e64b05b077e",
+  "runtime_source_fingerprint": "eef75fe2e8fbd6b30ad2306564182486451345e915baf886bb44a63dcd2802f0",
+  "runtime_source_file_count": 227,
+  "backend": "Godot 4.7.1 OpenGL compatibility viewport capture",
+  "resolution": "1280x720",
+  "capture_catalog": "art-source/city-full-kit-candidate/asset-runtime-catalog-city-full-kit-quaternius-override.json",
+  "captures": [
+    {
+      "id": "city-01",
+      "image": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-01-v25.png",
+      "sha256": "ee9353f229dfea37cd964db3b774e5d781493753b67e0490483b4051ad9cb642",
+      "visual_status": "unverified",
+      "manual_decision": "reject_for_reference_fidelity",
+      "finding": "人群肤色与发型材质已修正，但人物比例、服装、建筑近景和参考视频的写实光照仍不一致"
+    },
+    {
+      "id": "city-08",
+      "image": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-08-v25.png",
+      "sha256": "c13c860e65246ed55e58e824d6bf19c05eff3dc866ec8b23a55b56ecc52b5f65",
+      "visual_status": "unverified",
+      "manual_decision": "reject_for_reference_fidelity",
+      "finding": "城市驾驶镜头和人群材质已统一，但道路建筑、右侧体块、车辆比例、光照和 HUD 仍不一致"
+    },
+    {
+      "id": "city-11",
+      "image": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-11-v25.png",
+      "sha256": "edab1b6667155ff4763df9aeae86740065027c1291e3052b366bb21bf04caa34",
+      "visual_status": "unverified",
+      "manual_decision": "reject_for_reference_fidelity",
+      "finding": "终点卷帘门与载具层次可运行，但门面材质、玩家比例、城市背景和黄昏氛围仍不一致"
+    }
+  ],
+  "release_allowed": false,
+  "next_gate": "建立参考角色比例与动作标尺，重做近景建筑材质和 HUD，再进行三段逐帧验收"
+}

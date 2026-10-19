@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_visual_rejected",
+  "product_name": "新时代觉醒者",
+  "capture_id": "city-01",
+  "scene": "city",
+  "reference_frame": "reference-evidence/video-1/city-01.jpg",
+  "candidate_ids": [
+    "city-player-character-quaternius-brick-red-jacket-candidate",
+    "city-crowd-quaternius-cc0-candidate",
+    "city-environment-original-procedural-v3-candidate",
+    "city-full-kit-original-procedural-crowd-overlay-candidate"
+  ],
+  "source": {
+    "sha256": "eef75fe2e8fbd6b30ad2306564182486451345e915baf886bb44a63dcd2802f0",
+    "file_count": 227
+  },
+  "candidate_package": {
+    "sha256": "dd97f75fdb75dde5f654cf568c8459350e37068f38f34684ffae5aa221a162a4",
+    "file_count": 315
+  },
+  "catalog": {
+    "path": "art-source/city-full-kit-candidate/asset-runtime-catalog-city-full-kit-quaternius-override.json",
+    "sha256": "2ae09871419b5ec6e2de140d063becb6163218d0f1d01905cb75c8c344423707",
+    "crowd_scene_sha256": "b3826aa56a64ccc0fb62fbc9d06f4c5c18b52e92a8d5bd7fc09a666e6a5af2ed"
+  },
+  "capture": {
+    "method": "visible_graphics_window",
+    "resolution": [1280, 720],
+    "rendering_driver": "opengl3",
+    "profile": "city_full_candidate",
+    "visual_status": "unverified",
+    "manual_visual_decision": "reject_for_reference_fidelity",
+    "image_path": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-01.png",
+    "image_sha256": "e07539e05f5db64b0888f1f5483641d516ca9fce3ac265a145d4bb1a40bdfb86",
+    "image_dimensions": [1280, 720]
+  },
+  "comparison_findings": [
+    "候选包已在当前正式源上完成可见图形窗口采集，画面包含砖红外套玩家、城市店铺招牌和稳定的 Quaternius 人群层",
+    "相较原始程序化人群，候选人群的轮廓、服装色彩和站立姿态更稳定，适合作为城市扩展的下一轮基线",
+    "当前固定镜头过近，玩家背包和人群遮挡了店铺主体，无法复现参考帧的空间层次",
+    "与参考帧相比，真实感、镜头景深、店铺材质、密度、人物比例、交通对象和光照仍有明显差异",
+    "低多边形角色、拼接式建筑和缺少真实阴影的环境不能作为一模一样的视觉基线",
+    "本证据只证明当前候选可见，不证明视觉通过、最终权利签收或可发布"
+  ],
+  "release_allowed": false,
+  "next_gates": [
+    "先返工城市固定镜头：拉远玩家与首店距离，确保招牌、店内人群和道路层次同时可见",
+    "替换或重做城市人群与店铺材质，增加真实阴影、景深、反射和交通背景层",
+    "补齐 city-08 与 city-11 当前源固定镜头截图",
+    "人工逐帧视觉签收并记录返工项",
+    "Windows 10/11 目标设备输入与性能回归",
+    "最终资产权利和 Steam 商店门禁"
+  ]
+}

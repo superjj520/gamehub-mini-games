@@ -1,0 +1,12 @@
+{
+	"asset_catalog_path": "res://content/asset-runtime-catalog-makehuman-office-candidate.json",
+	"capture_profile": "makehuman-office-candidate",
+	"evidence_prefix": "makehuman-office",
+	"message": "全部参考矩阵场景完成",
+	"phase": "complete",
+	"scenario_id": "",
+	"source_file_count": 248,
+	"source_fingerprint": "8afcb96276f6b3a845f45f74c2e6a16b5e401cb1702697b834736b2d9adca98f",
+	"updated_at": "2026-10-14T20:39:17",
+	"version": 1
+}

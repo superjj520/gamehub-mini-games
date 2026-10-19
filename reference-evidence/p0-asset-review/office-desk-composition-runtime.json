@@ -1,0 +1,16 @@
+{
+  "candidate_only": true,
+  "visual_status": "unverified",
+  "formal_acceptance": false,
+  "scene": "isolated_office_desk_composition",
+  "reference_frames": [
+    "video-2/office-01.jpg",
+    "video-2/office-06.jpg"
+  ],
+  "renderer": "Godot 4.7.1 OpenGL Compatibility",
+  "viewport": [640, 360],
+  "file_sha256": "318384045ecaf57e94108ef0b47f04115bd52f1cb248075b6365dd8ba7bd6c06",
+  "formal_runtime_source": "3a016e81a0218a39ed3d260a54d577a69d7fb377732653e3f4a992dc9237e8b8 files=169",
+  "capture_script": "capture_office_desk_runtime.gd@2026-10-07-before-candidate-guard",
+  "note": "历史候选截图；不是正式运行时矩阵，不代表人工视觉签收。"
+}

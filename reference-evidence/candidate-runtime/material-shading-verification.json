@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "technical_convention_passed",
+  "strict": true,
+  "convention_path": "docs/material-shading-conventions.json",
+  "source_fingerprint": {
+    "file_count": 19,
+    "sha256": "8bc9c2fe182bfb6f0a005a53ad3d4eb97aef266834e9a0461e4cd7b8193c6260"
+  },
+  "scope": [
+    "gta-reference-runtime/assets/characters/original-procedural-office-characters",
+    "gta-reference-runtime/assets/characters/original-procedural-city-crowd",
+    "gta-reference-runtime/assets/environment/original-procedural-city-environment",
+    "gta-reference-runtime/assets/props/original-procedural-interaction-props",
+    "gta-reference-runtime/assets/vehicles/three-wheel-delivery",
+    "gta-reference-runtime/content/candidates"
+  ],
+  "metrics": {
+    "source_files": 15,
+    "standard_material_mentions": 40,
+    "shader_material_mentions": 0,
+    "texture_reference_mentions": 6,
+    "alpha_transparency_mentions": 6,
+    "emission_mentions": 33,
+    "generated_texture_files": 19
+  },
+  "checks": {
+    "convention_file_valid": true,
+    "standard_material_only": true,
+    "no_custom_shader_in_scope": true,
+    "roughness_literals_in_range": true,
+    "metallic_literals_in_range": true,
+    "alpha_transparency_is_scoped": true,
+    "generated_facade_textures_are_declared": true
+  },
+  "findings": [],
+  "verified_at": "2026-10-18T19:35:07.040Z"
+}

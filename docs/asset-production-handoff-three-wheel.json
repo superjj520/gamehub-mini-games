@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "status": "candidate_handoff",
+  "policy": "这是候选资产的生产交接记录，不代表最终视觉、权利或发布签收",
+  "product": "新时代觉醒者",
+  "slot_id": "three-wheel-vehicle",
+  "candidate_id": "city-vehicle-three-wheel-delivery-final-procedural-candidate",
+  "source_kind": "project_original_procedural_glb",
+  "provenance": {
+    "builder": "art-source/vehicles/three-wheel-delivery/build_final_candidate_procedural.py",
+    "license_status": "project_original_candidate_only",
+    "external_source": false,
+    "review_required_before_release": true
+  },
+  "deliverables": {
+    "glb": {
+      "path": "art-source/vehicles/three-wheel-delivery/final-candidate/three_wheel_delivery_final_candidate.glb",
+      "sha256": "8c1dbcfff34cba5e73d1805021aebcf5f15d0ba98b173392580bba72e236d897"
+    },
+    "scene": {
+      "path": "art-source/vehicles/three-wheel-delivery/final-candidate/three_wheel_delivery_final_candidate.tscn",
+      "sha256": "16d777e3f0b12977a43db770ec141855e0f5e7a8c0757870f71846fde90fba2a"
+    },
+    "asset_card": {
+      "path": "art-source/vehicles/three-wheel-delivery/final-candidate/asset-card.json",
+      "sha256": "53ca5303cfac6062cc6a5520db50d85d0ff1abc1603b66411c84bf8c7eb4087b"
+    },
+    "runtime_evidence": "reference-evidence/candidate-runtime/three-wheel-delivery-final-procedural-runtime-current.json"
+  },
+  "runtime_contract": {
+    "unit": "meter",
+    "up_axis": "+Y",
+    "forward_axis": "-Z",
+    "pivot": "body_center",
+    "fallback_policy": "forbid_in_candidate_override",
+    "preserved_behaviors": [
+      "城市上下车与驾驶",
+      "办公室载具回放",
+      "三只车轮运动",
+      "碰撞与损伤反馈",
+      "存档恢复"
+    ]
+  },
+  "evidence": {
+    "integration_runner": "art-source/vehicles/three-wheel-delivery/run_isolated_three_wheel_atlas_runtime.mjs",
+    "candidate_runtime_script": "art-source/vehicles/three-wheel-delivery/three_wheel_delivery_atlas_candidate.gd",
+    "current_runtime_source_fingerprint": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+    "current_runtime_source_file_count": 326,
+    "checks_passed": [
+      "Godot GLB 导入预热",
+      "城市 Visual 挂载且禁止灰盒回退",
+      "城市任务与驾驶回放",
+      "办公室任务与驾驶回放",
+      "车轮运动与存档恢复"
+    ],
+    "visual_status": "unverified",
+    "release_allowed": false
+  },
+  "next_gates": [
+    "固定镜头图形采集",
+    "城市驾驶参考分段逐帧视觉验收",
+    "Windows 10/11 目标设备回放",
+    "最终资产来源与权利签收",
+    "发布包重新绑定"
+  ]
+}

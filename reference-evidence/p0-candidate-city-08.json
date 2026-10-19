@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "status": "candidate_isolated_formal_runtime_graphical_capture_unverified",
+  "capture_id": "p0-candidate-city-08",
+  "image": {
+    "path": "reference-evidence/p0-candidate-city-08.png",
+    "sha256": "cb31f62ceb183854c843fb7ba18bef7500a4b6b3a3c837a8bc7f669e50ef670f",
+    "width": 1280,
+    "height": 720,
+    "backend": "Godot 4.7.1 OpenGL compatibility viewport capture"
+  },
+  "candidate_ids": [
+    "player-character-quaternius-cc0-candidate",
+    "city-crowd-quaternius-cc0-candidate",
+    "city-vehicle-three-wheel-delivery-glb-candidate",
+    "city-environment-quaternius-downtown-cc0-candidate"
+  ],
+  "source_sha256": {
+    "runtime_source_fingerprint": "3a016e81a0218a39ed3d260a54d577a69d7fb377732653e3f4a992dc9237e8b8",
+    "runtime_file_count": 169,
+    "asset_catalog_override": "028b5d3fbeaf8ef665fedaffd455f3d299c91129531d5033dfca7afe6230cc1e",
+    "capture_script": "3eabd01c78c534edc549b6b0f67c6391428df8d68f336eaaa93f5ac91e1d064a"
+  },
+  "capture_options": {
+    "scene": "city",
+    "reference_segment": "city-08",
+    "vehicle_position": [5.0, 0.7, 3.0],
+    "camera_orbit_degrees": [-20.0, -18.0],
+    "state": "vehicle_driving_candidate"
+  },
+  "reference_comparison": {
+    "reference_frame": "reference-evidence/video-1/city-08.jpg",
+    "findings": [
+      "玩家、三轮车、道路车道线、城市建筑、行人、任务 HUD 和正式第三人称镜头在同一真实运行时出图",
+      "当前仍为低面数候选和程序化/候选城市环境，车辆材质、建筑细节、人群动作、光照和街道连续性未达到参考帧",
+      "该证据只证明候选接入与构图可审阅，不构成视觉签收"
+    ]
+  },
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "captured_at": "2026-10-08T00:58:15+08:00"
+}

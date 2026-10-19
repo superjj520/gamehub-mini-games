@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "status": "candidate_isolated_office_runtime_verified",
+  "candidate_id": "office-npc-makehuman-reference-office-v3-candidate",
+  "candidate_variant": "reference_office_materials_v3",
+  "candidate_sha256": "b58756eeff9642f463dadf753fa129cc108bc2591a734282fd19131e24fce2be",
+  "candidate_triangle_count": 38014,
+  "retouch_script_sha256": "17229e11c35ad297bd4dd37b0bcde6b6052e6c849482ca16a95110c4d18eab3b",
+  "runtime_options": {
+    "preserve_imported_materials": true,
+    "reference_office_materials": true,
+    "use_elegant_suit_candidate": false,
+    "use_elegant_suit_skinned": false
+  },
+  "auxiliary_asset_sha256": null,
+  "formal_runtime_source_fingerprint": "3a016e81a0218a39ed3d260a54d577a69d7fb377732653e3f4a992dc9237e8b8",
+  "formal_runtime_source_file_count": 169,
+  "environment": "temporary copy of gta-reference-runtime",
+  "checks": [
+    "Godot GLB import",
+    "office NPC Visual mount with fallback forbidden",
+    "Skeleton3D bone-count and meter-scale contract",
+    "retouch script and four candidate pose states",
+    "backpack visual mount",
+    "full office stealth, perception and save replay"
+  ],
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "captured_at": "2026-10-07T14:53:39.596Z"
+}

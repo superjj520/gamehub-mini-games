@@ -1,0 +1,5353 @@
+{
+  "captures": [
+    {
+      "camera": {
+        "current": true,
+        "distance": 5.2,
+        "fov": 60,
+        "global_position": [
+          -9,
+          3.40000009536743,
+          -0.200000002980232
+        ],
+        "height": 2.3,
+        "name": "候选资产验收预览镜头",
+        "shoulder_x": 0.25
+      },
+      "candidate_capture_camera_lock": true,
+      "capture_background": {
+        "asset_source": "user_authorized_ai_video_frame_edit",
+        "name": "原创城市首店人群写实背景卡",
+        "present": true,
+        "rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-01-video-playable-backdrop-v2.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "capture_id": "city-01",
+      "capture_render_layers": {
+        "background_excluded_from_non_dynamic_count": true,
+        "visible_candidate_endpoint_meshes": 0,
+        "visible_dynamic_meshes": 59,
+        "visible_non_dynamic_meshes": 827,
+        "visible_visual_layers": [
+          {
+            "name": "用户授权城市视频帧候选背景卡",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/用户授权城市视频帧候选背景卡",
+            "position": [
+              -8.75,
+              -6.58854389190674,
+              -28.9338092803955
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "候选城市首店相机远景板",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/候选城市首店相机远景板",
+            "position": [
+              -8.75,
+              -4.1164083480835,
+              -21.3253574371338
+            ],
+            "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-01-video-playable-backdrop-v2.png",
+            "visual_only": true
+          }
+        ]
+      },
+      "cargo": {
+        "count": 0,
+        "egg_tray": false,
+        "visual_visible": false
+      },
+      "conflict": {
+        "position": [
+          4,
+          0.899999976158142,
+          -2
+        ],
+        "visible": false,
+        "visible_meshes": 0,
+        "visual_only": false
+      },
+      "drive_background": {
+        "present": true,
+        "source": "city_visual",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-01-video-playable-backdrop-v2.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "drive_foreground": {
+        "visible_meshes": 122,
+        "visual_only": true
+      },
+      "mission": {
+        "objective": "领取免费鸡蛋",
+        "stage": "collect_eggs"
+      },
+      "player": {
+        "position": [
+          -9,
+          1,
+          -3.70000004768372
+        ],
+        "visible": true
+      },
+      "reference_capture_mode": true,
+      "registered": false,
+      "registration": {
+        "clerk_visible": false,
+        "scan_board_visible": false,
+        "visual_only": true
+      },
+      "store_interior": {
+        "inside_store_aisle": false,
+        "light_count": 4,
+        "node_count": 7,
+        "product_count": 40,
+        "visible_nodes": 0,
+        "visual_only": true
+      },
+      "storefront_foreground": {
+        "visible_meshes": 202,
+        "visible_persons": 14,
+        "visual_only": true
+      },
+      "traffic": {
+        "candidate_visual_nodes": 0,
+        "total": 3,
+        "visible": 0,
+        "visible_meshes": 0
+      },
+      "vehicle": {
+        "driver_is_player": false,
+        "visible": false
+      },
+      "video_backdrop_enabled": true
+    },
+    {
+      "camera": {
+        "current": true,
+        "distance": 5.2,
+        "fov": 60,
+        "global_position": [
+          -9,
+          3.40000009536743,
+          -0.200000002980232
+        ],
+        "height": 2.3,
+        "name": "候选资产验收预览镜头",
+        "shoulder_x": 0.25
+      },
+      "candidate_capture_camera_lock": true,
+      "capture_background": {
+        "asset_source": "user_authorized_ai_video_frame_edit",
+        "name": "原创城市首店人群写实背景卡",
+        "present": true,
+        "rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-02-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "capture_id": "city-02",
+      "capture_render_layers": {
+        "background_excluded_from_non_dynamic_count": true,
+        "visible_candidate_endpoint_meshes": 0,
+        "visible_dynamic_meshes": 100,
+        "visible_non_dynamic_meshes": 958,
+        "visible_visual_layers": [
+          {
+            "name": "用户授权城市视频帧候选背景卡",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/用户授权城市视频帧候选背景卡",
+            "position": [
+              -8.75,
+              -6.58854389190674,
+              -28.9338092803955
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "候选城市首店相机远景板",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/候选城市首店相机远景板",
+            "position": [
+              -8.75,
+              -4.1164083480835,
+              -21.3253574371338
+            ],
+            "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-01-video-playable-backdrop-v2.png",
+            "visual_only": true
+          }
+        ]
+      },
+      "cargo": {
+        "count": 0,
+        "egg_tray": false,
+        "visual_visible": false
+      },
+      "conflict": {
+        "position": [
+          4,
+          0.899999976158142,
+          -2
+        ],
+        "visible": false,
+        "visible_meshes": 0,
+        "visual_only": false
+      },
+      "drive_background": {
+        "present": true,
+        "source": "city_visual",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-02-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "drive_foreground": {
+        "visible_meshes": 122,
+        "visual_only": true
+      },
+      "mission": {
+        "objective": "领取免费鸡蛋",
+        "stage": "collect_eggs"
+      },
+      "player": {
+        "position": [
+          -9,
+          1,
+          -3.70000004768372
+        ],
+        "visible": true
+      },
+      "reference_capture_mode": true,
+      "registered": false,
+      "registration": {
+        "clerk_visible": false,
+        "scan_board_visible": false,
+        "visual_only": true
+      },
+      "store_interior": {
+        "inside_store_aisle": false,
+        "light_count": 4,
+        "node_count": 7,
+        "product_count": 40,
+        "visible_nodes": 0,
+        "visual_only": true
+      },
+      "storefront_foreground": {
+        "visible_meshes": 202,
+        "visible_persons": 14,
+        "visual_only": true
+      },
+      "traffic": {
+        "candidate_visual_nodes": 0,
+        "total": 3,
+        "visible": 0,
+        "visible_meshes": 0
+      },
+      "vehicle": {
+        "driver_is_player": false,
+        "visible": false
+      },
+      "video_backdrop_enabled": true
+    },
+    {
+      "camera": {
+        "current": true,
+        "distance": 2.5,
+        "fov": 58,
+        "global_position": [
+          -9,
+          2.15000009536743,
+          -5.25
+        ],
+        "height": 1.75,
+        "name": "候选资产验收预览镜头",
+        "shoulder_x": 0.25
+      },
+      "candidate_capture_camera_lock": true,
+      "capture_background": {
+        "asset_source": "user_authorized_ai_video_frame_edit",
+        "name": "原创城市超市通道背景卡",
+        "present": true,
+        "rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-03-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "capture_id": "city-03",
+      "capture_render_layers": {
+        "background_excluded_from_non_dynamic_count": true,
+        "visible_candidate_endpoint_meshes": 7,
+        "visible_dynamic_meshes": 99,
+        "visible_non_dynamic_meshes": 2713,
+        "visible_visual_layers": [
+          {
+            "name": "人行道-纵向--4_25",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道-纵向--4_25",
+            "position": [
+              -4.25,
+              0.0900000035762787,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道-纵向-4_25",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道-纵向-4_25",
+            "position": [
+              4.25,
+              0.0900000035762787,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道-横向--3_65",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道-横向--3_65",
+            "position": [
+              0,
+              0.0949999988079071,
+              -3.65000009536743
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道-横向-3_65",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道-横向-3_65",
+            "position": [
+              0,
+              0.0949999988079071,
+              3.65000009536743
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-0",
+            "position": [
+              -4.25,
+              0.125,
+              -14
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-1",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-1",
+            "position": [
+              -4.25,
+              0.125,
+              -10
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-2",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-2",
+            "position": [
+              -4.25,
+              0.125,
+              -6
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-3",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-3",
+            "position": [
+              -4.25,
+              0.125,
+              -2
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-4",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-4",
+            "position": [
+              -4.25,
+              0.125,
+              2
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-5",
+            "position": [
+              -4.25,
+              0.125,
+              6
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-6",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-6",
+            "position": [
+              -4.25,
+              0.125,
+              10
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-7",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-7",
+            "position": [
+              -4.25,
+              0.125,
+              14
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-0",
+            "position": [
+              4.25,
+              0.125,
+              -14
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-1",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-1",
+            "position": [
+              4.25,
+              0.125,
+              -10
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-2",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-2",
+            "position": [
+              4.25,
+              0.125,
+              -6
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-3",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-3",
+            "position": [
+              4.25,
+              0.125,
+              -2
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-4",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-4",
+            "position": [
+              4.25,
+              0.125,
+              2
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-5",
+            "position": [
+              4.25,
+              0.125,
+              6
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-6",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-6",
+            "position": [
+              4.25,
+              0.125,
+              10
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-7",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-7",
+            "position": [
+              4.25,
+              0.125,
+              14
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-纵向--14_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-纵向--14_0",
+            "position": [
+              0,
+              0.0649999976158142,
+              -14
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-纵向--8_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-纵向--8_0",
+            "position": [
+              0,
+              0.0649999976158142,
+              -8
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-纵向--2_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-纵向--2_0",
+            "position": [
+              0,
+              0.0649999976158142,
+              -2
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-纵向-4_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-纵向-4_0",
+            "position": [
+              0,
+              0.0649999976158142,
+              4
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-纵向-10_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-纵向-10_0",
+            "position": [
+              0,
+              0.0649999976158142,
+              10
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-纵向-16_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-纵向-16_0",
+            "position": [
+              0,
+              0.0649999976158142,
+              16
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-横向--14_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-横向--14_0",
+            "position": [
+              -14,
+              0.0700000002980232,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-横向--8_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-横向--8_0",
+            "position": [
+              -8,
+              0.0700000002980232,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-横向--2_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-横向--2_0",
+            "position": [
+              -2,
+              0.0700000002980232,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-横向-4_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-横向-4_0",
+            "position": [
+              4,
+              0.0700000002980232,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-横向-10_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-横向-10_0",
+            "position": [
+              10,
+              0.0700000002980232,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-横向-16_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-横向-16_0",
+            "position": [
+              16,
+              0.0700000002980232,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-纵向--3_35--8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-纵向--3_35--8_5",
+            "position": [
+              -3.34999990463257,
+              0.0700000002980232,
+              -8.5
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-纵向--3_35-8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-纵向--3_35-8_5",
+            "position": [
+              -3.34999990463257,
+              0.0700000002980232,
+              8.5
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-纵向-3_35--8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-纵向-3_35--8_5",
+            "position": [
+              3.34999990463257,
+              0.0700000002980232,
+              -8.5
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-纵向-3_35-8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-纵向-3_35-8_5",
+            "position": [
+              3.34999990463257,
+              0.0700000002980232,
+              8.5
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-横向--2_4--8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-横向--2_4--8_5",
+            "position": [
+              -8.5,
+              0.0750000029802322,
+              -2.40000009536743
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-横向--2_4-8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-横向--2_4-8_5",
+            "position": [
+              8.5,
+              0.0750000029802322,
+              -2.40000009536743
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-横向-2_4--8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-横向-2_4--8_5",
+            "position": [
+              -8.5,
+              0.0750000029802322,
+              2.40000009536743
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-横向-2_4-8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-横向-2_4-8_5",
+            "position": [
+              8.5,
+              0.0750000029802322,
+              2.40000009536743
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "北侧斑马线-0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/北侧斑马线-0",
+            "position": [
+              -2.40000009536743,
+              0.0820000022649765,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "南侧斑马线-0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/南侧斑马线-0",
+            "position": [
+              -2.40000009536743,
+              0.0820000022649765,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "北侧斑马线-1",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/北侧斑马线-1",
+            "position": [
+              -1.60000002384186,
+              0.0820000022649765,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "南侧斑马线-1",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/南侧斑马线-1",
+            "position": [
+              -1.60000002384186,
+              0.0820000022649765,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "北侧斑马线-2",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/北侧斑马线-2",
+            "position": [
+              -0.800000011920929,
+              0.0820000022649765,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "南侧斑马线-2",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/南侧斑马线-2",
+            "position": [
+              -0.800000011920929,
+              0.0820000022649765,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "北侧斑马线-3",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/北侧斑马线-3",
+            "position": [
+              4.44089209850063e-16,
+              0.0820000022649765,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "南侧斑马线-3",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/南侧斑马线-3",
+            "position": [
+              4.44089209850063e-16,
+              0.0820000022649765,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "北侧斑马线-4",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/北侧斑马线-4",
+            "position": [
+              0.800000011920929,
+              0.0820000022649765,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "南侧斑马线-4",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/南侧斑马线-4",
+            "position": [
+              0.800000011920929,
+              0.0820000022649765,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "北侧斑马线-5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/北侧斑马线-5",
+            "position": [
+              1.60000002384186,
+              0.0820000022649765,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "南侧斑马线-5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/南侧斑马线-5",
+            "position": [
+              1.60000002384186,
+              0.0820000022649765,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "北侧斑马线-6",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/北侧斑马线-6",
+            "position": [
+              2.40000009536743,
+              0.0820000022649765,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "南侧斑马线-6",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/南侧斑马线-6",
+            "position": [
+              2.40000009536743,
+              0.0820000022649765,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘排水沟-0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘排水沟-0",
+            "position": [
+              -3.04999995231628,
+              0.0850000008940697,
+              -5
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘排水沟-1",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘排水沟-1",
+            "position": [
+              3.04999995231628,
+              0.0850000008940697,
+              5
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘排水沟-2",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘排水沟-2",
+            "position": [
+              -5,
+              0.0850000008940697,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘排水沟-3",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘排水沟-3",
+            "position": [
+              5,
+              0.0850000008940697,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "道路检修井盖-0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/道路检修井盖-0",
+            "position": [
+              -1.89999997615814,
+              0.0860000029206276,
+              -1.35000002384186
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "道路检修井盖-1",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/道路检修井盖-1",
+            "position": [
+              1.89999997615814,
+              0.0860000029206276,
+              1.35000002384186
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景连续地面",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景连续地面",
+            "position": [
+              0,
+              -0.159999996423721,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_00",
+            "position": [
+              -23,
+              4.59999990463257,
+              -20
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_00_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_00_00",
+            "position": [
+              -23,
+              1.10400009155273,
+              -21.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_00_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_00_01",
+            "position": [
+              -23,
+              2.30399990081787,
+              -21.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_00_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_00_02",
+            "position": [
+              -23,
+              3.50399994850159,
+              -21.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_00_03",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_00_03",
+            "position": [
+              -23,
+              4.7039999961853,
+              -21.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_00_04",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_00_04",
+            "position": [
+              -23,
+              5.90399980545044,
+              -21.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_00_05",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_00_05",
+            "position": [
+              -23,
+              7.10400009155273,
+              -21.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_01",
+            "position": [
+              -15,
+              3.5,
+              -24
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_01_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_01_00",
+            "position": [
+              -15,
+              0.839999914169312,
+              -25.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_01_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_01_01",
+            "position": [
+              -15,
+              2.03999996185303,
+              -25.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_01_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_01_02",
+            "position": [
+              -15,
+              3.24000000953674,
+              -25.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_01_03",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_01_03",
+            "position": [
+              -15,
+              4.44000005722046,
+              -25.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_02",
+            "position": [
+              -6,
+              5.40000009536743,
+              -25
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_02_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_02_00",
+            "position": [
+              -6,
+              1.2960000038147,
+              -26.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_02_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_02_01",
+            "position": [
+              -6,
+              2.49600005149841,
+              -26.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_02_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_02_02",
+            "position": [
+              -6,
+              3.69600009918213,
+              -26.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_02_03",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_02_03",
+            "position": [
+              -6,
+              4.89599990844727,
+              -26.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_02_04",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_02_04",
+            "position": [
+              -6,
+              6.09600019454956,
+              -26.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_02_05",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_02_05",
+            "position": [
+              -6,
+              7.2960000038147,
+              -26.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_02_06",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_02_06",
+            "position": [
+              -6,
+              8.49600028991699,
+              -26.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_03",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_03",
+            "position": [
+              5,
+              3.79999995231628,
+              -24
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_03_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_03_00",
+            "position": [
+              5,
+              0.911999940872192,
+              -25.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_03_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_03_01",
+            "position": [
+              5,
+              2.11199998855591,
+              -25.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_03_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_03_02",
+            "position": [
+              5,
+              3.31200003623962,
+              -25.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_03_03",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_03_03",
+            "position": [
+              5,
+              4.51200008392334,
+              -25.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_03_04",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_03_04",
+            "position": [
+              5,
+              5.71199989318848,
+              -25.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_04",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_04",
+            "position": [
+              16.5,
+              5.09999990463257,
+              -22
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_04_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_04_00",
+            "position": [
+              16.5,
+              1.22399997711182,
+              -23.9300003051758
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_04_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_04_01",
+            "position": [
+              16.5,
+              2.42400002479553,
+              -23.9300003051758
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_04_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_04_02",
+            "position": [
+              16.5,
+              3.62400007247925,
+              -23.9300003051758
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_04_03",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_04_03",
+            "position": [
+              16.5,
+              4.82399988174438,
+              -23.9300003051758
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_04_04",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_04_04",
+            "position": [
+              16.5,
+              6.02400016784668,
+              -23.9300003051758
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_04_05",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_04_05",
+            "position": [
+              16.5,
+              7.22399997711182,
+              -23.9300003051758
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_04_06",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_04_06",
+            "position": [
+              16.5,
+              8.42399978637695,
+              -23.9300003051758
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_05",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_05",
+            "position": [
+              24,
+              3.59999990463257,
+              -18
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_05_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_05_00",
+            "position": [
+              24,
+              0.864000082015991,
+              -19.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_05_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_05_01",
+            "position": [
+              24,
+              2.06400012969971,
+              -19.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_05_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_05_02",
+            "position": [
+              24,
+              3.26399993896484,
+              -19.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_05_03",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_05_03",
+            "position": [
+              24,
+              4.46399974822998,
+              -19.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_06",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_06",
+            "position": [
+              -24,
+              2.59999990463257,
+              -8
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_06_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_06_00",
+            "position": [
+              -24,
+              0.623999953269958,
+              -9.52999973297119
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_06_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_06_01",
+            "position": [
+              -24,
+              1.82400000095367,
+              -9.52999973297119
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_06_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_06_02",
+            "position": [
+              -24,
+              3.0239999294281,
+              -9.52999973297119
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_07",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_07",
+            "position": [
+              25,
+              2.79999995231628,
+              -6
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_07_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_07_00",
+            "position": [
+              25,
+              0.671999931335449,
+              -7.63000011444092
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_07_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_07_01",
+            "position": [
+              25,
+              1.87199997901917,
+              -7.63000011444092
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_07_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_07_02",
+            "position": [
+              25,
+              3.07200002670288,
+              -7.63000011444092
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景屋顶设备_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景屋顶设备_00",
+            "position": [
+              -23,
+              10,
+              -20
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景屋顶设备_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景屋顶设备_01",
+            "position": [
+              -6,
+              11.1000003814697,
+              -25
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景屋顶设备_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景屋顶设备_02",
+            "position": [
+              16.5,
+              10.8000001907349,
+              -22
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "候选远景楼体",
+            "parent": "候选原创城市细节",
+            "path": "/root/CityDemo/Visual/候选原创城市细节/候选远景楼体",
+            "position": [
+              8,
+              3.59999990463257,
+              -8.64999961853027
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "候选远景楼体窗带",
+            "parent": "候选原创城市细节",
+            "path": "/root/CityDemo/Visual/候选原创城市细节/候选远景楼体窗带",
+            "position": [
+              8,
+              4.80000019073486,
+              -8.84000015258789
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "原创城市首店人群写实背景卡",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创城市首店人群写实背景卡",
+            "position": [
+              -9,
+              0.5,
+              -7.57000017166138
+            ],
+            "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-01-video-playable-backdrop-v2.png",
+            "visual_only": true
+          },
+          {
+            "name": "原创连续街区道路中线",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创连续街区道路中线",
+            "position": [
+              0,
+              0.108000002801418,
+              -12.6000003814697
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "原创远景城市楼体",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创远景城市楼体",
+            "position": [
+              -8.39999961853027,
+              2.29999995231628,
+              25.7999992370605
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "原创远景城市楼顶",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创远景城市楼顶",
+            "position": [
+              -8.39999961853027,
+              4.67999982833862,
+              25.7999992370605
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "原创远景城市窗格",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创远景城市窗格",
+            "position": [
+              -9.31999969482422,
+              1.45000004768372,
+              25.0300006866455
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "原创连续街区道路中线虚线",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创连续街区道路中线虚线",
+            "position": [
+              0,
+              0.101999998092651,
+              0.800000011920929
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "用户授权城市视频帧候选背景卡",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/用户授权城市视频帧候选背景卡",
+            "position": [
+              -8.7500057220459,
+              -4.00317430496216,
+              -38.800724029541
+            ],
+            "texture": "",
+            "visual_only": true
+          }
+        ]
+      },
+      "cargo": {
+        "count": 0,
+        "egg_tray": false,
+        "visual_visible": false
+      },
+      "conflict": {
+        "position": [
+          4,
+          0.899999976158142,
+          -2
+        ],
+        "visible": false,
+        "visible_meshes": 0,
+        "visual_only": false
+      },
+      "drive_background": {
+        "present": true,
+        "source": "city_visual",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-03-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "drive_foreground": {
+        "visible_meshes": 122,
+        "visual_only": true
+      },
+      "mission": {
+        "objective": "领取免费鸡蛋",
+        "stage": "collect_eggs"
+      },
+      "player": {
+        "position": [
+          -9,
+          0.899999976158142,
+          -10
+        ],
+        "visible": true
+      },
+      "reference_capture_mode": true,
+      "registered": false,
+      "registration": {
+        "clerk_visible": true,
+        "scan_board_visible": true,
+        "visual_only": true
+      },
+      "store_interior": {
+        "inside_store_aisle": true,
+        "light_count": 4,
+        "node_count": 7,
+        "product_count": 40,
+        "visible_nodes": 7,
+        "visual_only": true
+      },
+      "storefront_foreground": {
+        "visible_meshes": 0,
+        "visible_persons": 0,
+        "visual_only": true
+      },
+      "traffic": {
+        "candidate_visual_nodes": 0,
+        "total": 3,
+        "visible": 0,
+        "visible_meshes": 0
+      },
+      "vehicle": {
+        "driver_is_player": false,
+        "visible": false
+      },
+      "video_backdrop_enabled": true
+    },
+    {
+      "camera": {
+        "current": true,
+        "distance": 3.7,
+        "fov": 58,
+        "global_position": [
+          -9,
+          2.15000009536743,
+          -13.6499996185303
+        ],
+        "height": 1.9,
+        "name": "候选资产验收预览镜头",
+        "shoulder_x": 0.25
+      },
+      "candidate_capture_camera_lock": true,
+      "capture_background": {
+        "asset_source": "user_authorized_ai_video_frame_edit",
+        "name": "原创城市超市冲突背景卡",
+        "present": true,
+        "rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-04-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "capture_id": "city-04",
+      "capture_render_layers": {
+        "background_excluded_from_non_dynamic_count": true,
+        "visible_candidate_endpoint_meshes": 7,
+        "visible_dynamic_meshes": 100,
+        "visible_non_dynamic_meshes": 2763,
+        "visible_visual_layers": [
+          {
+            "name": "人行道-纵向--4_25",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道-纵向--4_25",
+            "position": [
+              -4.25,
+              0.0900000035762787,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道-纵向-4_25",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道-纵向-4_25",
+            "position": [
+              4.25,
+              0.0900000035762787,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道-横向--3_65",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道-横向--3_65",
+            "position": [
+              0,
+              0.0949999988079071,
+              -3.65000009536743
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道-横向-3_65",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道-横向-3_65",
+            "position": [
+              0,
+              0.0949999988079071,
+              3.65000009536743
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-0",
+            "position": [
+              -4.25,
+              0.125,
+              -14
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-1",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-1",
+            "position": [
+              -4.25,
+              0.125,
+              -10
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-2",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-2",
+            "position": [
+              -4.25,
+              0.125,
+              -6
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-3",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-3",
+            "position": [
+              -4.25,
+              0.125,
+              -2
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-4",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-4",
+            "position": [
+              -4.25,
+              0.125,
+              2
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-5",
+            "position": [
+              -4.25,
+              0.125,
+              6
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-6",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-6",
+            "position": [
+              -4.25,
+              0.125,
+              10
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向--4_25-7",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向--4_25-7",
+            "position": [
+              -4.25,
+              0.125,
+              14
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-0",
+            "position": [
+              4.25,
+              0.125,
+              -14
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-1",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-1",
+            "position": [
+              4.25,
+              0.125,
+              -10
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-2",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-2",
+            "position": [
+              4.25,
+              0.125,
+              -6
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-3",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-3",
+            "position": [
+              4.25,
+              0.125,
+              -2
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-4",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-4",
+            "position": [
+              4.25,
+              0.125,
+              2
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-5",
+            "position": [
+              4.25,
+              0.125,
+              6
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-6",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-6",
+            "position": [
+              4.25,
+              0.125,
+              10
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "人行道接缝-纵向-4_25-7",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/人行道接缝-纵向-4_25-7",
+            "position": [
+              4.25,
+              0.125,
+              14
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-纵向--14_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-纵向--14_0",
+            "position": [
+              0,
+              0.0649999976158142,
+              -14
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-纵向--8_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-纵向--8_0",
+            "position": [
+              0,
+              0.0649999976158142,
+              -8
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-纵向--2_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-纵向--2_0",
+            "position": [
+              0,
+              0.0649999976158142,
+              -2
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-纵向-4_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-纵向-4_0",
+            "position": [
+              0,
+              0.0649999976158142,
+              4
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-纵向-10_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-纵向-10_0",
+            "position": [
+              0,
+              0.0649999976158142,
+              10
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-纵向-16_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-纵向-16_0",
+            "position": [
+              0,
+              0.0649999976158142,
+              16
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-横向--14_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-横向--14_0",
+            "position": [
+              -14,
+              0.0700000002980232,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-横向--8_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-横向--8_0",
+            "position": [
+              -8,
+              0.0700000002980232,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-横向--2_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-横向--2_0",
+            "position": [
+              -2,
+              0.0700000002980232,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-横向-4_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-横向-4_0",
+            "position": [
+              4,
+              0.0700000002980232,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-横向-10_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-横向-10_0",
+            "position": [
+              10,
+              0.0700000002980232,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "车道线-横向-16_0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/车道线-横向-16_0",
+            "position": [
+              16,
+              0.0700000002980232,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-纵向--3_35--8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-纵向--3_35--8_5",
+            "position": [
+              -3.34999990463257,
+              0.0700000002980232,
+              -8.5
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-纵向--3_35-8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-纵向--3_35-8_5",
+            "position": [
+              -3.34999990463257,
+              0.0700000002980232,
+              8.5
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-纵向-3_35--8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-纵向-3_35--8_5",
+            "position": [
+              3.34999990463257,
+              0.0700000002980232,
+              -8.5
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-纵向-3_35-8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-纵向-3_35-8_5",
+            "position": [
+              3.34999990463257,
+              0.0700000002980232,
+              8.5
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-横向--2_4--8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-横向--2_4--8_5",
+            "position": [
+              -8.5,
+              0.0750000029802322,
+              -2.40000009536743
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-横向--2_4-8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-横向--2_4-8_5",
+            "position": [
+              8.5,
+              0.0750000029802322,
+              -2.40000009536743
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-横向-2_4--8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-横向-2_4--8_5",
+            "position": [
+              -8.5,
+              0.0750000029802322,
+              2.40000009536743
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘-横向-2_4-8_5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘-横向-2_4-8_5",
+            "position": [
+              8.5,
+              0.0750000029802322,
+              2.40000009536743
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "北侧斑马线-0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/北侧斑马线-0",
+            "position": [
+              -2.40000009536743,
+              0.0820000022649765,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "南侧斑马线-0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/南侧斑马线-0",
+            "position": [
+              -2.40000009536743,
+              0.0820000022649765,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "北侧斑马线-1",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/北侧斑马线-1",
+            "position": [
+              -1.60000002384186,
+              0.0820000022649765,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "南侧斑马线-1",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/南侧斑马线-1",
+            "position": [
+              -1.60000002384186,
+              0.0820000022649765,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "北侧斑马线-2",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/北侧斑马线-2",
+            "position": [
+              -0.800000011920929,
+              0.0820000022649765,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "南侧斑马线-2",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/南侧斑马线-2",
+            "position": [
+              -0.800000011920929,
+              0.0820000022649765,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "北侧斑马线-3",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/北侧斑马线-3",
+            "position": [
+              4.44089209850063e-16,
+              0.0820000022649765,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "南侧斑马线-3",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/南侧斑马线-3",
+            "position": [
+              4.44089209850063e-16,
+              0.0820000022649765,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "北侧斑马线-4",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/北侧斑马线-4",
+            "position": [
+              0.800000011920929,
+              0.0820000022649765,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "南侧斑马线-4",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/南侧斑马线-4",
+            "position": [
+              0.800000011920929,
+              0.0820000022649765,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "北侧斑马线-5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/北侧斑马线-5",
+            "position": [
+              1.60000002384186,
+              0.0820000022649765,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "南侧斑马线-5",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/南侧斑马线-5",
+            "position": [
+              1.60000002384186,
+              0.0820000022649765,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "北侧斑马线-6",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/北侧斑马线-6",
+            "position": [
+              2.40000009536743,
+              0.0820000022649765,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "南侧斑马线-6",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/南侧斑马线-6",
+            "position": [
+              2.40000009536743,
+              0.0820000022649765,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘排水沟-0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘排水沟-0",
+            "position": [
+              -3.04999995231628,
+              0.0850000008940697,
+              -5
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘排水沟-1",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘排水沟-1",
+            "position": [
+              3.04999995231628,
+              0.0850000008940697,
+              5
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘排水沟-2",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘排水沟-2",
+            "position": [
+              -5,
+              0.0850000008940697,
+              3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "路缘排水沟-3",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/路缘排水沟-3",
+            "position": [
+              5,
+              0.0850000008940697,
+              -3.04999995231628
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "道路检修井盖-0",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/道路检修井盖-0",
+            "position": [
+              -1.89999997615814,
+              0.0860000029206276,
+              -1.35000002384186
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "道路检修井盖-1",
+            "parent": "道路视觉细节",
+            "path": "/root/CityDemo/道路视觉细节/道路检修井盖-1",
+            "position": [
+              1.89999997615814,
+              0.0860000029206276,
+              1.35000002384186
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景连续地面",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景连续地面",
+            "position": [
+              0,
+              -0.159999996423721,
+              0
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_00",
+            "position": [
+              -23,
+              4.59999990463257,
+              -20
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_00_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_00_00",
+            "position": [
+              -23,
+              1.10400009155273,
+              -21.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_00_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_00_01",
+            "position": [
+              -23,
+              2.30399990081787,
+              -21.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_00_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_00_02",
+            "position": [
+              -23,
+              3.50399994850159,
+              -21.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_00_03",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_00_03",
+            "position": [
+              -23,
+              4.7039999961853,
+              -21.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_00_04",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_00_04",
+            "position": [
+              -23,
+              5.90399980545044,
+              -21.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_00_05",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_00_05",
+            "position": [
+              -23,
+              7.10400009155273,
+              -21.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_01",
+            "position": [
+              -15,
+              3.5,
+              -24
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_01_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_01_00",
+            "position": [
+              -15,
+              0.839999914169312,
+              -25.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_01_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_01_01",
+            "position": [
+              -15,
+              2.03999996185303,
+              -25.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_01_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_01_02",
+            "position": [
+              -15,
+              3.24000000953674,
+              -25.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_01_03",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_01_03",
+            "position": [
+              -15,
+              4.44000005722046,
+              -25.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_02",
+            "position": [
+              -6,
+              5.40000009536743,
+              -25
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_02_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_02_00",
+            "position": [
+              -6,
+              1.2960000038147,
+              -26.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_02_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_02_01",
+            "position": [
+              -6,
+              2.49600005149841,
+              -26.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_02_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_02_02",
+            "position": [
+              -6,
+              3.69600009918213,
+              -26.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_02_03",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_02_03",
+            "position": [
+              -6,
+              4.89599990844727,
+              -26.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_02_04",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_02_04",
+            "position": [
+              -6,
+              6.09600019454956,
+              -26.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_02_05",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_02_05",
+            "position": [
+              -6,
+              7.2960000038147,
+              -26.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_02_06",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_02_06",
+            "position": [
+              -6,
+              8.49600028991699,
+              -26.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_03",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_03",
+            "position": [
+              5,
+              3.79999995231628,
+              -24
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_03_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_03_00",
+            "position": [
+              5,
+              0.911999940872192,
+              -25.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_03_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_03_01",
+            "position": [
+              5,
+              2.11199998855591,
+              -25.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_03_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_03_02",
+            "position": [
+              5,
+              3.31200003623962,
+              -25.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_03_03",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_03_03",
+            "position": [
+              5,
+              4.51200008392334,
+              -25.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_03_04",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_03_04",
+            "position": [
+              5,
+              5.71199989318848,
+              -25.8299999237061
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_04",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_04",
+            "position": [
+              16.5,
+              5.09999990463257,
+              -22
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_04_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_04_00",
+            "position": [
+              16.5,
+              1.22399997711182,
+              -23.9300003051758
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_04_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_04_01",
+            "position": [
+              16.5,
+              2.42400002479553,
+              -23.9300003051758
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_04_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_04_02",
+            "position": [
+              16.5,
+              3.62400007247925,
+              -23.9300003051758
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_04_03",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_04_03",
+            "position": [
+              16.5,
+              4.82399988174438,
+              -23.9300003051758
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_04_04",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_04_04",
+            "position": [
+              16.5,
+              6.02400016784668,
+              -23.9300003051758
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_04_05",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_04_05",
+            "position": [
+              16.5,
+              7.22399997711182,
+              -23.9300003051758
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_04_06",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_04_06",
+            "position": [
+              16.5,
+              8.42399978637695,
+              -23.9300003051758
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_05",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_05",
+            "position": [
+              24,
+              3.59999990463257,
+              -18
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_05_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_05_00",
+            "position": [
+              24,
+              0.864000082015991,
+              -19.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_05_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_05_01",
+            "position": [
+              24,
+              2.06400012969971,
+              -19.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_05_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_05_02",
+            "position": [
+              24,
+              3.26399993896484,
+              -19.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_05_03",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_05_03",
+            "position": [
+              24,
+              4.46399974822998,
+              -19.5300006866455
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_06",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_06",
+            "position": [
+              -24,
+              2.59999990463257,
+              -8
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_06_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_06_00",
+            "position": [
+              -24,
+              0.623999953269958,
+              -9.52999973297119
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_06_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_06_01",
+            "position": [
+              -24,
+              1.82400000095367,
+              -9.52999973297119
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_06_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_06_02",
+            "position": [
+              -24,
+              3.0239999294281,
+              -9.52999973297119
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景楼体_07",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景楼体_07",
+            "position": [
+              25,
+              2.79999995231628,
+              -6
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_07_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_07_00",
+            "position": [
+              25,
+              0.671999931335449,
+              -7.63000011444092
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_07_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_07_01",
+            "position": [
+              25,
+              1.87199997901917,
+              -7.63000011444092
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景窗带_07_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景窗带_07_02",
+            "position": [
+              25,
+              3.07200002670288,
+              -7.63000011444092
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景屋顶设备_00",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景屋顶设备_00",
+            "position": [
+              -23,
+              10,
+              -20
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景屋顶设备_01",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景屋顶设备_01",
+            "position": [
+              -6,
+              11.1000003814697,
+              -25
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "城市远景屋顶设备_02",
+            "parent": "原创城市远景层",
+            "path": "/root/CityDemo/原创城市远景层/城市远景屋顶设备_02",
+            "position": [
+              16.5,
+              10.8000001907349,
+              -22
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "候选远景楼体",
+            "parent": "候选原创城市细节",
+            "path": "/root/CityDemo/Visual/候选原创城市细节/候选远景楼体",
+            "position": [
+              8,
+              3.59999990463257,
+              -8.64999961853027
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "候选远景楼体窗带",
+            "parent": "候选原创城市细节",
+            "path": "/root/CityDemo/Visual/候选原创城市细节/候选远景楼体窗带",
+            "position": [
+              8,
+              4.80000019073486,
+              -8.84000015258789
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "原创城市首店人群写实背景卡",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创城市首店人群写实背景卡",
+            "position": [
+              -9,
+              0.5,
+              -7.57000017166138
+            ],
+            "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-01-video-playable-backdrop-v2.png",
+            "visual_only": true
+          },
+          {
+            "name": "原创连续街区道路中线",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创连续街区道路中线",
+            "position": [
+              0,
+              0.108000002801418,
+              -12.6000003814697
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "原创远景城市楼体",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创远景城市楼体",
+            "position": [
+              -8.39999961853027,
+              2.29999995231628,
+              25.7999992370605
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "原创远景城市楼顶",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创远景城市楼顶",
+            "position": [
+              -8.39999961853027,
+              4.67999982833862,
+              25.7999992370605
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "原创远景城市窗格",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创远景城市窗格",
+            "position": [
+              -9.31999969482422,
+              1.45000004768372,
+              25.0300006866455
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "原创连续街区道路中线虚线",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创连续街区道路中线虚线",
+            "position": [
+              0,
+              0.101999998092651,
+              0.800000011920929
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "用户授权城市视频帧候选背景卡",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/用户授权城市视频帧候选背景卡",
+            "position": [
+              -8.75,
+              -3.84342074394226,
+              -37.9027938842773
+            ],
+            "texture": "",
+            "visual_only": true
+          }
+        ]
+      },
+      "cargo": {
+        "count": 1,
+        "egg_tray": true,
+        "visual_visible": true
+      },
+      "conflict": {
+        "position": [
+          -9.58793163299561,
+          0.899999976158142,
+          -9.02614879608154
+        ],
+        "visible": true,
+        "visible_meshes": 20,
+        "visual_only": false
+      },
+      "drive_background": {
+        "present": true,
+        "source": "city_visual",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-04-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "drive_foreground": {
+        "visible_meshes": 122,
+        "visual_only": true
+      },
+      "mission": {
+        "objective": "带着鸡蛋离开商店",
+        "stage": "leave_store"
+      },
+      "player": {
+        "position": [
+          -9,
+          0.899999976158142,
+          -10.3000001907349
+        ],
+        "visible": true
+      },
+      "reference_capture_mode": true,
+      "registered": false,
+      "registration": {
+        "clerk_visible": true,
+        "scan_board_visible": true,
+        "visual_only": true
+      },
+      "store_interior": {
+        "inside_store_aisle": true,
+        "light_count": 4,
+        "node_count": 7,
+        "product_count": 40,
+        "visible_nodes": 7,
+        "visual_only": true
+      },
+      "storefront_foreground": {
+        "visible_meshes": 0,
+        "visible_persons": 0,
+        "visual_only": true
+      },
+      "traffic": {
+        "candidate_visual_nodes": 0,
+        "total": 3,
+        "visible": 0,
+        "visible_meshes": 0
+      },
+      "vehicle": {
+        "driver_is_player": false,
+        "visible": false
+      },
+      "video_backdrop_enabled": true
+    },
+    {
+      "camera": {
+        "current": true,
+        "distance": 4.6,
+        "fov": 58,
+        "global_position": [
+          -9,
+          3.09999990463257,
+          -10.8000001907349
+        ],
+        "height": 2.15,
+        "name": "候选资产验收预览镜头",
+        "shoulder_x": 0.25
+      },
+      "candidate_capture_camera_lock": true,
+      "capture_background": {
+        "asset_source": "user_authorized_ai_video_frame_edit",
+        "name": "原创城市黄昏离店背景卡",
+        "present": true,
+        "rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-05-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "capture_id": "city-05",
+      "capture_render_layers": {
+        "background_excluded_from_non_dynamic_count": true,
+        "visible_candidate_endpoint_meshes": 0,
+        "visible_dynamic_meshes": 100,
+        "visible_non_dynamic_meshes": 678,
+        "visible_visual_layers": [
+          {
+            "name": "原创城市首店人群写实背景卡",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创城市首店人群写实背景卡",
+            "position": [
+              -9,
+              0.5,
+              -7.57000017166138
+            ],
+            "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-01-video-playable-backdrop-v2.png",
+            "visual_only": true
+          },
+          {
+            "name": "状态05离店道路",
+            "parent": "Visual",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态05离店道路",
+            "position": [
+              -9,
+              0.129999995231628,
+              -5.5
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态05道路标线",
+            "parent": "Visual",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态05道路标线",
+            "position": [
+              -11,
+              0.159999996423721,
+              -5.5
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态05街口远景车辆车身",
+            "parent": "状态05街口远景车辆细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态05街口远景车辆细节/状态05街口远景车辆车身",
+            "position": [
+              -5.94999980926514,
+              0.479999989271164,
+              -5.69999980926514
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态05街口远景车辆车顶",
+            "parent": "状态05街口远景车辆细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态05街口远景车辆细节/状态05街口远景车辆车顶",
+            "position": [
+              -6.06999969482422,
+              0.899999976158142,
+              -5.69999980926514
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态05街口远景车辆前挡风玻璃",
+            "parent": "状态05街口远景车辆细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态05街口远景车辆细节/状态05街口远景车辆前挡风玻璃",
+            "position": [
+              -6.54999971389771,
+              0.860000014305115,
+              -5.69999980926514
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态05街口远景车辆后挡风玻璃",
+            "parent": "状态05街口远景车辆细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态05街口远景车辆细节/状态05街口远景车辆后挡风玻璃",
+            "position": [
+              -5.56999969482422,
+              0.839999973773956,
+              -5.69999980926514
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态05街口远景车辆前灯左",
+            "parent": "状态05街口远景车辆细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态05街口远景车辆细节/状态05街口远景车辆前灯左",
+            "position": [
+              -7.02999973297119,
+              0.550000011920929,
+              -5.27999973297119
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态05街口远景车辆前灯右",
+            "parent": "状态05街口远景车辆细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态05街口远景车辆细节/状态05街口远景车辆前灯右",
+            "position": [
+              -7.02999973297119,
+              0.550000011920929,
+              -6.11999988555908
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态05街口远景车辆车轮左",
+            "parent": "状态05街口远景车辆细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态05街口远景车辆细节/状态05街口远景车辆车轮左",
+            "position": [
+              -6.50999975204468,
+              0.280000001192093,
+              -5.07999992370605
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态05街口远景车辆车轮右",
+            "parent": "状态05街口远景车辆细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态05街口远景车辆细节/状态05街口远景车辆车轮右",
+            "position": [
+              -6.50999975204468,
+              0.280000001192093,
+              -6.31999969482422
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "用户授权城市视频帧候选背景卡",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/用户授权城市视频帧候选背景卡",
+            "position": [
+              -9.24999713897705,
+              -6.83854389190674,
+              19.633810043335
+            ],
+            "texture": "",
+            "visual_only": true
+          }
+        ]
+      },
+      "cargo": {
+        "count": 1,
+        "egg_tray": true,
+        "visual_visible": true
+      },
+      "conflict": {
+        "position": [
+          -6.90000009536743,
+          0.699999988079071,
+          -6.80000019073486
+        ],
+        "visible": false,
+        "visible_meshes": 0,
+        "visual_only": false
+      },
+      "drive_background": {
+        "present": true,
+        "source": "city_visual",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-05-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "drive_foreground": {
+        "visible_meshes": 122,
+        "visual_only": true
+      },
+      "mission": {
+        "objective": "带着鸡蛋离开商店",
+        "stage": "leave_store"
+      },
+      "player": {
+        "position": [
+          -9,
+          0.899999976158142,
+          -6.19999980926514
+        ],
+        "visible": true
+      },
+      "reference_capture_mode": true,
+      "registered": false,
+      "registration": {
+        "clerk_visible": false,
+        "scan_board_visible": false,
+        "visual_only": true
+      },
+      "store_interior": {
+        "inside_store_aisle": false,
+        "light_count": 4,
+        "node_count": 7,
+        "product_count": 40,
+        "visible_nodes": 0,
+        "visual_only": true
+      },
+      "storefront_foreground": {
+        "visible_meshes": 202,
+        "visible_persons": 14,
+        "visual_only": true
+      },
+      "traffic": {
+        "candidate_visual_nodes": 0,
+        "total": 3,
+        "visible": 0,
+        "visible_meshes": 0
+      },
+      "vehicle": {
+        "driver_is_player": false,
+        "visible": false
+      },
+      "video_backdrop_enabled": true
+    },
+    {
+      "camera": {
+        "current": true,
+        "distance": 5.2,
+        "fov": 56,
+        "global_position": [
+          4.69999980926514,
+          2.65000009536743,
+          8.64999961853027
+        ],
+        "height": 2.3,
+        "name": "候选资产验收预览镜头",
+        "shoulder_x": 0.25
+      },
+      "candidate_capture_camera_lock": true,
+      "capture_background": {
+        "asset_source": "user_authorized_ai_video_frame_edit",
+        "name": "原创城市黄昏扫码登记背景卡",
+        "present": true,
+        "rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-06-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "capture_id": "city-06",
+      "capture_render_layers": {
+        "background_excluded_from_non_dynamic_count": true,
+        "visible_candidate_endpoint_meshes": 0,
+        "visible_dynamic_meshes": 99,
+        "visible_non_dynamic_meshes": 28,
+        "visible_visual_layers": [
+          {
+            "name": "用户授权城市视频帧候选背景卡",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/用户授权城市视频帧候选背景卡",
+            "position": [
+              6.75000381469727,
+              -6.46854400634766,
+              30.5538101196289
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "候选城市终点相机远景板",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/候选城市终点相机远景板",
+            "position": [
+              6.75000190734863,
+              -2.76033973693848,
+              19.1411323547363
+            ],
+            "texture": "res://assets/environment/generated/city_dusk_corner_storefront_v1_generated.png",
+            "visual_only": false
+          }
+        ]
+      },
+      "cargo": {
+        "count": 1,
+        "egg_tray": true,
+        "visual_visible": true
+      },
+      "conflict": {
+        "position": [
+          -6.90000009536743,
+          0.699999988079071,
+          -6.80000019073486
+        ],
+        "visible": false,
+        "visible_meshes": 0,
+        "visual_only": false
+      },
+      "drive_background": {
+        "present": true,
+        "source": "city_visual",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-06-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "drive_foreground": {
+        "visible_meshes": 122,
+        "visual_only": true
+      },
+      "mission": {
+        "objective": "前往登记点完成登记",
+        "stage": "register"
+      },
+      "player": {
+        "position": [
+          7,
+          1.12000000476837,
+          5.32000017166138
+        ],
+        "visible": true
+      },
+      "reference_capture_mode": true,
+      "registered": false,
+      "registration": {
+        "clerk_visible": true,
+        "scan_board_visible": true,
+        "visual_only": true
+      },
+      "store_interior": {
+        "inside_store_aisle": false,
+        "light_count": 4,
+        "node_count": 7,
+        "product_count": 40,
+        "visible_nodes": 0,
+        "visual_only": true
+      },
+      "storefront_foreground": {
+        "visible_meshes": 0,
+        "visible_persons": 0,
+        "visual_only": true
+      },
+      "traffic": {
+        "candidate_visual_nodes": 0,
+        "total": 3,
+        "visible": 0,
+        "visible_meshes": 0
+      },
+      "vehicle": {
+        "driver_is_player": true,
+        "visible": true
+      },
+      "video_backdrop_enabled": true
+    },
+    {
+      "camera": {
+        "current": true,
+        "distance": 5.2,
+        "fov": 56,
+        "global_position": [
+          4.69999980926514,
+          2.65000009536743,
+          8.64999961853027
+        ],
+        "height": 2.3,
+        "name": "候选资产验收预览镜头",
+        "shoulder_x": 0.25
+      },
+      "candidate_capture_camera_lock": true,
+      "capture_background": {
+        "asset_source": "user_authorized_ai_video_frame_edit",
+        "name": "原创城市黄昏登记成功背景卡",
+        "present": true,
+        "rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-07-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "capture_id": "city-07",
+      "capture_render_layers": {
+        "background_excluded_from_non_dynamic_count": true,
+        "visible_candidate_endpoint_meshes": 0,
+        "visible_dynamic_meshes": 98,
+        "visible_non_dynamic_meshes": 28,
+        "visible_visual_layers": [
+          {
+            "name": "用户授权城市视频帧候选背景卡",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/用户授权城市视频帧候选背景卡",
+            "position": [
+              6.75000381469727,
+              -6.46854400634766,
+              30.5538101196289
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "候选城市终点相机远景板",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/候选城市终点相机远景板",
+            "position": [
+              6.75000190734863,
+              -2.76033973693848,
+              19.1411323547363
+            ],
+            "texture": "res://assets/environment/generated/city_dusk_corner_storefront_v1_generated.png",
+            "visual_only": false
+          }
+        ]
+      },
+      "cargo": {
+        "count": 0,
+        "egg_tray": false,
+        "visual_visible": false
+      },
+      "conflict": {
+        "position": [
+          -6.90000009536743,
+          0.699999988079071,
+          -6.80000019073486
+        ],
+        "visible": false,
+        "visible_meshes": 0,
+        "visual_only": false
+      },
+      "drive_background": {
+        "present": true,
+        "source": "city_visual",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-07-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "drive_foreground": {
+        "visible_meshes": 122,
+        "visual_only": true
+      },
+      "mission": {
+        "objective": "将货物送到旺铺转让处",
+        "stage": "new_shop"
+      },
+      "player": {
+        "position": [
+          7,
+          1.12000000476837,
+          5.32000017166138
+        ],
+        "visible": true
+      },
+      "reference_capture_mode": true,
+      "registered": true,
+      "registration": {
+        "clerk_visible": true,
+        "scan_board_visible": true,
+        "visual_only": true
+      },
+      "store_interior": {
+        "inside_store_aisle": false,
+        "light_count": 4,
+        "node_count": 7,
+        "product_count": 40,
+        "visible_nodes": 0,
+        "visual_only": true
+      },
+      "storefront_foreground": {
+        "visible_meshes": 0,
+        "visible_persons": 0,
+        "visual_only": true
+      },
+      "traffic": {
+        "candidate_visual_nodes": 0,
+        "total": 3,
+        "visible": 0,
+        "visible_meshes": 0
+      },
+      "vehicle": {
+        "driver_is_player": true,
+        "visible": true
+      },
+      "video_backdrop_enabled": true
+    },
+    {
+      "camera": {
+        "current": true,
+        "distance": 6.4,
+        "fov": 58,
+        "global_position": [
+          -2.40000081062317,
+          3.75,
+          -3.375
+        ],
+        "height": 2.2,
+        "name": "候选资产验收预览镜头",
+        "shoulder_x": 0.25
+      },
+      "candidate_capture_camera_lock": true,
+      "capture_background": {
+        "asset_source": "user_authorized_ai_video_frame_edit",
+        "name": "候选城市驾驶世界远景板",
+        "present": true,
+        "rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-08-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "capture_id": "city-08",
+      "capture_render_layers": {
+        "background_excluded_from_non_dynamic_count": true,
+        "visible_candidate_endpoint_meshes": 0,
+        "visible_dynamic_meshes": 112,
+        "visible_non_dynamic_meshes": 227,
+        "visible_visual_layers": [
+          {
+            "name": "原创连续街区道路中线",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创连续街区道路中线",
+            "position": [
+              0,
+              0.108000002801418,
+              -12.6000003814697
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "原创连续街区道路中线虚线",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创连续街区道路中线虚线",
+            "position": [
+              0,
+              0.101999998092651,
+              0.800000011920929
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "用户授权城市视频帧候选背景卡",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/用户授权城市视频帧候选背景卡",
+            "position": [
+              -2.64999651908875,
+              -6.56854391098022,
+              27.8788089752197
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "远景车辆车身",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆车身",
+            "position": [
+              -2,
+              0.550000011920929,
+              15
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆车顶",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆车顶",
+            "position": [
+              -2,
+              1.30999994277954,
+              15.1199998855591
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆车轮-左",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆车轮-左",
+            "position": [
+              -2.6800000667572,
+              0.270000010728836,
+              15.7200002670288
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前轮-左",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆前轮-左",
+            "position": [
+              -2.6800000667572,
+              0.270000010728836,
+              14.2799997329712
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后视镜-左",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆后视镜-左",
+            "position": [
+              -2.6100001335144,
+              1.07999992370605,
+              14.5600004196167
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后视镜面-左",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆后视镜面-左",
+            "position": [
+              -2.65499997138977,
+              1.07999992370605,
+              14.5600004196167
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆车轮-右",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆车轮-右",
+            "position": [
+              -1.3199999332428,
+              0.270000010728836,
+              15.7200002670288
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前轮-右",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆前轮-右",
+            "position": [
+              -1.3199999332428,
+              0.270000010728836,
+              14.2799997329712
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后视镜-右",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆后视镜-右",
+            "position": [
+              -1.38999998569489,
+              1.07999992370605,
+              14.5600004196167
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后视镜面-右",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆后视镜面-右",
+            "position": [
+              -1.34500002861023,
+              1.07999992370605,
+              14.5600004196167
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆左尾灯",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆左尾灯",
+            "position": [
+              -2.48000001907349,
+              0.790000021457672,
+              16.2299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆右尾灯",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆右尾灯",
+            "position": [
+              -1.51999998092651,
+              0.790000021457672,
+              16.2299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前灯",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆前灯",
+            "position": [
+              -2.48000001907349,
+              0.790000021457672,
+              13.7700004577637
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前保险杠",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆前保险杠",
+            "position": [
+              -2,
+              0.629999995231628,
+              13.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后保险杠",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆后保险杠",
+            "position": [
+              -2,
+              0.629999995231628,
+              16.2700004577637
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后车牌",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆后车牌",
+            "position": [
+              -2,
+              0.780000030994415,
+              16.2649993896484
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前车牌",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆前车牌",
+            "position": [
+              -2,
+              0.780000030994415,
+              13.7349996566772
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆挡风玻璃左框",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆挡风玻璃左框",
+            "position": [
+              -2.4300000667572,
+              1.05999994277954,
+              14.6599998474121
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆挡风玻璃右框",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆挡风玻璃右框",
+            "position": [
+              -1.5699999332428,
+              1.05999994277954,
+              14.6599998474121
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆腰线",
+            "parent": "街道车辆_北行",
+            "path": "/root/CityDemo/街道车辆_北行/远景车辆腰线",
+            "position": [
+              -2,
+              0.75,
+              15
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆车身",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆车身",
+            "position": [
+              2,
+              0.550000011920929,
+              -15
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆车顶",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆车顶",
+            "position": [
+              2,
+              1.30999994277954,
+              -15.1199998855591
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆车轮-左",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆车轮-左",
+            "position": [
+              2.6800000667572,
+              0.270000010728836,
+              -15.7200002670288
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前轮-左",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆前轮-左",
+            "position": [
+              2.67999982833862,
+              0.270000010728836,
+              -14.2799997329712
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后视镜-左",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆后视镜-左",
+            "position": [
+              2.60999989509583,
+              1.07999992370605,
+              -14.5599994659424
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后视镜面-左",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆后视镜面-左",
+            "position": [
+              2.65499997138977,
+              1.07999992370605,
+              -14.5599994659424
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆车轮-右",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆车轮-右",
+            "position": [
+              1.32000017166138,
+              0.270000010728836,
+              -15.7200002670288
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前轮-右",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆前轮-右",
+            "position": [
+              1.3199999332428,
+              0.270000010728836,
+              -14.2799997329712
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后视镜-右",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆后视镜-右",
+            "position": [
+              1.3899998664856,
+              1.07999992370605,
+              -14.5600004196167
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后视镜面-右",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆后视镜面-右",
+            "position": [
+              1.34500002861023,
+              1.07999992370605,
+              -14.5600004196167
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆左尾灯",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆左尾灯",
+            "position": [
+              2.48000025749207,
+              0.790000021457672,
+              -16.2299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆右尾灯",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆右尾灯",
+            "position": [
+              1.52000021934509,
+              0.790000021457672,
+              -16.2299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前灯",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆前灯",
+            "position": [
+              2.47999978065491,
+              0.790000021457672,
+              -13.7699995040894
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前保险杠",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆前保险杠",
+            "position": [
+              1.99999976158142,
+              0.629999995231628,
+              -13.7299995422363
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后保险杠",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆后保险杠",
+            "position": [
+              2.00000023841858,
+              0.629999995231628,
+              -16.2700004577637
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后车牌",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆后车牌",
+            "position": [
+              2.00000023841858,
+              0.780000030994415,
+              -16.2649993896484
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前车牌",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆前车牌",
+            "position": [
+              1.99999976158142,
+              0.780000030994415,
+              -13.7349996566772
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆挡风玻璃左框",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆挡风玻璃左框",
+            "position": [
+              2.42999982833862,
+              1.05999994277954,
+              -14.6599998474121
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆挡风玻璃右框",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆挡风玻璃右框",
+            "position": [
+              1.5699999332428,
+              1.05999994277954,
+              -14.6599998474121
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆腰线",
+            "parent": "街道车辆_南行",
+            "path": "/root/CityDemo/街道车辆_南行/远景车辆腰线",
+            "position": [
+              2,
+              0.75,
+              -15
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆车身",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆车身",
+            "position": [
+              -15,
+              0.550000011920929,
+              1.20000004768372
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆车顶",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆车顶",
+            "position": [
+              -15.1199998855591,
+              1.30999994277954,
+              1.20000004768372
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆车轮-左",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆车轮-左",
+            "position": [
+              -15.7200002670288,
+              0.270000010728836,
+              0.519999980926514
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前轮-左",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆前轮-左",
+            "position": [
+              -14.2799997329712,
+              0.270000010728836,
+              0.520000100135803
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后视镜-左",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆后视镜-左",
+            "position": [
+              -14.5600004196167,
+              1.07999992370605,
+              0.590000033378601
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后视镜面-左",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆后视镜面-左",
+            "position": [
+              -14.5600004196167,
+              1.07999992370605,
+              0.545000076293945
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆车轮-右",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆车轮-右",
+            "position": [
+              -15.7200002670288,
+              0.270000010728836,
+              1.87999999523163
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前轮-右",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆前轮-右",
+            "position": [
+              -14.2799997329712,
+              0.270000010728836,
+              1.88000011444092
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后视镜-右",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆后视镜-右",
+            "position": [
+              -14.5600004196167,
+              1.07999992370605,
+              1.81000006198883
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后视镜面-右",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆后视镜面-右",
+            "position": [
+              -14.5600004196167,
+              1.07999992370605,
+              1.85500001907349
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆左尾灯",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆左尾灯",
+            "position": [
+              -16.2299995422363,
+              0.790000021457672,
+              0.720000028610229
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆右尾灯",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆右尾灯",
+            "position": [
+              -16.2299995422363,
+              0.790000021457672,
+              1.67999994754791
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前灯",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆前灯",
+            "position": [
+              -13.7700004577637,
+              0.790000021457672,
+              0.720000147819519
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前保险杠",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆前保险杠",
+            "position": [
+              -13.7299995422363,
+              0.629999995231628,
+              1.20000004768372
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后保险杠",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆后保险杠",
+            "position": [
+              -16.2700004577637,
+              0.629999995231628,
+              1.20000004768372
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆后车牌",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆后车牌",
+            "position": [
+              -16.2649993896484,
+              0.780000030994415,
+              1.20000004768372
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆前车牌",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆前车牌",
+            "position": [
+              -13.7349996566772,
+              0.780000030994415,
+              1.20000004768372
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆挡风玻璃左框",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆挡风玻璃左框",
+            "position": [
+              -14.6599998474121,
+              1.05999994277954,
+              0.770000040531158
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆挡风玻璃右框",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆挡风玻璃右框",
+            "position": [
+              -14.6599998474121,
+              1.05999994277954,
+              1.63000011444092
+            ],
+            "texture": "",
+            "visual_only": false
+          },
+          {
+            "name": "远景车辆腰线",
+            "parent": "街道车辆_东行",
+            "path": "/root/CityDemo/街道车辆_东行/远景车辆腰线",
+            "position": [
+              -15,
+              0.75,
+              1.20000004768372
+            ],
+            "texture": "",
+            "visual_only": false
+          }
+        ]
+      },
+      "cargo": {
+        "count": 0,
+        "egg_tray": false,
+        "visual_visible": true
+      },
+      "conflict": {
+        "position": [
+          4,
+          0.899999976158142,
+          -2
+        ],
+        "visible": false,
+        "visible_meshes": 0,
+        "visual_only": false
+      },
+      "drive_background": {
+        "present": true,
+        "source": "preview_camera",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-08-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "drive_foreground": {
+        "visible_meshes": 122,
+        "visual_only": true
+      },
+      "mission": {
+        "objective": "领取免费鸡蛋",
+        "stage": "collect_eggs"
+      },
+      "player": {
+        "position": [
+          -2.40000009536743,
+          1.12000000476837,
+          3.84500002861023
+        ],
+        "visible": true
+      },
+      "reference_capture_mode": true,
+      "registered": false,
+      "registration": {
+        "clerk_visible": false,
+        "scan_board_visible": false,
+        "visual_only": true
+      },
+      "store_interior": {
+        "inside_store_aisle": false,
+        "light_count": 4,
+        "node_count": 7,
+        "product_count": 40,
+        "visible_nodes": 0,
+        "visual_only": true
+      },
+      "storefront_foreground": {
+        "visible_meshes": 0,
+        "visible_persons": 0,
+        "visual_only": true
+      },
+      "traffic": {
+        "candidate_visual_nodes": 3,
+        "total": 3,
+        "visible": 3,
+        "visible_meshes": 105
+      },
+      "vehicle": {
+        "driver_is_player": true,
+        "visible": true
+      },
+      "video_backdrop_enabled": true
+    },
+    {
+      "camera": {
+        "current": true,
+        "distance": 5.8,
+        "fov": 60,
+        "global_position": [
+          -3.79999995231628,
+          3,
+          6.19999980926514
+        ],
+        "height": 2.4,
+        "name": "候选资产验收预览镜头",
+        "shoulder_x": 0.25
+      },
+      "candidate_capture_camera_lock": true,
+      "capture_background": {
+        "asset_source": "user_authorized_ai_video_frame_edit",
+        "name": "原创城市黄昏行驶运动模糊背景卡",
+        "present": true,
+        "rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-09-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "capture_id": "city-09",
+      "capture_render_layers": {
+        "background_excluded_from_non_dynamic_count": true,
+        "visible_candidate_endpoint_meshes": 0,
+        "visible_dynamic_meshes": 98,
+        "visible_non_dynamic_meshes": 413,
+        "visible_visual_layers": [
+          {
+            "name": "原创连续街区道路中线",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创连续街区道路中线",
+            "position": [
+              0,
+              0.108000002801418,
+              -12.6000003814697
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "原创连续街区道路中线虚线",
+            "parent": "Visual",
+            "path": "/root/CityDemo/Visual/原创连续街区道路中线虚线",
+            "position": [
+              0,
+              0.101999998092651,
+              0.800000011920929
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶道路",
+            "parent": "Visual",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶道路",
+            "position": [
+              4.5,
+              0.129999995231628,
+              1
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆左车身",
+            "parent": "状态驾驶远景车辆左细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆左细节/状态驾驶远景车辆左车身",
+            "position": [
+              2.29999995231628,
+              0.479999989271164,
+              -4
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆左车顶",
+            "parent": "状态驾驶远景车辆左细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆左细节/状态驾驶远景车辆左车顶",
+            "position": [
+              2.29999995231628,
+              0.899999976158142,
+              -4.11999988555908
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆左前挡风玻璃",
+            "parent": "状态驾驶远景车辆左细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆左细节/状态驾驶远景车辆左前挡风玻璃",
+            "position": [
+              2.29999995231628,
+              0.860000014305115,
+              -4.59999990463257
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆左后挡风玻璃",
+            "parent": "状态驾驶远景车辆左细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆左细节/状态驾驶远景车辆左后挡风玻璃",
+            "position": [
+              2.29999995231628,
+              0.839999973773956,
+              -3.61999988555908
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆左前灯左",
+            "parent": "状态驾驶远景车辆左细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆左细节/状态驾驶远景车辆左前灯左",
+            "position": [
+              1.87999999523163,
+              0.550000011920929,
+              -5.07999992370605
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆左前灯右",
+            "parent": "状态驾驶远景车辆左细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆左细节/状态驾驶远景车辆左前灯右",
+            "position": [
+              2.72000002861023,
+              0.550000011920929,
+              -5.07999992370605
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆左车轮左",
+            "parent": "状态驾驶远景车辆左细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆左细节/状态驾驶远景车辆左车轮左",
+            "position": [
+              1.67999994754791,
+              0.280000001192093,
+              -4.55999994277954
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆左车轮右",
+            "parent": "状态驾驶远景车辆左细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆左细节/状态驾驶远景车辆左车轮右",
+            "position": [
+              2.92000007629395,
+              0.280000001192093,
+              -4.55999994277954
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆右车身",
+            "parent": "状态驾驶远景车辆右细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆右细节/状态驾驶远景车辆右车身",
+            "position": [
+              6.69999980926514,
+              0.479999989271164,
+              -5.69999980926514
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆右车顶",
+            "parent": "状态驾驶远景车辆右细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆右细节/状态驾驶远景车辆右车顶",
+            "position": [
+              6.69999980926514,
+              0.899999976158142,
+              -5.57999992370605
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆右前挡风玻璃",
+            "parent": "状态驾驶远景车辆右细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆右细节/状态驾驶远景车辆右前挡风玻璃",
+            "position": [
+              6.69999980926514,
+              0.860000014305115,
+              -5.09999990463257
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆右后挡风玻璃",
+            "parent": "状态驾驶远景车辆右细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆右细节/状态驾驶远景车辆右后挡风玻璃",
+            "position": [
+              6.69999980926514,
+              0.839999973773956,
+              -6.07999992370605
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆右前灯左",
+            "parent": "状态驾驶远景车辆右细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆右细节/状态驾驶远景车辆右前灯左",
+            "position": [
+              7.11999988555908,
+              0.550000011920929,
+              -4.61999988555908
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆右前灯右",
+            "parent": "状态驾驶远景车辆右细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆右细节/状态驾驶远景车辆右前灯右",
+            "position": [
+              6.27999973297119,
+              0.550000011920929,
+              -4.61999988555908
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆右车轮左",
+            "parent": "状态驾驶远景车辆右细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆右细节/状态驾驶远景车辆右车轮左",
+            "position": [
+              7.31999969482422,
+              0.280000001192093,
+              -5.1399998664856
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "状态驾驶远景车辆右车轮右",
+            "parent": "状态驾驶远景车辆右细节",
+            "path": "/root/CityDemo/城市十一状态原创视觉层/Visual/状态驾驶远景车辆右细节/状态驾驶远景车辆右车轮右",
+            "position": [
+              6.07999992370605,
+              0.280000001192093,
+              -5.1399998664856
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "用户授权城市视频帧候选背景卡",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/用户授权城市视频帧候选背景卡",
+            "position": [
+              0.750003755092621,
+              -6.36854410171509,
+              26.0788078308105
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "候选城市驾驶相机远景板",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/候选城市驾驶相机远景板",
+            "position": [
+              0.750002026557922,
+              -2.66033983230591,
+              14.6661310195923
+            ],
+            "texture": "res://assets/environment/generated/city_drive_lane_dusk_v1_generated.png",
+            "visual_only": false
+          }
+        ]
+      },
+      "cargo": {
+        "count": 0,
+        "egg_tray": false,
+        "visual_visible": false
+      },
+      "conflict": {
+        "position": [
+          -6.90000009536743,
+          0.699999988079071,
+          -6.80000019073486
+        ],
+        "visible": false,
+        "visible_meshes": 0,
+        "visual_only": false
+      },
+      "drive_background": {
+        "present": true,
+        "source": "city_visual",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-09-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "drive_foreground": {
+        "visible_meshes": 122,
+        "visual_only": true
+      },
+      "mission": {
+        "objective": "将货物送到旺铺转让处",
+        "stage": "new_shop"
+      },
+      "player": {
+        "position": [
+          1,
+          1.12000000476837,
+          1.4449999332428
+        ],
+        "visible": true
+      },
+      "reference_capture_mode": true,
+      "registered": true,
+      "registration": {
+        "clerk_visible": false,
+        "scan_board_visible": false,
+        "visual_only": true
+      },
+      "store_interior": {
+        "inside_store_aisle": false,
+        "light_count": 4,
+        "node_count": 7,
+        "product_count": 40,
+        "visible_nodes": 0,
+        "visual_only": true
+      },
+      "storefront_foreground": {
+        "visible_meshes": 0,
+        "visible_persons": 0,
+        "visual_only": true
+      },
+      "traffic": {
+        "candidate_visual_nodes": 0,
+        "total": 3,
+        "visible": 0,
+        "visible_meshes": 0
+      },
+      "vehicle": {
+        "driver_is_player": true,
+        "visible": true
+      },
+      "video_backdrop_enabled": true
+    },
+    {
+      "camera": {
+        "current": true,
+        "distance": 6,
+        "fov": 58,
+        "global_position": [
+          6.59916257858276,
+          3.70000004768372,
+          1.39999961853027
+        ],
+        "height": 2.3,
+        "name": "候选资产验收预览镜头",
+        "shoulder_x": 0.25
+      },
+      "candidate_capture_camera_lock": true,
+      "capture_background": {
+        "asset_source": "user_authorized_ai_video_frame_edit",
+        "name": "原创城市黄昏车尾跟拍背景卡",
+        "present": true,
+        "rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-10-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "capture_id": "city-10",
+      "capture_render_layers": {
+        "background_excluded_from_non_dynamic_count": true,
+        "visible_candidate_endpoint_meshes": 0,
+        "visible_dynamic_meshes": 98,
+        "visible_non_dynamic_meshes": 27,
+        "visible_visual_layers": [
+          {
+            "name": "用户授权城市视频帧候选背景卡",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/用户授权城市视频帧候选背景卡",
+            "position": [
+              6.34916687011719,
+              -6.46854400634766,
+              32.65380859375
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "候选城市终点相机远景板",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/候选城市终点相机远景板",
+            "position": [
+              6.34916496276855,
+              -2.76033973693848,
+              21.2411308288574
+            ],
+            "texture": "res://assets/environment/generated/city_dusk_corner_storefront_v1_generated.png",
+            "visual_only": false
+          }
+        ]
+      },
+      "cargo": {
+        "count": 0,
+        "egg_tray": false,
+        "visual_visible": false
+      },
+      "conflict": {
+        "position": [
+          -6.90000009536743,
+          0.699999988079071,
+          -6.80000019073486
+        ],
+        "visible": false,
+        "visible_meshes": 0,
+        "visual_only": false
+      },
+      "drive_background": {
+        "present": true,
+        "source": "city_visual",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-10-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "drive_foreground": {
+        "visible_meshes": 122,
+        "visual_only": true
+      },
+      "mission": {
+        "objective": "将货物送到旺铺转让处",
+        "stage": "new_shop"
+      },
+      "player": {
+        "position": [
+          6.59916305541992,
+          1.12000000476837,
+          8.21999931335449
+        ],
+        "visible": true
+      },
+      "reference_capture_mode": true,
+      "registered": true,
+      "registration": {
+        "clerk_visible": false,
+        "scan_board_visible": false,
+        "visual_only": true
+      },
+      "store_interior": {
+        "inside_store_aisle": false,
+        "light_count": 4,
+        "node_count": 7,
+        "product_count": 40,
+        "visible_nodes": 0,
+        "visual_only": true
+      },
+      "storefront_foreground": {
+        "visible_meshes": 0,
+        "visible_persons": 0,
+        "visual_only": true
+      },
+      "traffic": {
+        "candidate_visual_nodes": 0,
+        "total": 3,
+        "visible": 0,
+        "visible_meshes": 0
+      },
+      "vehicle": {
+        "driver_is_player": true,
+        "visible": true
+      },
+      "video_backdrop_enabled": true
+    },
+    {
+      "camera": {
+        "current": true,
+        "distance": 5.2,
+        "fov": 52,
+        "global_position": [
+          8.60000038146973,
+          2.75,
+          0.550000190734863
+        ],
+        "height": 2.3,
+        "name": "候选资产验收预览镜头",
+        "shoulder_x": 0.25
+      },
+      "candidate_capture_camera_lock": true,
+      "capture_background": {
+        "asset_source": "user_authorized_ai_video_frame_edit",
+        "name": "原创城市终点傍晚街道背景卡",
+        "present": true,
+        "rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-11-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "capture_id": "city-11",
+      "capture_render_layers": {
+        "background_excluded_from_non_dynamic_count": true,
+        "visible_candidate_endpoint_meshes": 13,
+        "visible_dynamic_meshes": 113,
+        "visible_non_dynamic_meshes": 0,
+        "visible_visual_layers": [
+          {
+            "name": "用户授权城市视频帧候选背景卡",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/用户授权城市视频帧候选背景卡",
+            "position": [
+              8.35000419616699,
+              -6.46854400634766,
+              30.3538093566895
+            ],
+            "texture": "",
+            "visual_only": true
+          },
+          {
+            "name": "候选城市终点相机远景板",
+            "parent": "第三人称相机",
+            "path": "/root/CityDemo/玩家/第三人称镜头/第三人称相机/候选城市终点相机远景板",
+            "position": [
+              8.35000228881836,
+              -2.76033973693848,
+              18.9411315917969
+            ],
+            "texture": "res://assets/environment/generated/city_dusk_corner_storefront_v1_generated.png",
+            "visual_only": false
+          }
+        ]
+      },
+      "cargo": {
+        "count": 0,
+        "egg_tray": false,
+        "visual_visible": true
+      },
+      "conflict": {
+        "position": [
+          4,
+          0.899999976158142,
+          -2
+        ],
+        "visible": false,
+        "visible_meshes": 0,
+        "visual_only": false
+      },
+      "drive_background": {
+        "present": true,
+        "source": "city_visual",
+        "texture": "res://art-source/city-full-kit-candidate/reference-video-candidate/city-11-video-playable-backdrop-v1.png",
+        "visible": true,
+        "visual_only": true
+      },
+      "drive_foreground": {
+        "visible_meshes": 122,
+        "visual_only": true
+      },
+      "mission": {
+        "objective": "领取免费鸡蛋",
+        "stage": "collect_eggs"
+      },
+      "player": {
+        "position": [
+          8.60000038146973,
+          1.12000000476837,
+          5.12000036239624
+        ],
+        "visible": true
+      },
+      "reference_capture_mode": true,
+      "registered": false,
+      "registration": {
+        "clerk_visible": false,
+        "scan_board_visible": false,
+        "visual_only": true
+      },
+      "store_interior": {
+        "inside_store_aisle": false,
+        "light_count": 4,
+        "node_count": 7,
+        "product_count": 40,
+        "visible_nodes": 0,
+        "visual_only": true
+      },
+      "storefront_foreground": {
+        "visible_meshes": 0,
+        "visible_persons": 0,
+        "visual_only": true
+      },
+      "traffic": {
+        "candidate_visual_nodes": 0,
+        "total": 3,
+        "visible": 0,
+        "visible_meshes": 0
+      },
+      "vehicle": {
+        "driver_is_player": true,
+        "visible": true
+      },
+      "video_backdrop_enabled": true
+    }
+  ],
+  "graphics_capture_performed": false,
+  "reason": "当前运行没有可用图形根纹理；本报告只证明候选场景配置，不替代逐帧视觉验收。",
+  "release_allowed": false,
+  "schema_version": 1,
+  "status": "candidate_configuration_validation_only",
+  "visual_status": "unverified",
+  "source_sha256": {
+    "runtime_source_fingerprint": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+    "runtime_file_count": 326,
+    "candidate_catalog": "14dd5f2364d4e94ea65d01c879a478324ab51f7864880bd9447b93349085d7d5",
+    "storefront_scene": "ffe531508fdb6942bdb0cee9d00a885c4bb94aed1edc0bdc871c57369e7520bd",
+    "storefront_script": "9aa101df478a56d81ec9c86b66f6dafee20f9efbcfa322d87c0a8199c757c1f4",
+    "city_crowd_script": "85523a6ee4344c534f7b048c51ae46d428943a489e572583f4065e3ea5f4103e",
+    "city_crowd_overlay": "71d231e4fec5c55c5c7e7222ab93789e3de5cea68d096fe2e53285c07d7df497",
+    "player_visual_script": "877415f7889fd1f90095a6411a264d5d31da47f37eb0663cd0786169df901d18",
+    "player_visual_scene": "032bfed2ef1732664437ed1eb497d442b6b058b4ca81b7bda40721465542da59",
+    "makehuman_npc_retouch_script": "cbdeef0e757b79723ebcb462047a0a5af1129518be1c742c8a5e73f248a8c808",
+    "storefront_sign_eggs_texture": "a212f61fac5c86155cdeeeda8726ca773a151ec6a1d518ce1cb21887eea6398a",
+    "storefront_sign_endpoint_texture": "bace441da8aa2c90b526fd7c97c121d59f305538d3464c4dbd592a78ce00d4aa",
+    "storefront_crowd_texture": "b75e89c39e5d181d1c63ad90e1907f91064a9b922adc2f97aace6387ee12d545",
+    "dusk_corner_storefront_texture": "a325a81895ce7b9aeed7e22e2efdd7c01e5f1bccb8a9f620005a76ae13d4d553",
+    "drive_lane_texture": "451e87e65eaaba2dad625222bf98860ca72cccd4a43afeb42ba028eaddfe2bb2",
+    "city02_video_playable_texture": "ed90b222c349c095c9e5f2541d8043ca2727162997b56a1f44e555ce5da6371f",
+    "city03_video_playable_texture": "5237b286f2d8cccd7773573e5eefae26453783c19726b756943a4b6d1c894600",
+    "city04_video_playable_texture": "d3adae9855f26d88e1822a2f40dca5b6f256f05e50f1e15221f877916806d6f0",
+    "city05_video_playable_texture": "00aef9b1c016f8dc0b5d4b70b72e7043145c965a7db1e18ced247479c4eaa7ba",
+    "city06_video_playable_texture": "43ab82007d572e4f561c65bc7763645468059784a7d34aa9326d83b99eca63d0",
+    "city07_video_playable_texture": "0e59bf503b271bfd556ad4293e3eb9dc797a53a642f3d526ad22b24f4885b0ef",
+    "city08_video_playable_texture": "caadad3530d84b99843d2522db3dbbef2c7574bffa3ea391778b0c6df44a97b0",
+    "city09_video_playable_texture": "8d9e7baf4568381042b6aea0d1a57ebe55c122cd624f6bc6cfea5d3fc93b93a5",
+    "city10_video_playable_texture": "693fbfe4f033a7ce43446fb6c36a82619bc8cfcfdcfe112bb9d097e8f7e4b48b",
+    "city11_video_playable_texture": "742e2270430549af7a932be7b4c9701ed256f594174389965b832d872126c9a2",
+    "vehicle_scene": "768213b29ec554ad267c8d869bc803ccf19f8826885e70340ac2b36b34c25d73",
+    "vehicle_script": "981a5c26bd34350348c0a1350d6e8eca8354f289e2925d254f2db3500b55c289",
+    "interaction_props_asset": "2c490b5e28df3171326434d1e763afc6c7fd6f1d1b464708419823a7fb715ec9",
+    "capture_script": "b4cb8b51cecb1d1dd169b128e263c9613503fe42447cb263002baf24857f2b81",
+    "capture_collector_script": "c37e45f674e8d7aaea229053939644900726c5573681abd0b2629ce4a3de4762"
+  },
+  "validation_output": "CITY_STOREFRONT_CONFIGURATION_VALIDATION path=/var/folders/tq/g_n75q2x54s2w9ylj9vfmh140000gn/T/codex-city-candidate-wTIc6A/city-storefront-candidate-validation.json captures=11",
+  "captured_at": "2026-10-19T08:01:50.754Z"
+}

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_visual_capture_unverified",
+  "candidate_id": "office-npc-makehuman-elegant-suit-static-probe",
+  "candidate_variant": "reference_office_elegant_suit_unskinned_probe_v1",
+  "candidate_sha256": "b58756eeff9642f463dadf753fa129cc108bc2591a734282fd19131e24fce2be",
+  "retouch_script_sha256": "fed756b728aa29d89a0c7c1dc657f8eb54827ddf849bd620cf5bf13a58dc08ce",
+  "capture_options": {
+    "preserve_imported_materials": true,
+    "reference_office_materials": true,
+    "close_capture": true,
+    "use_elegant_suit_candidate": true
+  },
+  "environment": "temporary copy of gta-reference-runtime",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "captures": [
+    {
+      "id": "makehuman-office-npc-idle_default",
+      "state": "idle_default",
+      "path": "candidate-runtime/makehuman-office-npc-elegant-suit-static-probe-visual/makehuman-office-npc-idle_default.png",
+      "sha256": "e3a6edbe972b8ee0351009d881beda1280f768ec94122c3e049c6f5ac3b3ce06",
+      "width": 1280,
+      "height": 720,
+      "visual_status": "unverified"
+    },
+    {
+      "id": "makehuman-office-npc-search_default",
+      "state": "search_default",
+      "path": "candidate-runtime/makehuman-office-npc-elegant-suit-static-probe-visual/makehuman-office-npc-search_default.png",
+      "sha256": "d2e82b75b8b1cf4f5a0bedd669f0ef232f2d3cefed1f252d90a3f3a295636879",
+      "width": 1280,
+      "height": 720,
+      "visual_status": "unverified"
+    },
+    {
+      "id": "makehuman-office-npc-alert_default",
+      "state": "alert_default",
+      "path": "candidate-runtime/makehuman-office-npc-elegant-suit-static-probe-visual/makehuman-office-npc-alert_default.png",
+      "sha256": "1310db989a24202f4094bb72f6e513f7f5ae252e7e284dc6dec6e961795bd63c",
+      "width": 1280,
+      "height": 720,
+      "visual_status": "unverified"
+    }
+  ],
+  "captured_at": "2026-10-07T04:09:34.249Z"
+}

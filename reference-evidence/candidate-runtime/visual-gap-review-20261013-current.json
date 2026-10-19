@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "status": "candidate_gap_review_only",
+  "reviewed_at": "2026-10-13",
+  "method": "当前源可见窗口 PNG 与参考帧直接对照",
+  "purpose": "记录当前源码下的可见差异，不升级正式视觉验收状态",
+  "acceptance_binding": {
+    "current_runtime_source_fingerprint": "5fb0f92adbc6abf01f5f4c9aca63652de6d137a1a7a81760d875789aaee44816",
+    "current_runtime_source_file_count": 233,
+    "visual_matrix_bound": true,
+    "visual_status": "unverified",
+    "release_allowed": false,
+    "human_signoff_required": true,
+    "reason": "本批 PNG 已由真实可见窗口生成并绑定当前源，但候选角色、城市人群、载具和构图与参考帧仍有明显差异；不得把图形采集事实等同于视觉通过"
+  },
+  "comparisons": [
+    {
+      "segment": "office-01",
+      "reference": {"path": "reference-evidence/video-2/office-01.jpg", "sha256": "c7cc59ae818c6644f5252c015beb2337484554a5ef706b403f683ac59fef1aae"},
+      "candidate": {"path": "reference-evidence/runtime-matrix/office-01.png", "sha256": "786cf235b54ff6d320d0d8a536a37dfc0ac24f8f11c2ec143633b2ab1965c137", "size": "1280x720", "source_status": "current_source_visible_window"},
+      "observations": [
+        "当前画面已经形成办公室工位、连续玻璃隔断、暖暗顶灯、右侧储物墙和任务 HUD 的完整层次，环境可读性明显高于旧灰盒候选。",
+        "参考帧是贴近角色的肩后近景，角色、背包和桌面关系是主体；当前镜头更宽、更高，程序化角色位于画面中心，办公桌和隔断仍占据过多面积。",
+        "当前角色仍是胶囊体和盒体组合，头发、脸部、背包、手臂和椅子接触关系不可信，未达到参考帧的真实角色和坐姿接触。"
+      ],
+      "decision": "rejected",
+      "next_gate": "优先替换主角最终网格与坐姿骨骼，收紧肩后镜头距离和角色画面占比，再复核工位遮挡关系"
+    },
+    {
+      "segment": "office-10",
+      "reference": {"path": "reference-evidence/video-2/office-10.jpg", "sha256": "1678b061d8b9a53018fdac61496fcf4985c0234fa2ca5acab80a2f0065f655b0"},
+      "candidate": {"path": "reference-evidence/runtime-matrix/office-10.png", "sha256": "5eb02d287aa2d5290420609a12b9f73fe96346e2c557dc31bfa1c3b7a548b618", "size": "1280x720", "source_status": "current_source_visible_window"},
+      "observations": [
+        "当前画面已恢复到工位侧固定采集态，能够读出坐姿、桌面、显示器、玻璃隔断和右侧储物墙。",
+        "当前姿态已把臀部压低到椅垫高度并让躯干向桌面前倾，手部仍绑定到键盘坐标；但参考帧是自然人体侧面打字，当前程序化角色的躯干、四肢、手部和椅子接触仍不可信。",
+        "当前环境的暖暗色调和局部灯光方向可继续保留，但最终角色网格、手指动画、接触阴影、隔断遮挡和桌面比例仍是决定性差异。"
+      ],
+      "decision": "rejected",
+      "next_gate": "把 office-10 作为主角坐姿与手部接触的 P0 验收段，完成最终角色网格、键盘接触点、接触阴影和坐姿动画后再签收"
+    },
+    {
+      "segment": "office-06",
+      "reference": {"path": "reference-evidence/video-2/office-06.jpg", "sha256": "b2af317b68abf81be831e5f03da034160304c27e0b40fd0426ca8d5244280b84"},
+      "candidate": {"path": "reference-evidence/runtime-matrix/office-06.png", "sha256": "1aba0523841ceb65d9b6eec60cb4c6795a25c62735313d5b94096eb02e795c4a", "size": "1280x720", "source_status": "current_source_visible_window"},
+      "observations": [
+        "当前失败覆盖层、目标 HUD、电梯厅门体和办公室空间均可读，任务状态机的视觉反馈已经存在。",
+        "参考帧的核心是角色与电梯门、楼层牌、按钮之间的近距离关系；当前失败画面中角色被暗色覆盖层和低模空间压低，电梯门体细节、角色动作和警报表现不足。"
+      ],
+      "decision": "rejected",
+      "next_gate": "补齐电梯厅最终门体、楼层牌、按钮灯和失败动作，再以相同状态回放进行近景验收"
+    },
+    {
+      "segment": "city-01",
+      "reference": {"path": "reference-evidence/video-1/city-01.jpg", "sha256": "0122d798f42453d3aa464dc054dc37877e306831f1da61b94329e24aedf1ce44"},
+      "candidate": {"path": "reference-evidence/runtime-matrix/city-01.png", "sha256": "873326c99d52080239a7e7ea6b70c291d7e1c8998978136cecc5b4c9b51c87c3", "size": "1280x720", "source_status": "current_source_visible_window"},
+      "observations": [
+        "当前原创店铺背景卡的暖色门头、卷帘门、店内货架和雨后人群背景具有较强可读性，任务 HUD 与人群数量也已经进入同一画面。",
+        "当前城市人群全部是低模胶囊角色，服装、面部、动作、脚底接触和遮挡层次与参考帧完全不是同一细节等级；玩家背包和人群在门头前形成了明显的几何堆叠。",
+        "当前镜头中心仍由玩家和程序化人群占满，参考帧的店铺入口、街道边界和真实拥挤关系没有被准确复现。"
+      ],
+      "decision": "rejected",
+      "next_gate": "先替换城市人群与玩家最终网格、脚底接触和近景动作，再校准店铺入口的拥挤构图"
+    },
+    {
+      "segment": "city-08",
+      "reference": {"path": "reference-evidence/video-1/city-08.jpg", "sha256": "c1f0203d92d5f856fd9c71060143311eda9d65921f412eea4cfa6af7cf195e1b"},
+      "candidate": {"path": "reference-evidence/runtime-matrix/city-08.png", "sha256": "217c97c78c6a82c3e8edf5fa71e237580628615f4e4c167316b457a0e8a1e4c4", "size": "1280x720", "source_status": "current_source_visible_window"},
+      "observations": [
+        "当前三轮车已经具备车架、货斗、车灯、道路标线和驾驶 HUD，驾驶流程在画面中可读。",
+        "参考帧是连续沿街道路驾驶，当前主要依赖模糊城市背景卡，车辆与道路的真实透视、交通层次和速度感不足。",
+        "本轮已修复驾驶员头部、下巴、额前发束和鞋带在载具姿态下的悬浮/断开观感；坐姿挂点、角色身体与车辆座椅的接触关系仍需继续校准。"
+      ],
+      "decision": "rejected",
+      "next_gate": "先修复载具坐姿挂点和角色连续几何，再补连续街景、交通层和车辆材质，最后校准驾驶镜头"
+    },
+    {
+      "segment": "city-11",
+      "reference": {"path": "reference-evidence/video-1/city-11.jpg", "sha256": "acfc820d8959b42b041df4fd5f972047a33a953922f503a839347a47b52c965b"},
+      "candidate": {"path": "reference-evidence/runtime-matrix/city-11.png", "sha256": "753f3d255e40d7d1f531de1be789b07cb2c57c43e81ba3fb22dac7d3838f01d0", "size": "1280x720", "source_status": "current_source_visible_window"},
+      "observations": [
+        "当前终点画面已经能读出商店门面、室内货架、三轮车尾部、任务结算 HUD 和夜间街道。",
+        "参考帧的卷帘门、门头文字、目标标记和车辆尾部构成明确终点焦点；当前门面仍是背景卡，程序化车辆与角色和背景真实度断层明显，目标交互焦点不够突出。"
+      ],
+      "decision": "rejected",
+      "next_gate": "锁定卷帘门、门头标识、目标标记、车辆尾部和交互提示的相对位置，并替换最终店面和车辆资产"
+    }
+  ]
+}

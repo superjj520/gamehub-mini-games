@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "status": "candidate_handoff",
+  "policy": "这是候选资产的生产交接记录，不代表最终视觉、权利或发布签收",
+  "product": "新时代觉醒者",
+  "slot_id": "city-crowd-set",
+  "candidate_id": "city-crowd-original-procedural-v1-candidate",
+  "source_kind": "project_original_procedural_city_crowd",
+  "provenance": {
+    "runtime_script": "gta-reference-runtime/assets/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.gd",
+    "runtime_scene": "gta-reference-runtime/assets/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.tscn",
+    "license_status": "project_original_candidate_only",
+    "external_source": false,
+    "review_required_before_release": true
+  },
+  "deliverables": {
+    "script": {
+      "path": "gta-reference-runtime/assets/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.gd",
+      "sha256": "7bd6b65caa2cae822c539000cc81e57482a835068c669c9758c640a3bfc1b66a"
+    },
+    "scene": {
+      "path": "gta-reference-runtime/assets/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.tscn",
+      "sha256": "80c6f8b531ccea173189130366865126c83f91dd3a5db0381194710d502d4318"
+    },
+    "runtime_evidence": "reference-evidence/candidate-runtime/full-candidate-playtest-original-only.json"
+  },
+  "runtime_contract": {
+    "roles": ["courier", "office_worker", "shopper", "street_vendor", "conflict"],
+    "animation_states": ["idle_default", "walk_default", "displaced_default", "hit_default"],
+    "visual_contract": ["角色身份配件", "连续软轮廓", "自然下垂手臂", "48米远景裁剪", "4米过渡边界"],
+    "preserved_behaviors": [
+      "街区人群路线和碰撞",
+      "冲突对象推开与恢复",
+      "人群密度与远近层级",
+      "任务、载具、镜头和存档回放"
+    ]
+  },
+  "evidence": {
+    "full_candidate_playtest": "reference-evidence/candidate-runtime/full-candidate-playtest-original-only.json",
+    "current_runtime_source_fingerprint": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+    "current_runtime_source_file_count": 326,
+    "checks_passed": [
+      "原创-only 完整候选启动",
+      "城市人群身份配色与配件回放",
+      "闲置、行走、被推开和受击状态契约",
+      "冲突对象与碰撞回放",
+      "任务、载具、镜头和存档保持"
+    ],
+    "visual_status": "unverified",
+    "release_allowed": false
+  },
+  "next_gates": [
+    "city-01/city-02/city-05/city-08 固定镜头采集",
+    "近景人物轮廓、服装配件、动作和人群密度逐帧验收",
+    "Windows 10/11 目标设备回放与性能签收",
+    "最终资产来源与权利签收",
+    "发布包重新绑定"
+  ]
+}

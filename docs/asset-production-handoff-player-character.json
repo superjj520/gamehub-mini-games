@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "status": "candidate_handoff",
+  "policy": "这是候选资产的生产交接记录，不代表最终视觉、权利或发布签收",
+  "product": "新时代觉醒者",
+  "slot_id": "player-character",
+  "candidate_id": "player-character-p0-procedural-candidate",
+  "source_kind": "project_original_procedural_character",
+  "provenance": {
+    "runtime_script": "gta-reference-runtime/assets/characters/original-procedural-office-characters/original_player_candidate.gd",
+    "runtime_scene": "gta-reference-runtime/assets/characters/original-procedural-office-characters/original_player_candidate.tscn",
+    "license_status": "project_original_candidate_only",
+    "external_source": false,
+    "review_required_before_release": true
+  },
+  "deliverables": {
+    "script": {
+      "path": "gta-reference-runtime/assets/characters/original-procedural-office-characters/original_player_candidate.gd",
+      "sha256": "67703ac8108a51fb4ff6c1dba32c4e3f44cb19cb544e0011a17649aca612abe3"
+    },
+    "scene": {
+      "path": "gta-reference-runtime/assets/characters/original-procedural-office-characters/original_player_candidate.tscn",
+      "sha256": "95ded9ec4290c12938640dba59dbdf728f21d720afd42b33abbf2bd8394a165b"
+    },
+    "runtime_evidence": "reference-evidence/candidate-runtime/full-candidate-playtest-original.json"
+  },
+  "runtime_contract": {
+    "animation_states": [
+      "idle_default",
+      "walk_default",
+      "crouch_default",
+      "interact_default",
+      "typing_default",
+      "vehicle_default",
+      "hit_default",
+      "fail_default"
+    ],
+    "required_mounts": ["交互手部挂点", "载具挂点", "视线起点", "脚底碰撞参考点"],
+    "contexts": ["office", "city"],
+    "preserved_behaviors": [
+      "第三人称移动与镜头跟随",
+      "办公室坐姿打字",
+      "城市载具驾驶姿态",
+      "交互、碰撞、任务和存档链路"
+    ]
+  },
+  "evidence": {
+    "full_candidate_playtest": "reference-evidence/candidate-runtime/full-candidate-playtest-original.json",
+    "current_runtime_source_fingerprint": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+    "current_runtime_source_file_count": 326,
+    "checks_passed": [
+      "原创角色候选完整启动",
+      "办公室与城市角色挂载",
+      "动画状态与任务回放",
+      "坐姿打字与载具姿态",
+      "镜头、碰撞、交互和存档保持"
+    ],
+    "visual_status": "unverified",
+    "release_allowed": false
+  },
+  "next_gates": [
+    "office-01/office-06/city-01/city-08 固定镜头采集",
+    "角色比例、服装、面部和动作逐帧视觉验收",
+    "Windows 10/11 目标设备回放",
+    "最终资产来源与权利签收",
+    "发布包重新绑定"
+  ]
+}

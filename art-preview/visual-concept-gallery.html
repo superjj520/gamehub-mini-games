@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>新时代觉醒者 · 视觉生产画廊</title>
+  <style>
+    :root { color-scheme: dark; --bg:#10151a; --panel:#192129; --line:#34424e; --text:#eef4f7; --muted:#a9b8c1; --accent:#f5b85d; --danger:#ff8579; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background:radial-gradient(circle at 10% 0%, #243340, var(--bg) 38%); color:var(--text); }
+    main { max-width:1500px; margin:0 auto; padding:48px 28px 72px; }
+    header { display:flex; justify-content:space-between; gap:24px; align-items:flex-end; border-bottom:1px solid var(--line); padding-bottom:28px; margin-bottom:28px; }
+    h1 { margin:0 0 10px; font-size:clamp(28px,4vw,54px); letter-spacing:-.04em; }
+    header p { margin:0; max-width:760px; color:var(--muted); line-height:1.7; }
+    .summary { min-width:240px; padding:16px 18px; border:1px solid #665234; border-radius:14px; background:#241f17; color:#f8d49a; }
+    .summary strong { display:block; color:#fff0c8; font-size:24px; margin-bottom:4px; }
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(430px,1fr)); gap:22px; }
+    .card { overflow:hidden; border:1px solid var(--line); border-radius:18px; background:linear-gradient(145deg,#1d2730,#141a20); box-shadow:0 18px 46px #0004; }
+    .image-wrap { position:relative; background:#0b0f13; aspect-ratio:16/9; }
+    .image-wrap img { display:block; width:100%; height:100%; object-fit:cover; }
+    .status { position:absolute; top:14px; left:14px; padding:7px 10px; border-radius:999px; background:#3c2918dd; border:1px solid #a97d3d; color:#ffd898; font-size:12px; }
+    .card-body { padding:22px; }
+    .eyebrow { color:var(--accent); font-size:12px; letter-spacing:.12em; text-transform:uppercase; }
+    h2 { margin:6px 0 10px; font-size:24px; }
+    .purpose { color:#c5d1d7; line-height:1.6; min-height:52px; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; margin-top:18px; }
+    h3 { margin:0 0 8px; font-size:13px; color:#f6d79d; }
+    ul { margin:0; padding-left:18px; color:var(--muted); line-height:1.7; font-size:13px; }
+    code { color:#d8e9f2; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; overflow-wrap:anywhere; }
+    .target, .acceptance { margin-top:18px; padding:12px 14px; border-radius:10px; background:#11181e; border:1px solid #2b3943; }
+    .target span, .acceptance strong { display:block; margin-bottom:6px; color:#f1c77e; font-size:12px; }
+    .acceptance { color:#c7d2d8; line-height:1.6; font-size:13px; }
+    .fingerprint { margin-top:14px; color:#71818a; font:11px ui-monospace,SFMono-Regular,Menlo,monospace; overflow-wrap:anywhere; }
+    footer { margin-top:34px; padding:20px 0 0; border-top:1px solid var(--line); color:#85959e; font-size:13px; line-height:1.7; }
+    @media (max-width:700px) { main { padding:28px 14px 48px; } header { display:block; } .summary { margin-top:20px; } .cards { grid-template-columns:1fr; } .grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>视觉生产画廊</h1>
+        <p>《新时代觉醒者》的视觉稿、逻辑状态和运行时资产目标绑定面板。这里展示的是原创生产参考，不是最终游戏截图；只有完成真实窗口采集、逐帧对照、目标设备验收和权利签收，才能提升为最终资产。</p>
+      </div>
+      <div class="summary"><strong>7 组</strong>视觉稿已登记<br>状态：待运行时验收</div>
+    </header>
+    <section class="cards">
+    <article class="card">
+      <div class="image-wrap">
+        <img src="../art-source/visual-concepts/office-state-storyboard-v1.png" alt="office-state-storyboard-v1">
+        <span class="status">视觉稿 · 待运行时验收</span>
+      </div>
+      <div class="card-body">
+        <div class="eyebrow">office_state_storyboard</div>
+        <h2>office-state-storyboard-v1</h2>
+        <p class="purpose">10 个办公室状态使用同一角色、同一空间尺度和连续灯光；每格都能由真实任务状态机触发，不以静态分镜替代运行时画面</p>
+        <div class="grid">
+          <section>
+            <h3>绑定逻辑状态</h3>
+            <ul><li><code>office-01</code></li><li><code>office-02</code></li><li><code>office-03</code></li><li><code>office-04</code></li><li><code>office-05</code></li><li><code>office-06</code></li><li><code>office-07</code></li><li><code>office-08</code></li><li><code>office-09</code></li><li><code>office-10</code></li></ul>
+          </section>
+          <section>
+            <h3>必须落地的视觉状态</h3>
+            <ul><li>camera_framing</li><li>player_pose</li><li>npc_perception</li><li>cover_occlusion</li><li>failure_feedback</li><li>checkpoint_recovery</li></ul>
+          </section>
+          
+        </div>
+        <div class="target"><span>运行时目标</span><code>gta-reference-runtime/tests/reference_capture_matrix.gd</code></div>
+        <div class="acceptance"><strong>验收出口</strong>10 个办公室状态使用同一角色、同一空间尺度和连续灯光；每格都能由真实任务状态机触发，不以静态分镜替代运行时画面</div>
+        <div class="fingerprint">文件指纹：4d46e73c977283a63ce2985f0ddaa0fedb086986acb29104c15ddb31948ae77e</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="image-wrap">
+        <img src="../art-source/visual-concepts/city-state-storyboard-v1.png" alt="city-state-storyboard-v1">
+        <span class="status">视觉稿 · 待运行时验收</span>
+      </div>
+      <div class="card-body">
+        <div class="eyebrow">city_state_storyboard</div>
+        <h2>city-state-storyboard-v1</h2>
+        <p class="purpose">11 个城市状态保持角色、砖红外套、蓝色三轮车和黄昏湿路面的连续性；步行、交互、登记、驾驶和到达必须由真实输入与任务状态触发</p>
+        <div class="grid">
+          <section>
+            <h3>绑定逻辑状态</h3>
+            <ul><li><code>city-01</code></li><li><code>city-02</code></li><li><code>city-03</code></li><li><code>city-04</code></li><li><code>city-05</code></li><li><code>city-06</code></li><li><code>city-07</code></li><li><code>city-08</code></li><li><code>city-09</code></li><li><code>city-10</code></li><li><code>city-11</code></li></ul>
+          </section>
+          <section>
+            <h3>必须落地的视觉状态</h3>
+            <ul><li>storefront</li><li>crowd</li><li>store_interior</li><li>pickup_prop</li><li>conflict</li><li>registration</li><li>vehicle_drive</li><li>wet_road</li><li>endpoint_shutter</li></ul>
+          </section>
+          
+        </div>
+        <div class="target"><span>运行时目标</span><code>gta-reference-runtime/tests/reference_capture_matrix.gd</code></div>
+        <div class="acceptance"><strong>验收出口</strong>11 个城市状态保持角色、砖红外套、蓝色三轮车和黄昏湿路面的连续性；步行、交互、登记、驾驶和到达必须由真实输入与任务状态触发</div>
+        <div class="fingerprint">文件指纹：9ac7c0eb389d2d6841b34a96d6ebd5cbfdc9168d9a1a0e011c3b60351090979f</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="image-wrap">
+        <img src="../art-source/visual-concepts/player-visual-board-v1.png" alt="player-visual-board-v1">
+        <span class="status">视觉稿 · 待运行时验收</span>
+      </div>
+      <div class="card-body">
+        <div class="eyebrow">player_character</div>
+        <h2>player-visual-board-v1</h2>
+        <p class="purpose">同一角色脸部、服装、背包在办公室和城市状态保持一致；蹲伏、打字和驾驶接触关系逐帧检查</p>
+        <div class="grid">
+          <section>
+            <h3>绑定逻辑状态</h3>
+            <ul><li><code>office-01</code></li><li><code>office-02</code></li><li><code>office-08</code></li><li><code>office-10</code></li><li><code>city-05</code></li><li><code>city-08</code></li><li><code>city-11</code></li></ul>
+          </section>
+          <section>
+            <h3>必须落地的视觉状态</h3>
+            <ul><li>idle_default</li><li>walk_default</li><li>crouch_default</li><li>typing_default</li><li>interact_default</li><li>vehicle_default</li><li>hit_default</li><li>fail_default</li></ul>
+          </section>
+          <section><h3>挂点契约</h3><ul><li><code>交互手部挂点</code></li><li><code>载具挂点</code></li><li><code>视线起点</code></li><li><code>脚底碰撞参考点</code></li></ul></section>
+        </div>
+        <div class="target"><span>运行时目标</span><code>art-source/characters/makehuman-office-player/makehuman_player_visual_candidate.tscn</code></div>
+        <div class="acceptance"><strong>验收出口</strong>同一角色脸部、服装、背包在办公室和城市状态保持一致；蹲伏、打字和驾驶接触关系逐帧检查</div>
+        <div class="fingerprint">文件指纹：4115fcaa86240b0c7da3bc681be5a54e1f393239bb2cde5301f4aac4c20f7712</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="image-wrap">
+        <img src="../art-source/visual-concepts/office-stealth-visual-board-v1.png" alt="office-stealth-visual-board-v1">
+        <span class="status">视觉稿 · 待运行时验收</span>
+      </div>
+      <div class="card-body">
+        <div class="eyebrow">office_environment</div>
+        <h2>office-stealth-visual-board-v1</h2>
+        <p class="purpose">玩家、工位、NPC和出口在同一空间中可走、可遮挡、可追踪；暖暗灯光和肩后构图保持一致</p>
+        <div class="grid">
+          <section>
+            <h3>绑定逻辑状态</h3>
+            <ul><li><code>office-01</code></li><li><code>office-04</code></li><li><code>office-05</code></li><li><code>office-06</code></li><li><code>office-10</code></li></ul>
+          </section>
+          <section>
+            <h3>必须落地的视觉状态</h3>
+            <ul><li>collision</li><li>navigation</li><li>interaction</li><li>lighting</li><li>visual_detail</li></ul>
+          </section>
+          
+        </div>
+        <div class="target"><span>运行时目标</span><code>gta-reference-runtime/content/candidates/original_office_desk_runtime_candidate.tscn</code></div>
+        <div class="acceptance"><strong>验收出口</strong>玩家、工位、NPC和出口在同一空间中可走、可遮挡、可追踪；暖暗灯光和肩后构图保持一致</div>
+        <div class="fingerprint">文件指纹：ad38c48b0465c6dff8ed6ae6624d638080a753789b01e1a825a61d5079df6145</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="image-wrap">
+        <img src="../art-source/visual-concepts/city-delivery-visual-board-v1.png" alt="city-delivery-visual-board-v1">
+        <span class="status">视觉稿 · 待运行时验收</span>
+      </div>
+      <div class="card-body">
+        <div class="eyebrow">city_environment</div>
+        <h2>city-delivery-visual-board-v1</h2>
+        <p class="purpose">道路消失点、店铺入口、三轮车后视构图和终点门面与任务状态一致；城市不以静态背景替代碰撞和交互</p>
+        <div class="grid">
+          <section>
+            <h3>绑定逻辑状态</h3>
+            <ul><li><code>city-01</code></li><li><code>city-04</code></li><li><code>city-08</code></li><li><code>city-11</code></li></ul>
+          </section>
+          <section>
+            <h3>必须落地的视觉状态</h3>
+            <ul><li>road_collision</li><li>sidewalk_collision</li><li>storefront_interaction</li><li>traffic</li><li>weather_lighting</li><li>distant_city</li></ul>
+          </section>
+          
+        </div>
+        <div class="target"><span>运行时目标</span><code>gta-reference-runtime/assets/environment/original-procedural-city-environment/original_city_environment_candidate.tscn</code></div>
+        <div class="acceptance"><strong>验收出口</strong>道路消失点、店铺入口、三轮车后视构图和终点门面与任务状态一致；城市不以静态背景替代碰撞和交互</div>
+        <div class="fingerprint">文件指纹：33695c3ba173b12b54c1af1d3bed2a17f339901fdb67fbf9db08cfae715ca922</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="image-wrap">
+        <img src="../art-source/visual-concepts/npc-crowd-visual-board-v1.png" alt="npc-crowd-visual-board-v1">
+        <span class="status">视觉稿 · 待运行时验收</span>
+      </div>
+      <div class="card-body">
+        <div class="eyebrow">npc_and_crowd</div>
+        <h2>npc-crowd-visual-board-v1</h2>
+        <p class="purpose">NPC警觉、搜索、追踪与城市人群避让由真实状态机驱动，远景身份仍可区分，近景不穿模</p>
+        <div class="grid">
+          <section>
+            <h3>绑定逻辑状态</h3>
+            <ul><li><code>office-04</code></li><li><code>office-06</code></li><li><code>office-07</code></li><li><code>city-01</code></li><li><code>city-02</code></li><li><code>city-04</code></li></ul>
+          </section>
+          <section>
+            <h3>必须落地的视觉状态</h3>
+            <ul><li>idle_default</li><li>patrol_default</li><li>alert_default</li><li>search_default</li><li>pursuit_default</li><li>conflict_default</li><li>walk_default</li><li>panic_default</li></ul>
+          </section>
+          <section><h3>挂点契约</h3><ul><li><code>视线起点</code></li><li><code>手持物挂点</code></li><li><code>脚底接触点</code></li></ul></section>
+        </div>
+        <div class="target"><span>运行时目标</span><code>gta-reference-runtime/assets/characters/original-procedural-office-characters/original_office_npc_candidate.tscn</code></div>
+        <div class="acceptance"><strong>验收出口</strong>NPC警觉、搜索、追踪与城市人群避让由真实状态机驱动，远景身份仍可区分，近景不穿模</div>
+        <div class="fingerprint">文件指纹：7a9bdca6bc2ad9da3f952d363a555f332b214481b24f25eb2b515c4f5d57b7ad</div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="image-wrap">
+        <img src="../art-source/visual-concepts/three-wheel-vehicle-visual-board-v1.png" alt="three-wheel-vehicle-visual-board-v1">
+        <span class="status">视觉稿 · 待运行时验收</span>
+      </div>
+      <div class="card-body">
+        <div class="eyebrow">three_wheel_vehicle</div>
+        <h2>three-wheel-vehicle-visual-board-v1</h2>
+        <p class="purpose">驾驶员坐姿、双手、座椅、方向盘、货斗和三只轮胎接触关系正确；损伤由碰撞事件驱动</p>
+        <div class="grid">
+          <section>
+            <h3>绑定逻辑状态</h3>
+            <ul><li><code>city-06</code></li><li><code>city-07</code></li><li><code>city-08</code></li><li><code>city-09</code></li><li><code>city-10</code></li><li><code>city-11</code></li></ul>
+          </section>
+          <section>
+            <h3>必须落地的视觉状态</h3>
+            <ul><li>idle_default</li><li>drive_default</li><li>brake_default</li><li>collision_default</li><li>damage_default</li><li>destroyed_default</li></ul>
+          </section>
+          <section><h3>挂点契约</h3><ul><li><code>驾驶座挂点</code></li><li><code>上下车点</code></li><li><code>前轮接触点</code></li><li><code>左后轮接触点</code></li><li><code>右后轮接触点</code></li><li><code>货架挂点</code></li></ul></section>
+        </div>
+        <div class="target"><span>运行时目标</span><code>gta-reference-runtime/assets/vehicles/three-wheel-delivery/three_wheel_delivery_candidate.tscn</code></div>
+        <div class="acceptance"><strong>验收出口</strong>驾驶员坐姿、双手、座椅、方向盘、货斗和三只轮胎接触关系正确；损伤由碰撞事件驱动</div>
+        <div class="fingerprint">文件指纹：100459cf4ef8d28120f83492682b3cc3e49e7e5f2c5e8e58548c71cc5ebd25cb</div>
+      </div>
+    </article></section>
+    <footer>生成来源：docs/visual-concept-manifest.json · 生成脚本：scripts/create_visual_concept_gallery.mjs · 清单版本：1<br>验收顺序：人物轮廓与接触关系 → 材质与灯光 → 镜头构图 → 动画节奏 → HUD 与音频 → 目标设备表现。</footer>
+  </main>
+</body>
+</html>

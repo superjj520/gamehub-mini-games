@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "asset_id": "office-elevator-lobby-v2-generated-candidate",
+  "slot_id": "office-environment-kit",
+  "source_kind": "project_original_ai_generated_bitmap_candidate",
+  "generator": "内置图像生成工具",
+  "license": "项目原创候选；需在最终发布前完成权利与负责人签收",
+  "runtime_asset": "office_elevator_lobby_v2_generated.png",
+  "runtime_sha256": "a6db8611009bf1cd01591ba459adf0031ec402e796ee294bf883283cb881a102",
+  "dimensions": [1672, 941],
+  "intended_use": "office-05 电梯厅到达状态的候选背景卡",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "constraints": ["原创生成，不包含参考视频像素", "不承担碰撞、导航、交互或任务逻辑", "必须通过当前源码固定镜头截图、人工视觉和 Windows 目标设备验收"]
+}

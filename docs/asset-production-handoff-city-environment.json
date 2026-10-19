@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "status": "candidate_handoff",
+  "policy": "这是候选资产的生产交接记录，不代表最终视觉、权利或发布签收",
+  "product": "新时代觉醒者",
+  "slot_id": "city-environment-kit",
+  "candidate_id": "city-environment-original-only-procedural-v1-candidate",
+  "source_kind": "project_original_generated_city_environment",
+  "provenance": {
+    "runtime_script": "art-source/candidate-playtest/original-only/original_only_city_environment_candidate.gd",
+    "runtime_scene": "art-source/candidate-playtest/original-only/original_only_city_environment_candidate.tscn",
+    "license_status": "project_original_candidate_only",
+    "external_source": false,
+    "review_required_before_release": true
+  },
+  "deliverables": {
+    "script": {
+      "path": "art-source/candidate-playtest/original-only/original_only_city_environment_candidate.gd",
+      "sha256": "0d73a75117efb680c0e276339ed7e78af571dbdb97136c5e6ec399c306a24e68"
+    },
+    "scene": {
+      "path": "art-source/candidate-playtest/original-only/original_only_city_environment_candidate.tscn",
+      "sha256": "360ddbe05e6c0e1b6d9e68adef02ee7319d2bc263615e364c2ae68459c06f68b"
+    },
+    "runtime_evidence": "reference-evidence/candidate-runtime/full-candidate-playtest-original-only.json"
+  },
+  "runtime_contract": {
+    "environment_layers": ["首店与终点店", "仓储后场", "连续街区道路", "远景楼群", "街灯与街道生活", "天气与驾驶背景卡"],
+    "visual_anchors": ["免费赠送鸡蛋", "旺铺转让", "装卸区", "原创城市驾驶街道背景卡"],
+    "registered_generated_textures": [
+      "urban_storefront_v2_generated.png",
+      "city_storefront_crowd_v1_generated.png",
+      "warehouse_backlot_facade_v1_generated.png",
+      "city_dusk_corner_storefront_v1_generated.png",
+      "city_drive_lane_day_v2_clear_foreground_candidate.png"
+    ],
+    "preserved_behaviors": [
+      "开放街区入口和任务店铺锚点",
+      "道路、载具、人群和仓储后场空间关系",
+      "城市驾驶、天气、镜头和载具损伤回放",
+      "碰撞、导航、任务和存档逻辑不被视觉层替换"
+    ]
+  },
+  "evidence": {
+    "full_candidate_playtest": "reference-evidence/candidate-runtime/full-candidate-playtest-original-only.json",
+    "current_runtime_source_fingerprint": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+    "current_runtime_source_file_count": 326,
+    "checks_passed": [
+      "原创-only 城市候选启动",
+      "店铺、仓储、道路和远景楼群接入",
+      "任务首店/终点店视觉锚点存在",
+      "城市驾驶、天气和镜头扩展保持",
+      "任务、碰撞、导航、载具和存档保持"
+    ],
+    "visual_status": "unverified",
+    "release_allowed": false
+  },
+  "next_gates": [
+    "city-01/city-03/city-08/city-10/city-11 固定镜头采集",
+    "店铺、仓储、道路、远景、天气和驾驶构图逐帧验收",
+    "生成纹理来源和最终权利签收",
+    "Windows 10/11 目标设备回放与性能签收",
+    "发布包重新绑定"
+  ]
+}

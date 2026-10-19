@@ -1,0 +1,271 @@
+{
+  "schema_version": 1,
+  "status": "internal_no_go",
+  "decision": "仅允许内部开发验证",
+  "build_identity": {
+    "project_version": "0.1.0-dev",
+    "engine": "4.7.1.stable.official.a13da4feb",
+    "source_sha256": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+    "source_file_count": 326
+  },
+  "launch_scope": {
+    "id": "office_vertical_slice",
+    "segment_ids": [
+      "office-01",
+      "office-02",
+      "office-03",
+      "office-04",
+      "office-05",
+      "office-06",
+      "office-07",
+      "office-08",
+      "office-09",
+      "office-10"
+    ],
+    "asset_ids": [
+      "player-character",
+      "three-wheel-vehicle",
+      "interaction-props",
+      "final-audio-library",
+      "office-npc-set",
+      "office-environment-kit"
+    ]
+  },
+  "gates": [
+    {
+      "id": "product_baseline",
+      "status": "approved",
+      "owner": "产品负责人",
+      "evidence": "docs/product-baseline-decision.json",
+      "reason": "用户已提交机器可读产品基线"
+    },
+    {
+      "id": "runtime_graybox",
+      "status": "passed_graybox",
+      "owner": "工程负责人",
+      "evidence": "scripts/verify_reference_runtime.sh",
+      "reason": "角色、镜头、任务、NPC、城市、载具、存档和异常恢复自动化通过"
+    },
+    {
+      "id": "behavior_matrix",
+      "status": "passed",
+      "owner": "QA负责人",
+      "evidence": "reference-evidence/acceptance-status.json",
+      "counts": {
+        "total": 10,
+        "graybox": 0,
+        "passed": 10
+      }
+    },
+    {
+      "id": "visual_matrix",
+      "status": "blocked_unverified",
+      "owner": "视觉负责人",
+      "evidence": "reference-evidence/runtime-matrix/manifest.json",
+      "counts": {
+        "total": 10,
+        "unverified": 10,
+        "passed": 0
+      },
+      "reason": "当前仅有低码率参考视频和灰盒截图，未完成最终逐帧签收"
+    },
+    {
+      "id": "final_assets",
+      "status": "blocked_incomplete",
+      "owner": "美术/音频负责人",
+      "evidence": "docs/asset-production-manifest.json",
+      "counts": {
+        "total": 6,
+        "graybox": 6
+      },
+      "reason": "最终角色、动画、环境、载具和音频资产尚未生产并完成权利签收"
+    },
+    {
+      "id": "rights_boundary",
+      "status": "blocked_assets",
+      "owner": "权利负责人",
+      "evidence": "gta-reference-runtime/content/rights-manifest.json",
+      "blocked_assets": [
+        "original_procedural_audio_library_candidate",
+        "original_three_wheel_delivery_candidate",
+        "original_generated_office_glass_partition_v1",
+        "original_procedural_player_character_candidate",
+        "original_procedural_office_npc_candidate",
+        "original_procedural_office_environment_candidate",
+        "original_procedural_interaction_props_candidate",
+        "authorized_ai_office10_backdrop_candidate",
+        "office_workstation_row_v1_generated_candidate",
+        "office_workstation_row_v2_worker_generated_candidate"
+      ],
+      "excluded_internal_assets": [
+        "reference_videos",
+        "reference_evidence_frames",
+        "commercial_game_assets"
+      ]
+    },
+    {
+      "id": "target_platform",
+      "status": "blocked_target_device_unverified",
+      "owner": "发布工程负责人",
+      "evidence": [
+        "docs/steam-windows-export-plan.md",
+        "gta-reference-runtime/project.godot",
+        "gta-reference-runtime/export_presets.cfg"
+      ],
+      "reason": "Steam Windows 导出预设已存在，但目标设备回归尚未完成"
+    },
+    {
+      "id": "store_compliance",
+      "status": "blocked_draft_only",
+      "owner": "法务/运营负责人",
+      "evidence": [
+        "docs/privacy-data-inventory.md",
+        "docs/privacy-policy-draft-zh-CN.md",
+        "docs/support-and-rollback-plan.md",
+        "scripts/verify_privacy_data_boundary.mjs",
+        "docs/store-submission-checklist.md"
+      ],
+      "reason": "开发基线已明确无网络数据收集并通过静态边界验证；隐私与客服已有内部草案，但正式政策、客服入口、年龄分级和平台商店字段仍未定稿"
+    },
+    {
+      "id": "rollback",
+      "status": "internal_rehearsal_passed_target_platform_pending",
+      "owner": "发布工程负责人",
+      "evidence": [
+        "reference-evidence/release-rollback-rehearsal.json",
+        "docs/support-and-rollback-plan.md"
+      ],
+      "reason": "已完成本地文件级候选构建切换与恢复；Steam 分支/Depot 和 Windows 真机回滚仍未验证"
+    }
+  ],
+  "objective_coverage": [
+    {
+      "id": "third_person_player",
+      "behavior_status": "graybox",
+      "visual_status": "unverified",
+      "evidence": [
+        "gta-reference-runtime/scripts/player_controller.gd",
+        "gta-reference-runtime/tests/office_integration_test.gd"
+      ]
+    },
+    {
+      "id": "third_person_camera",
+      "behavior_status": "graybox",
+      "visual_status": "unverified",
+      "evidence": [
+        "gta-reference-runtime/scripts/third_person_camera.gd",
+        "gta-reference-runtime/tests/city_integration_test.gd"
+      ]
+    },
+    {
+      "id": "npc_perception",
+      "behavior_status": "graybox",
+      "visual_status": "unverified",
+      "evidence": [
+        "gta-reference-runtime/scripts/perception_state.gd",
+        "gta-reference-runtime/tests/office_integration_test.gd"
+      ]
+    },
+    {
+      "id": "mission_state_machine",
+      "behavior_status": "graybox",
+      "visual_status": "unverified",
+      "evidence": [
+        "gta-reference-runtime/scripts/mission_state.gd",
+        "gta-reference-runtime/scripts/mission_chain.gd",
+        "gta-reference-runtime/tests/smoke_test.gd"
+      ]
+    },
+    {
+      "id": "city_world",
+      "behavior_status": "graybox",
+      "visual_status": "unverified",
+      "evidence": [
+        "gta-reference-runtime/scripts/city_demo.gd",
+        "gta-reference-runtime/tests/city_integration_test.gd"
+      ]
+    },
+    {
+      "id": "interaction",
+      "behavior_status": "graybox",
+      "visual_status": "unverified",
+      "evidence": [
+        "gta-reference-runtime/scripts/interaction_target.gd",
+        "gta-reference-runtime/tests/smoke_test.gd"
+      ]
+    },
+    {
+      "id": "vehicle",
+      "behavior_status": "graybox",
+      "visual_status": "unverified",
+      "evidence": [
+        "gta-reference-runtime/scripts/vehicle_controller.gd",
+        "gta-reference-runtime/tests/city_integration_test.gd"
+      ]
+    },
+    {
+      "id": "hud_and_pause",
+      "behavior_status": "graybox",
+      "visual_status": "unverified",
+      "evidence": [
+        "gta-reference-runtime/scripts/benchmark_scene.gd",
+        "gta-reference-runtime/scripts/city_demo.gd",
+        "gta-reference-runtime/tests/pause_integration_test.gd"
+      ]
+    },
+    {
+      "id": "save_and_recovery",
+      "behavior_status": "graybox",
+      "visual_status": "unverified",
+      "evidence": [
+        "gta-reference-runtime/scripts/save_store.gd",
+        "gta-reference-runtime/scripts/session_journal.gd",
+        "scripts/verify_session_crash_recovery.mjs"
+      ]
+    },
+    {
+      "id": "qa_and_release",
+      "behavior_status": "graybox",
+      "visual_status": "unverified",
+      "evidence": [
+        "scripts/verify_reference_runtime.sh",
+        "docs/release-acceptance-protocol.md",
+        "scripts/verify_readiness_report.mjs"
+      ]
+    }
+  ],
+  "product_decision": {
+    "schema_version": 1,
+    "status": "approved",
+    "decision_owner": "用户",
+    "confirmed_at": "2026-10-06T00:00:00.000Z",
+    "product_name": "新时代觉醒者",
+    "launch_platforms": [
+      "steam_windows"
+    ],
+    "launch_devices": [
+      "windows_10_11_1080p_keyboard_mouse_gamepad"
+    ],
+    "launch_regions_and_languages": [
+      "中国大陆_简体中文"
+    ],
+    "launch_scope": [
+      "office_vertical_slice"
+    ],
+    "visual_direction": "原创写实_中等细节",
+    "copyright_boundary": "original_assets_only",
+    "reference_media_commercial_rights": "confirmed_denied",
+    "commercialization": "首发免费测试版_不接真实支付",
+    "budget_or_person_weeks": "单人开发_20-35人周办公室垂直切片估算",
+    "target_launch_window": "先完成内部试玩_再决定公开测试日期",
+    "notes": "用户已确认该产品基线；参考视频仅用于研发、抽帧、对照和内部优化，不直接进入游戏或商店。最终资产、视觉签收、目标设备和商店门禁仍需独立通过。",
+    "candidate_status": "confirmed_baseline_applied"
+  },
+  "blockers": [
+    "最终角色、场景、载具、动画和音频资产未完成权利登记",
+    "10 个首发范围视觉分段的验收状态仍为 unverified",
+    "Steam Windows 目标设备性能、输入、隐私和商店材料尚未验证"
+  ],
+  "waivers": [],
+  "policy": "任何门禁没有同一构建的直接证据，都不得改为通过；本报告不改变任何验收状态。"
+}

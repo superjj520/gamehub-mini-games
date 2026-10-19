@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "status": "expanded_behavior_verified",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "source_fingerprint": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+  "source_file_count": 326,
+  "generated_at": "2026-10-19T07:58:17.611Z",
+  "counts": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0
+  },
+  "tests": [
+    {
+      "id": "global-launcher-and-focus",
+      "test": "tests/launcher_integration_test.gd",
+      "test_sha256": "cf2b5958973c0434ffc886d71c56fd28ddf0b69dd654145b1b0e4a51a0d3c4f0",
+      "capabilities": [
+        "launcher",
+        "focus_navigation",
+        "input_feedback"
+      ],
+      "expanded_entries": [
+        "launcher-cold-boot",
+        "launcher-focus-navigation"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "diagnostics": []
+    },
+    {
+      "id": "global-session-recovery",
+      "test": "tests/launcher_checkpoint_integration_test.gd",
+      "test_sha256": "ce891e1bfb531e2421a2a42f19715477149a01ffb02ffbf414d903d73f8f339f",
+      "capabilities": [
+        "session_recovery",
+        "checkpoint_load",
+        "safe_resume"
+      ],
+      "expanded_entries": [
+        "global-crash-recovery-prompt",
+        "office-checkpoint-recovery"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "diagnostics": []
+    },
+    {
+      "id": "office-task-and-search",
+      "test": "tests/office_integration_test.gd",
+      "test_sha256": "98c663b3878ddcfb7a4f3e51507c67dcac7a02d07adbef8efa7fa04122313a19",
+      "capabilities": [
+        "mission_success",
+        "failure_state",
+        "npc_search",
+        "patrol_resume",
+        "reward_feedback"
+      ],
+      "expanded_entries": [
+        "office-success-feedback",
+        "office-search-loop",
+        "office-failure-overlay"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "diagnostics": []
+    },
+    {
+      "id": "office-pause-and-audio",
+      "test": "tests/pause_integration_test.gd",
+      "test_sha256": "d35e3fba8f22da0c970cc5c7cd821333d6256a31f3c455f634984a9f29918446",
+      "capabilities": [
+        "pause_overlay",
+        "settings",
+        "audio_toggle",
+        "fallback_feedback"
+      ],
+      "expanded_entries": [
+        "office-pause-overlay",
+        "global-audio-disabled-fallback"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "diagnostics": []
+    },
+    {
+      "id": "office-hud-resolution",
+      "test": "tests/hud_layout_integration_test.gd",
+      "test_sha256": "0a5b85475cc08ffe1d82d249554430d595c6fd47b0233643f3fbf6c775ed34b9",
+      "capabilities": [
+        "responsive_hud",
+        "camera_safe_area",
+        "input_feedback"
+      ],
+      "expanded_entries": [
+        "office-resolution-variants"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "diagnostics": []
+    },
+    {
+      "id": "city-store-crowd-and-traffic",
+      "test": "tests/city_integration_test.gd",
+      "test_sha256": "5bec74dc26f29cf45e399231f1be8104f18523ad035cf7af0705467dd071b16a",
+      "capabilities": [
+        "store_transition",
+        "crowd_variation",
+        "traffic_routes",
+        "collision_feedback",
+        "vehicle_presentation"
+      ],
+      "expanded_entries": [
+        "city-store-transition",
+        "city-crowd-variants",
+        "city-traffic-near-miss",
+        "city-police-pursuit",
+        "city-police-escape",
+        "city-vehicle-damage-feedback"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "diagnostics": []
+    },
+    {
+      "id": "city-extension-weather-and-damage",
+      "test": "tests/city_extension_integration_test.gd",
+      "test_sha256": "2aa458baa38b84188d607d212bdc41655bcc4d2a037953df960625832594fc5a",
+      "capabilities": [
+        "new_district",
+        "landmark_navigation",
+        "lighting_profile",
+        "weather_profile",
+        "material_response",
+        "vehicle_presentation",
+        "collision_feedback"
+      ],
+      "expanded_entries": [
+        "city-neighborhood-extension",
+        "city-weather-lighting-extension",
+        "city-vehicle-damage-feedback"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "diagnostics": []
+    },
+    {
+      "id": "city-delivery-and-conflict",
+      "test": "tests/city_conflict_integration_test.gd",
+      "test_sha256": "d3c128dede68b497325da418a13aa8203924d94d79ec757946d7d599a510a666",
+      "capabilities": [
+        "delivery_state",
+        "inventory_consume",
+        "reward_feedback",
+        "collision_feedback"
+      ],
+      "expanded_entries": [
+        "city-delivery-completion",
+        "city-vehicle-damage-feedback"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "diagnostics": []
+    },
+    {
+      "id": "global-content-pack-and-asset-safety",
+      "test": "tests/content_pack_manifest_integration_test.gd",
+      "test_sha256": "945165de4c24df8e1a06d992a48875274f7f12e375d0371ea1f4134ba0f5ce3d",
+      "capabilities": [
+        "content_pack_trace",
+        "asset_forbid_fallback",
+        "error_feedback",
+        "safe_exit"
+      ],
+      "expanded_entries": [
+        "global-missing-asset-blocked",
+        "city-neighborhood-extension"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "diagnostics": []
+    },
+    {
+      "id": "global-determinism-and-session-journal",
+      "test": "tests/determinism_integration_test.gd",
+      "test_sha256": "50817e1ef781f30f791b2e24b25f7b5548d54f04d203d7a31a81932dda0f631d",
+      "capabilities": [
+        "deterministic_replay",
+        "session_trace",
+        "safe_resume"
+      ],
+      "expanded_entries": [
+        "global-crash-recovery-prompt",
+        "office-checkpoint-recovery"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "diagnostics": []
+    }
+  ],
+  "policy": "该报告只证明无头行为和能力回放；不证明截图、人工视觉、最终资产、目标设备或发布通过。"
+}

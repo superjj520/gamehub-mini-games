@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "status": "technical_candidate_verified",
+  "visual_status": "not_applicable",
+  "technical_status": "passed",
+  "manual_listening_status": "unverified",
+  "platform_status": "unverified",
+  "release_allowed": false,
+  "event_count": 14,
+  "audio_files": [
+    {
+      "id": "interaction_success",
+      "path": "res://assets/audio/generated/interaction_success.wav",
+      "bytes": 7982,
+      "sample_rate": 22050,
+      "channels": 1,
+      "bits_per_sample": 16,
+      "duration_seconds": 0.18,
+      "peak": 0.440491,
+      "rms": 0.265171,
+      "sha256": "0d20c1fb112db4a17f60cd420a89835c4f01a644950fb9f2ed2eb1335539b85c"
+    },
+    {
+      "id": "interaction_denied",
+      "path": "res://assets/audio/generated/interaction_denied.wav",
+      "bytes": 8864,
+      "sample_rate": 22050,
+      "channels": 1,
+      "bits_per_sample": 16,
+      "duration_seconds": 0.2,
+      "peak": 0.359344,
+      "rms": 0.195452,
+      "sha256": "7265615e49be27af2954ad8fa7b8f9004b0ddb642af49eb84ba10b9ffb521842"
+    },
+    {
+      "id": "mission_success",
+      "path": "res://assets/audio/generated/mission_success.wav",
+      "bytes": 22976,
+      "sample_rate": 22050,
+      "channels": 1,
+      "bits_per_sample": 16,
+      "duration_seconds": 0.52,
+      "peak": 0.335388,
+      "rms": 0.20739,
+      "sha256": "7e6c4a306a7fe19ed28ff105d1d4378253d48f6d57f97e280be3cb276555595a"
+    },
+    {
+      "id": "mission_failed",
+      "path": "res://assets/audio/generated/mission_failed.wav",
+      "bytes": 20330,
+      "sample_rate": 22050,
+      "channels": 1,
+      "bits_per_sample": 16,
+      "duration_seconds": 0.46,
+      "peak": 0.417572,
+      "rms": 0.237966,
+      "sha256": "5fda71402d412060380a9f5710d5be59f2bff301dbd1c031b86c7f911bb67d6c"
+    },
+    {
+      "id": "perception_alert",
+      "path": "res://assets/audio/generated/perception_alert.wav",
+      "bytes": 12392,
+      "sample_rate": 22050,
+      "channels": 1,
+      "bits_per_sample": 16,
+      "duration_seconds": 0.28,
+      "peak": 0.331543,
+      "rms": 0.162479,
+      "sha256": "9fbfb311e0103ee17234e27a8bb5236da380e216e8e3bc48e2e2b0d4a4ec8c40"
+    },
+    {
+      "id": "conflict_started",
+      "path": "res://assets/audio/generated/conflict_started.wav",
+      "bytes": 15920,
+      "sample_rate": 22050,
+      "channels": 1,
+      "bits_per_sample": 16,
+      "duration_seconds": 0.36,
+      "peak": 0.428619,
+      "rms": 0.231022,
+      "sha256": "9e4daeb4deceecd86bb9cdf174454e3ecf093a6a87524925ffae719d620cdf8e"
+    },
+    {
+      "id": "vehicle_driver",
+      "path": "res://assets/audio/generated/vehicle_driver.wav",
+      "bytes": 9746,
+      "sample_rate": 22050,
+      "channels": 1,
+      "bits_per_sample": 16,
+      "duration_seconds": 0.22,
+      "peak": 0.24115,
+      "rms": 0.124498,
+      "sha256": "00ddb8e50a59c1841d92ca193223a1a4c460653f10a59e6513a9d7b74e79925b"
+    },
+    {
+      "id": "vehicle_collision",
+      "path": "res://assets/audio/generated/vehicle_collision.wav",
+      "bytes": 8864,
+      "sample_rate": 22050,
+      "channels": 1,
+      "bits_per_sample": 16,
+      "duration_seconds": 0.2,
+      "peak": 0.39566,
+      "rms": 0.120717,
+      "sha256": "7a73f15e4b156fa90007ef7dcd2b8cc547ee1c684b9c2c3ea481452694de34d1"
+    },
+    {
+      "id": "vehicle_destroyed",
+      "path": "res://assets/audio/generated/vehicle_destroyed.wav",
+      "bytes": 21212,
+      "sample_rate": 22050,
+      "channels": 1,
+      "bits_per_sample": 16,
+      "duration_seconds": 0.48,
+      "peak": 0.337067,
+      "rms": 0.1474,
+      "sha256": "00b7c657288da3c58fa92a6332e37cbe911cae66dfcd869dd036ecad94610056"
+    },
+    {
+      "id": "scan_registered",
+      "path": "res://assets/audio/generated/scan_registered.wav",
+      "bytes": 13274,
+      "sample_rate": 22050,
+      "channels": 1,
+      "bits_per_sample": 16,
+      "duration_seconds": 0.3,
+      "peak": 0.359985,
+      "rms": 0.205205,
+      "sha256": "f3bde4f378a59bdd2714e8d5be543ee60c5108769b1b5ac9a466ab8ba4f2dd96"
+    },
+    {
+      "id": "checkpoint_loaded",
+      "path": "res://assets/audio/generated/checkpoint_loaded.wav",
+      "bytes": 10628,
+      "sample_rate": 22050,
+      "channels": 1,
+      "bits_per_sample": 16,
+      "duration_seconds": 0.24,
+      "peak": 0.370728,
+      "rms": 0.196877,
+      "sha256": "273cf8bbb5f4b6797c96c43e5f951007b92fca1fc5848fd4c0c4f4535f2b1e34"
+    },
+    {
+      "id": "mission_restart",
+      "path": "res://assets/audio/generated/mission_restart.wav",
+      "bytes": 11510,
+      "sample_rate": 22050,
+      "channels": 1,
+      "bits_per_sample": 16,
+      "duration_seconds": 0.26,
+      "peak": 0.345398,
+      "rms": 0.194778,
+      "sha256": "49193c4ef536a32527950145aff23abf175839c6ec2091f8ea82e9a06b7039e6"
+    },
+    {
+      "id": "footstep",
+      "path": "res://assets/audio/generated/footstep.wav",
+      "bytes": 4896,
+      "sample_rate": 22050,
+      "channels": 1,
+      "bits_per_sample": 16,
+      "duration_seconds": 0.110023,
+      "peak": 0.267456,
+      "rms": 0.061737,
+      "sha256": "65f64035339fec03c8b1664502b63ff7bcfc4b8f62060b15e77c3e37a4735fe6"
+    },
+    {
+      "id": "vehicle_engine",
+      "path": "res://assets/audio/generated/vehicle_engine.wav",
+      "bytes": 10628,
+      "sample_rate": 22050,
+      "channels": 1,
+      "bits_per_sample": 16,
+      "duration_seconds": 0.24,
+      "peak": 0.354248,
+      "rms": 0.180712,
+      "sha256": "1b6e0f467e88c1496293a4de2d789969b0e13c5a3b7f407617a2d989a290a8e3"
+    }
+  ],
+  "evidence": {
+    "rights_manifest": {
+      "path": "gta-reference-runtime/content/rights-manifest.json",
+      "sha256": "f5255be509cc04192731fa044cc292d8612bd1ac37b6edc75eaf6d64f8079998"
+    },
+    "cue_catalog": {
+      "path": "gta-reference-runtime/content/audio_cues.json",
+      "sha256": "b39ea58034f31b472d7e8394efc016b3aa54cc56cdc248dd7a7713f12fcd99af"
+    },
+    "runtime_catalog": {
+      "path": "gta-reference-runtime/content/audio-runtime-catalog.json",
+      "sha256": "6b1ef6f706dbca051e3fbd0c674ea2e36d0290462043be693463df13c1238c83"
+    },
+    "library_manifest": {
+      "path": "gta-reference-runtime/assets/audio/generated/audio-library-manifest.json",
+      "sha256": "fd36c0bcc034e8ca06ee71e59d462867adfd9dc47731f52715f873054bf11206"
+    }
+  },
+  "remaining_gates": [
+    "人工听感与混音审阅",
+    "音量开关回放",
+    "Windows 10/11 目标设备验证",
+    "最终发布权利复核"
+  ],
+  "policy": "技术目录、WAV 格式和来源证据通过不等于最终音频质量或发布通过。",
+  "generated_at": "2026-10-18T20:55:11.136Z"
+}

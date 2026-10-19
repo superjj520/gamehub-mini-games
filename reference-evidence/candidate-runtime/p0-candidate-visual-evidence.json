@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_manual_acceptance_pending",
+  "source_stale_since_capture": {
+    "reason": "P0 候选截图绑定旧源和旧候选包；当前候选包已重新生成，未重新采集前不得用于视觉验收。",
+    "current_candidate_package": "750d0587ea0420b0158f48f5e446ef8cb6e8845b5acca974dac5bc0f8d3d3468"
+  },
+  "product_name": "新时代觉醒者",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "capture_method": "真实 Godot 图形窗口，候选运行包专用构图入口",
+  "source": {
+    "sha256": "82b375799c7f032f4141b46d011cbdfdc4073f19ae88b53feb85dd2e985575d6",
+    "file_count": 180
+  },
+  "candidate_package": {
+    "root": "build/internal-full-candidate",
+    "sha256": "603abc173e9d745337d249f3b729ff9504f5d9f80a9a4589fdf3c838909f6035",
+    "file_count": 250
+  },
+  "captures": [
+    {
+      "id": "p0-candidate-office-01",
+      "path": "reference-evidence/p0-candidate-office-01.png",
+      "sha256": "f3f91cd7ee620076bd54f4df1bbba53714fa326c90e9942bd3eb6db430486feb",
+      "reference_path": "reference-evidence/video-2/office-01.jpg",
+      "visual_status": "unverified",
+      "notes": "候选办公室内部工位构图；已加载候选环境、角色和桌面资产，未完成人工逐帧签收。"
+    },
+    {
+      "id": "p0-candidate-city-08",
+      "path": "reference-evidence/p0-candidate-city-08.png",
+      "sha256": "d91a99b5efe94d2e12aa1377821d51154fd5b94a4d090c417fad57edf4385739",
+      "reference_path": "reference-evidence/video-1/city-08.jpg",
+      "visual_status": "unverified",
+      "notes": "候选城市驾驶构图；已加载候选街景、开放货斗三轮车和角色驾驶状态，未完成人工逐帧签收。"
+    }
+  ],
+  "rejected_reuse": [
+    {
+      "id": "p0-candidate-office-06",
+      "reason": "本轮图形服务不稳定且没有生成当前候选包截图，不绑定历史文件。"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "status": "candidate_isolated_formal_runtime_graphical_capture_failed",
+  "capture_profile": "wide",
+  "image": {
+    "path": null,
+    "visual_status": "unverified",
+    "release_allowed": false
+  },
+  "candidate_ids": [
+    "player-character-makehuman-elegant-suit-atlas-candidate",
+    "office-npc-makehuman-elegant-suit-skinned-512-atlas-candidate",
+    "office-polyhaven-five-desk-full-kit-candidate",
+    "office-workstation-row-v1-generated-candidate",
+    "office-elevator-lobby-v1-generated-candidate",
+    "office-01-video-authored-backdrop-candidate-v1",
+    "office-02-video-authored-backdrop-candidate-v1",
+    "office-06-video-authored-backdrop-candidate-v1",
+    "office-10-video-authored-backdrop-candidate-v1",
+    "city-vehicle-three-wheel-delivery-atlas-candidate"
+  ],
+  "source_sha256": {
+    "player_character_glb": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+    "player_visual_candidate_gd": "fcb62a678192711ee2696d07b16dc6dd4f429c6ba51f8e939b2014f8c84db8b3",
+    "office_npc_atlas_glb": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+    "npc_retouch_candidate_gd": "cbdeef0e757b79723ebcb462047a0a5af1129518be1c742c8a5e73f248a8c808",
+    "office_desk_glb": "bebc7a127bcc102ae4b58fbbbf5ecea1c8c735c53b5cf322ff0196c70c6314be",
+    "office_carpet_texture": "4a6cab846323e238c1a8d528d51c37769e0c68b42034fe679e3cabc7e05c969b",
+    "office_workstation_texture": "5905d08c367f00b5a44a9043f5177884e78839d22647112cb411969704d1b475",
+    "office_elevator_lobby_texture": "b3c0588b1281e8017606e7edbe4a9885471ef542cdb824c558777db9ff772ec1",
+    "office_video_playable_backdrop": "a75cf50d0b0cf1b512e6d2915f865c5bf07b8bad6c5318f48c7db776aca8fabb",
+    "office_composition_gd": "291709ab6069686fd8971d13ba14ce08903baa9d3bb49905bd8c0d448254ca14",
+    "interaction_props_glb": "2c490b5e28df3171326434d1e763afc6c7fd6f1d1b464708419823a7fb715ec9",
+    "three_wheel_atlas_glb": "59706c3a50e7e66a6ca927c9976613cce86304e60e439c2458f2197bb949f085",
+    "capture_runner_mjs": "90376243a2f9846d987431ca567aa8d5e0b6eebb65666244a8ebef52b6b12c30"
+  },
+  "capture_options": {
+    "profile": "wide",
+    "backend": "headless",
+    "timeout_ms": 120000
+  },
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "diagnostic_only": true,
+  "failure_kind": "headless_graphics_unavailable",
+  "failure": "无头或无根纹理运行不会生成正式图形证据",
+  "captured_at": "2026-10-18T17:48:46.594Z"
+}

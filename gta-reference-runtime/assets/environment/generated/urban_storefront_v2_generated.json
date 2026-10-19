@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "asset_id": "urban-storefront-v2-generated-candidate",
+  "slot_id": "city-environment-kit",
+  "source_kind": "ai_generated_original_bitmap",
+  "generator": "内置图像生成工具",
+  "license": "项目原创候选；需在最终发布前完成权利与负责人签收",
+  "runtime_asset": "urban_storefront_v2_generated.png",
+  "runtime_sha256": "15c4f5d031260ba4969a0462c9a6a340de0d5e8a087caf734d44218297d1d0e3",
+  "dimensions": [1536, 1024],
+  "intended_use": "城市背景店铺正面立面候选材质",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "constraints": [
+    "无品牌标识",
+    "无可读文字",
+    "不承担碰撞、导航、交互或任务逻辑",
+    "必须通过当前源码固定镜头截图和 Windows 目标设备验收"
+  ]
+}

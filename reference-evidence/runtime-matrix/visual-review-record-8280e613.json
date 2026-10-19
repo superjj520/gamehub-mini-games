@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "reviewer": "当前视觉复核",
+  "method": "manual_frame_review",
+  "reviewed_at": "2026-10-12T19:32:25.000Z",
+  "runtime_source_fingerprint": "8280e6135061d1b44e9e5984110fcb555ca87d8e90c28d1b957c908aaff5468b",
+  "segments": [
+    {"id": "office-01", "decision": "rejected", "findings": ["主角仍是明显的程序化低模几何体，人体比例、衣物连续性和背包融合未达到参考视频。", "办公室环境可读，但主角与环境的材质细节和光照响应不一致。"]},
+    {"id": "office-02", "decision": "rejected", "findings": ["主角低模轮廓在第三人称镜头中仍然突出，无法作为真实角色通过视觉验收。"]},
+    {"id": "office-03", "decision": "rejected", "findings": ["办公场景结构可读，但角色面部、四肢连接和服装材质与参考目标差距过大。"]},
+    {"id": "office-04", "decision": "rejected", "findings": ["主角的程序化组件存在明显块状分件，动作状态下不具备参考视频的人体连续性。"]},
+    {"id": "office-05", "decision": "rejected", "findings": ["办公室灯光与任务 HUD 可读，但角色外观仍为低模候选，不能签视觉通过。"]},
+    {"id": "office-06", "decision": "rejected", "findings": ["失败状态遮罩和任务冻结逻辑可读，但主角低模与办公室真实背景不匹配。"]},
+    {"id": "office-07", "decision": "rejected", "findings": ["搜索状态保持可辨识，但肩部、手臂、腿部和服装仍呈分离几何块。"]},
+    {"id": "office-08", "decision": "rejected", "findings": ["办公室空间方向成立，但角色材质、面部和动画姿态质量未达到参考帧要求。"]},
+    {"id": "office-09", "decision": "rejected", "findings": ["近景中低模头部、手部和背包细节成为硬伤，无法通过一模一样的视觉验收。"]},
+    {"id": "office-10", "decision": "rejected", "findings": ["办公室候选运行稳定，但角色资产仍是程序化临时方案，需换成真实人体资产后重拍。"]},
+    {"id": "city-01", "decision": "rejected", "findings": ["真实街市背景与低模主角存在强烈材质和尺度断层，主角像叠加在照片上的模型。"]},
+    {"id": "city-02", "decision": "rejected", "findings": ["城市人群和主角没有统一的空间光照与景深关系，低模角色破坏参考画面的沉浸感。"]},
+    {"id": "city-03", "decision": "rejected", "findings": ["城市任务场景可玩，但建筑、道路、角色和背景卡片之间的三维融合不足。"]},
+    {"id": "city-04", "decision": "rejected", "findings": ["人群变化有行为证据，但人群与主角均为简化几何体，未达到参考视频的人群密度和真实度。"]},
+    {"id": "city-05", "decision": "rejected", "findings": ["交通近失误状态可辨识，但车辆、行人和背景的材质层级不统一。"]},
+    {"id": "city-06", "decision": "rejected", "findings": ["城市街景存在明显背景卡片感，主角与道路接触、阴影和比例仍不自然。"]},
+    {"id": "city-07", "decision": "rejected", "findings": ["载具与配送流程可读，但驾驶角色低模、载具比例和街道空间关系未通过。"]},
+    {"id": "city-08", "decision": "rejected", "findings": ["雨夜氛围成立，但低模主角和三轮车与真实雨夜背景脱节，反射和接触阴影不足。"]},
+    {"id": "city-09", "decision": "rejected", "findings": ["车辆受损反馈有功能证据，但城市背景稀疏、角色和车辆细节不足。"]},
+    {"id": "city-10", "decision": "rejected", "findings": ["城市扩展区域缺少连续可探索的真实几何体，当前更像背景卡片加灰盒。"]},
+    {"id": "city-11", "decision": "rejected", "findings": ["城市收尾状态可运行，但主角、人群和环境尚未形成统一的 GTA 类型第三人称视觉质量。"]}
+  ]
+}

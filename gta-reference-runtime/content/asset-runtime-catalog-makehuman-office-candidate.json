@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "policy": "internal_makehuman_office_visual_candidate_only",
+  "character_variant": "makehuman_office_candidate",
+  "release_allowed": false,
+  "rights_note": "MakeHuman/MPFB 候选仅用于内部视觉与动画验证；发布前必须完成许可证、目标设备和最终权利复核",
+  "slots": [
+    {"id": "player-character", "category": "characters", "root_name": "Visual", "scene_path": "res://art-source/characters/makehuman-office-player/makehuman_player_visual_candidate.tscn", "fallback_policy": "forbid"},
+    {"id": "office-npc-set", "category": "characters", "root_name": "Visual", "scene_path": "res://assets/characters/original-procedural-office-characters/original_office_npc_candidate.tscn", "fallback_policy": "forbid"},
+    {"id": "city-crowd-set", "category": "characters", "root_name": "Visual", "scene_path": "res://assets/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.tscn", "fallback_policy": "forbid"},
+    {"id": "three-wheel-vehicle", "category": "vehicles", "root_name": "Visual", "scene_path": "res://assets/vehicles/three-wheel-delivery/three_wheel_delivery_candidate.tscn", "fallback_policy": "forbid"},
+    {"id": "office-environment-kit", "category": "environment", "root_name": "Visual", "scene_path": "res://content/candidates/original_office_desk_runtime_candidate.tscn", "fallback_policy": "forbid"},
+    {"id": "city-environment-kit", "category": "environment", "root_name": "Visual", "scene_path": "res://assets/environment/original-procedural-city-environment/original_city_environment_candidate.tscn", "fallback_policy": "forbid"},
+    {"id": "interaction-props", "category": "props", "root_name": "Visual", "scene_path": "res://assets/props/original-procedural-interaction-props/original_interaction_props_candidate.tscn", "fallback_policy": "forbid"},
+    {"id": "final-audio-library", "category": "audio", "root_name": "Audio", "scene_path": "", "fallback_policy": "procedural_graybox"}
+  ]
+}

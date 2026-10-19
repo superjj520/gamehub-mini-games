@@ -1,0 +1,1759 @@
+{
+  "schema_version": 1,
+  "status": "internal_no_go",
+  "reason": "最终资产、目标设备和视觉验收尚未完成",
+  "project": {
+    "name": "新时代觉醒者",
+    "version": "0.1.0-dev",
+    "engine": "4.7.1.stable.official.a13da4feb",
+    "renderer": "gl_compatibility",
+    "main_scene": "res://scenes/launcher.tscn"
+  },
+  "source": {
+    "root": "gta-reference-runtime",
+    "sha256": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+    "file_count": 326,
+    "files": [
+      {
+        "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate_makehuman_atlas_hair_detail_base_color_atlas.png",
+        "bytes": 498092,
+        "sha256": "b8111e87f1d1e93a43795d3a19be0cb09c3bbeb3a50550d134667a75e31d35c4"
+      },
+      {
+        "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate_makehuman_atlas_hair_detail_metallic_roughness_atlas.png",
+        "bytes": 20079,
+        "sha256": "960edbe909a017327ff089311fc12bfe43f40cf43223bcefc8f5bcab2ba8928d"
+      },
+      {
+        "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate_makehuman_atlas_outfit_base_color_atlas.png",
+        "bytes": 721013,
+        "sha256": "44ee4bc1a625ad020989e66d9003b0285545ae5d5f142bf16ee021f3de597104"
+      },
+      {
+        "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate_makehuman_atlas_outfit_metallic_roughness_atlas.png",
+        "bytes": 15621,
+        "sha256": "41453cd43802a0ee904946c1da7eda56d7ea9109537cc7f2b3315874b3e4060d"
+      },
+      {
+        "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate_makehuman_atlas_skin_base_color_atlas.png",
+        "bytes": 760190,
+        "sha256": "76f6a83fe54a949babb4d8c1421c4c4794bdc9d69735340f4972bf3a3025e5f3"
+      },
+      {
+        "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate_makehuman_atlas_skin_metallic_roughness_atlas.png",
+        "bytes": 15619,
+        "sha256": "d6bbd3fea1bce4b8603570142eddd22ae0be7868e0364884a38edaab5e819b93"
+      },
+      {
+        "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate.glb",
+        "bytes": 3495628,
+        "sha256": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9"
+      },
+      {
+        "path": "art-source/characters/makehuman-office-worker/MPFB-LICENSE.ASSETS.md",
+        "bytes": 6962,
+        "sha256": "f6089cba01cb570a24712b41ab8a586ccd3cc5ef53dc266ca50b95c288956d2c"
+      },
+      {
+        "path": "art-source/characters/makehuman-office-worker/MPFB-LICENSE.CODE.md",
+        "bytes": 34940,
+        "sha256": "26c03bc049c15fc5b9e52d791a06f1a6bc32f89edc8f8c701ab0aadf66e85b82"
+      },
+      {
+        "path": "art-source/vehicles/three-wheel-delivery/final-candidate/three_wheel_delivery_final_candidate.glb",
+        "bytes": 94016,
+        "sha256": "8c1dbcfff34cba5e73d1805021aebcf5f15d0ba98b173392580bba72e236d897"
+      },
+      {
+        "path": "art-source/vehicles/three-wheel-delivery/final-candidate/three_wheel_delivery_final_candidate.tscn",
+        "bytes": 1033,
+        "sha256": "16d777e3f0b12977a43db770ec141855e0f5e7a8c0757870f71846fde90fba2a"
+      },
+      {
+        "path": "art-source/vehicles/three-wheel-delivery/three_wheel_delivery_atlas_candidate.gd",
+        "bytes": 8564,
+        "sha256": "981a5c26bd34350348c0a1350d6e8eca8354f289e2925d254f2db3500b55c289"
+      },
+      {
+        "path": "assets/audio/generated/audio-library-manifest.json",
+        "bytes": 5207,
+        "sha256": "fd36c0bcc034e8ca06ee71e59d462867adfd9dc47731f52715f873054bf11206"
+      },
+      {
+        "path": "assets/audio/generated/checkpoint_loaded.wav",
+        "bytes": 10628,
+        "sha256": "273cf8bbb5f4b6797c96c43e5f951007b92fca1fc5848fd4c0c4f4535f2b1e34"
+      },
+      {
+        "path": "assets/audio/generated/conflict_started.wav",
+        "bytes": 15920,
+        "sha256": "9e4daeb4deceecd86bb9cdf174454e3ecf093a6a87524925ffae719d620cdf8e"
+      },
+      {
+        "path": "assets/audio/generated/footstep.wav",
+        "bytes": 4896,
+        "sha256": "65f64035339fec03c8b1664502b63ff7bcfc4b8f62060b15e77c3e37a4735fe6"
+      },
+      {
+        "path": "assets/audio/generated/interaction_denied.wav",
+        "bytes": 8864,
+        "sha256": "7265615e49be27af2954ad8fa7b8f9004b0ddb642af49eb84ba10b9ffb521842"
+      },
+      {
+        "path": "assets/audio/generated/interaction_success.wav",
+        "bytes": 7982,
+        "sha256": "0d20c1fb112db4a17f60cd420a89835c4f01a644950fb9f2ed2eb1335539b85c"
+      },
+      {
+        "path": "assets/audio/generated/mission_failed.wav",
+        "bytes": 20330,
+        "sha256": "5fda71402d412060380a9f5710d5be59f2bff301dbd1c031b86c7f911bb67d6c"
+      },
+      {
+        "path": "assets/audio/generated/mission_restart.wav",
+        "bytes": 11510,
+        "sha256": "49193c4ef536a32527950145aff23abf175839c6ec2091f8ea82e9a06b7039e6"
+      },
+      {
+        "path": "assets/audio/generated/mission_success.wav",
+        "bytes": 22976,
+        "sha256": "7e6c4a306a7fe19ed28ff105d1d4378253d48f6d57f97e280be3cb276555595a"
+      },
+      {
+        "path": "assets/audio/generated/perception_alert.wav",
+        "bytes": 12392,
+        "sha256": "9fbfb311e0103ee17234e27a8bb5236da380e216e8e3bc48e2e2b0d4a4ec8c40"
+      },
+      {
+        "path": "assets/audio/generated/scan_registered.wav",
+        "bytes": 13274,
+        "sha256": "f3bde4f378a59bdd2714e8d5be543ee60c5108769b1b5ac9a466ab8ba4f2dd96"
+      },
+      {
+        "path": "assets/audio/generated/vehicle_collision.wav",
+        "bytes": 8864,
+        "sha256": "7a73f15e4b156fa90007ef7dcd2b8cc547ee1c684b9c2c3ea481452694de34d1"
+      },
+      {
+        "path": "assets/audio/generated/vehicle_destroyed.wav",
+        "bytes": 21212,
+        "sha256": "00b7c657288da3c58fa92a6332e37cbe911cae66dfcd869dd036ecad94610056"
+      },
+      {
+        "path": "assets/audio/generated/vehicle_driver.wav",
+        "bytes": 9746,
+        "sha256": "00ddb8e50a59c1841d92ca193223a1a4c460653f10a59e6513a9d7b74e79925b"
+      },
+      {
+        "path": "assets/audio/generated/vehicle_engine.wav",
+        "bytes": 10628,
+        "sha256": "1b6e0f467e88c1496293a4de2d789969b0e13c5a3b7f407617a2d989a290a8e3"
+      },
+      {
+        "path": "assets/characters/generated-dialogue-portraits/office_npc_dialogue_sprite_v1.json",
+        "bytes": 766,
+        "sha256": "6db25090e325189475fecdda2dfb508747185e51ac5f98fed6b3cc0d4d255b5a"
+      },
+      {
+        "path": "assets/characters/generated-dialogue-portraits/office_npc_dialogue_sprite_v1.png",
+        "bytes": 1712943,
+        "sha256": "b1a1eea15a936d4bbd4f79d55b28213767f8a9561cd55981d042f0edd5535532"
+      },
+      {
+        "path": "assets/characters/generated-dialogue-portraits/player_dialogue_sprite_v1.json",
+        "bytes": 750,
+        "sha256": "b07e0eaaa417b1cbcedaf17c72709de23258354d1801c6a8aaa46d4c6951ae47"
+      },
+      {
+        "path": "assets/characters/generated-dialogue-portraits/player_dialogue_sprite_v1.png",
+        "bytes": 1594233,
+        "sha256": "debca65db8ca3162633cf92768f232456359e5036534b3955a1ab3fb6585966c"
+      },
+      {
+        "path": "assets/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.gd",
+        "bytes": 16688,
+        "sha256": "7bd6b65caa2cae822c539000cc81e57482a835068c669c9758c640a3bfc1b66a"
+      },
+      {
+        "path": "assets/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.tscn",
+        "bytes": 282,
+        "sha256": "80c6f8b531ccea173189130366865126c83f91dd3a5db0381194710d502d4318"
+      },
+      {
+        "path": "assets/characters/original-procedural-office-characters/original_office_npc_candidate.gd",
+        "bytes": 21241,
+        "sha256": "b1d036cf10d74d60414837c16031bf870b7766581a8ead63dd13e014505ef2d6"
+      },
+      {
+        "path": "assets/characters/original-procedural-office-characters/original_office_npc_candidate.tscn",
+        "bytes": 268,
+        "sha256": "7a336e3c76abb50753746c055f310caa1fbf1293dbe8a7d675ae3e30ade9e7b6"
+      },
+      {
+        "path": "assets/characters/original-procedural-office-characters/original_player_candidate.gd",
+        "bytes": 60805,
+        "sha256": "67703ac8108a51fb4ff6c1dba32c4e3f44cb19cb544e0011a17649aca612abe3"
+      },
+      {
+        "path": "assets/characters/original-procedural-office-characters/original_player_candidate.tscn",
+        "bytes": 261,
+        "sha256": "95ded9ec4290c12938640dba59dbdf728f21d720afd42b33abbf2bd8394a165b"
+      },
+      {
+        "path": "assets/characters/original-procedural-office-characters/original_player_visual_v1.glb",
+        "bytes": 234804,
+        "sha256": "7927e603a89a670cb0ed2ee7294884f9fc0b909014a3173a3e921a64c634d20f"
+      },
+      {
+        "path": "assets/characters/quaternius-superhero-male/character_npc_outfitted.glb",
+        "bytes": 1161624,
+        "sha256": "5b88f2b3b930a00227a7c9d8326221a96e168482771d8c5563b72778f2d6c17d"
+      },
+      {
+        "path": "assets/characters/quaternius-superhero-male/character_outfitted.glb",
+        "bytes": 1188508,
+        "sha256": "6480065557eac5304dd0a019fcaf72726605d5e6253bbd2c44fa0208ee715bd1"
+      },
+      {
+        "path": "assets/characters/quaternius-superhero-male/character.glb",
+        "bytes": 741320,
+        "sha256": "d6f3b64cab629f6ddca9ba063811aeffd3663a8a4e49ade47cd9505dc2bbd70f"
+      },
+      {
+        "path": "assets/characters/quaternius-superhero-male/city_crowd_quaternius_candidate.gd",
+        "bytes": 3319,
+        "sha256": "797859f6770197858bcc79ad3ae1bd42c722e2ecd84089331efc2dcf5cef8c3b"
+      },
+      {
+        "path": "assets/characters/quaternius-superhero-male/city_crowd_quaternius_candidate.tscn",
+        "bytes": 540,
+        "sha256": "4afe1dd998cb1a734e4fdfffe4d551681d7e67a702d47b8f273150dcef5356b8"
+      },
+      {
+        "path": "assets/characters/quaternius-superhero-male/office_npc_quaternius_candidate.gd",
+        "bytes": 6309,
+        "sha256": "a669e9cd98bd367aad5149a760eeb936b06a8c97050befa1accdfc02a3fc8a56"
+      },
+      {
+        "path": "assets/characters/quaternius-superhero-male/office_npc_quaternius_candidate.tscn",
+        "bytes": 506,
+        "sha256": "8eb07f7d5e9de6be5478373bdc801ede5786a00798efcf6fabdb10818bf5e5c0"
+      },
+      {
+        "path": "assets/characters/quaternius-superhero-male/player_character_quaternius_candidate.gd",
+        "bytes": 10227,
+        "sha256": "e4dee5a7895c1f833edabd248fdf85d1bd1e1093b50ab1cc87e7923d9f922d01"
+      },
+      {
+        "path": "assets/characters/quaternius-superhero-male/player_character_quaternius_candidate.tscn",
+        "bytes": 514,
+        "sha256": "467d126414389f36025f7dad6bc4202abf8dd75bd91bc1e38c5ae70a40f2e2b4"
+      },
+      {
+        "path": "assets/characters/quaternius-superhero-male/QUATERNIUS-LICENSE.txt",
+        "bytes": 806,
+        "sha256": "0f4beaf0fe360a7732e58bbe3dbf60a2422367fbea60cb9ea4add968f383268e"
+      },
+      {
+        "path": "assets/environment/cc0/worn_asphalt/worn_asphalt_ao_1k.jpg",
+        "bytes": 1224954,
+        "sha256": "c07b7d9608e73ed9732abbfe6e5afcd01da5ebeee227093855ebd0299b2abb73"
+      },
+      {
+        "path": "assets/environment/cc0/worn_asphalt/worn_asphalt_arm_1k.jpg",
+        "bytes": 1184182,
+        "sha256": "df8f97e3739be52933907f92527c79aac7c3d0e6f7c76fa0ce709815bfd0fe51"
+      },
+      {
+        "path": "assets/environment/cc0/worn_asphalt/worn_asphalt_diff_1k.jpg",
+        "bytes": 914719,
+        "sha256": "3bf71ad290730092ad2aee85e246b2e43318bc1f32261826ba91250e815b5f72"
+      },
+      {
+        "path": "assets/environment/cc0/worn_asphalt/worn_asphalt_nor_gl_1k.jpg",
+        "bytes": 1503498,
+        "sha256": "5f835d192dac296674229a763553f356f5e206bb7f6d812bca5b0f38fc5302a4"
+      },
+      {
+        "path": "assets/environment/cc0/worn_asphalt/worn_asphalt_rough_1k.jpg",
+        "bytes": 480395,
+        "sha256": "ad63ece01a94cb43f57a9d628fa9d28a560bffc8878749998ad3601831ab843f"
+      },
+      {
+        "path": "assets/environment/generated/city_08_authorized_ai_backdrop_candidate.png",
+        "bytes": 136429,
+        "sha256": "acae9294790ff1d7148498f239a1ee0c570716e930f4d5a3d12e35fe5ad09d71"
+      },
+      {
+        "path": "assets/environment/generated/city_destination_drive_v1_generated.json",
+        "bytes": 954,
+        "sha256": "b175d0496a2a708adce6fad686f0ff0de48a11ac5cfa16f3e46c171684fd4907"
+      },
+      {
+        "path": "assets/environment/generated/city_destination_drive_v1_generated.png",
+        "bytes": 2861814,
+        "sha256": "c1df71d29549aeed6448f77a5707d258fc31c980570370834dee8ae303939370"
+      },
+      {
+        "path": "assets/environment/generated/city_drive_lane_day_v1_candidate.json",
+        "bytes": 945,
+        "sha256": "93148cf24ec3032ac2681a1ed8e9054be15ad98d427503d358d7ff7d5754043d"
+      },
+      {
+        "path": "assets/environment/generated/city_drive_lane_day_v1_candidate.png",
+        "bytes": 2875001,
+        "sha256": "dced75804210e04bfb06e0f2fbfc5bb4b8fd360be3556b9f6d4f4158671d254a"
+      },
+      {
+        "path": "assets/environment/generated/city_drive_lane_day_v2_clear_foreground_candidate.json",
+        "bytes": 1124,
+        "sha256": "cf0fd65c2bf310e728a960ce1f4a8404a351664ea73da87568106ac1b76ee75e"
+      },
+      {
+        "path": "assets/environment/generated/city_drive_lane_day_v2_clear_foreground_candidate.png",
+        "bytes": 2719054,
+        "sha256": "084fcfdaa006cda4528668d286c08b76dd5dddbd17a3bc1effff54cc6ced89be"
+      },
+      {
+        "path": "assets/environment/generated/city_drive_lane_dusk_v1_generated.json",
+        "bytes": 953,
+        "sha256": "5afbf21e6e157da7eea4a7d3ba320b444dd22430149e90b609cde722a663c58c"
+      },
+      {
+        "path": "assets/environment/generated/city_drive_lane_dusk_v1_generated.png",
+        "bytes": 2901268,
+        "sha256": "451e87e65eaaba2dad625222bf98860ca72cccd4a43afeb42ba028eaddfe2bb2"
+      },
+      {
+        "path": "assets/environment/generated/city_dusk_corner_storefront_v1_generated.json",
+        "bytes": 956,
+        "sha256": "45a397e91ed5928dbe82740501a20871cc213a13cf11f93c021645b2ce1da73c"
+      },
+      {
+        "path": "assets/environment/generated/city_dusk_corner_storefront_v1_generated.png",
+        "bytes": 2772652,
+        "sha256": "a325a81895ce7b9aeed7e22e2efdd7c01e5f1bccb8a9f620005a76ae13d4d553"
+      },
+      {
+        "path": "assets/environment/generated/city_endpoint_shutter_v1_generated.json",
+        "bytes": 943,
+        "sha256": "57610f4d4995a1a899d7d471163e17a8cf73a0156d2c814345ce48b7a73415b5"
+      },
+      {
+        "path": "assets/environment/generated/city_endpoint_shutter_v1_generated.png",
+        "bytes": 2476341,
+        "sha256": "e5df94c493030183270842ef9956220c92770b5682b69576eaa450d5410d6d68"
+      },
+      {
+        "path": "assets/environment/generated/city_store_conflict_aisle_v1_generated.json",
+        "bytes": 1362,
+        "sha256": "8a8db6ef092285b8f731ec8ca5bed38bf629490c272745538c33084d3b6244ac"
+      },
+      {
+        "path": "assets/environment/generated/city_store_conflict_aisle_v1_generated.png",
+        "bytes": 2570191,
+        "sha256": "e9f85cced93327c56792b1cd48631fb1e46ce9f4e5ac594a104b5d8c9d310b24"
+      },
+      {
+        "path": "assets/environment/generated/city_storefront_crowd_v1_generated.json",
+        "bytes": 926,
+        "sha256": "cea4026456663b254b71b318178810875492f1d2e2bf2b594b4fd50373c29275"
+      },
+      {
+        "path": "assets/environment/generated/city_storefront_crowd_v1_generated.png",
+        "bytes": 2184403,
+        "sha256": "d1e67dc0818e2b5af01d239a09a87968f555b59a8f91c1dac83f2945994e43dc"
+      },
+      {
+        "path": "assets/environment/generated/city_storefront_crowd_v2_generated.json",
+        "bytes": 994,
+        "sha256": "441aeeeaf5ae230ee5d26c16d520494a947c9be0dabc04cdd88630909ab5b42b"
+      },
+      {
+        "path": "assets/environment/generated/city_storefront_crowd_v2_generated.png",
+        "bytes": 2884746,
+        "sha256": "b75e89c39e5d181d1c63ad90e1907f91064a9b922adc2f97aace6387ee12d545"
+      },
+      {
+        "path": "assets/environment/generated/city_storefront_crowd_v3_generated.json",
+        "bytes": 1017,
+        "sha256": "62cc6d8d709548144ba074d224471961efa865d91344f546a2b0eb74f30333dc"
+      },
+      {
+        "path": "assets/environment/generated/city_storefront_crowd_v3_generated.png",
+        "bytes": 2511331,
+        "sha256": "d40ca4fc01cae0b5af1fc865e1d15bd28ca1d8334556762aea8894c0edc3fb00"
+      },
+      {
+        "path": "assets/environment/generated/office_10_authorized_ai_backdrop_candidate.png",
+        "bytes": 125848,
+        "sha256": "67158e53b18736d534dc6e7b6f8fd7ccc8629ac9499b30fbe70f30e574b499f1"
+      },
+      {
+        "path": "assets/environment/generated/office_dialogue_corridor_v1_generated.json",
+        "bytes": 837,
+        "sha256": "a2cc7474c5532974de4112e8bc560daab1d8bb3d22d5f2454142332fe6fc2a52"
+      },
+      {
+        "path": "assets/environment/generated/office_dialogue_corridor_v1_generated.png",
+        "bytes": 1739396,
+        "sha256": "a270f1a5377705f7e8819b2dda88ad1aeebd785268685e3987544ae688b909d9"
+      },
+      {
+        "path": "assets/environment/generated/office_doorway_threshold_v1_generated.json",
+        "bytes": 856,
+        "sha256": "b331a9471ef791a8da705f0cd39730c6a00c8e0b8527193759c1d01dacfa640e"
+      },
+      {
+        "path": "assets/environment/generated/office_doorway_threshold_v1_generated.png",
+        "bytes": 1992157,
+        "sha256": "a5368acf69faeec3478a5320b5e4802ae09751ebeb203dd42927ccaa7c87935d"
+      },
+      {
+        "path": "assets/environment/generated/office_elevator_call_v1_generated.json",
+        "bytes": 852,
+        "sha256": "73aa28313c0d7d1c0d0fc2c5833a95edf6213f6d7889c5e16b7544deebc0dd8a"
+      },
+      {
+        "path": "assets/environment/generated/office_elevator_call_v1_generated.png",
+        "bytes": 2273220,
+        "sha256": "ae9360d6e109b15de183239f32d6e70f34461bcfb440e56068fa33e54a0335f1"
+      },
+      {
+        "path": "assets/environment/generated/office_elevator_hall_v1_generated.json",
+        "bytes": 814,
+        "sha256": "4c96222b45472088233c57175b60faab6ee3b289d2748c4dfa21481dffbdfb56"
+      },
+      {
+        "path": "assets/environment/generated/office_elevator_hall_v1_generated.png",
+        "bytes": 2095621,
+        "sha256": "9d4635f22a3398b320b8d07b96204bcafa0b9bcf44202db89f5f8a92b54d7e0b"
+      },
+      {
+        "path": "assets/environment/generated/office_elevator_lobby_v1_generated.json",
+        "bytes": 855,
+        "sha256": "19169dd11b58b4d6e27512b69d538282533618b5f48f3b8b7743ebefb7572d8c"
+      },
+      {
+        "path": "assets/environment/generated/office_elevator_lobby_v1_generated.png",
+        "bytes": 2266490,
+        "sha256": "b3c0588b1281e8017606e7edbe4a9885471ef542cdb824c558777db9ff772ec1"
+      },
+      {
+        "path": "assets/environment/generated/office_elevator_lobby_v2_generated.json",
+        "bytes": 844,
+        "sha256": "4d2c0abc9da73eb0dec09d7e2a78bea7c4079b224349dd357cdd6a003c108056"
+      },
+      {
+        "path": "assets/environment/generated/office_elevator_lobby_v2_generated.png",
+        "bytes": 2209893,
+        "sha256": "a6db8611009bf1cd01591ba459adf0031ec402e796ee294bf883283cb881a102"
+      },
+      {
+        "path": "assets/environment/generated/office_glass_partition_v1.png",
+        "bytes": 1940040,
+        "sha256": "d875517e289f5f3e0f2e7327137d819ec9a21e693062c6b60db8fb0cd104d516"
+      },
+      {
+        "path": "assets/environment/generated/office_hallway_dialogue_v1_generated.json",
+        "bytes": 848,
+        "sha256": "2b4b6874625fb82fe42855f21cb1839eb104a8540c27417bd46ffaa3e431f84a"
+      },
+      {
+        "path": "assets/environment/generated/office_hallway_dialogue_v1_generated.png",
+        "bytes": 2044499,
+        "sha256": "506aa068b5384a90c8cf01ff795e95d316c481649e479587a43c372a6c5a4618"
+      },
+      {
+        "path": "assets/environment/generated/office_hallway_encounter_v1_generated.json",
+        "bytes": 841,
+        "sha256": "2d7590ecc1e620fd4e4d1c00e53cffb6867cb02a27351a9e487ab63d3142eff5"
+      },
+      {
+        "path": "assets/environment/generated/office_hallway_encounter_v1_generated.png",
+        "bytes": 2077795,
+        "sha256": "a3371d808f0b1df32843aad28467a730e90d695536296dfabefb7b3b8fab9125"
+      },
+      {
+        "path": "assets/environment/generated/office_perception_room_v1_generated.json",
+        "bytes": 855,
+        "sha256": "1d3ed92f95a294eeded86d7b3ef4f90fcaeb03503f2993b76676bc411acd3108"
+      },
+      {
+        "path": "assets/environment/generated/office_perception_room_v1_generated.png",
+        "bytes": 1815903,
+        "sha256": "4be9bb35f715ca9d8a7b9cfcdecca0a1d93eab978913bf662b7bc8e89138b88c"
+      },
+      {
+        "path": "assets/environment/generated/office_workstation_row_v1_generated.json",
+        "bytes": 824,
+        "sha256": "965fb63791e3c22b02c80273684f18c446a375e1cfad8a977cee4922d1ac1e53"
+      },
+      {
+        "path": "assets/environment/generated/office_workstation_row_v1_generated.png",
+        "bytes": 2100719,
+        "sha256": "9a30f549c018d2dc4673e52271b025fcc0441101565000733a4aa9186386fb5d"
+      },
+      {
+        "path": "assets/environment/generated/office_workstation_row_v2_worker_generated.json",
+        "bytes": 1052,
+        "sha256": "7d2c40f04567878066d7e6b6747cd2da9f3288302b4fa0ebfcb3dd58e8070f46"
+      },
+      {
+        "path": "assets/environment/generated/office_workstation_row_v2_worker_generated.png",
+        "bytes": 1985840,
+        "sha256": "5905d08c367f00b5a44a9043f5177884e78839d22647112cb411969704d1b475"
+      },
+      {
+        "path": "assets/environment/generated/urban_store_aisle_v1_generated.json",
+        "bytes": 937,
+        "sha256": "7722a8f19aa4c55f2cfaf2d4b5ce77624d1046d76dd8f6b18e4215bc4b61f5b3"
+      },
+      {
+        "path": "assets/environment/generated/urban_store_aisle_v1_generated.png",
+        "bytes": 2232156,
+        "sha256": "d2babace26e2f68c83a26d06e9376df8f28549a27372f52e056a8fd1a15745ed"
+      },
+      {
+        "path": "assets/environment/generated/urban_storefront_v1.png",
+        "bytes": 2994391,
+        "sha256": "168af3a152f0e4beba7a993e8b40c000d9443610fcd4b5591b1d5b0e02688189"
+      },
+      {
+        "path": "assets/environment/generated/urban_storefront_v2_generated.json",
+        "bytes": 805,
+        "sha256": "47e5bf194171262a762bfd78f38de1804c2149ebf4577c9d7d443a4bf93ccf18"
+      },
+      {
+        "path": "assets/environment/generated/urban_storefront_v2_generated.png",
+        "bytes": 3191789,
+        "sha256": "15c4f5d031260ba4969a0462c9a6a340de0d5e8a087caf734d44218297d1d0e3"
+      },
+      {
+        "path": "assets/environment/generated/warehouse_backlot_facade_v1_generated.json",
+        "bytes": 838,
+        "sha256": "a171d8045f9fc196957a1c3289c5e1f15b01a7e1e1a15dc6d67a69843d964db0"
+      },
+      {
+        "path": "assets/environment/generated/warehouse_backlot_facade_v1_generated.png",
+        "bytes": 3107492,
+        "sha256": "208c9e62d45b4c4f53d3b22cf402ffb5179e9552a45edb60252d57a9717e92a7"
+      },
+      {
+        "path": "assets/environment/original-procedural-city-environment/original_city_environment_candidate.gd",
+        "bytes": 37160,
+        "sha256": "a36028bd5c5637c1fe6bca6abd44830831737fc2dd37cb78c834694785941193"
+      },
+      {
+        "path": "assets/environment/original-procedural-city-environment/original_city_environment_candidate.tscn",
+        "bytes": 254,
+        "sha256": "7a57c9414098b03b86d3b40336a955e59d3bf19005057fada76cf55c14a286d5"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_Concrete_Asphalt_BaseColor.webp",
+        "bytes": 2458,
+        "sha256": "bcda6de8103faf9fb1e4fc0128af8e6aeefa39fdf4bbc8b9ffc9b4fbe1a03c36"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_Concrete_Normal.webp",
+        "bytes": 15398,
+        "sha256": "0c213816a92f9644086a7c73068a91d7c69efea4c0413291c085137806b10b60"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_Concrete_ORM.webp",
+        "bytes": 6560,
+        "sha256": "bef1a5e439c8922a67e7234656b3ca10965666eac871044cd5d3ad0c315acd99"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_dark_interior.webp",
+        "bytes": 11692,
+        "sha256": "abbd718949a3d0d417a043d464be8649356aabed0096e7201a8354640904ef16"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_lit_interior_1.webp",
+        "bytes": 23860,
+        "sha256": "cbea72dcc3155ffa1a6306d1c86216fd9439d8ac3e0ce8650a1b19e708fb9b18"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_lit_interior_2.webp",
+        "bytes": 11846,
+        "sha256": "ee4700696d785999fa4f2d06c2e8556857e7c60b0aa79851e8258c88777bf8df"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_MarbleFloor_BaseColor.webp",
+        "bytes": 7208,
+        "sha256": "fcb66a888421830dd494bd73863bcad8437e2864302bcc298165847d60324402"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_MarbleFloor_Normal.webp",
+        "bytes": 9886,
+        "sha256": "47e21dc8f65a05db061b0b9f536172fe1f114c5b709203ef6e64670af93e0501"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_MarbleFloor_ORM.webp",
+        "bytes": 6454,
+        "sha256": "a121b1375e20e2570df8a0d5a4ab8950f8dcaf746ea44f7eef27a97a19134595"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_MetalConcrete_BaseColor.webp",
+        "bytes": 5700,
+        "sha256": "75b8f8b5dc34a596da04d0f21b81bde95f94dae78477dd824c2b5d7425c36259"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_MetalConcrete_Normal.webp",
+        "bytes": 17372,
+        "sha256": "59d039fce36da69f1a7b21496f8281950e3efb7de6fb5de0e9d17fd5ef3490e6"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_MetalConcrete_ORM.webp",
+        "bytes": 13720,
+        "sha256": "0e4ea3392a38ff128b0e74a8eac8915e56eb3a387551c341d4024da8367ccfce"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_RedBrick_BaseColor.webp",
+        "bytes": 13558,
+        "sha256": "9c95d54208c7c36478cda03099f561ce42f05c16fe093e9c6c8579b17707df24"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_RedBrick_Normal.webp",
+        "bytes": 42948,
+        "sha256": "616b283754b17726c079aa4b0c25c5671543cf370477e80aad89a151dc68bfb2"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_RedBrick_ORM.webp",
+        "bytes": 24578,
+        "sha256": "b82d02137940dcbbcaabbe5a5d4df0c7ea495acadeb2e26f959555f9eb6ba6a5"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_Trim_BaseColor.webp",
+        "bytes": 10128,
+        "sha256": "8982c7bfe5d24c1ca82a5f1831c88f5891bf05411c33df42987bd834d81f566a"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_Trim_Normal.webp",
+        "bytes": 9782,
+        "sha256": "aadda904706abedc4f12de3775df71f8600c59df82f810006658d96b998aa619"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large_T_Trim_ORM.webp",
+        "bytes": 7698,
+        "sha256": "f2f106d665bb5686a3cb61d9565a75eaada0fd425c25f84bac0d7c040210f17b"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_large.glb",
+        "bytes": 2434972,
+        "sha256": "7cc886d3a817f1538a96139b2642d2923925a340e7249f588be1dd8229e1e780"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_Concrete_Asphalt_BaseColor.webp",
+        "bytes": 2458,
+        "sha256": "bcda6de8103faf9fb1e4fc0128af8e6aeefa39fdf4bbc8b9ffc9b4fbe1a03c36"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_Concrete_Normal.webp",
+        "bytes": 15398,
+        "sha256": "0c213816a92f9644086a7c73068a91d7c69efea4c0413291c085137806b10b60"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_Concrete_ORM.webp",
+        "bytes": 6560,
+        "sha256": "bef1a5e439c8922a67e7234656b3ca10965666eac871044cd5d3ad0c315acd99"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_dark_interior.webp",
+        "bytes": 11692,
+        "sha256": "abbd718949a3d0d417a043d464be8649356aabed0096e7201a8354640904ef16"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_lit_interior_1.webp",
+        "bytes": 23860,
+        "sha256": "cbea72dcc3155ffa1a6306d1c86216fd9439d8ac3e0ce8650a1b19e708fb9b18"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_lit_interior_2.webp",
+        "bytes": 11846,
+        "sha256": "ee4700696d785999fa4f2d06c2e8556857e7c60b0aa79851e8258c88777bf8df"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_MarbleFloor_BaseColor.webp",
+        "bytes": 7208,
+        "sha256": "fcb66a888421830dd494bd73863bcad8437e2864302bcc298165847d60324402"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_MarbleFloor_Normal.webp",
+        "bytes": 9886,
+        "sha256": "47e21dc8f65a05db061b0b9f536172fe1f114c5b709203ef6e64670af93e0501"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_MarbleFloor_ORM.webp",
+        "bytes": 6454,
+        "sha256": "a121b1375e20e2570df8a0d5a4ab8950f8dcaf746ea44f7eef27a97a19134595"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_RedBrick_BaseColor.webp",
+        "bytes": 13558,
+        "sha256": "9c95d54208c7c36478cda03099f561ce42f05c16fe093e9c6c8579b17707df24"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_RedBrick_Normal.webp",
+        "bytes": 42948,
+        "sha256": "616b283754b17726c079aa4b0c25c5671543cf370477e80aad89a151dc68bfb2"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_RedBrick_ORM.webp",
+        "bytes": 24578,
+        "sha256": "b82d02137940dcbbcaabbe5a5d4df0c7ea495acadeb2e26f959555f9eb6ba6a5"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_Trim_BaseColor.webp",
+        "bytes": 10128,
+        "sha256": "8982c7bfe5d24c1ca82a5f1831c88f5891bf05411c33df42987bd834d81f566a"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_Trim_Normal.webp",
+        "bytes": 9782,
+        "sha256": "aadda904706abedc4f12de3775df71f8600c59df82f810006658d96b998aa619"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium_T_Trim_ORM.webp",
+        "bytes": 7698,
+        "sha256": "f2f106d665bb5686a3cb61d9565a75eaada0fd425c25f84bac0d7c040210f17b"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_medium.glb",
+        "bytes": 1858336,
+        "sha256": "5a3133c67f2f2ade760156b27f882d43b18dadd97703ade11b350b9cb163a41d"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_Concrete_Asphalt_BaseColor.webp",
+        "bytes": 2458,
+        "sha256": "bcda6de8103faf9fb1e4fc0128af8e6aeefa39fdf4bbc8b9ffc9b4fbe1a03c36"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_Concrete_BaseColor.webp",
+        "bytes": 5384,
+        "sha256": "11e0ff284c4d05383d2a75b43734787c94e76b926560dc1a3e08ca02195d4b66"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_Concrete_Normal.webp",
+        "bytes": 15398,
+        "sha256": "0c213816a92f9644086a7c73068a91d7c69efea4c0413291c085137806b10b60"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_Concrete_ORM.webp",
+        "bytes": 6560,
+        "sha256": "bef1a5e439c8922a67e7234656b3ca10965666eac871044cd5d3ad0c315acd99"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_dark_interior.webp",
+        "bytes": 11692,
+        "sha256": "abbd718949a3d0d417a043d464be8649356aabed0096e7201a8354640904ef16"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_lit_interior_1.webp",
+        "bytes": 23860,
+        "sha256": "cbea72dcc3155ffa1a6306d1c86216fd9439d8ac3e0ce8650a1b19e708fb9b18"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_lit_interior_2.webp",
+        "bytes": 11846,
+        "sha256": "ee4700696d785999fa4f2d06c2e8556857e7c60b0aa79851e8258c88777bf8df"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_MarbleFloor_BaseColor.webp",
+        "bytes": 7208,
+        "sha256": "fcb66a888421830dd494bd73863bcad8437e2864302bcc298165847d60324402"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_MarbleFloor_Normal.webp",
+        "bytes": 9886,
+        "sha256": "47e21dc8f65a05db061b0b9f536172fe1f114c5b709203ef6e64670af93e0501"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_MarbleFloor_ORM.webp",
+        "bytes": 6454,
+        "sha256": "a121b1375e20e2570df8a0d5a4ab8950f8dcaf746ea44f7eef27a97a19134595"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_MetalConcrete_BaseColor.webp",
+        "bytes": 5700,
+        "sha256": "75b8f8b5dc34a596da04d0f21b81bde95f94dae78477dd824c2b5d7425c36259"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_MetalConcrete_Normal.webp",
+        "bytes": 17372,
+        "sha256": "59d039fce36da69f1a7b21496f8281950e3efb7de6fb5de0e9d17fd5ef3490e6"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_MetalConcrete_ORM.webp",
+        "bytes": 13720,
+        "sha256": "0e4ea3392a38ff128b0e74a8eac8915e56eb3a387551c341d4024da8367ccfce"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_RedBrick_BaseColor.webp",
+        "bytes": 13558,
+        "sha256": "9c95d54208c7c36478cda03099f561ce42f05c16fe093e9c6c8579b17707df24"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_RedBrick_Normal.webp",
+        "bytes": 42948,
+        "sha256": "616b283754b17726c079aa4b0c25c5671543cf370477e80aad89a151dc68bfb2"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_RedBrick_ORM.webp",
+        "bytes": 24578,
+        "sha256": "b82d02137940dcbbcaabbe5a5d4df0c7ea495acadeb2e26f959555f9eb6ba6a5"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_Trim_BaseColor.webp",
+        "bytes": 10128,
+        "sha256": "8982c7bfe5d24c1ca82a5f1831c88f5891bf05411c33df42987bd834d81f566a"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_Trim_Normal.webp",
+        "bytes": 9782,
+        "sha256": "aadda904706abedc4f12de3775df71f8600c59df82f810006658d96b998aa619"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small_T_Trim_ORM.webp",
+        "bytes": 7698,
+        "sha256": "f2f106d665bb5686a3cb61d9565a75eaada0fd425c25f84bac0d7c040210f17b"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/b_small.glb",
+        "bytes": 1202148,
+        "sha256": "3e8e432d69253d4f459094850508ef55379b188f43a6884c92774aac0d5d97b4"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/LICENSE-quaternius.txt",
+        "bytes": 847,
+        "sha256": "afac5819301671301c41e90402d26e4ade5e459ad58fdf77f142147410862f1f"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/prop_ac_T_Ornaments_BaseColor.webp",
+        "bytes": 3314,
+        "sha256": "a72bd262f080a8a794becabc56926f2d35152758832dc85c710068973051b4d7"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/prop_ac_T_Ornaments_Normal.webp",
+        "bytes": 12112,
+        "sha256": "35e8d635110ab21756c0c0611a0049be8af665fa285ac1bc20751e755b21c794"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/prop_ac_T_Ornaments_ORM.webp",
+        "bytes": 11214,
+        "sha256": "332c6eab88d44fc988c8adba2cf04772abc6c1b6b9c2dbe83bf70f318532217e"
+      },
+      {
+        "path": "assets/environment/quaternius-downtown/prop_ac.glb",
+        "bytes": 33608,
+        "sha256": "5fe0e996c5b54563dac30a79020a07c22fcc74e7ff49dccc7d939dad6a409225"
+      },
+      {
+        "path": "assets/props/original-procedural-interaction-props/original_interaction_props_candidate.gd",
+        "bytes": 7204,
+        "sha256": "b73313ff3253ef63d510a5bb93e70451e3fca445771d7e3b481f312b7870cde0"
+      },
+      {
+        "path": "assets/props/original-procedural-interaction-props/original_interaction_props_candidate.tscn",
+        "bytes": 263,
+        "sha256": "54b8104b9a6029bd84d3d9734277011a5b191313d0a114170750892b06fdba34"
+      },
+      {
+        "path": "assets/reference-video-candidate/city-01-video-playable-backdrop-v2.png",
+        "bytes": 1571647,
+        "sha256": "c72e3d68cc1103462914b7e970243dd3084fa71b00e7e7dea3f8bc3984f31e7e"
+      },
+      {
+        "path": "assets/reference-video-candidate/city-02-video-playable-backdrop-v1.png",
+        "bytes": 1801359,
+        "sha256": "ed90b222c349c095c9e5f2541d8043ca2727162997b56a1f44e555ce5da6371f"
+      },
+      {
+        "path": "assets/reference-video-candidate/city-03-video-playable-backdrop-v1.png",
+        "bytes": 1904384,
+        "sha256": "5237b286f2d8cccd7773573e5eefae26453783c19726b756943a4b6d1c894600"
+      },
+      {
+        "path": "assets/reference-video-candidate/city-04-video-playable-backdrop-v1.png",
+        "bytes": 1641068,
+        "sha256": "d3adae9855f26d88e1822a2f40dca5b6f256f05e50f1e15221f877916806d6f0"
+      },
+      {
+        "path": "assets/reference-video-candidate/city-05-video-playable-backdrop-v1.png",
+        "bytes": 1950768,
+        "sha256": "00aef9b1c016f8dc0b5d4b70b72e7043145c965a7db1e18ced247479c4eaa7ba"
+      },
+      {
+        "path": "assets/reference-video-candidate/city-06-video-playable-backdrop-v1.png",
+        "bytes": 1707911,
+        "sha256": "43ab82007d572e4f561c65bc7763645468059784a7d34aa9326d83b99eca63d0"
+      },
+      {
+        "path": "assets/reference-video-candidate/city-07-video-playable-backdrop-v1.png",
+        "bytes": 2404488,
+        "sha256": "0e59bf503b271bfd556ad4293e3eb9dc797a53a642f3d526ad22b24f4885b0ef"
+      },
+      {
+        "path": "assets/reference-video-candidate/city-08-video-playable-backdrop-v1.png",
+        "bytes": 1663967,
+        "sha256": "caadad3530d84b99843d2522db3dbbef2c7574bffa3ea391778b0c6df44a97b0"
+      },
+      {
+        "path": "assets/reference-video-candidate/city-09-video-playable-backdrop-v1.png",
+        "bytes": 1603188,
+        "sha256": "8d9e7baf4568381042b6aea0d1a57ebe55c122cd624f6bc6cfea5d3fc93b93a5"
+      },
+      {
+        "path": "assets/reference-video-candidate/city-10-video-playable-backdrop-v1.png",
+        "bytes": 1628319,
+        "sha256": "693fbfe4f033a7ce43446fb6c36a82619bc8cfcfdcfe112bb9d097e8f7e4b48b"
+      },
+      {
+        "path": "assets/reference-video-candidate/city-11-video-playable-backdrop-v1.png",
+        "bytes": 1886409,
+        "sha256": "742e2270430549af7a932be7b4c9701ed256f594174389965b832d872126c9a2"
+      },
+      {
+        "path": "assets/reference-video-candidate/office-01-video-playable-backdrop-v1.png",
+        "bytes": 1713985,
+        "sha256": "6a0a9d1592a827e6c099e56470668c800fb5d53d56f6126c7175e8631116f2ef"
+      },
+      {
+        "path": "assets/reference-video-candidate/office-02-video-playable-backdrop-v1.png",
+        "bytes": 1961021,
+        "sha256": "fd5e17d3ffcef102a8143bdc4140a9b81000f7f607a09888d8573a913a671c4b"
+      },
+      {
+        "path": "assets/reference-video-candidate/office-03-video-playable-backdrop-v1.png",
+        "bytes": 667094,
+        "sha256": "903082857fbd3a74c04f71d3f38ff498ab7e6b48042fe8f045d687e21b93408c"
+      },
+      {
+        "path": "assets/reference-video-candidate/office-04-video-playable-backdrop-v1.png",
+        "bytes": 701326,
+        "sha256": "013328bfa063b0703fdae422a0965fcd78ded19761db0df5d99d04573f1e0dd6"
+      },
+      {
+        "path": "assets/reference-video-candidate/office-05-video-playable-backdrop-v1.png",
+        "bytes": 703485,
+        "sha256": "aecac6542ee5cc75e7c4b9cd4d1bc9610af9cc4be4d29afefb577ef010bc892c"
+      },
+      {
+        "path": "assets/reference-video-candidate/office-06-video-playable-backdrop-v1.png",
+        "bytes": 1588087,
+        "sha256": "ef6aa18fb4de33685b345a6c6ea964ff6d50c2bd8d409a521a2f703cfb25fbcc"
+      },
+      {
+        "path": "assets/reference-video-candidate/office-07-video-playable-backdrop-v1.png",
+        "bytes": 617615,
+        "sha256": "dc694e23e3cd6ffa175236a2cd461eee34733709cddd48e82501c849ed3cea4f"
+      },
+      {
+        "path": "assets/reference-video-candidate/office-08-video-playable-backdrop-v1.png",
+        "bytes": 890805,
+        "sha256": "da6181ed14ff1a9a134133247e0c42443d4da4f02a349ce7ed38b1a883ae8060"
+      },
+      {
+        "path": "assets/reference-video-candidate/office-09-video-playable-backdrop-v1.png",
+        "bytes": 932387,
+        "sha256": "6cea56996cf79eee42a7543ca2e880fc50913a9de496f42dbfd802f1381c5926"
+      },
+      {
+        "path": "assets/reference-video-candidate/office-10-video-playable-backdrop-v1.png",
+        "bytes": 1549445,
+        "sha256": "a75cf50d0b0cf1b512e6d2915f865c5bf07b8bad6c5318f48c7db776aca8fabb"
+      },
+      {
+        "path": "assets/vehicles/three-wheel-delivery/original_city_vehicle_candidate.gd",
+        "bytes": 17765,
+        "sha256": "fe794f786d82c824a26e964a5be9c25c4f11ab324dbf4370fdb5cfeb2eb0c695"
+      },
+      {
+        "path": "assets/vehicles/three-wheel-delivery/three_wheel_delivery_atlas_candidate_three_wheel_opaque_base_color_atlas.png",
+        "bytes": 51516,
+        "sha256": "1a0fe787baedc6cac3b3fcc5e61f0d61bbb4379ba9f9fbde5c89827a8927ff24"
+      },
+      {
+        "path": "assets/vehicles/three-wheel-delivery/three_wheel_delivery_atlas_candidate_three_wheel_opaque_metallic_roughness_atlas.png",
+        "bytes": 50343,
+        "sha256": "7a6648e3cccf9ef9816b6a2a8306049462db6065a987115f236fe820f91c5619"
+      },
+      {
+        "path": "assets/vehicles/three-wheel-delivery/three_wheel_delivery_candidate.tscn",
+        "bytes": 988,
+        "sha256": "1806c889fcc6e5d2381d00222909944900ae0244a25abc1d7c991a04d3c7568b"
+      },
+      {
+        "path": "assets/vehicles/three-wheel-delivery/three_wheel_delivery.glb",
+        "bytes": 94016,
+        "sha256": "8c1dbcfff34cba5e73d1805021aebcf5f15d0ba98b173392580bba72e236d897"
+      },
+      {
+        "path": "assets/vehicles/three-wheel-delivery/vehicle_driver_sprite_v1.json",
+        "bytes": 775,
+        "sha256": "2ca7dd0c570d390a68750d26a7645f91e054ba578859606a8b86d6905b71dce7"
+      },
+      {
+        "path": "assets/vehicles/three-wheel-delivery/vehicle_driver_sprite_v1.png",
+        "bytes": 1097744,
+        "sha256": "c3a41681ec6cab6cad102aef6845afb565f0043271a5a99df0c54ef93e86d040"
+      },
+      {
+        "path": "content/asset-runtime-catalog-makehuman-office-candidate.json",
+        "bytes": 2004,
+        "sha256": "b1bde448c7e95705a41e28c55178999ed19fd3aaebb4f904d4c072fb05609aa6"
+      },
+      {
+        "path": "content/asset-runtime-catalog-original-only.json",
+        "bytes": 1879,
+        "sha256": "d07ce9de87caefefe6f8fa490476f788bf5276f71a82d3d98d1252059e7d4e7e"
+      },
+      {
+        "path": "content/asset-runtime-catalog.json",
+        "bytes": 2029,
+        "sha256": "a5c58fea308569b444bb9c4cbc99adb64e64fbc84df904614238c84f838d0208"
+      },
+      {
+        "path": "content/audio_cues.json",
+        "bytes": 1500,
+        "sha256": "b39ea58034f31b472d7e8394efc016b3aa54cc56cdc248dd7a7713f12fcd99af"
+      },
+      {
+        "path": "content/audio-runtime-catalog-original-only.json",
+        "bytes": 1963,
+        "sha256": "cacb4ed990c1793028ba554278f468661d43a5bcd0750bee7cae0be4004acae5"
+      },
+      {
+        "path": "content/audio-runtime-catalog.json",
+        "bytes": 2123,
+        "sha256": "6b1ef6f706dbca051e3fbd0c674ea2e36d0290462043be693463df13c1238c83"
+      },
+      {
+        "path": "content/candidates/original_office_desk_runtime_candidate.gd",
+        "bytes": 18752,
+        "sha256": "14c03cc01401a2cacd2cdf089e8479513e4ac905ac8db39a244a1eb9576bbd78"
+      },
+      {
+        "path": "content/candidates/original_office_desk_runtime_candidate.tscn",
+        "bytes": 254,
+        "sha256": "dfc53c254ec51ac1935168c4b04935554384f25d03c109ae5e5b4a3b2e8fd503"
+      },
+      {
+        "path": "content/candidates/original_office_visual_runtime_candidate.tscn",
+        "bytes": 250,
+        "sha256": "5dbcc64cbcadf4250ce142f673b93427f2856180667a306a131e4cce5cf315c6"
+      },
+      {
+        "path": "content/city_mission.json",
+        "bytes": 5989,
+        "sha256": "ca7c5c2d943abdc400779f6f1b421ace3c034e5341370bbbd004bbb669c54479"
+      },
+      {
+        "path": "content/city-market-delivery-v1.json",
+        "bytes": 3486,
+        "sha256": "1e3506ec843ac1d8c4af568e6826bead5110cc824dc8c38f0bf85c13b784d62d"
+      },
+      {
+        "path": "content/content-pack-manifest.json",
+        "bytes": 979,
+        "sha256": "8f74c4f4eab0de49c70cd2ec2e18ec592380f9e24b798dc24b0cd9ca0dc219ef"
+      },
+      {
+        "path": "content/launch-profile.json",
+        "bytes": 794,
+        "sha256": "486b743f2bd9e303e899af4d7a0abb5fe1922e3d93064cf5435ed1891f0f430b"
+      },
+      {
+        "path": "content/office_mission.json",
+        "bytes": 1225,
+        "sha256": "d9f1231354e76247d72beeb6ee956533f2a90747270576622f35d4712c78cae2"
+      },
+      {
+        "path": "content/rights-manifest.json",
+        "bytes": 25012,
+        "sha256": "f5255be509cc04192731fa044cc292d8612bd1ac37b6edc75eaf6d64f8079998"
+      },
+      {
+        "path": "export_presets.cfg",
+        "bytes": 2915,
+        "sha256": "6d69fb23d604b06882eff1a75014b44f2ca2defd39ab96a89c6a972057bff71d"
+      },
+      {
+        "path": "project.godot",
+        "bytes": 918,
+        "sha256": "e22dc2e0648d61583179da26403d109e1c268655eabbc75d6d084f5c901d9b9a"
+      },
+      {
+        "path": "README.md",
+        "bytes": 4641,
+        "sha256": "e2f930ff416b016bd73e22ff83e1bdf250a731b4c0b3659e6f9e34d141575a66"
+      },
+      {
+        "path": "scenes/benchmark.tscn",
+        "bytes": 181,
+        "sha256": "a765130aeb52bcf26008767424185d0db44bc0a171944fd5d408f9a1771f8f20"
+      },
+      {
+        "path": "scenes/city.tscn",
+        "bytes": 169,
+        "sha256": "4246abedf33c1dfd002887ba37710d889504ac791b876a99d01b839bdea648bb"
+      },
+      {
+        "path": "scenes/launcher.tscn",
+        "bytes": 282,
+        "sha256": "88e12537bd2deff88a23f663448ac64c577f82c9fd697a0e8dc63d40e76d3302"
+      },
+      {
+        "path": "scripts/asset_runtime_catalog.gd",
+        "bytes": 6291,
+        "sha256": "5d36ad1954abed4d10f5bd4cc030c28323355632d46fcf57dc3dc69072978f9c"
+      },
+      {
+        "path": "scripts/audio_event_router.gd",
+        "bytes": 11764,
+        "sha256": "c6c523d7352a6f3d03daf25d8e1155604ebbccd537817a3041a4c11c721b5f14"
+      },
+      {
+        "path": "scripts/benchmark_scene.gd",
+        "bytes": 111277,
+        "sha256": "a8973d7ec74b279d39e77a5ca7adaaf63f8cc91161f688aa0ea6766155061808"
+      },
+      {
+        "path": "scripts/campaign_state.gd",
+        "bytes": 3684,
+        "sha256": "6149f975b72fc228aa2ccebd8b64df13388c1b9a4779c73f28f28db3dbb931f2"
+      },
+      {
+        "path": "scripts/city_demo.gd",
+        "bytes": 212979,
+        "sha256": "e2ec7d4c5d8218e3ab43cb3d83621a76ce63f7b482d1d98ffc0fffd4ec7b630c"
+      },
+      {
+        "path": "scripts/city_pedestrian.gd",
+        "bytes": 7578,
+        "sha256": "6cab0230107799138f8f6eeb7c0c134b3adb3939066b88260f1bb933afc90bda"
+      },
+      {
+        "path": "scripts/city_scene_visuals.gd",
+        "bytes": 84226,
+        "sha256": "6a544bd426f1d5903fe98fc9697591bdbcede415b01e8dba676d53c47a10e156"
+      },
+      {
+        "path": "scripts/city_traffic_vehicle.gd",
+        "bytes": 9092,
+        "sha256": "ebf686c54b0e8dc3c8ea1ed5433eedc1a5feffdc1bdf6c3f6cf3b0eda34706cb"
+      },
+      {
+        "path": "scripts/conflict_state.gd",
+        "bytes": 3132,
+        "sha256": "0b6e0540cd1f4c5dca7b1dd40675c3c82625178d65aea3d83f9d9543b6165e1b"
+      },
+      {
+        "path": "scripts/content_pack_loader.gd",
+        "bytes": 18944,
+        "sha256": "f266812dd29f1e87e81f09ddaf05774b1483bed83928fe8d885e857e062e143a"
+      },
+      {
+        "path": "scripts/display_settings_store.gd",
+        "bytes": 5304,
+        "sha256": "cc899768199d4717ac5da71e845724bf9aa07a4d43e1851cb6b0288e8418a131"
+      },
+      {
+        "path": "scripts/failure_overlay.gd",
+        "bytes": 2722,
+        "sha256": "8b419e896be881915cdb1d1a45d3455cd743c88dcec706a321385d8f1b9ddefd"
+      },
+      {
+        "path": "scripts/game_hud_visual.gd",
+        "bytes": 16021,
+        "sha256": "0200730888d1b1372590bf199ab970d266ab424078b25ec7b5d519c6a45f9581"
+      },
+      {
+        "path": "scripts/input_actions.gd",
+        "bytes": 3406,
+        "sha256": "18b950afb8ea1ea8a71aec5b92ab566c4f25841c5d3bdc69f08ef4b96a058db3"
+      },
+      {
+        "path": "scripts/input_frame.gd",
+        "bytes": 3680,
+        "sha256": "7d06f6b493d3780b6a04641e0d5ff5dec96bb5a863bced23fd2797dbf518243e"
+      },
+      {
+        "path": "scripts/interaction_target.gd",
+        "bytes": 917,
+        "sha256": "7b096acb3ef60fe1a523ed4a22637ce24bad2c875f9894c1449cd7f687eccfed"
+      },
+      {
+        "path": "scripts/inventory_state.gd",
+        "bytes": 1143,
+        "sha256": "a5511223c8973b9bbce05e6ec529c9a47507818231172b47b7154deeffa4d60a"
+      },
+      {
+        "path": "scripts/launch_context.gd",
+        "bytes": 1183,
+        "sha256": "37a8d286b060548c4ae2690f08d9e4104af2308260e0e8fabf7c229dd65e3d8b"
+      },
+      {
+        "path": "scripts/launcher.gd",
+        "bytes": 26843,
+        "sha256": "52f1e0571141a37771e459873adfcf83b84a65aa5f36431f951876f40cbe88cd"
+      },
+      {
+        "path": "scripts/mission_chain.gd",
+        "bytes": 2271,
+        "sha256": "1d73f3bb4840c2ac2babd3524190021e1de43932ea29792fe682b18385dddb89"
+      },
+      {
+        "path": "scripts/mission_state.gd",
+        "bytes": 1789,
+        "sha256": "d9ef03425b8e9e337b43c9d2696272373d822a1a18b002a42ec865fdb4b01b9d"
+      },
+      {
+        "path": "scripts/office_scene_visuals.gd",
+        "bytes": 50064,
+        "sha256": "8b49dc87775bf3272d38521aaa7db2c2c75e3386374470b3866d1eab2b208838"
+      },
+      {
+        "path": "scripts/pause_overlay.gd",
+        "bytes": 7486,
+        "sha256": "074c58ebb1cf251c3dc15d2fb734364c6276dacf543e2eed6b2aba3a43e258db"
+      },
+      {
+        "path": "scripts/perception_state.gd",
+        "bytes": 3225,
+        "sha256": "df277ba23f16d07b1eae17f7607d21f50f6c2d081894c579ee9f5fe874282168"
+      },
+      {
+        "path": "scripts/play_candidate.sh",
+        "bytes": 3018,
+        "sha256": "4a02d7c55b8839e8018d152945b047e1db9e6e1e6ec269edbd385fc6a2a322d3"
+      },
+      {
+        "path": "scripts/player_controller.gd",
+        "bytes": 8590,
+        "sha256": "abbc21d8e254ba1c394392761eac4f0524c803a619def66d7b55801f6faf9997"
+      },
+      {
+        "path": "scripts/replay_tape.gd",
+        "bytes": 1723,
+        "sha256": "5b85d3169ff7440895fc88ee4f6b7c845f9fe31be5a19bdbdc51d46c19ab46ef"
+      },
+      {
+        "path": "scripts/runtime_boot_error.gd",
+        "bytes": 2666,
+        "sha256": "fd8ff70e0814c7db55585e36a5a2d06b7946cd8e62bc86e936c37a611773a01a"
+      },
+      {
+        "path": "scripts/runtime_boot_status.gd",
+        "bytes": 736,
+        "sha256": "fb8d2192a278bedccd1f81f30f5ce49f3aaf4ca3709de8c680c0d6a4a5178bdb"
+      },
+      {
+        "path": "scripts/runtime_capture.gd",
+        "bytes": 1612,
+        "sha256": "9eb387e4329128a8e4978101dd6cfcc3ad334326749cf621ac1f98f19b4f9032"
+      },
+      {
+        "path": "scripts/save_store.gd",
+        "bytes": 25340,
+        "sha256": "49a9d0062a2dd965ce56d222c360d1b02ae0d9c38c9a367534fe41b5a4cb1bf1"
+      },
+      {
+        "path": "scripts/session_journal.gd",
+        "bytes": 1811,
+        "sha256": "f15d563f2504424d13a8dee96b14c412c846852f0c3553d94b17485d375e0f7d"
+      },
+      {
+        "path": "scripts/settings_store.gd",
+        "bytes": 4790,
+        "sha256": "b28221e878a29e314c60f106695481bc9776ec5368d7fd31b400c39af0e4813f"
+      },
+      {
+        "path": "scripts/third_person_camera.gd",
+        "bytes": 6466,
+        "sha256": "e37930408c160c6fa03680fd6509510d67a28b6cddda3cb79de94aa4a9ba5dab"
+      },
+      {
+        "path": "scripts/trace_recorder.gd",
+        "bytes": 2741,
+        "sha256": "56fada1f531d787c8dcf4d9553b175d35fa7df2eefb79f253740a2471b5c1282"
+      },
+      {
+        "path": "scripts/vehicle_controller.gd",
+        "bytes": 5912,
+        "sha256": "7de08ce1bf35837b3fd9b13eb0680bb33766301520425306812b70ffdc2fec7a"
+      },
+      {
+        "path": "scripts/wanted_state.gd",
+        "bytes": 1949,
+        "sha256": "d76680c51bd16f7ea3f383d8275f264f215a740608f6d42d60b7fd86cce161e6"
+      },
+      {
+        "path": "tests/asset_import_validation_test.gd",
+        "bytes": 2923,
+        "sha256": "bbd1a8f5958d3a1afe4d4523f9207c90e66dc3c70bc5c2653f720cbd8d227a4c"
+      },
+      {
+        "path": "tests/asset_override_fixture.tscn",
+        "bytes": 181,
+        "sha256": "3a231ac679c71b3005f2522b8f2440d302c6750a367da5d25fca5068c5688a70"
+      },
+      {
+        "path": "tests/asset_profile_preview_test.gd",
+        "bytes": 1582,
+        "sha256": "74ce1b7bee3dadeb53b82f9ac6e7a8984cf9975bbe350ca8eae394dc62f23854"
+      },
+      {
+        "path": "tests/asset_runtime_integration_test.gd",
+        "bytes": 44414,
+        "sha256": "18c453f926aeabdf72452289bac66014044cbd6a3e55432fcd74fb13850438b9"
+      },
+      {
+        "path": "tests/asset-runtime-catalog-original-character-override.json",
+        "bytes": 1656,
+        "sha256": "3d032a7dac22b0f2a22ac8067ee716e8ec200ee4bb53898fa12d64d19c0f4f00"
+      },
+      {
+        "path": "tests/asset-runtime-catalog-override.json",
+        "bytes": 1697,
+        "sha256": "8c7704ceba7454468ca955367e65a52f15cd8f6f6054f135c6da9d4ced2050dc"
+      },
+      {
+        "path": "tests/assets/original_player_visual_v1.glb",
+        "bytes": 234804,
+        "sha256": "7927e603a89a670cb0ed2ee7294884f9fc0b909014a3173a3e921a64c634d20f"
+      },
+      {
+        "path": "tests/audio_original_only_integration_test.gd",
+        "bytes": 2001,
+        "sha256": "b0dfd283a3c749cbcf6ee99c2adbe89d6d07a4fa2e93e6cd0282ba8bb6ad999c"
+      },
+      {
+        "path": "tests/audio_stream_fixture.tres",
+        "bytes": 102,
+        "sha256": "5f7494488ed209b155f20c3237e28fbab7466e99a16bca4de5574d953dc60496"
+      },
+      {
+        "path": "tests/camera_volume_collision_test.gd",
+        "bytes": 2378,
+        "sha256": "c79bdbc5db74a1c32e696cc1bff2d47c18ea8866e0a7f743e22edd65e14f9536"
+      },
+      {
+        "path": "tests/campaign_continuity_integration_test.gd",
+        "bytes": 3762,
+        "sha256": "244723981bba0b2e8618bd70f10bbeebacf7b82458c94afcdb376f54f540a3c7"
+      },
+      {
+        "path": "tests/capture_p0_candidate_visual.gd",
+        "bytes": 2079,
+        "sha256": "0bcd62903e3839255319b4d2636bb6f1025b94eb017f171a7765101552219edf"
+      },
+      {
+        "path": "tests/capture_p0_city_candidate_visual.gd",
+        "bytes": 1969,
+        "sha256": "3eabd01c78c534edc549b6b0f67c6391428df8d68f336eaaa93f5ac91e1d064a"
+      },
+      {
+        "path": "tests/city_conflict_integration_test.gd",
+        "bytes": 8926,
+        "sha256": "d3c128dede68b497325da418a13aa8203924d94d79ec757946d7d599a510a666"
+      },
+      {
+        "path": "tests/city_environment_candidate.gd",
+        "bytes": 4993,
+        "sha256": "877003795d68fa595e9acd36ae97144d40830dbb9695823fda4ca24865b8ec3c"
+      },
+      {
+        "path": "tests/city_environment_candidate.tscn",
+        "bytes": 199,
+        "sha256": "11287b3e89245b647cd27deb336b0b8e375058d68642f8ed37b736600c50de13"
+      },
+      {
+        "path": "tests/city_environment_quaternius_candidate.gd",
+        "bytes": 2629,
+        "sha256": "56985d9d5646331c90821002e13f5fc871ad9ebbfc766d74338367ced732f71c"
+      },
+      {
+        "path": "tests/city_environment_quaternius_candidate.tscn",
+        "bytes": 220,
+        "sha256": "7f2a2d32d6298c31454dc954d61c960c26586c3bb8f73ed5e69e630ebd3974e2"
+      },
+      {
+        "path": "tests/city_extension_integration_test.gd",
+        "bytes": 11921,
+        "sha256": "2aa458baa38b84188d607d212bdc41655bcc4d2a037953df960625832594fc5a"
+      },
+      {
+        "path": "tests/city_fun_loop_integration_test.gd",
+        "bytes": 3385,
+        "sha256": "c789b977e0b6c25c0f6b085b874a1fd8f2fa274892db6588a24a3cf11f858591"
+      },
+      {
+        "path": "tests/city_integration_test.gd",
+        "bytes": 58158,
+        "sha256": "5bec74dc26f29cf45e399231f1be8104f18523ad035cf7af0705467dd071b16a"
+      },
+      {
+        "path": "tests/city_market_delivery_integration_test.gd",
+        "bytes": 5903,
+        "sha256": "9b3c3861e12af0dd911ead5c1388980073b5d502c35d0425848ad6335be4b00d"
+      },
+      {
+        "path": "tests/city_performance_profile_test.gd",
+        "bytes": 1906,
+        "sha256": "4cbe06e4dcb35d817347e41443e003f07f4bf0a9a31530952a72aacf2ee4f85e"
+      },
+      {
+        "path": "tests/city_side_activity_integration_test.gd",
+        "bytes": 9730,
+        "sha256": "6846a0828a0b1b11ac59d160f6edd81b6db31f050443fa63322f3ddf64c4be08"
+      },
+      {
+        "path": "tests/city_vehicle_candidate.gd",
+        "bytes": 5023,
+        "sha256": "145d11190f484557a5d8ec3a275d4b4b2e0e9e5938f766efc88c8dc9081923f3"
+      },
+      {
+        "path": "tests/city_vehicle_candidate.tscn",
+        "bytes": 191,
+        "sha256": "298125f0137ed031247200b356fadd44f123dad4d0e9ba5068a79b6aa1e21404"
+      },
+      {
+        "path": "tests/content_pack_manifest_integration_test.gd",
+        "bytes": 6515,
+        "sha256": "945165de4c24df8e1a06d992a48875274f7f12e375d0371ea1f4134ba0f5ce3d"
+      },
+      {
+        "path": "tests/determinism_integration_test.gd",
+        "bytes": 2880,
+        "sha256": "50817e1ef781f30f791b2e24b25f7b5548d54f04d203d7a31a81932dda0f631d"
+      },
+      {
+        "path": "tests/hud_layout_integration_test.gd",
+        "bytes": 5560,
+        "sha256": "0a5b85475cc08ffe1d82d249554430d595c6fd47b0233643f3fbf6c775ed34b9"
+      },
+      {
+        "path": "tests/input_actions_integration_test.gd",
+        "bytes": 6129,
+        "sha256": "a9fd3788b424f412fd8ce3c618b704e9a10dd699c0806901514cf10e21663ad6"
+      },
+      {
+        "path": "tests/inspect_city_assets.gd",
+        "bytes": 989,
+        "sha256": "fa050e2e74817a037276ea04774e5e697ed632a7ceb83a5e7840c146c9d7555d"
+      },
+      {
+        "path": "tests/inspect_npc_outfitted_asset.gd",
+        "bytes": 1070,
+        "sha256": "436a9e6857e7fa58e5bec57bda0b585baeed18e9be79eaea7b17a43c83292128"
+      },
+      {
+        "path": "tests/inspect_outfitted_asset.gd",
+        "bytes": 1341,
+        "sha256": "2fdd03d63acf6c052afa35d6d0a4fd6ba9e48cfbb7eb273de3ecc0d7200e3de2"
+      },
+      {
+        "path": "tests/inspect_quaternius_candidate.gd",
+        "bytes": 1620,
+        "sha256": "d3b6efe0f71c2910d8b3e44f432ee12060132cd0680bd3709682d1ba80647d79"
+      },
+      {
+        "path": "tests/inspect_runtime_player_glb_bounds.gd",
+        "bytes": 913,
+        "sha256": "1f2e33e9c3de2c5905ebabef788ef4641f1ea5ca603655ad769e24ddac6eb1ce"
+      },
+      {
+        "path": "tests/inspect_three_wheel_asset.gd",
+        "bytes": 2749,
+        "sha256": "6522bc27747b09bdc589316a7464cc39b3daa62f7e1c6b59d6d257c46433e054"
+      },
+      {
+        "path": "tests/interaction_props_candidate.gd",
+        "bytes": 5090,
+        "sha256": "5ec991e4bcf6cb9b31f465c03639f98570043b717ca95316678c56f2a3f1257e"
+      },
+      {
+        "path": "tests/interaction_props_candidate.tscn",
+        "bytes": 201,
+        "sha256": "aa68e48b4f21a7d4079eede148536b653fed3ca064d44d8f921eb850bd7eb297"
+      },
+      {
+        "path": "tests/launcher_candidate_preview_test.gd",
+        "bytes": 7308,
+        "sha256": "75d39d644cb66f96951e8f19f7fc3e7e40bb4e50fe42589d449ba3ac64c8ef7e"
+      },
+      {
+        "path": "tests/launcher_checkpoint_integration_test.gd",
+        "bytes": 12812,
+        "sha256": "ce891e1bfb531e2421a2a42f19715477149a01ffb02ffbf414d903d73f8f339f"
+      },
+      {
+        "path": "tests/launcher_integration_test.gd",
+        "bytes": 3874,
+        "sha256": "cf2b5958973c0434ffc886d71c56fd28ddf0b69dd654145b1b0e4a51a0d3c4f0"
+      },
+      {
+        "path": "tests/launcher_new_game_integration_test.gd",
+        "bytes": 2241,
+        "sha256": "470eb3675a06c05ebe8877d01b924e8edeb6deb2d2acc97625eed6c35cc3ace1"
+      },
+      {
+        "path": "tests/launcher_session_integration_test.gd",
+        "bytes": 1449,
+        "sha256": "7a87faa80a2bb27adbbe4b89411687b8f532451667bf618a19fc90be93209c7d"
+      },
+      {
+        "path": "tests/launcher_settings_integration_test.gd",
+        "bytes": 3832,
+        "sha256": "c515b710aacd7f217ee258f59b98a5df4bd6e80b9bac0a7aeb7a177a666a448c"
+      },
+      {
+        "path": "tests/makehuman_animation_contract.gd",
+        "bytes": 2938,
+        "sha256": "16cf859e9416d1bfd3b4d0f43bc999abbc3f110f8a681e80fcf8f1ce207a6900"
+      },
+      {
+        "path": "tests/office_environment_candidate.gd",
+        "bytes": 7244,
+        "sha256": "ce563fa54904c49e383e825bec37630e9f37ab6993de5d1f4b8bd9096bf84483"
+      },
+      {
+        "path": "tests/office_environment_candidate.tscn",
+        "bytes": 203,
+        "sha256": "a93db6010f7e0592da5ef0d0a076e117f66d1bb20e32d7b02f3a110f0c1c2657"
+      },
+      {
+        "path": "tests/office_integration_test.gd",
+        "bytes": 33236,
+        "sha256": "98c663b3878ddcfb7a4f3e51507c67dcac7a02d07adbef8efa7fa04122313a19"
+      },
+      {
+        "path": "tests/office_npc_candidate.gd",
+        "bytes": 6195,
+        "sha256": "78c9298e918622ac6ba8af0c5fb104cfb30c57b5c3069a4391cfe68a4699bc18"
+      },
+      {
+        "path": "tests/office_npc_candidate.tscn",
+        "bytes": 187,
+        "sha256": "760151a6732de467e4b9a8ece3e41df5c4e2910b31efe7de286963f3f90fe43f"
+      },
+      {
+        "path": "tests/offscreen_subviewport_capture_test.gd",
+        "bytes": 2677,
+        "sha256": "add6666d45c89bde8db0b2fd529406eb03c73231325f34d6b19f55eec73fe0bc"
+      },
+      {
+        "path": "tests/original_character_candidate_test.gd",
+        "bytes": 15851,
+        "sha256": "9534391da115d7d6df453df7e11a85254a8a5d94dce12fb8c6ff9a7a02213e9b"
+      },
+      {
+        "path": "tests/original_only_catalog_vehicle_test.gd",
+        "bytes": 2722,
+        "sha256": "5e483909d72bffd67ebedff1a9411af6a1bb4b2ae9a7557e0c5a84dfd8314954"
+      },
+      {
+        "path": "tests/original_player_glb_import_test.gd",
+        "bytes": 1426,
+        "sha256": "964edfc67fef22a5bb2332d97fbdfbff785822b9f758e55ec59d819511396992"
+      },
+      {
+        "path": "tests/p0_candidate_visual.gd",
+        "bytes": 8745,
+        "sha256": "f726993988ecfc3d77b12fa74ab124839a0d53f0dc1796d4f7170b08ed57b208"
+      },
+      {
+        "path": "tests/pause_integration_test.gd",
+        "bytes": 5224,
+        "sha256": "d35e3fba8f22da0c970cc5c7cd821333d6256a31f3c455f634984a9f29918446"
+      },
+      {
+        "path": "tests/playable_boot_chain_test.gd",
+        "bytes": 4071,
+        "sha256": "cd53174308f3dc3750e0b2b2ef1af28b7356385b696ec8334fefbba24d943d3f"
+      },
+      {
+        "path": "tests/presentation_animation_test.gd",
+        "bytes": 4612,
+        "sha256": "5dc33506b3b47864d5ccadc26947041b2014e0ce5c31bb92cdd0178314a2f7bd"
+      },
+      {
+        "path": "tests/real_input_loop_integration_test.gd",
+        "bytes": 2782,
+        "sha256": "b3eef53052b669abb245eb9b996ba92a5020e58deb5f3150b16fa5d77df602bb"
+      },
+      {
+        "path": "tests/reference_capture_matrix.gd",
+        "bytes": 44819,
+        "sha256": "b194450047e3a9c7f60a5d02481d78d1dbe284780606ab43eb9ebaeb58b88022"
+      },
+      {
+        "path": "tests/reference_capture_runner.gd",
+        "bytes": 12764,
+        "sha256": "3ecdd83999778a677b5f8d03ef76fb0807225c8c1feab1b16b06ae7525ab3e3b"
+      },
+      {
+        "path": "tests/reference_capture_runner.tscn",
+        "bytes": 207,
+        "sha256": "e16f61b925914fa635ae93b40a4b2dcc198a2f8fb75afdef6960a34a22d8eee7"
+      },
+      {
+        "path": "tests/runtime_boot_error_test.gd",
+        "bytes": 1454,
+        "sha256": "9846fee8fdd8857022acce187ebc3b4f672180b68886b15ff5f0699767f2d62a"
+      },
+      {
+        "path": "tests/runtime_capture_integration_test.gd",
+        "bytes": 1949,
+        "sha256": "cefb78c8db1c3996e648f82fa70a6a13f502494127c12bdc048625322c080917"
+      },
+      {
+        "path": "tests/runtime_performance_smoke_test.gd",
+        "bytes": 1466,
+        "sha256": "f27c72f4492fb1e6fd9cbbcb93fa0e06f0c90f8b7597270832d388764ab87ce9"
+      },
+      {
+        "path": "tests/scene_lifecycle_smoke_test.gd",
+        "bytes": 2625,
+        "sha256": "2fb4b792245a15755bf2b3529fca9e1cb307666b532910b79bcf1b8c2002f6b9"
+      },
+      {
+        "path": "tests/session_crash_probe.gd",
+        "bytes": 1180,
+        "sha256": "f2012db2166200d35cd10bc954f4682e88506ae000b8593d5256ee75f9c9e057"
+      },
+      {
+        "path": "tests/session_journal_test.gd",
+        "bytes": 1139,
+        "sha256": "53be2cfcfbfd6ceef82f39ebf71d0f453621fa9fb1cb306d1c5c12495bdb3b55"
+      },
+      {
+        "path": "tests/smoke_test.gd",
+        "bytes": 51140,
+        "sha256": "9b2425544020b90afdd49a254138205ae1fb7ce2a54b8ffdd0b3dc7f707f123d"
+      },
+      {
+        "path": "tests/visual_compare.gd",
+        "bytes": 3920,
+        "sha256": "3b98a78f4b69a0ea45680df8c6f7d4bd841c5d9dc527f8ebbc8dfc220feaff88"
+      },
+      {
+        "path": "THIRD_PARTY_NOTICES.md",
+        "bytes": 3611,
+        "sha256": "91fd6d3c941337f7a25643747f50cc2327ccb2a3a212c1db3a8a26fbdf9eb9e3"
+      }
+    ]
+  },
+  "content_packages": [
+    {
+      "path": "content/content-pack-manifest.json",
+      "id": "reference-content-packs-v1",
+      "version": 1
+    },
+    {
+      "path": "content/office_mission.json",
+      "id": "office-leave-on-time-v1",
+      "version": 1
+    },
+    {
+      "path": "content/city_mission.json",
+      "id": "city-free-eggs-v1",
+      "version": 1
+    },
+    {
+      "path": "content/audio_cues.json",
+      "id": "audio-cues-v1",
+      "version": 1
+    },
+    {
+      "path": "content/audio-runtime-catalog.json",
+      "id": "audio-runtime-catalog-v1",
+      "version": 1
+    },
+    {
+      "path": "content/launch-profile.json",
+      "id": "launch-profile-v1",
+      "version": 1
+    }
+  ],
+  "rights": {
+    "release_allowed_assets": 3,
+    "required_blocked_assets": [
+      "original_procedural_audio_library_candidate",
+      "original_three_wheel_delivery_candidate",
+      "original_generated_office_glass_partition_v1",
+      "original_procedural_player_character_candidate",
+      "original_procedural_office_npc_candidate",
+      "original_procedural_office_environment_candidate",
+      "original_procedural_interaction_props_candidate",
+      "authorized_ai_office10_backdrop_candidate",
+      "office_workstation_row_v1_generated_candidate",
+      "office_workstation_row_v2_worker_generated_candidate"
+    ],
+    "launch_scope_id": "office_vertical_slice",
+    "out_of_scope_candidate_assets": [
+      "quaternius_universal_base_character_candidate",
+      "quaternius_downtown_city_standard_candidate",
+      "original_generated_urban_storefront_v1",
+      "polyhaven_worn_asphalt_1k_candidate",
+      "original_procedural_city_crowd_candidate",
+      "original_procedural_city_environment_candidate",
+      "authorized_ai_city08_backdrop_candidate",
+      "city_storefront_crowd_v3_generated_candidate",
+      "city_drive_lane_dusk_v1_generated_candidate"
+    ],
+    "blocked_assets": [
+      "original_procedural_audio_library_candidate",
+      "quaternius_universal_base_character_candidate",
+      "quaternius_downtown_city_standard_candidate",
+      "original_three_wheel_delivery_candidate",
+      "original_generated_urban_storefront_v1",
+      "original_generated_office_glass_partition_v1",
+      "polyhaven_worn_asphalt_1k_candidate",
+      "original_procedural_player_character_candidate",
+      "original_procedural_office_npc_candidate",
+      "original_procedural_city_crowd_candidate",
+      "original_procedural_office_environment_candidate",
+      "original_procedural_city_environment_candidate",
+      "original_procedural_interaction_props_candidate",
+      "authorized_ai_office10_backdrop_candidate",
+      "authorized_ai_city08_backdrop_candidate",
+      "city_storefront_crowd_v3_generated_candidate",
+      "city_drive_lane_dusk_v1_generated_candidate",
+      "office_workstation_row_v1_generated_candidate",
+      "office_workstation_row_v2_worker_generated_candidate",
+      "reference_videos",
+      "reference_evidence_frames",
+      "commercial_game_assets"
+    ],
+    "excluded_internal_assets": [
+      "reference_videos",
+      "reference_evidence_frames",
+      "commercial_game_assets"
+    ],
+    "in_use_components": [
+      {
+        "id": "godot_engine",
+        "version": "4.7.1.stable",
+        "license": "MIT",
+        "release_allowed": true
+      }
+    ]
+  },
+  "third_party_notices": {
+    "path": "THIRD_PARTY_NOTICES.md",
+    "status": "internal_index_requires_official_license_text_before_release"
+  },
+  "excluded_from_runtime": [
+    "reference-evidence/",
+    "视频参考文件",
+    "未授权商业资产"
+  ],
+  "release_blockers": [
+    "最终角色、场景、载具、动画和音频资产未完成权利登记",
+    "10 个首发范围视觉分段的验收状态仍为 unverified",
+    "Steam Windows 目标设备性能、输入、隐私和商店材料尚未验证"
+  ]
+}

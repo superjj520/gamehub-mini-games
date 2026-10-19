@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_rejected",
+  "capture_scope": "MakeHuman 主角与 MakeHuman 城市人群 A/B",
+  "candidate_catalog": "art-source/city-full-kit-candidate/asset-runtime-catalog-city-full-kit-makehuman-player-override.json",
+  "release_allowed": false,
+  "captures": [
+    {
+      "id": "city-01",
+      "image": "reference-evidence/candidate-runtime/city-makehuman-crowd-ab-city-01-v29.png",
+      "sha256": "97ecfc107c285288e067c69859168dc6dc3d740c57163c45a25437dec134c280",
+      "manual_decision": "reject",
+      "finding": "MakeHuman 城市人群出现统一白色帽体、异常蒙皮姿态和不自然比例，明显偏离参考视频人群"
+    },
+    {
+      "id": "city-08",
+      "image": "reference-evidence/candidate-runtime/city-makehuman-crowd-ab-city-08-v29.png",
+      "sha256": "93b108f15b25b8b9c1ba1b7a8780e67861d4382a741dd520955b7d4cf59e6043",
+      "manual_decision": "reject",
+      "finding": "道路两侧出现漂浮和裁切的人群，驾驶构图与城市层次不具备可签收稳定性"
+    },
+    {
+      "id": "city-11",
+      "image": "reference-evidence/candidate-runtime/city-makehuman-crowd-ab-city-11-v29.png",
+      "sha256": "acf7ec64aaab7c59e8000777517ad8ac82487b310316cb441a8656d483b22652",
+      "manual_decision": "reject",
+      "finding": "终点镜头的人群替换没有带来参考一致性提升，主角驾驶状态可用但群体候选必须撤回"
+    }
+  ],
+  "next_gate": "恢复 Quaternius 城市人群，保留 MakeHuman 主角候选；后续重新制作符合参考人物比例的原创人群资产"
+}

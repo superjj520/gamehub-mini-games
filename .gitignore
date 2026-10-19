@@ -1,28 +1,22 @@
-# Supabase temp files
-supabase/.temp/
-
-# macOS
 .DS_Store
-
-# Node
-node_modules/
-
-# Godot
 .godot/
-godot/.godot/
-godot/.godot/
-export/
-exports/
+gta-reference-runtime/.godot/
+.playwright-mcp/
+node_modules/
+*.tmp
+*.bak
+*.log
+*.import
+build/
 
-# 本地环境与测试产物
+# 本地凭据与密钥
 .env
 .env.*
 !.env.example
-screenshots/
-test-report.json
-playwright-report/
-test-results/
+.aws/
+*.pem
+*.key
 
-# 编辑器
-.vscode/settings.json
-.idea/
+# 不进入代码审计仓库的历史采集快照
+reference-evidence/**/historical-*/
+reference-evidence/candidate-runtime/review-*/

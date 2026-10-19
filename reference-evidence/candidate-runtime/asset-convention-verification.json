@@ -1,0 +1,835 @@
+{
+  "schema_version": 1,
+  "status": "technical_convention_passed",
+  "strict": true,
+  "contract_path": "docs/3d-asset-pipeline-contract.json",
+  "policy": "技术契约通过不等于视觉、权利、目标设备或发布验收通过；失败时资产停留在候选生产阶段",
+  "results": [
+    {
+      "id": "player-character-original-gltf-transform-fallback-candidate",
+      "slot_id": "player-character",
+      "profile": "character",
+      "path": "art-source/characters/player-design/generated/original_player_visual_v1.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "height_in_character_range": true,
+        "foot_origin": true,
+        "character_top_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "OriginalPlayerVisualCandidate"
+        ],
+        "meshes": 43,
+        "bounds": {
+          "min": [
+            -0.645,
+            -0.010000000000000009,
+            -0.38
+          ],
+          "max": [
+            0.645,
+            2.085,
+            0.39
+          ],
+          "size": [
+            1.29,
+            2.0949999999999998,
+            0.77
+          ]
+        },
+        "sha256": "7927e603a89a670cb0ed2ee7294884f9fc0b909014a3173a3e921a64c634d20f"
+      }
+    },
+    {
+      "id": "player-character-quaternius-cc0-candidate",
+      "slot_id": "player-character",
+      "profile": "character",
+      "path": "gta-reference-runtime/assets/characters/quaternius-superhero-male/character_outfitted.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "height_in_character_range": true,
+        "foot_origin": true,
+        "character_top_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "Armature"
+        ],
+        "meshes": 18,
+        "bounds": {
+          "min": [
+            -0.9294330477714539,
+            -0.009510005824267864,
+            -0.3800000632404993
+          ],
+          "max": [
+            0.9294331073760986,
+            1.940000419429859,
+            0.3425000561931429
+          ],
+          "size": [
+            1.8588661551475525,
+            1.9495104252541269,
+            0.7225001194336422
+          ]
+        },
+        "sha256": "6480065557eac5304dd0a019fcaf72726605d5e6253bbd2c44fa0208ee715bd1"
+      }
+    },
+    {
+      "id": "player-character-makehuman-elegant-suit-atlas-candidate",
+      "slot_id": "player-character",
+      "profile": "character",
+      "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "height_in_character_range": true,
+        "foot_origin": true,
+        "character_top_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "Human.rig_export"
+        ],
+        "meshes": 7,
+        "bounds": {
+          "min": [
+            -0.5239700078964233,
+            -0.014319226145744324,
+            -0.12193000316619873
+          ],
+          "max": [
+            0.5289300084114075,
+            1.6743186712265015,
+            0.3214700520038605
+          ],
+          "size": [
+            1.0529000163078308,
+            1.6886378973722458,
+            0.4434000551700592
+          ]
+        },
+        "sha256": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9"
+      }
+    },
+    {
+      "id": "office-npc-quaternius-cc0-candidate",
+      "slot_id": "office-npc-set",
+      "profile": "character",
+      "path": "gta-reference-runtime/assets/characters/quaternius-superhero-male/character_npc_outfitted.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "height_in_character_range": true,
+        "foot_origin": true,
+        "character_top_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "Armature"
+        ],
+        "meshes": 16,
+        "bounds": {
+          "min": [
+            -0.9294330477714539,
+            -0.009510005824267864,
+            -0.29000005484120966
+          ],
+          "max": [
+            0.9294331073760986,
+            1.940000419429859,
+            0.3425000561931429
+          ],
+          "size": [
+            1.8588661551475525,
+            1.9495104252541269,
+            0.6325001110343526
+          ]
+        },
+        "sha256": "5b88f2b3b930a00227a7c9d8326221a96e168482771d8c5563b72778f2d6c17d"
+      }
+    },
+    {
+      "id": "city-crowd-quaternius-cc0-candidate",
+      "slot_id": "city-crowd-set",
+      "profile": "character",
+      "path": "gta-reference-runtime/assets/characters/quaternius-superhero-male/character_npc_outfitted.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "height_in_character_range": true,
+        "foot_origin": true,
+        "character_top_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "Armature"
+        ],
+        "meshes": 16,
+        "bounds": {
+          "min": [
+            -0.9294330477714539,
+            -0.009510005824267864,
+            -0.29000005484120966
+          ],
+          "max": [
+            0.9294331073760986,
+            1.940000419429859,
+            0.3425000561931429
+          ],
+          "size": [
+            1.8588661551475525,
+            1.9495104252541269,
+            0.6325001110343526
+          ]
+        },
+        "sha256": "5b88f2b3b930a00227a7c9d8326221a96e168482771d8c5563b72778f2d6c17d"
+      }
+    },
+    {
+      "id": "city-crowd-makehuman-elegant-suit-atlas-candidate",
+      "slot_id": "city-crowd-set",
+      "profile": "character",
+      "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "height_in_character_range": true,
+        "foot_origin": true,
+        "character_top_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "Human.rig_export"
+        ],
+        "meshes": 7,
+        "bounds": {
+          "min": [
+            -0.5239700078964233,
+            -0.014319226145744324,
+            -0.12193000316619873
+          ],
+          "max": [
+            0.5289300084114075,
+            1.6743186712265015,
+            0.3214700520038605
+          ],
+          "size": [
+            1.0529000163078308,
+            1.6886378973722458,
+            0.4434000551700592
+          ]
+        },
+        "sha256": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9"
+      }
+    },
+    {
+      "id": "city-vehicle-three-wheel-delivery-glb-candidate",
+      "slot_id": "three-wheel-vehicle",
+      "profile": "vehicle",
+      "path": "gta-reference-runtime/assets/vehicles/three-wheel-delivery/three_wheel_delivery.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "width_in_vehicle_range": true,
+        "height_in_vehicle_range": true,
+        "depth_in_vehicle_range": true,
+        "body_center_origin": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "ThreeWheelDelivery"
+        ],
+        "meshes": 56,
+        "bounds": {
+          "min": [
+            -0.9799999996647238,
+            -0.680000011920929,
+            -1.260000011920929
+          ],
+          "max": [
+            0.9599999982118608,
+            1.1199999991059304,
+            1.3399999991059304
+          ],
+          "size": [
+            1.9399999978765847,
+            1.8000000110268592,
+            2.600000011026859
+          ]
+        },
+        "sha256": "8c1dbcfff34cba5e73d1805021aebcf5f15d0ba98b173392580bba72e236d897"
+      }
+    },
+    {
+      "id": "city-vehicle-three-wheel-delivery-atlas-candidate",
+      "slot_id": "three-wheel-vehicle",
+      "profile": "vehicle",
+      "path": "art-source/vehicles/three-wheel-delivery/three_wheel_delivery_atlas_candidate.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "width_in_vehicle_range": true,
+        "height_in_vehicle_range": true,
+        "depth_in_vehicle_range": true,
+        "body_center_origin": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "ThreeWheelDelivery"
+        ],
+        "meshes": 32,
+        "bounds": {
+          "min": [
+            -0.9799999996647238,
+            -0.680000011920929,
+            -1.260000011920929
+          ],
+          "max": [
+            0.9599999982118608,
+            1.1199999991059304,
+            1.3299999986588955
+          ],
+          "size": [
+            1.9399999978765847,
+            1.8000000110268592,
+            2.5900000105798244
+          ]
+        },
+        "sha256": "59706c3a50e7e66a6ca927c9976613cce86304e60e439c2458f2197bb949f085"
+      }
+    },
+    {
+      "id": "city-vehicle-three-wheel-delivery-final-procedural-candidate",
+      "slot_id": "three-wheel-vehicle",
+      "profile": "vehicle",
+      "path": "art-source/vehicles/three-wheel-delivery/final-candidate/three_wheel_delivery_final_candidate.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "width_in_vehicle_range": true,
+        "height_in_vehicle_range": true,
+        "depth_in_vehicle_range": true,
+        "body_center_origin": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "ThreeWheelDelivery"
+        ],
+        "meshes": 56,
+        "bounds": {
+          "min": [
+            -0.9799999996647238,
+            -0.680000011920929,
+            -1.260000011920929
+          ],
+          "max": [
+            0.9599999982118608,
+            1.1199999991059304,
+            1.3399999991059304
+          ],
+          "size": [
+            1.9399999978765847,
+            1.8000000110268592,
+            2.600000011026859
+          ]
+        },
+        "sha256": "8c1dbcfff34cba5e73d1805021aebcf5f15d0ba98b173392580bba72e236d897"
+      }
+    },
+    {
+      "id": "office-desk-polyhaven-metal-cc0-candidate",
+      "slot_id": "office-environment-kit",
+      "profile": "environment",
+      "path": "art-source/environment/polyhaven-metal-office-desk/metal_office_desk_1k.gltf",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "base_origin": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "metal_office_desk_drawer_06",
+          "metal_office_desk_tray_01",
+          "metal_office_desk",
+          "metal_office_desk_drawer_04",
+          "metal_office_desk_drawer_03",
+          "metal_office_desk_drawer_05",
+          "metal_office_desk_drawer_02",
+          "metal_office_desk_drawer_01",
+          "metal_office_desk_tray_02"
+        ],
+        "meshes": 9,
+        "bounds": {
+          "min": [
+            -1.0000008344650269,
+            0,
+            -0.4691101610660553
+          ],
+          "max": [
+            0.9999995231628418,
+            0.7875000238418579,
+            0.478103369474411
+          ],
+          "size": [
+            2.0000003576278687,
+            0.7875000238418579,
+            0.9472135305404663
+          ]
+        },
+        "sha256": "f07032a5ee89aacceebf10fd9fa192c22775ae81861cfb0bdb1594497179373c"
+      }
+    },
+    {
+      "id": "office-npc-makehuman-cc0-candidate",
+      "slot_id": "office-npc-set",
+      "profile": "character",
+      "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_candidate.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "height_in_character_range": true,
+        "foot_origin": true,
+        "character_top_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "Human.rig_export"
+        ],
+        "meshes": 8,
+        "bounds": {
+          "min": [
+            -0.4962701201438904,
+            -0.014319226145744324,
+            -0.10431127995252609
+          ],
+          "max": [
+            0.4962701201438904,
+            1.6743186712265015,
+            0.3214700520038605
+          ],
+          "size": [
+            0.9925402402877808,
+            1.6886378973722458,
+            0.42578133195638657
+          ]
+        },
+        "sha256": "85f649bb5200aa763cbdab152b7a528ea6b83aaa71bf44096d3a21c4aa7f26a6"
+      }
+    },
+    {
+      "id": "office-npc-makehuman-sanitized-candidate",
+      "slot_id": "office-npc-set",
+      "profile": "character",
+      "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_candidate_sanitized.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "height_in_character_range": true,
+        "foot_origin": true,
+        "character_top_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "Human.rig_export"
+        ],
+        "meshes": 8,
+        "bounds": {
+          "min": [
+            -0.4962701201438904,
+            -0.014319226145744324,
+            -0.10431127995252609
+          ],
+          "max": [
+            0.4962701201438904,
+            1.6743186712265015,
+            0.3214700520038605
+          ],
+          "size": [
+            0.9925402402877808,
+            1.6886378973722458,
+            0.42578133195638657
+          ]
+        },
+        "sha256": "a7ddc0eb8a5e3ab9b9f8872cffff798e8d41cc8123ba9408f70ed27e014bc43f"
+      }
+    },
+    {
+      "id": "office-npc-makehuman-sanitized-materials-candidate",
+      "slot_id": "office-npc-set",
+      "profile": "character",
+      "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_candidate_sanitized_materials.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "height_in_character_range": true,
+        "foot_origin": true,
+        "character_top_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "Human.rig_export"
+        ],
+        "meshes": 8,
+        "bounds": {
+          "min": [
+            -0.4962701201438904,
+            -0.014319226145744324,
+            -0.10431127995252609
+          ],
+          "max": [
+            0.4962701201438904,
+            1.6743186712265015,
+            0.3214700520038605
+          ],
+          "size": [
+            0.9925402402877808,
+            1.6886378973722458,
+            0.42578133195638657
+          ]
+        },
+        "sha256": "b58756eeff9642f463dadf753fa129cc108bc2591a734282fd19131e24fce2be"
+      }
+    },
+    {
+      "id": "office-npc-makehuman-elegant-suit-skinned-candidate",
+      "slot_id": "office-npc-set",
+      "profile": "character",
+      "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "height_in_character_range": true,
+        "foot_origin": true,
+        "character_top_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "Human.rig_export"
+        ],
+        "meshes": 9,
+        "bounds": {
+          "min": [
+            -0.5239700078964233,
+            -0.014319226145744324,
+            -0.12193000316619873
+          ],
+          "max": [
+            0.5289300084114075,
+            1.6743186712265015,
+            0.3214700520038605
+          ],
+          "size": [
+            1.0529000163078308,
+            1.6886378973722458,
+            0.4434000551700592
+          ]
+        },
+        "sha256": "7343dfa7b38f8474fee9fd297769472398809d0487e3afa660f372444497faea"
+      }
+    },
+    {
+      "id": "office-npc-makehuman-elegant-suit-skinned-1024-candidate",
+      "slot_id": "office-npc-set",
+      "profile": "character",
+      "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_1024.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "height_in_character_range": true,
+        "foot_origin": true,
+        "character_top_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "Human.rig_export"
+        ],
+        "meshes": 9,
+        "bounds": {
+          "min": [
+            -0.5239700078964233,
+            -0.014319226145744324,
+            -0.12193000316619873
+          ],
+          "max": [
+            0.5289300084114075,
+            1.6743186712265015,
+            0.3214700520038605
+          ],
+          "size": [
+            1.0529000163078308,
+            1.6886378973722458,
+            0.4434000551700592
+          ]
+        },
+        "sha256": "88577acfc12be0a994f35b30f6f07dc6e968aaebdc290b4c3f9d611f55641485"
+      }
+    },
+    {
+      "id": "office-npc-makehuman-elegant-suit-skinned-512-pruned-candidate",
+      "slot_id": "office-npc-set",
+      "profile": "character",
+      "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "height_in_character_range": true,
+        "foot_origin": true,
+        "character_top_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "Human.rig_export"
+        ],
+        "meshes": 7,
+        "bounds": {
+          "min": [
+            -0.5239700078964233,
+            -0.014319226145744324,
+            -0.12193000316619873
+          ],
+          "max": [
+            0.5289300084114075,
+            1.6743186712265015,
+            0.3214700520038605
+          ],
+          "size": [
+            1.0529000163078308,
+            1.6886378973722458,
+            0.4434000551700592
+          ]
+        },
+        "sha256": "555d582d1cfae3b814de30dd0aebb6e07335c73555a89cce0e8772dd64e28ae8"
+      }
+    },
+    {
+      "id": "office-npc-makehuman-elegant-suit-skinned-512-simplified-candidate",
+      "slot_id": "office-npc-set",
+      "profile": "character",
+      "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_simplified.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "height_in_character_range": true,
+        "foot_origin": true,
+        "character_top_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "Human.rig_export"
+        ],
+        "meshes": 7,
+        "bounds": {
+          "min": [
+            -0.5239700078964233,
+            -0.014319226145744324,
+            -0.12193000316619873
+          ],
+          "max": [
+            0.5289300084114075,
+            1.6743186712265015,
+            0.3214700520038605
+          ],
+          "size": [
+            1.0529000163078308,
+            1.6886378973722458,
+            0.4434000551700592
+          ]
+        },
+        "sha256": "0140aa5c9b2fed5061ec31cf4afd77ae19925af9352374694ebf36d23695d60a"
+      }
+    },
+    {
+      "id": "office-npc-makehuman-elegant-suit-skinned-512-atlas-candidate",
+      "slot_id": "office-npc-set",
+      "profile": "character",
+      "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "height_in_character_range": true,
+        "foot_origin": true,
+        "character_top_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "Human.rig_export"
+        ],
+        "meshes": 7,
+        "bounds": {
+          "min": [
+            -0.5239700078964233,
+            -0.014319226145744324,
+            -0.12193000316619873
+          ],
+          "max": [
+            0.5289300084114075,
+            1.6743186712265015,
+            0.3214700520038605
+          ],
+          "size": [
+            1.0529000163078308,
+            1.6886378973722458,
+            0.4434000551700592
+          ]
+        },
+        "sha256": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9"
+      }
+    },
+    {
+      "id": "interaction-props-original-kit-candidate",
+      "slot_id": "interaction-props",
+      "profile": "prop",
+      "path": "art-source/props/original-interaction-kit/interaction_props_kit.glb",
+      "checks": {
+        "file_exists": true,
+        "supported_format": true,
+        "one_scene": true,
+        "mesh_present": true,
+        "finite_positive_bounds": true,
+        "root_transform_identity": true,
+        "base_origin": true,
+        "prop_height_in_range": true
+      },
+      "status": "convention_pass",
+      "metrics": {
+        "scenes": 1,
+        "root_nodes": [
+          "InteractionPropsKit"
+        ],
+        "meshes": 24,
+        "bounds": {
+          "min": [
+            -0.5249999761581421,
+            0,
+            -0.38999998569488525
+          ],
+          "max": [
+            0.5249999761581421,
+            1.6100000143051147,
+            0.38999998569488525
+          ],
+          "size": [
+            1.0499999523162842,
+            1.6100000143051147,
+            0.7799999713897705
+          ]
+        },
+        "sha256": "2c490b5e28df3171326434d1e763afc6c7fd6f1d1b464708419823a7fb715ec9"
+      }
+    }
+  ],
+  "verified_at": "2026-10-18T19:35:06.956Z"
+}

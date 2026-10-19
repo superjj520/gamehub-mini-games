@@ -1,0 +1,14 @@
+{
+	"reason": "当前运行没有可用图形根纹理；本报告只证明 office-10 正式工位交互、typing_default 与视频候选背景配置，不替代逐帧视觉验收。",
+	"release_allowed": false,
+	"schema_version": 1,
+	"status": "candidate_configuration_validation_only",
+	"typing_mode": true,
+	"typing_state": "typing_default",
+	"video_backdrop_asset_source": "user_authorized_ai_video_frame_edit",
+	"video_backdrop_enabled": true,
+	"video_backdrop_id": "office-10",
+	"video_backdrop_rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+	"video_backdrop_texture": "res://reference-video-candidate/office-10-video-playable-backdrop-v1.png",
+	"visual_status": "unverified"
+}

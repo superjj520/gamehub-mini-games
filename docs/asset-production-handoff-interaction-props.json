@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "status": "candidate_handoff",
+  "policy": "这是候选资产的生产交接记录，不代表最终视觉、权利或发布签收",
+  "product": "新时代觉醒者",
+  "slot_id": "interaction-props",
+  "candidate_id": "interaction-props-original-kit-candidate",
+  "source_kind": "project_original_node_generated_glb",
+  "provenance": {
+    "builder": "art-source/props/original-interaction-kit/build_interaction_props_glb.mjs",
+    "fallback_builder": "art-source/props/original-interaction-kit/build_interaction_props.py",
+    "license_status": "project_original_candidate_only",
+    "external_source": false,
+    "review_required_before_release": true
+  },
+  "deliverables": {
+    "glb": {
+      "path": "art-source/props/original-interaction-kit/interaction_props_kit.glb",
+      "sha256": "2c490b5e28df3171326434d1e763afc6c7fd6f1d1b464708419823a7fb715ec9"
+    },
+    "material_atlas": {
+      "path": "art-source/props/original-interaction-kit/interaction_props_atlas_v1.png",
+      "sha256": "71b72e2d70408a6a8c42ee9785eb4cc6ee7f8e74010e8cf3682b01edf94bf706"
+    },
+    "asset_record": "art-source/props/original-interaction-kit/asset-record.json",
+    "runtime_evidence": "reference-evidence/candidate-runtime/interaction-props-runtime-integration.json"
+  },
+  "runtime_contract": {
+    "root_name": "InteractionPropsKit",
+    "units": "meters",
+    "up_axis": "+Y",
+    "required_groups": [
+      "EggTray_Interaction",
+      "ScanBoard_Interaction",
+      "DeliveryMarker_Interaction",
+      "ShopBasket_Interaction"
+    ],
+    "fallback_policy": "forbid_in_candidate_override",
+    "preserved_behaviors": [
+      "交互提示",
+      "鸡蛋库存变化",
+      "任务阶段推进",
+      "镜头、玩家和任务状态保持"
+    ]
+  },
+  "evidence": {
+    "integration_runner": "art-source/props/original-interaction-kit/run_isolated_runtime_integration.mjs",
+    "integration_test": "art-source/props/original-interaction-kit/interaction_props_runtime_integration_test.gd",
+    "current_runtime_source_fingerprint": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+    "current_runtime_source_file_count": 326,
+    "checks_passed": [
+      "GLB 导入预热",
+      "候选 Visual 挂载且禁止灰盒回退",
+      "交互提示与鸡蛋库存变化",
+      "城市完整任务回放",
+      "玩家、镜头和任务状态保持"
+    ],
+    "visual_status": "unverified",
+    "release_allowed": false
+  },
+  "next_gates": [
+    "固定镜头图形采集",
+    "人工视觉验收",
+    "Windows 10/11 目标设备回放",
+    "最终资产来源与权利签收",
+    "发布包重新绑定"
+  ]
+}

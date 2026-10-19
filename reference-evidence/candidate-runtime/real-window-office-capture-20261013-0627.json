@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "status": "candidate_isolated_formal_runtime_graphical_capture_failed",
+  "capture_id": "office-01",
+  "capture_profile": "internal_candidate",
+  "runtime_source_fingerprint": "9725ed7d5a4734d29c6ce82ee64b0eb282326658458a0a15840204d9478e1c03",
+  "runtime_file_count": 231,
+  "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+  "capture_options": {
+    "backend": "visible_window",
+    "display_driver": "macos",
+    "rendering_driver": "opengl3",
+    "resolution": "1280x720",
+    "timeout_seconds": 120
+  },
+  "attempted_command": "godot --path gta-reference-runtime --scene res://tests/reference_capture_runner.tscn --display-driver macos --audio-driver Dummy --rendering-driver opengl3 --rendering-method gl_compatibility --single-window --windowed --resolution 1280x720 --quit-after 120",
+  "output_directory": "/private/tmp/新时代觉醒者-current-visible-office01",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "failure_kind": "macos_graphics_service_failure",
+  "failure": "macOS 返回 com.apple.hiservices-xpcservice Connection Invalid；独立可见会话在观察窗口内没有输出 PNG、进度文件或矩阵清单，随后被安全终止。",
+  "observations": {
+    "png_count": 0,
+    "progress_file_present": false,
+    "matrix_manifest_present": false,
+    "process_cleanup": "manual_interrupt_after_observation_timeout"
+  },
+  "captured_at": "2026-10-12T22:31:38.000Z"
+}

@@ -1,0 +1,589 @@
+{
+  "version": 1,
+  "policy": "行为和视觉必须分开验收；视觉通过必须有运行时截图、截图哈希和人工审阅记录（审阅人、时间、方式）",
+  "segments": [
+    {
+      "id": "city-01",
+      "runtime_events": [
+        "mission_stage"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-city-01-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "0122d798f42453d3aa464dc054dc37877e306831f1da61b94329e24aedf1ce44",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "当前运行时为低多边形灰盒街区与程序化人群，参考帧为真实街区、密集人群和店铺门头；人物材质、服装、密度、光照、镜头构图和 HUD 均未达到逐帧还原要求。"
+        ]
+      }
+    },
+    {
+      "id": "city-02",
+      "runtime_events": [
+        "input",
+        "interaction",
+        "navigation",
+        "collision"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-city-02-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "315b1db620ca135ec6ffbc77c07b9ddcc1d94c18f8826b9a5f12f2f9ae00d2da",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧的进店入口、人群遮挡和真实店铺空间没有被当前低多边形场景还原；当前角色、材质、碰撞构图和交互提示均需重做。"
+        ]
+      }
+    },
+    {
+      "id": "city-03",
+      "runtime_events": [
+        "camera_state",
+        "navigation",
+        "collision"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-city-03-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "8cce1f7ce1305afa7e40405ac792784b23b358e72bc6c0fe6d09ace60208544b",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧的货架、商品陈列、室内灯光和玩家比例与当前灰盒货架空间明显不一致；需要补齐真实店内资产、材质和镜头站位。"
+        ]
+      }
+    },
+    {
+      "id": "city-04",
+      "runtime_events": [
+        "conflict_status",
+        "crowd_displaced"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-city-04-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "331e70432a1519e387e25cf90623e111b2001c44780e0374c3fa9a2c8dc53f20",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧包含真实商品堆、室内空间和角色动作，当前截图仍是低多边形货架与简化角色；任务状态虽可见，但视觉资产、动作、灯光和构图全部未达标。"
+        ]
+      }
+    },
+    {
+      "id": "city-05",
+      "runtime_events": [
+        "interaction",
+        "inventory_changed"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-city-05-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "a51336cfe9945dd4885c0c981d7f36539a25f3d8b8b1f178f9a527776f8b28a5",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧的冲突、商品和店内空间需要真实可辨识的角色与道具；当前画面使用灰盒几何和简化人物，且主体层级与参考帧不一致。"
+        ]
+      }
+    },
+    {
+      "id": "city-06",
+      "runtime_events": [
+        "mission_stage",
+        "inventory_changed"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-city-06-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "1228ca0e7d1679e535be3297dfb01d15ea4fa1272aa31b7e9e5bc0a00b1c4ae9",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧的离店、街区关系和交互反馈没有达到同一视觉语义；当前环境、角色、道具和镜头仍为灰盒表现。"
+        ]
+      }
+    },
+    {
+      "id": "city-07",
+      "runtime_events": [
+        "vehicle_driver"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-city-07-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "86aa576e4e7c6fdf0671752086874cc6150d972af754a2ef5e7d23eaea40f4ae",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧要求真实街道、人物群组和任务推进构图，当前城市素材的建筑、路面、人物材质与镜头比例均明显偏离。"
+        ]
+      }
+    },
+    {
+      "id": "city-08",
+      "runtime_events": [
+        "interaction"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-city-08-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "c1f0203d92d5f856fd9c71060143311eda9d65921f412eea4cfa6af7cf195e1b",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧的三轮车、驾驶姿态、道路和后方建筑需要真实资产级表现；当前候选/灰盒载具与人物没有进入正式视觉，不能签收。"
+        ]
+      }
+    },
+    {
+      "id": "city-09",
+      "runtime_events": [
+        "mission_stage",
+        "clerk_interaction"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-city-09-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "51fb3706d5b1455fbdeb237584bcf8cabf983c634cd3562c0ae214f7a558686f",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧的登记点、店铺门面和交互标识具有真实街区细节，当前低多边形街区缺少对应材质、招牌、道具和角色动作。"
+        ]
+      }
+    },
+    {
+      "id": "city-10",
+      "runtime_events": [
+        "vehicle_driver",
+        "input"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-city-10-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "938d517931ecf77ce436fa02d5ac4f76a58f106fe2e046415e8ee4c666cd993f",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "当前城市画面的色彩、建筑比例、路面材质、人群和载具构图与参考帧不一致；行为证据不能替代视觉签收。"
+        ]
+      }
+    },
+    {
+      "id": "city-11",
+      "runtime_events": [
+        "mission_stage",
+        "mission_completed"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-city-11-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "acfc820d8959b42b041df4fd5f972047a33a953922f503a839347a47b52c965b",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧是靠近店铺卷帘门的三轮车/交互构图，当前截图主体被灰盒平台和简化几何占据；载具、门面、交互标识和镜头距离均需重做。"
+        ]
+      }
+    },
+    {
+      "id": "office-01",
+      "runtime_events": [
+        "input",
+        "camera_state"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-office-01-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "c7cc59ae818c6644f5252c015beb2337484554a5ef706b403f683ac59fef1aae",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧为写实办公室工位、人物动作和暖色窗光，当前画面是低多边形隔断、简化人物和不同镜头位置；角色、家具、动画、材质和灯光均未达标。"
+        ]
+      }
+    },
+    {
+      "id": "office-02",
+      "runtime_events": [
+        "input",
+        "collision"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-office-02-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "6bf46006f168d3baf3b0e2eea140d10b9bc980ec0ef89dd98cefc429e42612eb",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧的办公室工位布局、人物比例和摄像机跟随关系没有被当前灰盒场景还原；需要资产级家具、角色和镜头构图。"
+        ]
+      }
+    },
+    {
+      "id": "office-03",
+      "runtime_events": [
+        "perception_state"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-office-03-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "bd3121789c46edce5b5c1829a193489cf1e8ef0855712dd4665423a0b28ba827",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧要求可辨识的办公桌、显示器、文件和 NPC 关系，当前截图的简化几何、材质和角色表现不足以支持逐帧验收。"
+        ]
+      }
+    },
+    {
+      "id": "office-04",
+      "runtime_events": [
+        "perception_state",
+        "npc_search_started"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-office-04-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "f934ea133a66cefe1a0e6edc1bd5ccb8194f34a2dfd52194c4b502d0bf488ced",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "当前办公室环境、角色服装、动画姿态和室内光照与参考视频写实画面存在结构性差异；任务 HUD 通过不代表视觉通过。"
+        ]
+      }
+    },
+    {
+      "id": "office-05",
+      "runtime_events": [
+        "interaction"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-office-05-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "ea3db4e7727be46c1189e3e1238e9ff67e3382630c9a9d0978d249bc32894a3d",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧中的办公空间层次、玻璃隔断、工位道具和角色关系未在当前灰盒中准确呈现；需要补齐环境资产和固定镜头验收。"
+        ]
+      }
+    },
+    {
+      "id": "office-06",
+      "runtime_events": [
+        "hallway_encounter",
+        "mission_failed"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-office-06-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "b2af317b68abf81be831e5f03da034160304c27e0b40fd0426ca8d5244280b84",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧的办公室移动/相遇状态依赖写实角色、服装和室内细节，当前低多边形人物与几何空间无法达到 100% 视觉还原。"
+        ]
+      }
+    },
+    {
+      "id": "office-07",
+      "runtime_events": [
+        "perception_state",
+        "mission_failed"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-office-07-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "be492edeae16d3af6a0a670fbd98745a85524358603ac3c0905241a2a149b3ea",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧为楼梯/通道空间，当前截图仍是办公室灰盒与失败覆盖层构图；场景地点、角色状态、镜头和 UI 层级均不一致。"
+        ]
+      }
+    },
+    {
+      "id": "office-08",
+      "runtime_events": [
+        "mission_failed"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-office-08-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "18324491ae68824de303ae8bf59f2e530077614afc094b3e4dec2284652f5bcb",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧中的办公室路线、光照和角色动画没有由当前低多边形场景复现；需要真实资产、动画和镜头状态重做。"
+        ]
+      }
+    },
+    {
+      "id": "office-09",
+      "runtime_events": [
+        "checkpoint_loaded"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-office-09-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "468f4da4be03536dbc531269aa904fb16e095eedd3c5ff489a33ecaf6a48a3e0",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧的近距离 NPC 感知/搜索空间与当前画面的角色、隔断、材质和镜头关系明显不同；行为状态已覆盖但视觉不通过。"
+        ]
+      }
+    },
+    {
+      "id": "office-10",
+      "runtime_events": [
+        "mission_restart"
+      ],
+      "behavior_status": "passed",
+      "visual_status": "unverified",
+      "behavior_review": {
+        "reviewer": "自动化回放门禁",
+        "replay_id": "reference-matrix-office-10-f45b0ef2",
+        "method": "automated_replay",
+        "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+        "decision": "passed",
+        "findings": []
+      },
+      "visual_review": {
+        "reviewer": "Codex后台人工帧审阅",
+        "reviewed_at": "2026-10-13T19:34:52.000Z",
+        "method": "manual_frame_review",
+        "reference_sha256": "1678b061d8b9a53018fdac61496fcf4985c0234fa2ca5acab80a2f0065f655b0",
+        "runtime_source_fingerprint": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+        "decision": "rejected",
+        "findings": [
+          "参考帧为办公桌前角色动作和真实工位构图，当前截图为低多边形人物与灰盒隔断；角色姿态、家具、材质、灯光和镜头均需返工。"
+        ]
+      }
+    }
+  ]
+}

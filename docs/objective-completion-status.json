@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-19T08:02:44.887Z",
+  "status": "incomplete",
+  "completion_proven": false,
+  "source_fingerprint": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+  "source_file_count": 326,
+  "counts": {
+    "segments": 21,
+    "behavior_passed": 21,
+    "visual_passed": 0,
+    "visual_total": 21,
+    "expanded_visual_passed": 0,
+    "expanded_visual_total": 18,
+    "graybox_assets": 8,
+    "candidate_assets": 8
+  },
+  "requirements": [
+    {
+      "id": "reference_evidence",
+      "status": "incomplete",
+      "evidence": [
+        "reference-evidence/manifest.json",
+        "reference-evidence/acceptance-status.json",
+        "reference-evidence/runtime-matrix/manifest.json"
+      ],
+      "reason": "参考分段或当前源运行时截图未完成：参考分段 21/21、运行时登记 21/21、当前源有效 PNG 0/21"
+    },
+    {
+      "id": "behavior_runtime",
+      "status": "passed_graybox",
+      "evidence": [
+        "reference-evidence/current-runtime-behavior/manifest.json",
+        "reference-evidence/current-runtime-behavior/trace-evidence.json",
+        "scripts/verify_current_behavior_matrix.mjs"
+      ],
+      "reason": "21/21 个分段行为回放通过，且当前源码行为证据已绑定 598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745/326；这不是最终视觉完成证明"
+    },
+    {
+      "id": "visual_acceptance",
+      "status": "unverified",
+      "evidence": [
+        "reference-evidence/runtime-matrix/manifest.json",
+        "reference-evidence/runtime-matrix/compare-reports"
+      ],
+      "reason": "0/21 个视觉分段通过人工签收"
+    },
+    {
+      "id": "expanded_visual_acceptance",
+      "status": "unverified",
+      "evidence": [
+        "docs/expanded-content-plan.md",
+        "docs/expanded-visual-acceptance-matrix.json",
+        "scripts/verify_expanded_visual_acceptance.mjs"
+      ],
+      "reason": "0/18 个视频样本之外的扩展视觉项通过人工签收"
+    },
+    {
+      "id": "final_assets",
+      "status": "blocked_graybox",
+      "evidence": [
+        "docs/asset-production-manifest.json",
+        "gta-reference-runtime/content/asset-runtime-catalog.json"
+      ],
+      "reason": "8/8 个正式资产槽位仍为灰盒；8 个候选槽位已有隔离接入证据但尚未完成视觉、权利和设备签收"
+    },
+    {
+      "id": "product_baseline",
+      "status": "passed",
+      "evidence": [
+        "docs/product-baseline-decision.json",
+        "docs/product-confirmation-packet.md"
+      ],
+      "reason": "产品基线已确认"
+    },
+    {
+      "id": "release_readiness",
+      "status": "blocked_release_gates",
+      "evidence": [
+        "docs/readiness-report.json",
+        "scripts/verify_readiness_report.mjs",
+        "scripts/verify_release_preconditions.mjs"
+      ],
+      "reason": "发布准备状态为 internal_no_go"
+    },
+    {
+      "id": "build_identity",
+      "status": "inconsistent",
+      "evidence": [
+        "reference-evidence/runtime-matrix/manifest.json",
+        "docs/release-manifest.json",
+        "scripts/source_fingerprint.mjs"
+      ],
+      "reason": "当前发布清单为 598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745/326；历史矩阵为 f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35/321，需重新采集后才能绑定"
+    },
+    {
+      "id": "platform_export",
+      "status": "pending_target_device_validation",
+      "evidence": [
+        "gta-reference-runtime/project.godot",
+        "gta-reference-runtime/export_presets.cfg"
+      ],
+      "reason": "已有导出预设，仍需目标设备验证"
+    }
+  ],
+  "blockers": [
+    "reference_evidence",
+    "visual_acceptance",
+    "expanded_visual_acceptance",
+    "final_assets",
+    "release_readiness",
+    "build_identity",
+    "platform_export"
+  ],
+  "report_hash": "9acf7d17f0072f70adf6d38aa40bf7cf8d19aed58623b5b00b2c6c1527606191",
+  "policy": "只有所有要求都有直接证据时才能标记 complete_candidate；本报告不会替代产品、权利、平台或人工视觉定稿。"
+}

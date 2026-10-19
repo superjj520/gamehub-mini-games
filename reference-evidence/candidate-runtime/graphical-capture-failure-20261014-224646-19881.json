@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "status": "graphical_capture_failed",
+  "failure_kind": "timeout",
+  "generated_at": "2026-10-14T14:46:46.379Z",
+  "process": {
+    "pid": 19881,
+    "timeout_seconds": 25
+  },
+  "source": {
+    "sha256": "213e10e103bca334743a50ad14d0c159ee03c523a9aa1bf041181d658a45ec7b",
+    "file_count": 241
+  },
+  "log_path": "/tmp/new-era-visible-probe.log",
+  "command": "timeout /Users/superjj/gamehub-mini-games 19881 25 --path gta-reference-runtime --scene res://tests/reference_capture_runner.tscn --display-driver macos --audio-driver Dummy --rendering-driver opengl3 --rendering-method gl_compatibility --single-window --windowed --position 2000,2000 --resolution 1280x720 --log-file /tmp/new-era-visible-probe.log --quit-after 3000",
+  "policy": "失败记录只用于诊断，不构成 PNG、视觉验收或发布证据"
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "status": "graphical_capture_failed",
+  "failure_kind": "display_unavailable",
+  "generated_at": "2026-10-18T15:55:21.040Z",
+  "process": {
+    "pid": 0,
+    "timeout_seconds": 0,
+    "godot_bin": "/opt/homebrew/bin/godot"
+  },
+  "source": {
+    "sha256": "99953a23ef72af940d5089e8faff36db816769c3ab5234379d23c62a2cedb50f",
+    "file_count": 305
+  },
+  "log_path": "/tmp/新时代觉醒者-reference-capture-editor-original-only.log",
+  "command": "/opt/homebrew/bin/godot --path gta-reference-runtime --scene res://tests/reference_capture_runner.tscn --display-driver macos --audio-driver Dummy --rendering-driver opengl3 --rendering-method gl_compatibility --single-window --windowed --resolution 1280x720 --log-file /tmp/新时代觉醒者-reference-capture-editor-original-only.log --quit-after 12000",
+  "policy": "失败记录只用于诊断，不构成 PNG、视觉验收或发布证据"
+}

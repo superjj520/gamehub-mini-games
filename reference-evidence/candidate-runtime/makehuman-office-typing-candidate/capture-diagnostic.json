@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "diagnosed_at": "2026-10-14",
+  "status": "blocked_by_render_backend",
+  "capture_mode": "offscreen_subviewport",
+  "release_allowed": false,
+  "visual_status": "unverified",
+  "source_fingerprint": "5fb0f92adbc6abf01f5f4c9aca63652de6d137a1a7a81760d875789aaee44816",
+  "source_file_count": 233,
+  "candidate_package_sha256": "dd1fbe1af313b7d7852a18350bd9e9ef05e43e9fcf8d01a08e1a3a52db1f51ff",
+  "capture_script_sha256": "6be5c4a4a1cdf385b36162810166787e950ad6abd88606e0fa965b9a7b623384",
+  "graphical_window_attempt": {
+    "attempted_at": "2026-10-14T02:24:00.000Z",
+    "status": "timed_out_without_overwriting_png",
+    "renderer": "OpenGL API 4.1 Metal",
+    "timeout_seconds": [90, 60],
+    "old_png_preserved": true,
+    "mouse_or_keyboard_automation": false,
+    "observations": [
+      "候选包直接图形窗口启动未在有界时间内进入截图脚本完成态。",
+      "候选 PNG 时间戳未变化，因此没有把旧 PNG 重新绑定为新图形证据。",
+      "同一工作区的正式 21 段后台图形采集已经写出当前源 PNG，但不能替代候选 office-10 截图。"
+    ]
+  },
+  "command": "MAKEHUMAN_OFFICE_TYPING_OFFSCREEN=1 godot --headless --rendering-driver opengl3 --rendering-method gl_compatibility -s tests/capture_makehuman_office_typing.gd",
+  "observations": [
+    "办公室场景、候选角色和 typing_default 状态初始化通过；候选包完整预检通过。",
+    "SubViewport.get_texture() 返回对象，但 get_image() 返回空图像；Godot dummy 无头渲染后端没有可读像素。",
+    "采集脚本以退出码 2 明确停止，未覆盖上一张候选 PNG。",
+    "Godot 4.7.1 的 --write-movie 无头模式会在引擎读取空纹理时崩溃；候选电影脚本已加入无头视口前置拒绝，但该入口不应在无头模式调用。"
+  ],
+  "next_gate": "在 Windows 10/11 真机或可用的 Godot OpenGL/Vulkan 图形窗口环境重新执行同一脚本，生成侧后方 office-10 PNG 后再进行人工视觉签收。"
+}
