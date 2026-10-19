@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "asset_id": "office-02-video-authored-backdrop-candidate-v1",
+  "status": "candidate_only",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "source": {
+    "kind": "user_authorized_ai_video_frame_edit",
+    "reference_frame": "reference-evidence/video-2/office-02.jpg",
+    "exact_frame": "reference-video-candidate/office-02-video-backdrop.jpg",
+    "playable_edit": "reference-video-candidate/office-02-video-playable-backdrop-v1.png",
+    "playable_edit_sha256": "fd5e17d3ffcef102a8143bdc4140a9b81000f7f607a09888d8573a913a671c4b",
+    "user_authorization": "本轮对话中用户明确要求直接使用并优化其 AI 生成视频"
+  },
+  "integration_contract": {
+    "role": "office-02 办公隔断潜行和 NPC 感知背景候选",
+    "dynamic_overlay": ["正式玩家角色", "正式办公室 NPC", "正式蹲伏状态", "正式感知与警戒 HUD", "正式碰撞、导航、任务和存档"],
+    "visual_only": true,
+    "candidate_video_backdrop_id": "office-02"
+  },
+  "rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+  "final_acceptance_required": ["当前源版本真实图形窗口采集", "逐帧视觉签收", "最终资产权利确认", "目标设备回归"]
+}

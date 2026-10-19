@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://../art-source/characters/quaternius-superhero-male/city-crowd-candidate/city_crowd_quaternius_candidate.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://assets/characters/quaternius-superhero-male/character_npc_outfitted.glb" id="2_character"]
+
+[node name="CityCrowdQuaterniusCandidate" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Character" parent="." instance=ExtResource("2_character")]
+rotation_degrees = Vector3(0, 180, 0)

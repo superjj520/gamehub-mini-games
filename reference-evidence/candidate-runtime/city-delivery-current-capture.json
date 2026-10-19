@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_manual_acceptance_pending",
+  "capture_id": "p0-candidate-city-08-current",
+  "product_name": "新时代觉醒者",
+  "capture_method": "真实 Godot 图形窗口；OpenGL 兼容模式；城市 P0 候选驾驶构图入口",
+  "source_sha256": {
+    "runtime_source_fingerprint": "cc565547853c7cf272b438ac8f3c2099249db1253daf3a13ac19b7f638eb6b51",
+    "runtime_file_count": 187,
+    "candidate_package": "1512ac252f258370260a82f69bb15feeff4b8910132d9d633488c1b77820c784"
+  },
+  "capture_options": {
+    "scene": "city",
+    "reference_segment": "city-08",
+    "player_camera_profile": "candidate_preview_camera",
+    "dynamic_actors": "city_crowd_and_traffic_visible",
+    "player_visibility": "visible",
+    "vehicle_visibility": "visible_driving",
+    "candidate_visual": "urban_storefront_v2_and_three_wheel_delivery",
+    "collision_and_mission_logic": "formal_runtime_unchanged",
+    "resolution": [1280, 720]
+  },
+  "reference_comparison": {
+    "reference_frame": "reference-evidence/video-1/city-08.jpg",
+    "findings": [
+      "当前截图已确认城市驾驶、开放货斗三轮车、店铺候选和交互摊位在真实窗口中加载",
+      "道路、碰撞、交通和任务状态仍由当前运行时逻辑提供",
+      "城市建筑材质、角色、人群、光照、镜头和参考画面构图仍需人工逐帧返工，不能视为视觉通过"
+    ]
+  },
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "captured_at": "2026-10-10T03:34:00+08:00",
+  "image": {
+    "path": "reference-evidence/p0-candidate-city-08.png",
+    "sha256": "9fe085e6650853e5cdb129153c47700f62b1824197411e5a88e74d7ddb826b0b",
+    "dimensions": [1280, 720],
+    "visual_status": "unverified",
+    "release_allowed": false
+  }
+}

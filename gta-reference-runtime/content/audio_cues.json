@@ -1,0 +1,22 @@
+{
+  "id": "audio-cues-v1",
+  "version": 1,
+  "display_name": "程序化音频提示",
+  "policy": "当前仅用于事件路由和程序化灰盒反馈；最终音频资源接入前不得视为成品音效",
+  "cues": [
+    {"id": "interaction_success", "category": "ui", "frequency": 660.0, "duration": 0.10},
+    {"id": "interaction_denied", "category": "ui", "frequency": 180.0, "duration": 0.16},
+    {"id": "mission_success", "category": "feedback", "frequency": 880.0, "duration": 0.22},
+    {"id": "mission_failed", "category": "feedback", "frequency": 120.0, "duration": 0.24},
+    {"id": "perception_alert", "category": "feedback", "frequency": 520.0, "duration": 0.12},
+    {"id": "conflict_started", "category": "feedback", "frequency": 260.0, "duration": 0.18},
+    {"id": "vehicle_driver", "category": "vehicle", "frequency": 420.0, "duration": 0.08},
+    {"id": "vehicle_collision", "category": "vehicle", "frequency": 155.0, "duration": 0.10},
+    {"id": "vehicle_destroyed", "category": "feedback", "frequency": 90.0, "duration": 0.30},
+    {"id": "scan_registered", "category": "ui", "frequency": 740.0, "duration": 0.14},
+    {"id": "checkpoint_loaded", "category": "ui", "frequency": 520.0, "duration": 0.10},
+    {"id": "mission_restart", "category": "feedback", "frequency": 300.0, "duration": 0.12},
+    {"id": "footstep", "category": "player", "frequency": 110.0, "duration": 0.07},
+    {"id": "vehicle_engine", "category": "vehicle", "frequency": 92.0, "duration": 0.18}
+  ]
+}

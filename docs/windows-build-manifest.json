@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "status": "generated_target_device_unverified",
+  "product_name": "新时代觉醒者",
+  "godot_version": "4.7.1.stable.official.a13da4feb",
+  "runtime_source_fingerprint": "0bf6feb864ac441c7921504b01455ed1b8de99184e446b38cd01f74a87800315",
+  "runtime_source_file_count": 305,
+  "platform": "Windows Desktop",
+  "architecture": "x86_64",
+  "presets": [
+    {
+      "name": "新时代觉醒者 Windows 内部测试",
+      "path": "build/windows/新时代觉醒者.exe",
+      "includes_tests": true,
+      "bytes": 216094536,
+      "sha256": "ea7f17462005d04a926617c21f24b41292370a16d45f8e5dc1ec6b171afe8618",
+      "target_device_status": "unverified"
+    },
+    {
+      "name": "新时代觉醒者 Windows 首发候选",
+      "path": "build/windows/新时代觉醒者-首发候选.exe",
+      "includes_tests": false,
+      "bytes": 166962576,
+      "sha256": "4546da2470fb14468e6170e3d7caede146e4487e2b325308ec84aa4afd742253",
+      "target_device_status": "unverified"
+    }
+  ],
+  "export_templates": {
+    "windows_debug_x86_64.exe": "5bf89f938102f0e3119a5fdaafac4f55884c877681667d0dce844509c8bd8752",
+    "windows_release_x86_64.exe": "76269a403bb832599edeee4432a5b7a7e88c018eb5c9c798dfd8289359b0ec07"
+  },
+  "remaining_gates": [
+    "最终资产与权利签收",
+    "21 段参考视觉人工签收",
+    "扩展视觉人工签收",
+    "Windows 10/11 目标设备启动与输入回归",
+    "Steam 商店材料和上传前置"
+  ]
+}

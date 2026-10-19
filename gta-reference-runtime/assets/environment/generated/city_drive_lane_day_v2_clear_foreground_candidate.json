@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "asset_id": "city-drive-lane-day-v2-clear-foreground-candidate",
+  "slot_id": "city-environment-kit",
+  "source_kind": "project_original_ai_generated_bitmap_candidate",
+  "generator": "内置图像生成工具",
+  "license": "项目原创候选；生成记录和负责人签收待补齐",
+  "runtime_asset": "city_drive_lane_day_v2_clear_foreground_candidate.png",
+  "runtime_sha256": "084fcfdaa006cda4528668d286c08b76dd5dddbd17a3bc1effff54cc6ced89be",
+  "dimensions": [1672, 941],
+  "intended_use": "城市 city-08 傍晚干路驾驶镜头的原创远景候选背景卡；前景道路留空，由运行时唯一提供三轮配送车和驾驶员",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "constraints": [
+    "原创生成，不包含参考视频像素",
+    "无品牌标识、商标和可读文字",
+    "不包含近景车辆、人物或动物，避免与运行时载具和角色重复",
+    "只承担纯视觉远景，不承担碰撞、导航、交互或任务逻辑",
+    "必须通过当前源码固定镜头截图、人工视觉和 Windows 目标设备验收"
+  ]
+}

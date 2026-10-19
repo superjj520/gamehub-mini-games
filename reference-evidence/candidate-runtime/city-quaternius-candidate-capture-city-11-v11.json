@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_visual_rejected",
+  "product_name": "新时代觉醒者",
+  "capture_id": "city-11-v11",
+  "reference_frame": "reference-evidence/video-1/city-11.jpg",
+  "source": {
+    "sha256": "eef75fe2e8fbd6b30ad2306564182486451345e915baf886bb44a63dcd2802f0",
+    "file_count": 227
+  },
+  "candidate_package": {
+    "sha256": "0b19076a448c468b5c720446b0822f543cc2b5c5b4236828b60c0897d9fbd20d",
+    "file_count": 315
+  },
+  "capture": {
+    "method": "visible_graphics_window",
+    "resolution": [1280, 720],
+    "rendering_driver": "opengl3",
+    "profile": "city_full_candidate",
+    "camera": {"distance": 8.0, "height": 3.6, "shoulder_offset_x": 0.35},
+    "visual_status": "unverified",
+    "manual_visual_decision": "reject_for_reference_fidelity",
+    "image_path": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-11-v11.png",
+    "image_sha256": "c79661d7211684127af54e30123e5ad9a5d3fb067d85aa6c354a748078948a04",
+    "image_dimensions": [1280, 720]
+  },
+  "findings": [
+    "后场仓储写实立面卡保持稳定显示，远景立面层已按 city-11 场景减少。",
+    "左侧巨大候选建筑仍遮挡主体，玩家与载具没有形成可签收构图。",
+    "当前结果证明材质修复有效，但建筑节点层级和构图仍需重做，不能发布。"
+  ],
+  "release_allowed": false
+}

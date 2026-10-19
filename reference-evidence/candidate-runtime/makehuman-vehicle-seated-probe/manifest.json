@@ -1,0 +1,130 @@
+{
+  "capture_mode": "measurement_only",
+  "cases": [
+    {
+      "animation_player": true,
+      "contact_metrics": {
+        "hand_handlebar_error": 0.145727172493935,
+        "hand_handlebar_passed": true,
+        "measurement_only": true,
+        "seat_position_error": 0
+      },
+      "driver_seat_offset": [
+        0,
+        1.12000000476837,
+        0.180000007152557
+      ],
+      "hand_bones_found": [
+        "hand_l",
+        "hand_r"
+      ],
+      "hand_positions": {
+        "hand_l": [
+          -2.65749430656433,
+          1.41661703586578,
+          -0.839513599872589
+        ],
+        "hand_r": [
+          -2.94250559806824,
+          1.41661703586578,
+          -0.839513599872589
+        ]
+      },
+      "handlebar_positions": [
+        [
+          -3.05999994277954,
+          1.3400000333786,
+          -0.800000011920929
+        ],
+        [
+          -2.53999996185303,
+          1.3400000333786,
+          -0.800000011920929
+        ]
+      ],
+      "id": "gameplay_rear",
+      "passed": true,
+      "player_state": "vehicle_default",
+      "vehicle_rotation_y": 0
+    },
+    {
+      "animation_player": true,
+      "contact_metrics": {
+        "hand_handlebar_error": 0.14572712033987,
+        "hand_handlebar_passed": true,
+        "measurement_only": true,
+        "seat_position_error": 0
+      },
+      "driver_seat_offset": [
+        0,
+        1.12000000476837,
+        0.180000007152557
+      ],
+      "hand_bones_found": [
+        "hand_l",
+        "hand_r"
+      ],
+      "hand_positions": {
+        "hand_l": [
+          2.58780002593994,
+          1.41661703586578,
+          -1.07465875148773
+        ],
+        "hand_r": [
+          2.32755923271179,
+          1.41661703586578,
+          -0.958442330360413
+        ]
+      },
+      "handlebar_positions": [
+        [
+          2.23638844490051,
+          1.3400000333786,
+          -0.87445342540741
+        ],
+        [
+          2.71119475364685,
+          1.3400000333786,
+          -1.08648884296417
+        ]
+      ],
+      "id": "three_quarter",
+      "passed": true,
+      "player_state": "vehicle_default",
+      "vehicle_rotation_y": 0.42
+    }
+  ],
+  "driver_seat_offset": [
+    0,
+    1.12000000476837,
+    0.180000007152557
+  ],
+  "measurement_contract": {
+    "hand_handlebar_error_target": 0.18,
+    "seat_position_error_target": 0.001,
+    "status": "measured_only"
+  },
+  "motion_policy": "gameplay_driven_in_place_animation",
+  "release_allowed": false,
+  "schema_version": 1,
+  "status": "candidate_makehuman_vehicle_seated_probe_validated",
+  "visual_status": "unverified",
+  "contact_validation": {
+    "status": "passed",
+    "cases": 2,
+    "max_seat_position_error": 0,
+    "max_hand_handlebar_error": 0.145727172493935,
+    "thresholds": {
+      "seat_position_error": 0.001,
+      "hand_handlebar_error": 0.18
+    }
+  },
+  "source": {
+    "player_asset_sha256": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+    "vehicle_asset_sha256": "59706c3a50e7e66a6ca927c9976613cce86304e60e439c2458f2197bb949f085",
+    "player_script_sha256": "fcb62a678192711ee2696d07b16dc6dd4f429c6ba51f8e939b2014f8c84db8b3",
+    "probe_script_sha256": "28a61c87954dbcfeb9a4b82c77ff66fc219a724c323f33372ccd93b5b8e93d2f",
+    "runtime_source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+    "runtime_file_count": 321
+  }
+}

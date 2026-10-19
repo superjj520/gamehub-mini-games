@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "status": "graphics_environment_probe_failed",
+  "generated_at": "2026-10-14T03:06:43+08:00",
+  "source": {
+    "sha256": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+    "file_count": 233
+  },
+  "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+  "probes": [
+    {
+      "kind": "visible_window_vulkan_mobile",
+      "scenario": "office-10",
+      "result": "failed_unverified",
+      "timeout_seconds": 25,
+      "error": "Godot 在 macOS 图形服务初始化阶段触发 com.apple.hiservices-xpcservice Connection Invalid；未生成独立日志、进度文件或当前源 PNG，随后由有界包装器以 124 结束",
+      "rendering_driver": "vulkan",
+      "rendering_method": "mobile",
+      "mouse_automation": false,
+      "output_directory": "/tmp/新时代觉醒者-vulkan-capture"
+    }
+  ],
+  "policy": "该记录只证明当前图形环境探针失败，不构成视觉证据，不允许绑定旧 PNG 或提升 visual_status。"
+}

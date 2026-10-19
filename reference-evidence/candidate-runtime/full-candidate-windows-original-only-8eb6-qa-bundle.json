@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "status": "internal_candidate_windows_qa_bundle_generated",
+  "product_name": "新时代觉醒者",
+  "release_allowed": false,
+  "visual_status": "unverified",
+  "target_device_status": "unverified",
+  "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+  "bundle": {
+    "path": "build/新时代觉醒者-原创边界候选-8eb6-windows-qa.zip",
+    "bytes": 62612228,
+    "sha256": "3e27c7c3064971865b9951bde42092abce3abafaeb73fa59ccaebd783155863f"
+  },
+  "executable": {
+    "path": "build/windows/新时代觉醒者-原创边界候选-8eb6.exe",
+    "bytes": 133786920,
+    "sha256": "1d50be7189074f4e2b8d2fc41d0707567d71e138c94e73e5cbea3d3eeb17a7e3"
+  },
+  "qa_script": {
+    "path": "scripts/windows_device_qa.ps1",
+    "bytes": 13835,
+    "sha256": "141a3f3edf2c403b2f4f26c48c49dd53c8d781f7c97c121994856392d42a03fe"
+  },
+  "reference_matrix_script": {
+    "path": "scripts/windows_reference_matrix_capture.ps1",
+    "bytes": 7654,
+    "sha256": "226b7d5258f3cd82c2f520ad77b340105f42aab66c901134ce4d991ad2ace846"
+  },
+  "expanded_visual_script": {
+    "path": "scripts/windows_expanded_visual_capture.ps1",
+    "bytes": 10209,
+    "sha256": "7fcb309197e87ca5c3ab587c3fa99ac91fd6728766d6f42f1a88aedb783a8533"
+  },
+  "expanded_capture_script": {
+    "path": "scripts/capture_expanded_visual_matrix.gd",
+    "bytes": 15461,
+    "sha256": "ae37f4a4c6c4d636be76b57524bdb76ed82ac77d218c2ad36b60a1b1a415035e"
+  },
+  "complete_qa_script": {
+    "path": "scripts/windows_complete_qa.ps1",
+    "bytes": 8249,
+    "sha256": "5dd7822f8ea0364a59b64d6a8db0208d596ccb7cc83ff7a7569965c1185fb019"
+  },
+  "complete_qa_verifier": {
+    "path": "scripts/verify_windows_complete_qa.mjs",
+    "bytes": 14115,
+    "sha256": "66931289bf8928e08a84e13e419140f02fabfb233d52e7ac319d18b5a88c39c7"
+  },
+  "package": {
+    "root": "build/internal-full-candidate-original-only-8eb6",
+    "sha256": "2f0ba63f8384887048443e09b7c5035367d7982450b3e6b493a4dc176ac13fa9",
+    "file_count": 200,
+    "source_sha256": "8eb6c112106df5b8713a6ef2a3ae0672ec1c9f4798fd287cb3ff59fbfd43a87d",
+    "source_file_count": 231
+  },
+  "evidence_contract": {
+    "source": {
+      "sha256": "8eb6c112106df5b8713a6ef2a3ae0672ec1c9f4798fd287cb3ff59fbfd43a87d",
+      "file_count": 231
+    },
+    "candidate_package": {
+      "sha256": "2f0ba63f8384887048443e09b7c5035367d7982450b3e6b493a4dc176ac13fa9",
+      "file_count": 200
+    }
+  },
+  "included": [
+    "CANDIDATE_PACKAGE_README.md",
+    "WINDOWS_DEVICE_QA_RUNBOOK.md",
+    "build/windows/新时代觉醒者-原创边界候选-8eb6.exe",
+    "scripts/windows_device_qa.ps1",
+    "scripts/windows_reference_matrix_capture.ps1",
+    "scripts/windows_expanded_visual_capture.ps1",
+    "scripts/capture_expanded_visual_matrix.gd",
+    "scripts/windows_complete_qa.ps1",
+    "scripts/verify_windows_complete_qa.mjs",
+    "reference-evidence/candidate-runtime/full-candidate-windows-original-only-8eb6-build.json"
+  ],
+  "manual_signoff": {
+    "visual": "pending",
+    "keyboard": "pending",
+    "gamepad": "pending",
+    "save_load": "pending",
+    "performance": "pending"
+  }
+}

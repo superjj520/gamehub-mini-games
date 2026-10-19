@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "status": "candidate_integration_unverified",
+  "policy": "候选资产可以进入正式内部运行时、隔离运行时、行为回放和视觉审阅；未完成当前源截图、人工视觉签收、目标设备验证和最终权利确认前，不改变正式资产清单的 graybox 状态，也不得进入发布包。",
+  "source_fingerprint": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+  "source_file_count": 326,
+  "candidate_evidence": [
+    "reference-evidence/candidate-runtime/full-candidate-playtest.json",
+    "reference-evidence/candidate-runtime/full-candidate-playtest-original.json",
+    "build/internal-full-candidate/candidate-package-manifest.json",
+    "build/internal-full-candidate-original/candidate-package-manifest.json",
+    "reference-evidence/candidate-runtime/full-candidate-playtest-original-only.json",
+    "build/internal-full-candidate-original-only/candidate-package-manifest.json",
+    "gta-reference-runtime/assets/characters/original-procedural-office-characters/original_player_candidate.tscn",
+    "gta-reference-runtime/assets/characters/original-procedural-office-characters/original_office_npc_candidate.tscn",
+    "gta-reference-runtime/assets/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.tscn",
+    "gta-reference-runtime/assets/vehicles/three-wheel-delivery/three_wheel_delivery_candidate.tscn",
+    "gta-reference-runtime/assets/environment/original-procedural-city-environment/original_city_environment_candidate.tscn",
+    "gta-reference-runtime/assets/props/original-procedural-interaction-props/original_interaction_props_candidate.tscn",
+    "gta-reference-runtime/content/candidates/original_office_desk_runtime_candidate.tscn",
+    "gta-reference-runtime/content/candidates/original_office_visual_runtime_candidate.tscn",
+    "docs/asset-candidate-registry.json",
+    "reference-evidence/candidate-runtime/city-quaternius-candidate-capture.json",
+    "reference-evidence/candidate-runtime/city-quaternius-candidate-city-01.png"
+  ],
+  "slots": [
+    {
+      "id": "player-character",
+      "candidate_registry_ids": ["player-character-p0-procedural-candidate", "player-character-quaternius-cc0-candidate", "player-character-makehuman-elegant-suit-atlas-candidate"],
+      "integration_status": "verified_in_formal_internal_runtime_and_isolated_full_candidate",
+      "visual_status": "unverified",
+      "rights_status": "candidate_rights_recorded_not_release_signed",
+      "platform_status": "windows_target_device_pending"
+    },
+    {
+      "id": "office-npc-set",
+      "candidate_registry_ids": ["office-npc-p0-procedural-candidate", "office-npc-quaternius-cc0-candidate", "office-npc-makehuman-elegant-suit-skinned-512-atlas-candidate"],
+      "integration_status": "verified_in_formal_internal_runtime_and_isolated_full_candidate",
+      "visual_status": "unverified",
+      "rights_status": "candidate_rights_recorded_not_release_signed",
+      "platform_status": "windows_target_device_pending"
+    },
+    {
+      "id": "city-crowd-set",
+      "candidate_registry_ids": ["city-crowd-quaternius-cc0-candidate", "city-crowd-makehuman-elegant-suit-atlas-candidate", "city-crowd-original-procedural-v1-candidate"],
+      "integration_status": "verified_in_formal_internal_runtime_and_isolated_full_candidate",
+      "visual_status": "unverified",
+      "rights_status": "candidate_rights_recorded_not_release_signed",
+      "platform_status": "windows_target_device_pending"
+    },
+    {
+      "id": "three-wheel-vehicle",
+      "candidate_registry_ids": ["city-vehicle-three-wheel-delivery-glb-candidate", "city-vehicle-three-wheel-delivery-atlas-candidate", "city-vehicle-three-wheel-delivery-final-procedural-candidate", "city-vehicle-three-wheel-delivery-original-wrapper-candidate"],
+      "integration_status": "verified_in_formal_internal_runtime_and_isolated_full_candidate",
+      "visual_status": "unverified",
+      "rights_status": "candidate_rights_recorded_not_release_signed",
+      "platform_status": "windows_target_device_pending"
+    },
+    {
+      "id": "office-environment-kit",
+      "candidate_registry_ids": ["office-desk-polyhaven-metal-cc0-candidate", "office-polyhaven-five-desk-full-kit-candidate", "office-elevator-hall-v1-generated-candidate", "office-workstation-row-v1-generated-candidate", "office-elevator-lobby-v1-generated-candidate", "office-elevator-lobby-v2-generated-candidate"],
+      "integration_status": "verified_in_formal_internal_runtime_and_isolated_full_candidate",
+      "visual_status": "unverified",
+      "rights_status": "candidate_rights_recorded_not_release_signed",
+      "platform_status": "windows_target_device_pending"
+    },
+    {
+      "id": "city-environment-kit",
+      "candidate_registry_ids": ["city-environment-original-procedural-v3-candidate", "city-environment-original-only-procedural-v1-candidate", "city-environment-quaternius-downtown-cc0-candidate", "city-road-polyhaven-worn-asphalt-1k-candidate", "urban-storefront-v2-generated-candidate", "warehouse-backlot-facade-v1-generated-candidate", "city-storefront-crowd-v1-generated-candidate", "city-storefront-crowd-v2-generated-candidate", "city-dusk-corner-storefront-v1-generated-candidate", "city-drive-lane-dusk-v1-generated-candidate"],
+      "integration_status": "verified_in_formal_internal_runtime_and_isolated_full_candidate",
+      "visual_status": "unverified",
+      "rights_status": "candidate_rights_recorded_not_release_signed",
+      "platform_status": "windows_target_device_pending"
+    },
+    {
+      "id": "interaction-props",
+      "candidate_registry_ids": ["interaction-props-p0-procedural-candidate", "interaction-props-original-kit-candidate"],
+      "integration_status": "verified_in_isolated_full_candidate",
+      "visual_status": "unverified",
+      "rights_status": "candidate_rights_recorded_not_release_signed",
+      "platform_status": "windows_target_device_pending"
+    },
+    {
+      "id": "final-audio-library",
+      "candidate_registry_ids": [],
+      "integration_status": "verified_event_catalog_and_full_candidate_playback",
+      "visual_status": "unverified",
+      "rights_status": "candidate_rights_recorded_not_release_signed",
+      "platform_status": "windows_target_device_pending"
+    }
+  ]
+}

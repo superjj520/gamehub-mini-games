@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-18T22:42:12.841Z",
+  "status": "local_candidate_qa_passed",
+  "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+  "source_file_count": 321,
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "policy": "本报告只证明本机串行候选回归和证据绑定，不生成视觉 PNG，不替代可见窗口、Windows 真机或人工视觉签收。",
+  "checks": [
+    {
+      "script": "test:behavior:current",
+      "label": "当前 21 段行为回放",
+      "status": "passed",
+      "exit_code": 0,
+      "duration_ms": 7765,
+      "source_before": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_after": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_stable": true,
+      "output_tail": "\n> test:behavior:current\n> node scripts/run_current_behavior_matrix.mjs && node scripts/verify_current_behavior_matrix.mjs\n\n当前行为矩阵通过：21/21；源码 f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 / 321 个文件；视觉仍未验收\n当前行为矩阵验证通过：21/21 分段、源指纹 f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 / 321 个文件；视觉状态仍为 unverified\n",
+      "error": null
+    },
+    {
+      "script": "test:expanded-behavior",
+      "label": "扩展行为回放",
+      "status": "passed",
+      "exit_code": 0,
+      "duration_ms": 18618,
+      "source_before": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_after": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_stable": true,
+      "output_tail": "\n> test:expanded-behavior\n> node scripts/run_expanded_behavior_evidence.mjs\n\n扩展行为测试 passed：global-launcher-and-focus\n扩展行为测试 passed：global-session-recovery\n扩展行为测试 passed：office-task-and-search\n扩展行为测试 passed：office-pause-and-audio\n扩展行为测试 passed：office-hud-resolution\n扩展行为测试 passed：city-store-crowd-and-traffic\n扩展行为测试 passed：city-extension-weather-and-damage\n扩展行为测试 passed：city-delivery-and-conflict\n扩展行为测试 passed：global-content-pack-and-asset-safety\n扩展行为测试 passed：global-determinism-and-session-journal\n",
+      "error": null
+    },
+    {
+      "script": "test:combined-office-candidates",
+      "label": "办公室候选隔离运行时",
+      "status": "passed",
+      "exit_code": 0,
+      "duration_ms": 35839,
+      "source_before": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_after": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_stable": true,
+      "output_tail": "\n> test:combined-office-candidates\n> node art-source/environment/polyhaven-metal-office-desk/run_combined_office_candidate_runtime.mjs\n\n办公室候选组合隔离运行时证据已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-runtime.json\n",
+      "error": null
+    },
+    {
+      "script": "verify:candidate:office:configuration",
+      "label": "办公室候选结构配置",
+      "status": "passed",
+      "exit_code": 0,
+      "duration_ms": 412579,
+      "source_before": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_after": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_stable": true,
+      "output_tail": "\n> verify:candidate:office:configuration\n> node scripts/verify_combined_office_configuration.mjs\n\n办公室候选 close 无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-configuration-close.json\n办公室候选 stealth 无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-configuration-stealth.json\n办公室候选 lobby 无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-configuration-lobby.json\n办公室候选 wide 无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-configuration-wide.json\n办公室候选 wide 无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-configuration-office-01.json\n办公室候选 wide 无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-configuration-office-02.json\n办公室候选 wide 无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-configuration-office-03.json\n办公室候选 wide 无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-configuration-office-04.json\n办公室候选 wide 无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-configuration-office-05.json\n办公室候选 wide 无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-configuration-office-06.json\n办公室候选 wide 无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-configuration-office-07.json\n办公室候选 wide 无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-configuration-office-08.json\n办公室候选 wide 无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-configuration-office-09.json\n办公室候选 wide 无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/combined-office-candidates-configuration-office-10.json\n办公室候选配置验证通过：close、stealth、lobby、wide 四套相机、office-01 至 office-10 十段背景、玩家/NPC 和 10 个工位均已记录；视觉仍为 unverified\n",
+      "error": null
+    },
+    {
+      "script": "verify:candidate:city:configuration",
+      "label": "城市候选结构配置",
+      "status": "passed",
+      "exit_code": 0,
+      "duration_ms": 25156,
+      "source_before": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_after": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_stable": true,
+      "output_tail": "\n> verify:candidate:city:configuration\n> CITY_CANDIDATE_CAPTURE_VALIDATE_ONLY=1 node art-source/city-full-kit-candidate/capture_city_storefront_candidate_visual.mjs\n\n城市店铺候选无图形配置验证已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/city-storefront-candidate-validation.json\n",
+      "error": null
+    },
+    {
+      "script": "verify:makehuman:vehicle-seated-contact",
+      "label": "载具座椅与车把接触",
+      "status": "passed",
+      "exit_code": 0,
+      "duration_ms": 24420,
+      "source_before": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_after": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_stable": true,
+      "output_tail": "\n> verify:makehuman:vehicle-seated-contact\n> MAKEHUMAN_VEHICLE_PROBE_OFFSCREEN=1 MAKEHUMAN_VEHICLE_PROBE_VALIDATE_ONLY=1 node art-source/characters/makehuman-office-player/capture_makehuman_vehicle_seated_probe.mjs\n\nMakeHuman 载具驾驶探针证据已写入：/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/makehuman-vehicle-seated-probe\n",
+      "error": null
+    },
+    {
+      "script": "verify:candidate:full:launch",
+      "label": "完整候选启动器",
+      "status": "passed",
+      "exit_code": 0,
+      "duration_ms": 10444,
+      "source_before": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_after": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_stable": true,
+      "output_tail": "\n> verify:candidate:full:launch\n> node scripts/verify_full_candidate_launch.mjs\n\n完整候选启动器测试通过：makehuman\n完整候选启动器测试通过：original\n完整候选启动器测试通过：original_only\n完整候选包启动器 QA 通过：MakeHuman、原创角色与原创边界三套入口均可独立启动\n",
+      "error": null
+    },
+    {
+      "script": "verify:asset-candidate-adoption",
+      "label": "候选资产接入证据",
+      "status": "passed",
+      "exit_code": 0,
+      "duration_ms": 384,
+      "source_before": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_after": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_stable": true,
+      "output_tail": "\n> verify:asset-candidate-adoption\n> node scripts/verify_asset_candidate_adoption.mjs\n\n候选资产接入矩阵验证通过：8 个槽位；全部保持视觉 unverified、权利未签收和 Windows 目标设备待验收\n",
+      "error": null
+    },
+    {
+      "script": "verify:candidate:p0:ledger",
+      "label": "P0 候选质量台账",
+      "status": "passed",
+      "exit_code": 0,
+      "duration_ms": 355,
+      "source_before": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_after": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_stable": true,
+      "output_tail": "\n> verify:candidate:p0:ledger\n> node scripts/verify_p0_candidate_quality_ledger.mjs\n\nP0 候选质量台账验证通过：5 个槽位；候选证据完整；视觉、权利、Windows 设备和发布状态仍被正确阻断\n",
+      "error": null
+    },
+    {
+      "script": "verify:evidence-binding",
+      "label": "证据绑定一致性",
+      "status": "passed",
+      "exit_code": 0,
+      "duration_ms": 491,
+      "source_before": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_after": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 files=321",
+      "source_stable": true,
+      "output_tail": "\n> verify:evidence-binding\n> node scripts/verify_evidence_binding.mjs\n\n证据绑定一致性验证通过：当前行为、发布清单、准备报告和内部候选树均绑定 f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35 / 321 个文件；视觉矩阵 已绑定当前源\n",
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_manual_acceptance_pending",
+  "capture_id": "p0-candidate-office-01-current",
+  "product_name": "新时代觉醒者",
+  "capture_method": "真实 Godot 图形窗口；OpenGL 兼容模式；办公室 P0 候选构图入口",
+  "source_sha256": {
+    "runtime_source_fingerprint": "cc565547853c7cf272b438ac8f3c2099249db1253daf3a13ac19b7f638eb6b51",
+    "runtime_file_count": 187,
+    "candidate_package": "1512ac252f258370260a82f69bb15feeff4b8910132d9d633488c1b77820c784"
+  },
+  "capture_options": {
+    "scene": "office",
+    "reference_segment": "office-01",
+    "player_camera_profile": "candidate_preview_camera",
+    "dynamic_actors": "office_npc_and_environment_visible",
+    "player_visibility": "visible",
+    "candidate_visual": "office_workstation_row_v1_generated",
+    "collision_and_mission_logic": "formal_runtime_unchanged",
+    "resolution": [1280, 720]
+  },
+  "reference_comparison": {
+    "reference_frame": "reference-evidence/video-2/office-01.jpg",
+    "findings": [
+      "当前截图已确认原创连续工位立面在办公室后墙候选镜头中真实加载",
+      "办公室任务、角色、隔断和 HUD 仍由当前运行时逻辑提供",
+      "角色、灰盒桌面、材质统一性、镜头和整体构图仍需人工逐帧返工，不能视为视觉通过"
+    ]
+  },
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "captured_at": "2026-10-10T03:33:58+08:00",
+  "image": {
+    "path": "reference-evidence/p0-candidate-office-01.png",
+    "sha256": "e3069e0333ac7854fffd70e12fb359f9cd72ddf7bbf67a720c936b3d501acaaa",
+    "dimensions": [1280, 720],
+    "visual_status": "unverified",
+    "release_allowed": false
+  }
+}

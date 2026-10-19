@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "status": "candidate_isolated_city_office_runtime_verified",
+  "candidate_id": "city-vehicle-three-wheel-delivery-final-procedural-candidate",
+  "candidate_variant": "three_wheel_delivery_final_candidate_detailed_v2",
+  "candidate_sha256": "8c1dbcfff34cba5e73d1805021aebcf5f15d0ba98b173392580bba72e236d897",
+  "runtime_options": {
+    "asset_catalog": "three-wheel-atlas-override",
+    "fallback_policy": "forbid"
+  },
+  "environment": "temporary copy of gta-reference-runtime",
+  "checks": [
+    "Godot GLB import",
+    "vehicle Visual mount with fallback forbidden",
+    "city task and driving replay",
+    "office task and driving replay",
+    "vehicle wheel movement and save restore"
+  ],
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "captured_at": "2026-10-15T09:16:14.174Z"
+}

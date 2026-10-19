@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "status": "candidate_isolated_formal_office_city_runtime_verified",
+  "candidate_ids": [
+    "office-polyhaven-five-desk-full-kit-candidate",
+    "office-npc-makehuman-elegant-suit-skinned-512-atlas-candidate",
+    "city-vehicle-three-wheel-delivery-atlas-candidate",
+    "player-character-makehuman-elegant-suit-atlas-candidate"
+  ],
+  "source_sha256": {
+    "office_desk_glb": "bebc7a127bcc102ae4b58fbbbf5ecea1c8c735c53b5cf322ff0196c70c6314be",
+    "office_carpet_texture": "4a6cab846323e238c1a8d528d51c37769e0c68b42034fe679e3cabc7e05c969b",
+    "interaction_props_glb": "2c490b5e28df3171326434d1e763afc6c7fd6f1d1b464708419823a7fb715ec9",
+    "office_composition_gd": "291709ab6069686fd8971d13ba14ce08903baa9d3bb49905bd8c0d448254ca14",
+    "office_composition_tscn": "265743dff127efc8491c843bae5b08d5db7ac63a395553436a4f9245a6652060",
+    "office_npc_atlas_glb": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+    "npc_retouch_candidate_gd": "cbdeef0e757b79723ebcb462047a0a5af1129518be1c742c8a5e73f248a8c808",
+    "three_wheel_atlas_glb": "59706c3a50e7e66a6ca927c9976613cce86304e60e439c2458f2197bb949f085",
+    "player_character_glb": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+    "player_visual_candidate_gd": "fcb62a678192711ee2696d07b16dc6dd4f429c6ba51f8e939b2014f8c84db8b3",
+    "runtime_runner_mjs": "09eecfae3ec9c742fd7fead75976cb0872baf60ab3e4c4eb75b15e34ffd5a380"
+  },
+  "runtime_options": {
+    "asset_catalog": "combined-office-candidates-override",
+    "office_environment_fallback_policy": "forbid",
+    "office_npc_fallback_policy": "forbid",
+    "vehicle_fallback_policy": "forbid",
+    "player_character": "makehuman_elegant_suit_atlas_candidate"
+  },
+  "environment": "temporary copy of gta-reference-runtime",
+  "checks": [
+    "Godot import of office desk composition, player candidate, NPC atlas and vehicle atlas",
+    "player visual candidate wrapper with reduced backpack and original detail layers",
+    "office environment, player, NPC and vehicle Visual mounts with fallback forbidden",
+    "NPC retouch backpack bone attachment",
+    "full office stealth, perception, driving and save replay",
+    "full city task, driving, wheel and save replay"
+  ],
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "captured_at": "2026-10-19T07:58:37.692Z"
+}

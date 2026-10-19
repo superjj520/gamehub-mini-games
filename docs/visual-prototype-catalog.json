@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "status": "preview_only",
+  "purpose": "用于视觉方向确认的原创三维预览，不是发布候选资产",
+  "source_script": "art-preview/create_visual_prototypes.py",
+  "assets": [
+    {
+      "id": "player-character-preview",
+      "category": "characters",
+      "path": "art-preview/assets/characters/player-character-preview.glb",
+      "runtime_slot": "player-character",
+      "status": "prototype_static_no_final_animation",
+      "release_allowed": false
+    },
+    {
+      "id": "city-storefront-preview",
+      "category": "environment",
+      "path": "art-preview/assets/environment/city-storefront-preview.glb",
+      "runtime_slot": "city-environment-kit",
+      "status": "prototype_static_no_final_collision",
+      "release_allowed": false
+    }
+  ]
+}

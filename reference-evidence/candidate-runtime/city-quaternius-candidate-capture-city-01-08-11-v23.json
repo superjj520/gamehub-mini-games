@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_visual_rejected",
+  "product_name": "新时代觉醒者",
+  "candidate_package_sha256": "cf174b253ada752aeb3cfdc4ed8f07d7b6ebe1ca024905c0d380c2c91f2cef67",
+  "source": {
+    "sha256": "eef75fe2e8fbd6b30ad2306564182486451345e915baf886bb44a63dcd2802f0",
+    "file_count": 227
+  },
+  "catalog_path": "art-source/city-full-kit-candidate/asset-runtime-catalog-city-full-kit-quaternius-override.json",
+  "capture_method": "visible_graphics_window",
+  "resolution": [1280, 720],
+  "rendering_driver": "opengl3",
+  "captures": [
+    {
+      "capture_id": "city-01",
+      "image_path": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-01-v11.png",
+      "image_sha256": "cc2f5b78ee99c80786d8f793021d595ffcd4038d98420af25b30114dffdbe42a",
+      "visual_status": "unverified",
+      "manual_visual_decision": "reject_for_reference_fidelity",
+      "findings": [
+        "原创首店招牌、写实背景卡、前景人群和任务 HUD 同屏可见。",
+        "人物、建筑细节、材质、光照和拥挤关系仍明显偏离参考视频。"
+      ]
+    },
+    {
+      "capture_id": "city-08",
+      "image_path": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-08-v9.png",
+      "image_sha256": "1314635355f1b0e9a8e54363b0c76da6ee36a5579cc1587c644e28bfcef92157",
+      "visual_status": "unverified",
+      "manual_visual_decision": "reject_for_reference_fidelity",
+      "findings": [
+        "驾驶专用镜头、三轮车、道路、右侧连续建筑、行人、扫码牌和 HUD 同框可见。",
+        "载具材质、人物坐姿、交通密度、黄昏光照和城市真实感仍未达到参考帧。"
+      ]
+    },
+    {
+      "capture_id": "city-11",
+      "image_path": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-11-v23.png",
+      "image_sha256": "dd4e25e795b4a493a5958da793ef06786e167e20d814f473b43d1be3443da2c1",
+      "visual_status": "unverified",
+      "manual_visual_decision": "reject_for_reference_fidelity",
+      "findings": [
+        "后场仓储正面、侧向仓储边界、装卸货箱、垃圾桶、玩家、三轮车和 HUD 同屏可见。",
+        "候选低面数角色、程序化道路与背景、材质混合和参考逐帧一致性仍未签收。"
+      ]
+    }
+  ],
+  "release_allowed": false,
+  "next_gates": [
+    "完成最终角色、载具、城市、交通和灯光资产，不再使用候选低面数占位。",
+    "在目标平台窗口重新采集 21 段参考矩阵和扩展视觉矩阵。",
+    "完成权利登记、目标设备性能和人工逐帧视觉签收。"
+  ]
+}

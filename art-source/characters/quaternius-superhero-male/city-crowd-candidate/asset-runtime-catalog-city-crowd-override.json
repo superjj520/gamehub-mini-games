@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "policy": "integration_test_city_crowd_candidate",
+  "slots": [
+    {"id": "player-character", "category": "characters", "root_name": "Visual", "scene_path": "", "fallback_policy": "procedural_graybox"},
+    {"id": "office-npc-set", "category": "characters", "root_name": "Visual", "scene_path": "", "fallback_policy": "procedural_graybox"},
+    {"id": "city-crowd-set", "category": "characters", "root_name": "Visual", "scene_path": "res://assets/characters/quaternius-superhero-male/city_crowd_quaternius_candidate.tscn", "fallback_policy": "procedural_graybox"},
+    {"id": "three-wheel-vehicle", "category": "vehicles", "root_name": "Visual", "scene_path": "", "fallback_policy": "procedural_graybox"},
+    {"id": "office-environment-kit", "category": "environment", "root_name": "Visual", "scene_path": "", "fallback_policy": "procedural_graybox"},
+    {"id": "city-environment-kit", "category": "environment", "root_name": "Visual", "scene_path": "", "fallback_policy": "procedural_graybox"},
+    {"id": "interaction-props", "category": "props", "root_name": "Visual", "scene_path": "", "fallback_policy": "procedural_graybox"},
+    {"id": "final-audio-library", "category": "audio", "root_name": "Audio", "scene_path": "", "fallback_policy": "procedural_graybox"}
+  ]
+}

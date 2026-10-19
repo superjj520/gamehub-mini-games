@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "status": "candidate_isolated_runtime_verified",
+  "candidate_id": "interaction-props-original-kit-candidate",
+  "candidate_sha256": "2c490b5e28df3171326434d1e763afc6c7fd6f1d1b464708419823a7fb715ec9",
+  "integration_runner_sha256": "e7e6742547081d6ee35d3e673405fad2a126c43497a7ccf7353f62449488ce32",
+  "integration_script_sha256": "bcdc2ccc2cc3625ccdaf121ede4e54551880cfd21362f1a3d9c51f2fc528d76a",
+  "asset_record_sha256": "0ac089b16e4bc53b74d5a7efa8e4b42ebd2d4951535c9e2d300b0c9253c0a55b",
+  "formal_runtime_source_fingerprint": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+  "formal_runtime_source_file_count": 326,
+  "environment": "temporary copy of gta-reference-runtime",
+  "checks": [
+    "Godot GLB import",
+    "city Visual mount with fallback forbidden",
+    "interaction prompt and egg inventory transition",
+    "camera/player/mission preservation",
+    "full city mission integration replay"
+  ],
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "captured_at": "2026-10-18T16:05:58.728Z"
+}

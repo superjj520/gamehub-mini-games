@@ -1,0 +1,58 @@
+{
+  "close": {
+    "playerPosition": "Vector3(-2.65, 1.0, 1.15)",
+    "playerPositionArray": [-2.65, 1.0, 1.15],
+    "npcPosition": "Vector3(0.70, 0.9, -1.55)",
+    "npcPositionArray": [0.70, 0.9, -1.55],
+    "followDistance": "2.05",
+    "followHeight": "1.42",
+    "shoulderOffset": "Vector3(0.45, 0.0, 0.0)",
+    "shoulderOffsetArray": [0.45, 0.0, 0.0],
+    "orbitPitch": "-8.0",
+    "orbitYaw": "-58.0",
+    "targetLabel": "参考帧办公室近景：玩家侧后肩、工位、显示器和NPC背景关系",
+    "filenameSuffix": "-close"
+  },
+  "stealth": {
+    "playerPosition": "Vector3(-2.65, 1.0, 1.15)",
+    "playerPositionArray": [-2.65, 1.0, 1.15],
+    "npcPosition": "Vector3(0.70, 0.9, -1.55)",
+    "npcPositionArray": [0.70, 0.9, -1.55],
+    "followDistance": "1.85",
+    "followHeight": "1.42",
+    "shoulderOffset": "Vector3(0.50, 0.0, 0.0)",
+    "shoulderOffsetArray": [0.50, 0.0, 0.0],
+    "orbitPitch": "-8.0",
+    "orbitYaw": "-58.0",
+    "targetLabel": "参考帧 office-02 办公隔断潜行：蹲伏玩家、隔断遮挡、NPC感知和警戒HUD",
+    "filenameSuffix": "-stealth"
+  },
+  "lobby": {
+    "playerPosition": "Vector3(-1.15, 1.0, -4.85)",
+    "playerPositionArray": [-1.15, 1.0, -4.85],
+    "npcPosition": "Vector3(0.95, 0.9, -4.25)",
+    "npcPositionArray": [0.95, 0.9, -4.25],
+    "followDistance": "2.45",
+    "followHeight": "1.46",
+    "shoulderOffset": "Vector3(0.34, 0.0, 0.0)",
+    "shoulderOffsetArray": [0.34, 0.0, 0.0],
+    "orbitPitch": "-10.0",
+    "orbitYaw": "18.0",
+    "targetLabel": "参考帧 office-06 电梯厅遭遇：玩家、巡查NPC、电梯门厅和交互HUD",
+    "filenameSuffix": "-lobby"
+  },
+  "wide": {
+    "playerPosition": "Vector3(-0.85, 1.0, 1.15)",
+    "playerPositionArray": [-0.85, 1.0, 1.15],
+    "npcPosition": "Vector3(1.15, 0.9, -1.25)",
+    "npcPositionArray": [1.15, 0.9, -1.25],
+    "followDistance": "3.1",
+    "followHeight": "1.62",
+    "shoulderOffset": "Vector3(0.35, 0.0, 0.0)",
+    "shoulderOffsetArray": [0.35, 0.0, 0.0],
+    "orbitPitch": "-12.0",
+    "orbitYaw": "-10.0",
+    "targetLabel": "参考帧办公室宽景：玩家、工位、NPC和HUD",
+    "filenameSuffix": ""
+  }
+}

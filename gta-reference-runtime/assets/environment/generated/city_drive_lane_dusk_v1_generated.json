@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "asset_id": "city-drive-lane-dusk-v1-generated-candidate",
+  "slot_id": "city-environment-kit",
+  "source_kind": "project_original_ai_generated_bitmap_candidate",
+  "generator": "内置图像生成工具",
+  "license": "项目原创候选；需在最终发布前完成权利与负责人签收",
+  "runtime_asset": "city_drive_lane_dusk_v1_generated.png",
+  "runtime_sha256": "451e87e65eaaba2dad625222bf98860ca72cccd4a43afeb42ba028eaddfe2bb2",
+  "dimensions": [1672, 941],
+  "intended_use": "城市驾驶镜头的雨后黄昏商业街远景候选背景卡",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "constraints": [
+    "原创生成，不包含参考视频像素",
+    "无品牌标识、商标和可读文字",
+    "中央车道只承担视觉远景，不承担碰撞、导航、交互或任务逻辑",
+    "必须通过当前源码固定镜头截图、人工视觉和 Windows 目标设备验收"
+  ]
+}

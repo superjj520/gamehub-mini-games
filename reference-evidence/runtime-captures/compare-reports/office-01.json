@@ -1,0 +1,25 @@
+{
+	"candidate_path": "reference-evidence/runtime-captures/office-test.png",
+	"candidate_sha256": "2a736b045c9daa9a0c57f70b6eae7cd3109f76ba8bc845670aef20641b7f5eaf",
+	"candidate_source_size": [
+		1280,
+		720
+	],
+	"comparison_size": [
+		480,
+		270
+	],
+	"decision": "工具只产生对照指标，不自动批准视觉还原；必须由人工逐项复核参考帧与运行时截图",
+	"exact_pixel_ratio": 0.0,
+	"max_channel_error": 250,
+	"mean_absolute_channel_error": 73.1679706790123,
+	"reference_path": "reference-evidence/video-2/office-01.jpg",
+	"reference_sha256": "c7cc59ae818c6644f5252c015beb2337484554a5ef706b403f683ac59fef1aae",
+	"reference_size": [
+		480,
+		270
+	],
+	"version": 1,
+	"visual_status": "unverified",
+	"within_8_level_ratio": 0.000108024691358025
+}

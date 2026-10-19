@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>办公室 P0 环境候选视觉审阅</title>
+  <style>
+    :root { color-scheme: dark; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; }
+    body { margin: 0; background: #101827; color: #eef3fb; }
+    main { max-width: 1500px; margin: 0 auto; padding: 28px; }
+    h1 { margin: 0 0 8px; font-size: 26px; } h2 { margin-top: 28px; font-size: 19px; }
+    p { color: #b7c4d8; line-height: 1.6; } .warning { color: #ffd58a; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    figure { margin: 0; background: #182338; border: 1px solid #354561; border-radius: 10px; padding: 10px; }
+    figcaption { color: #c9d5e7; margin-bottom: 8px; font-size: 13px; }
+    img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain; background: #0b111d; border-radius: 6px; }
+    .status { display: inline-block; padding: 4px 9px; border-radius: 999px; background: #4b3d25; color: #ffd58a; font-size: 12px; }
+    .panel { background: #182338; border: 1px solid #354561; border-radius: 10px; padding: 16px; }
+    code { color: #9fd0ff; } li { margin: 8px 0; color: #c9d5e7; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>办公室 P0 环境候选视觉审阅</h1>
+    <p><span class="status">视觉状态：unverified</span>　本页只审阅环境，不审阅人物、任务逻辑或 HUD。</p>
+    <p class="warning">候选环境不承担碰撞、导航和任务判定；它只作为可逆视觉层，不代表最终发布资产。</p>
+
+    <h2>office-01：办公区结构</h2>
+    <section class="grid">
+      <figure><figcaption>参考视频帧</figcaption><img src="../reference-evidence/video-2/office-01.jpg" alt="参考 office-01"></figure>
+      <figure><figcaption>正式运行时灰盒基线</figcaption><img src="../reference-evidence/runtime-matrix/office-01.png" alt="灰盒 office-01"></figure>
+      <figure><figcaption>环境候选覆盖</figcaption><img src="../reference-evidence/p0-candidate-office-01.png" alt="环境候选 office-01"></figure>
+    </section>
+
+    <h2>office-06：走廊、电梯厅和巡查路线</h2>
+    <section class="grid">
+      <figure><figcaption>参考视频帧</figcaption><img src="../reference-evidence/video-2/office-06.jpg" alt="参考 office-06"></figure>
+      <figure><figcaption>正式运行时灰盒基线</figcaption><img src="../reference-evidence/runtime-matrix/office-06.png" alt="灰盒 office-06"></figure>
+      <figure><figcaption>环境候选覆盖</figcaption><img src="../reference-evidence/p0-candidate-office-06.png" alt="环境候选 office-06"></figure>
+    </section>
+
+    <h2>当前环境候选结论</h2>
+    <section class="panel">
+      <ul>
+        <li>已覆盖：工位桌面、显示器、抽屉、办公椅、玻璃隔断、电梯门、电梯面板、储物柜、绿植和顶灯。</li>
+        <li>已验证：候选可以通过运行时资产覆盖目录挂载，且不改变碰撞、导航、任务和存档逻辑。</li>
+        <li>未通过：材质仍偏程序化，办公室空间比例、灯光、玻璃反射、家具细节和参考镜头构图仍有明显差异。</li>
+        <li>发布边界：<code>release_allowed=false</code>；必须继续完成固定镜头、目标设备和人工视觉验收。</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

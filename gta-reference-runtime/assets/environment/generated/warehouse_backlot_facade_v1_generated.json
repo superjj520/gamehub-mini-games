@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "asset_id": "warehouse-backlot-facade-v1-generated-candidate",
+  "slot_id": "city-environment-kit",
+  "source_kind": "ai_generated_original_bitmap",
+  "generator": "内置图像生成工具",
+  "license": "项目原创候选；需在最终发布前完成权利与负责人签收",
+  "runtime_asset": "warehouse_backlot_facade_v1_generated.png",
+  "runtime_sha256": "208c9e62d45b4c4f53d3b22cf402ffb5179e9552a45edb60252d57a9717e92a7",
+  "dimensions": [2172, 724],
+  "intended_use": "城市扩展后场仓储装卸门面候选材质",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "constraints": [
+    "无品牌标识",
+    "无可读文字",
+    "不承担碰撞、导航、交互或任务逻辑",
+    "必须通过当前源码扩展街区固定镜头截图和 Windows 目标设备验收"
+  ]
+}

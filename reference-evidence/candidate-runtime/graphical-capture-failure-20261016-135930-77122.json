@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "status": "graphical_capture_failed",
+  "failure_kind": "timeout",
+  "generated_at": "2026-10-16T05:59:30.720Z",
+  "process": {
+    "pid": 77122,
+    "timeout_seconds": 20,
+    "godot_bin": "/opt/homebrew/bin/godot"
+  },
+  "source": {
+    "sha256": "6d0c9f9b5ecda03d0f615ac70dd7fb82cd4ff735bda92142e19427ffc08b38f2",
+    "file_count": 261
+  },
+  "log_path": "/tmp/新时代觉醒者-headless-office01.log",
+  "command": "/opt/homebrew/bin/godot --path /Users/superjj/gamehub-mini-games/build/internal-full-candidate --scene res://tests/reference_capture_runner.tscn --display-driver headless --audio-driver Dummy --rendering-driver opengl3 --rendering-method gl_compatibility --single-window --windowed --resolution 1280x720 --log-file /tmp/新时代觉醒者-headless-office01.log --quit-after 3000 --user-data-dir /var/folders/tq/g_n75q2x54s2w9ylj9vfmh140000gn/T//新时代觉醒者-godot-user-data-77117",
+  "policy": "失败记录只用于诊断，不构成 PNG、视觉验收或发布证据"
+}

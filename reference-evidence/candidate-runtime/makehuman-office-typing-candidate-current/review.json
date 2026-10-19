@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-10-15",
+  "review_type": "candidate_visual_gap_review",
+  "candidate_id": "makehuman-office-typing-candidate-current",
+  "status": "pending_manual_visual_signoff",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "human_signoff": false,
+  "method": "本地候选运行时 PNG 与 video-2/office-10 参考帧对照",
+  "reference": {
+    "path": "reference-evidence/video-2/office-10.jpg",
+    "sha256": "1678b061d8b9a53018fdac61496fcf4985c0234fa2ca5acab80a2f0065f655b0"
+  },
+  "candidate_capture": {
+    "path": "reference-evidence/candidate-runtime/makehuman-office-typing-candidate-current/makehuman-office-typing-current.png",
+    "sha256": "d2a8ad8e73ca8a0c8e69bf58f28d405190f8219b0f22210c166bdf27b4cbb456",
+    "manifest": "reference-evidence/candidate-runtime/makehuman-office-typing-candidate-current/manifest.json",
+    "state": "typing_default",
+    "formal_source_fingerprint": "aaa599197f945778d9da9a0ea9e0f5555e7e1cad7c0146ddd5c459aa84d13f44",
+    "formal_source_file_count": 242,
+    "candidate_package_fingerprint": "8c5653c8d77bbccd784d503510d54127cdb6159296e4e50236ce192cd1892f25",
+    "candidate_package_file_count": 332,
+    "capture_freshness": "current_after_formal_camera_contract",
+    "camera_contract": {
+      "yaw_degrees": 90,
+      "pitch_degrees": -20,
+      "height": 1.22,
+      "distance": 1.45,
+      "shoulder_x": 0.65
+    }
+  },
+  "positives": [
+    "候选运行包已通过完整行为回放和候选资产挂载校验。",
+    "候选人物使用真实 Skeleton3D 外观，并已接入正式坐姿打字状态。",
+    "办公室候选环境具备灯光、玻璃、连续工位和桌面生活感的扩展层。"
+  ],
+  "blocking_gaps": [
+	"当前 PNG 已绑定最新候选包和当前正式源，并且使用正式内容包镜头契约；它仍不能替代最终视觉签收。",
+	"当前截图已经能同时读到人物侧身、坐姿、双手、键盘/桌面、显示器和右侧隔断，但前景遮挡仍偏重，尚未达到参考帧的横向关系。",
+	"材质、人物比例、光照和镜头空间关系仍未达到参考帧，也未完成目标设备上的视觉复核。",
+    "角色、动画、办公室环境和目标设备仍未完成权利与人工签收。"
+  ],
+  "next_gate": "进入用户视觉签收前的最后一轮候选修整：降低前景隔断遮挡、校准人物与桌面比例、补齐材质和目标设备截图；人工签收前保持 release_allowed=false。",
+	"decision": "pending_manual_visual_signoff"
+}

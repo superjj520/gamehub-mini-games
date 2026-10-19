@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "status": "candidate_handoff",
+  "policy": "这是候选音频库的生产交接记录，不代表最终听感、权利或发布签收",
+  "product": "新时代觉醒者",
+  "slot_id": "final-audio-library",
+  "candidate_id": "original_procedural_audio_library_candidate",
+  "source_kind": "project_original_procedural_wav_library",
+  "provenance": {
+    "generator": "art-source/audio/generated/build_audio_library.mjs",
+    "license_status": "project_original_generated_candidate_only",
+    "external_source": false,
+    "review_required_before_release": true
+  },
+  "deliverables": {
+    "runtime_catalog": {
+      "path": "gta-reference-runtime/content/audio-runtime-catalog.json",
+      "sha256": "6b1ef6f706dbca051e3fbd0c674ea2e36d0290462043be693463df13c1238c83"
+    },
+    "cue_catalog": {
+      "path": "gta-reference-runtime/content/audio_cues.json",
+      "sha256": "b39ea58034f31b472d7e8394efc016b3aa54cc56cdc248dd7a7713f12fcd99af"
+    },
+    "library_manifest": {
+      "path": "gta-reference-runtime/assets/audio/generated/audio-library-manifest.json",
+      "sha256": "fd36c0bcc034e8ca06ee71e59d462867adfd9dc47731f52715f873054bf11206"
+    },
+    "runtime_evidence": "reference-evidence/candidate-runtime/audio-candidate-acceptance.json"
+  },
+  "runtime_contract": {
+    "event_count": 14,
+    "event_groups": ["交互", "任务", "感知", "冲突", "载具", "登记", "存档", "移动"],
+    "format": "22050 Hz / 单声道 / 16-bit WAV",
+    "fallback_policy": "procedural_graybox",
+    "preserved_behaviors": [
+      "事件路由与任务状态机对齐",
+      "载具、感知、冲突和交互反馈对齐",
+      "音量开关与静音备用反馈",
+      "失败、重试、检查点读取和存档回放"
+    ]
+  },
+  "evidence": {
+    "technical_status": "passed",
+    "manual_listening_status": "unverified",
+    "platform_status": "unverified",
+    "current_runtime_source_fingerprint": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+    "current_runtime_source_file_count": 326,
+    "checks_passed": [
+      "14 个 WAV 格式和采样参数",
+      "运行时事件目录与音频 Cue 目录对齐",
+      "完整候选回放包含音频事件",
+      "无音频时保留程序化备用反馈"
+    ],
+    "visual_status": "not_applicable",
+    "release_allowed": false
+  },
+  "next_gates": [
+    "人工逐事件听感与混音审阅",
+    "音量开关、静音和失败备用反馈回放",
+    "Windows 10/11 目标设备验证",
+    "最终发布权利复核",
+    "发布包重新绑定"
+  ]
+}

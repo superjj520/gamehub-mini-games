@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "candidate_id": "new-era-awakener-office-npc-turnaround-v1-generated-candidate",
+  "asset_type": "office_npc_modeling_reference_board",
+  "file": "new-era-awakener-office-npc-turnaround-v1-generated.png",
+  "dimensions": {
+    "width": 1672,
+    "height": 941,
+    "views": ["front", "three_quarter", "side", "back", "material_details"]
+  },
+  "source": {
+    "kind": "built_in_image_generation",
+    "tool_mode": "built_in",
+    "reference_videos_used": false,
+    "prompt_role": "original_office_npc_modeling_reference"
+  },
+  "design_contract": {
+    "roles": ["office_supervisor", "office_patrol"],
+    "primary_materials": ["charcoal technical jacket", "muted blue gray shirt", "dark trousers", "black leather shoes", "badge lanyard", "tablet"],
+    "runtime_targets": ["idle_default", "walk_default", "search_default", "alert_default"],
+    "modeling_notes": [
+      "保持四视图同一人物、同一服装和同一胸牌挂绳结构",
+      "胸牌和手持平板作为可拆分道具参考，不改变视线起点和搜索目标点",
+      "保留警觉状态下肩部、手臂和手持平板的动作空间，避免侵入碰撞体"
+    ]
+  },
+  "rights": {
+    "status": "candidate_provenance_recorded_pending_final_review",
+    "reference_video_pixels": false,
+    "third_party_logos": false,
+    "release_allowed": false
+  },
+  "visual_acceptance": {
+    "status": "unverified",
+    "review_notes": [
+      "已检查四视图一致性、服装层次、胸牌、平板和鞋部细节；可作为办公室 NPC 建模输入。",
+      "概念图不等于最终 3D 模型、绑定、搜索/警觉动画、材质或 Windows 运行时视觉通过。"
+    ]
+  },
+  "sha256": "9c4a33dc4369a998eac0d8164febd53c0178332426c55f67b39edc82e36319c1"
+}

@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "status": "internal_candidate_windows_qa_bundle_generated",
+  "product_name": "新时代觉醒者",
+  "release_allowed": false,
+  "visual_status": "unverified",
+  "target_device_status": "unverified",
+  "asset_catalog_path": "res://tests/asset-runtime-catalog-full-candidates.json",
+  "bundle": {
+    "path": "build/新时代觉醒者-完整候选-windows-qa.zip",
+    "bytes": 161464574,
+    "sha256": "07376aed92b80e11bdec016f178e3b2320eceef5376b91ac18bb3e0d7e10dc77"
+  },
+  "executable": {
+    "path": "build/windows/新时代觉醒者-完整候选.exe",
+    "bytes": 234013856,
+    "sha256": "1b8a9a1d9bbf6444661b96a582f19e5b4437dc7a50efa597b11cde6fd9be5986"
+  },
+  "qa_script": {
+    "path": "scripts/windows_device_qa.ps1",
+    "bytes": 15488,
+    "sha256": "ccf04034c11038e70a986d8222adb0f4567293ed02dc2c9cb3bc1ca1ef4289de"
+  },
+  "reference_matrix_script": {
+    "path": "scripts/windows_reference_matrix_capture.ps1",
+    "bytes": 8818,
+    "sha256": "1e21c201a16278b5afcaf2962041005f33727cbad52dd150555168360ae10ab6"
+  },
+  "expanded_visual_script": {
+    "path": "scripts/windows_expanded_visual_capture.ps1",
+    "bytes": 11425,
+    "sha256": "f33aa983156a0163e360bde44a6d4dd2298fd1ad9992e8a4fcf2ae5b6fb5c53e"
+  },
+  "expanded_capture_script": {
+    "path": "scripts/capture_expanded_visual_matrix.gd",
+    "bytes": 18033,
+    "sha256": "ae5f4ce6251a87db69bfa6c0f5d4727f709e5dec532d795ebd03a8395f8cafca"
+  },
+  "complete_qa_script": {
+    "path": "scripts/windows_complete_qa.ps1",
+    "bytes": 8442,
+    "sha256": "2826feee39f545b51c98c99a9fee5595cbd1e3286fadfeb1938014151325f6ea"
+  },
+  "complete_qa_verifier": {
+    "path": "scripts/verify_windows_complete_qa.mjs",
+    "bytes": 14115,
+    "sha256": "66931289bf8928e08a84e13e419140f02fabfb233d52e7ac319d18b5a88c39c7"
+  },
+  "complete_qa_contract": {
+    "path": "scripts/verify_windows_complete_qa_script_contract.mjs",
+    "bytes": 2787,
+    "sha256": "a2d8b01e5fb267763d1101f800de614fefbc1b34012f988a6a788f8bddbec12c"
+  },
+  "package": {
+    "root": "build/internal-full-candidate",
+    "sha256": "66773484f8b6bba9c647b3190e148acbeafc918760aa81cebd33abaff24f3d28",
+    "file_count": 450,
+    "source_sha256": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+    "source_file_count": 326
+  },
+  "evidence_contract": {
+    "source": {
+      "sha256": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+      "file_count": 326
+    },
+    "candidate_package": {
+      "sha256": "66773484f8b6bba9c647b3190e148acbeafc918760aa81cebd33abaff24f3d28",
+      "file_count": 450
+    }
+  },
+  "included": [
+    "CANDIDATE_PACKAGE_README.md",
+    "WINDOWS_DEVICE_QA_RUNBOOK.md",
+    "build/windows/新时代觉醒者-完整候选.exe",
+    "scripts/windows_device_qa.ps1",
+    "scripts/windows_reference_matrix_capture.ps1",
+    "scripts/windows_expanded_visual_capture.ps1",
+    "scripts/capture_expanded_visual_matrix.gd",
+    "scripts/windows_complete_qa.ps1",
+    "scripts/verify_windows_complete_qa.mjs",
+    "scripts/verify_windows_complete_qa_script_contract.mjs",
+    "reference-evidence/candidate-runtime/full-candidate-windows-build.json"
+  ],
+  "manual_signoff": {
+    "visual": "pending",
+    "keyboard": "pending",
+    "gamepad": "pending",
+    "save_load": "pending",
+    "performance": "pending"
+  }
+}

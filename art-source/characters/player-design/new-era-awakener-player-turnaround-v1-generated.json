@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "candidate_id": "new-era-awakener-player-turnaround-v1-generated-candidate",
+  "asset_type": "character_modeling_reference_board",
+  "file": "new-era-awakener-player-turnaround-v1-generated.png",
+  "dimensions": {
+    "width": 1536,
+    "height": 1024,
+    "views": ["front", "three_quarter", "side", "back", "material_details"]
+  },
+  "source": {
+    "kind": "built_in_image_generation",
+    "tool_mode": "built_in",
+    "reference_videos_used": false,
+    "prompt_role": "original_player_character_modeling_reference"
+  },
+  "design_contract": {
+    "silhouette": "adult urban courier / office worker",
+    "primary_materials": ["charcoal technical fabric", "muted brick red inner layer", "worn leather backpack", "brushed metal hardware"],
+    "runtime_targets": ["idle_default", "walk_default", "crouch_default", "interact_default", "vehicle_default", "hit_default", "fail_default"],
+    "modeling_notes": [
+      "保持四视图同一人物、同一服装和同一背包结构",
+      "保留胸口镜头锚点、双手握持点和驾驶姿态所需的衣物活动空间",
+      "背包和外套属于可拆分材质/网格候选，不应侵入碰撞体"
+    ]
+  },
+  "rights": {
+    "status": "candidate_provenance_recorded_pending_final_review",
+    "reference_video_pixels": false,
+    "third_party_logos": false,
+    "release_allowed": false
+  },
+  "visual_acceptance": {
+    "status": "unverified",
+    "review_notes": [
+      "已检查四视图一致性、轮廓、背包结构、材质分区和脚部完整性；可作为原创 3D 建模输入。",
+      "概念图不等于最终 3D 模型、绑定、动画、材质或 Windows 运行时视觉通过。"
+    ]
+  },
+  "sha256": "4f55aec49f16fce52d3e429e5b38f95d92adee24359a1dfd1df86f18314ec60b"
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_visual_capture_unverified",
+  "source_stale_since_capture": {
+    "reason": "该办公室/三轮车截图采集于当前候选模型与办公室光照调整之前；当前源哈希不一致，不能作为本轮视觉验收证据。",
+    "current_candidate_package": "750d0587ea0420b0158f48f5e446ef8cb6e8845b5acca974dac5bc0f8d3d3468"
+  },
+  "candidate_ids": [
+    "office-npc-makehuman-elegant-suit-skinned-512-atlas-candidate",
+    "city-vehicle-three-wheel-delivery-atlas-candidate"
+  ],
+  "candidate_sha256": {
+    "office-npc-makehuman-elegant-suit-skinned-512-atlas-candidate": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+    "city-vehicle-three-wheel-delivery-atlas-candidate": "bf833099378475e25d88d6aaf7916f23959ea3cf0034cf70d938076061c98eae"
+  },
+  "image": {
+    "path": "reference-evidence/candidate-runtime/office-vehicle-atlas-graphical-preview.png",
+    "sha256": "1f08a4b8e478427aad27eb876736fce6732fa05f1fffe31564f3a45ac8608b91",
+    "width": 1280,
+    "height": 720,
+    "render_backend": "Godot 4.7.1 OpenGL Compatibility on macOS graphical window"
+  },
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "comparison_reference": "reference-evidence/video-2/office-01.jpg",
+  "findings": [
+    "真实图形窗口能够加载并渲染 NPC 图集候选和三轮车图集候选",
+    "办公室构图仍是灰盒隔断、程序化桌面和简化灯光，不符合参考视频的真实办公室细节密度",
+    "NPC 面部、服装纹理、背包轮廓、人体比例和姿态仍明显低于参考视频，不得标记为视觉通过",
+    "三轮车图集候选在该构图中可渲染，但该镜头不是参考视频逐帧验收镜头"
+  ],
+  "captured_at": "2026-10-07"
+}

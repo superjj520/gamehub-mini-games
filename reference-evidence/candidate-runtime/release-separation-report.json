@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "status": "passed_internal_boundary",
+  "generated_at": "2026-10-18T20:55:10.899Z",
+  "formal_runtime": {
+    "path": "gta-reference-runtime",
+    "source_fingerprint": "b9cb061033e347f04e4162f74924f75be4387c040e7e06f1659d35a427733bea",
+    "file_count": 309,
+    "launch_profile": "approved"
+  },
+  "export_presets": {
+    "internal_test": {
+      "name": "新时代觉醒者 Windows 内部测试",
+      "runnable": "true",
+      "export_path": "../build/windows/新时代觉醒者.exe"
+    },
+    "first_launch_candidate": {
+      "name": "新时代觉醒者 Windows 首发候选",
+      "runnable": "false",
+      "export_path": "../build/windows/新时代觉醒者-首发候选.exe",
+      "exclude_filter_count": 13
+    }
+  },
+  "launch_profile_asset_catalogs": [
+    {
+      "entry_id": "office",
+      "path": "res://content/asset-runtime-catalog-original-only.json",
+      "status": "internal_only_candidate_assets",
+      "blocked_scene_paths": [
+        "assets/characters/original-procedural-office-characters/original_player_candidate.tscn",
+        "assets/characters/original-procedural-office-characters/original_office_npc_candidate.tscn",
+        "assets/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.tscn",
+        "content/candidates/original_office_desk_runtime_candidate.tscn",
+        "assets/environment/original-procedural-city-environment/original_city_environment_candidate.tscn",
+        "assets/props/original-procedural-interaction-props/original_interaction_props_candidate.tscn"
+      ]
+    }
+  ],
+  "candidate_package": {
+    "path": "build/internal-full-candidate",
+    "character_variant": "makehuman",
+    "status": "internal_candidate_review_only",
+    "release_allowed": false,
+    "sha256": "80cfcebe79b591b206dd1f0ef91611d44b97849f7332f33dcece3eabdb7812c2",
+    "file_count": 433
+  },
+  "candidate_packages": [
+    {
+      "path": "build/internal-full-candidate",
+      "character_variant": "makehuman",
+      "status": "internal_candidate_review_only",
+      "release_allowed": false,
+      "sha256": "80cfcebe79b591b206dd1f0ef91611d44b97849f7332f33dcece3eabdb7812c2",
+      "file_count": 433
+    },
+    {
+      "path": "build/internal-full-candidate-original",
+      "character_variant": "original",
+      "status": "internal_candidate_review_only",
+      "release_allowed": false,
+      "sha256": "db5a4b276129c4a986873ccb28547fb18a5dd3ddabc3c1846acf453065e94005",
+      "file_count": 429
+    }
+  ],
+  "policy": "正式运行时、内部测试构建和完整候选包必须分离；候选包不得升级为 release_allowed=true。",
+  "errors": []
+}

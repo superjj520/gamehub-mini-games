@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "launch-profile-v1",
+  "version": 1,
+  "status": "approved",
+  "launch_scope": "office_vertical_slice",
+  "internal_development_mode": false,
+  "product_decision_sha256": "c3a4ea7256138873cf48ca00d069aa724ca5c2dc9a25cd8bdb27f747c90f3d14",
+  "policy": "产品基线确认前保留办公室与城市内部开发入口；确认后只保留首发范围入口",
+  "entries": [
+    {
+      "id": "office",
+      "shortcut": "1",
+      "title": "1  准点下班 · 办公室潜行",
+      "description": "办公室潜行、NPC感知、准点条件、失败与重试",
+      "scene_path": "res://scenes/benchmark.tscn",
+      "content_pack_id": "office-leave-on-time-v1",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json"
+    }
+  ]
+}

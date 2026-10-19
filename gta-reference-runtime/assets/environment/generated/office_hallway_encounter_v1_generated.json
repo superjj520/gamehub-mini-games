@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "asset_id": "office-hallway-encounter-v1-generated-candidate",
+  "slot_id": "office-environment-kit",
+  "source_kind": "project_original_ai_generated_bitmap_candidate",
+  "generator": "内置图像生成工具",
+  "license": "项目原创候选；需在最终发布前完成权利与负责人签收",
+  "runtime_asset": "office_hallway_encounter_v1_generated.png",
+  "runtime_sha256": "a3371d808f0b1df32843aad28467a730e90d695536296dfabefb7b3b8fab9125",
+  "dimensions": [1672, 941],
+  "intended_use": "office-08 走廊遭遇的候选背景卡",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "constraints": ["原创生成，不包含参考视频像素", "不承担碰撞、导航、交互或任务逻辑", "必须通过当前源码固定镜头截图、人工视觉和 Windows 目标设备验收"]
+}

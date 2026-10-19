@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "asset_id": "vehicle-driver-sprite-v1",
+  "asset_type": "original_generated_transparent_vehicle_sprite",
+  "source_kind": "ai_generated_original_bitmap",
+  "generator": "Codex内置图像生成工具",
+  "source_reference": "reference-evidence/video-1/city-08.jpg",
+  "source_reference_role": "构图与主体比例参考，不作为运行时依赖",
+  "sha256": "c3a41681ec6cab6cad102aef6845afb565f0043271a5a99df0c54ef93e86d040",
+  "alpha": true,
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "final_rights_signoff": "pending",
+  "runtime_use": "city-08 固定车尾跟拍与车辆视觉候选",
+  "policy": "只作为原创候选位图；不得把生成完成等同于视觉验收、目标设备验收或最终发布授权。"
+}

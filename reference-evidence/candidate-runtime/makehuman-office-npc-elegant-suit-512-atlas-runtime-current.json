@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "status": "candidate_isolated_office_runtime_verified",
+  "candidate_id": "office-npc-makehuman-elegant-suit-skinned-512-atlas-candidate",
+  "candidate_variant": "reference_office_elegant_suit_512_material_atlas_v1",
+  "candidate_sha256": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+  "candidate_triangle_count": 17482,
+  "retouch_script_sha256": "cbdeef0e757b79723ebcb462047a0a5af1129518be1c742c8a5e73f248a8c808",
+  "integration_runner_sha256": "5796c121ebc7b368417367af476e5ab9e36971429c69c072263934f6e90a6d20",
+  "integration_script_sha256": "7ccf0b3e5dac1d24f4e38365e1ad23427a4b49cf5b80eba615ec21954743f95a",
+  "runtime_options": {
+    "preserve_imported_materials": true,
+    "reference_office_materials": false,
+    "use_elegant_suit_candidate": false,
+    "use_elegant_suit_skinned": true
+  },
+  "auxiliary_asset_sha256": null,
+  "formal_runtime_source_fingerprint": "6d84a57efab36870246ef8f002079648fee965bd55fa5a81d2881cf759310b69",
+  "formal_runtime_source_file_count": 241,
+  "environment": "temporary copy of gta-reference-runtime",
+  "checks": [
+    "Godot GLB import",
+    "office NPC Visual mount with fallback forbidden",
+    "Skeleton3D bone-count and meter-scale contract",
+    "retouch script and four candidate pose states",
+    "backpack visual mount",
+    "full office stealth, perception and save replay"
+  ],
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "captured_at": "2026-10-14T10:10:02.041Z"
+}

@@ -1,0 +1,79 @@
+{
+  "cases": [
+    {
+      "axis": "",
+      "id": "base",
+      "left": 0,
+      "missing_bones": [],
+      "passed": true,
+      "right": 0
+    },
+    {
+      "axis": "z",
+      "id": "z_player",
+      "left": -1.48,
+      "missing_bones": [],
+      "passed": true,
+      "right": 1.48
+    },
+    {
+      "axis": "z",
+      "id": "z_reverse",
+      "left": 1.48,
+      "missing_bones": [],
+      "passed": true,
+      "right": -1.48
+    },
+    {
+      "axis": "x",
+      "id": "x_player",
+      "left": -1.48,
+      "missing_bones": [],
+      "passed": true,
+      "right": -1.48
+    },
+    {
+      "axis": "x",
+      "id": "x_reverse",
+      "left": 1.48,
+      "missing_bones": [],
+      "passed": true,
+      "right": 1.48
+    },
+    {
+      "axis": "y",
+      "id": "y_pair",
+      "left": -1.48,
+      "missing_bones": [],
+      "passed": true,
+      "right": 1.48
+    },
+    {
+      "axis": "z",
+      "id": "z_small",
+      "left": -0.72,
+      "missing_bones": [],
+      "passed": true,
+      "right": 0.72
+    },
+    {
+      "axis": "x",
+      "id": "x_small",
+      "left": -0.72,
+      "missing_bones": [],
+      "passed": true,
+      "right": -0.72
+    }
+  ],
+  "image": "/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/makehuman-pose-axis-probe/makehuman-pose-axis-probe.png",
+  "release_allowed": false,
+  "schema_version": 1,
+  "status": "candidate_pose_axis_probe_captured",
+  "visual_status": "unverified",
+  "source": {
+    "asset_sha256": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+    "probe_script_sha256": "2aa898b471e4b18f2ac45f340fb3665f9cd6585b147f2af0bfe9be62a579ceb7",
+    "runtime_source_fingerprint": "3bcef7141926f157e2dfd4638f8fd74509a91c992da7b43bd27f9dd1db5271f7",
+    "runtime_file_count": 180
+  }
+}

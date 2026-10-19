@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "status": "candidate_handoff",
+  "policy": "这是候选资产的生产交接记录，不代表最终视觉、权利或发布签收",
+  "product": "新时代觉醒者",
+  "slot_id": "office-npc-set",
+  "candidate_id": "office-npc-p0-procedural-candidate",
+  "source_kind": "project_original_procedural_npc",
+  "provenance": {
+    "runtime_script": "gta-reference-runtime/assets/characters/original-procedural-office-characters/original_office_npc_candidate.gd",
+    "runtime_scene": "gta-reference-runtime/assets/characters/original-procedural-office-characters/original_office_npc_candidate.tscn",
+    "license_status": "project_original_candidate_only",
+    "external_source": false,
+    "review_required_before_release": true
+  },
+  "deliverables": {
+    "script": {
+      "path": "gta-reference-runtime/assets/characters/original-procedural-office-characters/original_office_npc_candidate.gd",
+      "sha256": "b1d036cf10d74d60414837c16031bf870b7766581a8ead63dd13e014505ef2d6"
+    },
+    "scene": {
+      "path": "gta-reference-runtime/assets/characters/original-procedural-office-characters/original_office_npc_candidate.tscn",
+      "sha256": "7a336e3c76abb50753746c055f310caa1fbf1293dbe8a7d675ae3e30ade9e7b6"
+    },
+    "runtime_evidence": "reference-evidence/candidate-runtime/full-candidate-playtest-original.json"
+  },
+  "runtime_contract": {
+    "perception_states": ["idle_default", "walk_default", "search_default", "alert_default"],
+    "required_mounts": ["视线起点", "搜索目标点", "警觉标记点", "脚底碰撞参考点"],
+    "state_feedback": ["候选NPC搜索状态灯", "候选NPC警觉状态灯", "候选NPC搜索状态环", "候选NPC警觉状态环"],
+    "preserved_behaviors": [
+      "NPC 视线、遮挡和感知判定",
+      "怀疑—发现—搜索—警觉状态机",
+      "巡逻路线与碰撞",
+      "任务、镜头和存档回放"
+    ]
+  },
+  "evidence": {
+    "full_candidate_playtest": "reference-evidence/candidate-runtime/full-candidate-playtest-original.json",
+    "current_runtime_source_fingerprint": "598d5a51abc5b5b7d26ade7bcd3a119499c506505fda68ab6712383d69c59745",
+    "current_runtime_source_file_count": 326,
+    "checks_passed": [
+      "原创 NPC 候选完整启动",
+      "NPC 感知与遮挡回放",
+      "巡逻、搜索、警觉动画状态",
+      "状态反馈表现层",
+      "任务、镜头、碰撞和存档保持"
+    ],
+    "visual_status": "unverified",
+    "release_allowed": false
+  },
+  "next_gates": [
+    "office-06/office-10 固定镜头采集",
+    "NPC 面部、服装、姿态和状态反馈逐帧验收",
+    "Windows 10/11 目标设备回放",
+    "最终资产来源与权利签收",
+    "发布包重新绑定"
+  ]
+}

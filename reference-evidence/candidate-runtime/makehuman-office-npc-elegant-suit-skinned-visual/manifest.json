@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_visual_capture_failed",
+  "candidate_id": "office-npc-makehuman-elegant-suit-skinned-candidate",
+  "candidate_variant": "reference_office_elegant_suit_nearest_neighbor_skinned_v1",
+  "candidate_sha256": "7343dfa7b38f8474fee9fd297769472398809d0487e3afa660f372444497faea",
+  "retouch_script_sha256": "658e430a9eb385e7129bdebe1951af227e60fca7b58ec2c2839a81ab554794b1",
+  "capture_options": {
+    "preserve_imported_materials": true,
+    "reference_office_materials": true,
+    "close_capture": true,
+    "use_elegant_suit_candidate": true,
+    "use_elegant_suit_skinned": true
+  },
+  "environment": "temporary copy of gta-reference-runtime",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "failure": "spawnSync godot ETIMEDOUT",
+  "captured_at": "2026-10-07T08:20:20.142Z"
+}

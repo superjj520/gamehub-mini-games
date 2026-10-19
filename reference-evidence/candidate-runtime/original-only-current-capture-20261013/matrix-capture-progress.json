@@ -1,0 +1,10 @@
+{
+	"asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+	"capture_profile": "internal_candidate",
+	"evidence_prefix": "candidate-runtime/original-only-full",
+	"message": "全部参考矩阵场景完成",
+	"phase": "complete",
+	"scenario_id": "",
+	"updated_at": "2026-10-13T03:52:27",
+	"version": 1
+}

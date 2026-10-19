@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "asset_id": "urban-store-aisle-v1-generated-candidate",
+  "slot_id": "city-environment-kit",
+  "source_kind": "ai_generated_original_bitmap",
+  "generator": "内置图像生成工具",
+  "license": "项目原创候选；需在最终发布前完成权利与负责人签收",
+  "runtime_asset": "urban_store_aisle_v1_generated.png",
+  "runtime_sha256": "d2babace26e2f68c83a26d06e9376df8f28549a27372f52e056a8fd1a15745ed",
+  "dimensions": [1672, 941],
+  "intended_use": "city-04 室内商店货架、鸡蛋柜台和收银台背景候选材质",
+  "reference_role": "参考视频 city-04 的原创构图与氛围参考，不直接复制视频帧",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "constraints": [
+    "无品牌标识",
+    "无可读文字",
+    "不承担碰撞、导航、交互或任务逻辑",
+    "必须通过当前源码固定镜头截图和 Windows 目标设备验收"
+  ]
+}

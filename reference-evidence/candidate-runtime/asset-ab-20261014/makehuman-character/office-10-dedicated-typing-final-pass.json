@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "status": "candidate_visual_probe_captured",
+  "candidate": "makehuman_player_and_office_npc",
+  "scope": "隔离候选包；仅记录 MakeHuman office-10 专用镜头与视觉身体挂点修正",
+  "source": {
+    "sha256": "66c9bbd46076158f82673091cf3c92df56ec4f3da231d9f3e6e201ba3da14b4b",
+    "file_count": 233
+  },
+  "candidate_package": {
+    "root": "build/internal-full-candidate",
+    "sha256": "bff490b095f531a22895f8a9cdf8ba9f2fbc97ab56de06de569d71f92421529b",
+    "file_count": 323,
+    "verification": "npm run verify:candidate:full"
+  },
+  "probe": {
+    "state": "typing_default",
+    "player_position": [0.0, 1.0, 2.94],
+    "camera": {
+      "distance": 2.1,
+      "height": 1.4,
+      "yaw": 45.0,
+      "pitch": -18.0,
+      "collision_mask": 0
+    },
+    "visual_pose_change": "typing_default 身体纵深偏移由 -1.05 调整为 -0.25",
+    "image": {
+      "path": "reference-evidence/candidate-runtime/asset-ab-20261014/makehuman-character/office-10-dedicated-typing-final-pass.png",
+      "sha256": "f8f23e7265e8cd6f30bea37aea97342f469fb6dfc4321d1a267eaebde97538bf",
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "visual_status": "unverified",
+  "acceptance": {
+    "passed": [],
+    "failed": [
+      "显示器仍遮挡键盘区域",
+      "手部与键盘接触不能从最终镜头稳定确认",
+      "尚未完成办公室 21 项矩阵重采集与逐项人工签收"
+    ],
+    "diagnostic_only": "曾在隔离实验中临时隐藏近景显示器确认角色姿态与桌面接触；该设置未写入正式候选截图，也不得作为最终画面方案"
+  },
+  "release_allowed": false,
+  "remaining_gates": [
+    "完成不隐藏显示器的 office-10 构图返工",
+    "重采集办公室 21 项正式视觉矩阵",
+    "重采集扩展视觉矩阵",
+    "最终权利清单确认",
+    "Windows 10/11 目标设备验收"
+  ]
+}

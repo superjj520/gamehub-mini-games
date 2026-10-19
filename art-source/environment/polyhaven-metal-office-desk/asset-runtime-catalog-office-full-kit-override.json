@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "policy": "isolated_office_full_kit_candidate",
+  "slots": [
+    {"id": "player-character", "category": "characters", "root_name": "Visual", "scene_path": "", "fallback_policy": "procedural_graybox"},
+    {"id": "office-npc-set", "category": "characters", "root_name": "Visual", "scene_path": "", "fallback_policy": "procedural_graybox"},
+    {"id": "three-wheel-vehicle", "category": "vehicles", "root_name": "Visual", "scene_path": "", "fallback_policy": "procedural_graybox"},
+    {"id": "office-environment-kit", "category": "environment", "root_name": "Visual", "scene_path": "res://office_desk_composition.tscn", "fallback_policy": "forbid"},
+    {"id": "city-environment-kit", "category": "environment", "root_name": "Visual", "scene_path": "", "fallback_policy": "procedural_graybox"},
+    {"id": "interaction-props", "category": "props", "root_name": "Visual", "scene_path": "", "fallback_policy": "procedural_graybox"},
+    {"id": "final-audio-library", "category": "audio", "root_name": "Audio", "scene_path": "", "fallback_policy": "procedural_graybox"}
+  ]
+}
