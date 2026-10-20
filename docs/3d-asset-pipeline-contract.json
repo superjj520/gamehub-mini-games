@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "engine": "Godot 4.x",
+  "units_per_meter": 1,
+  "up_axis": "+Y",
+  "forward_axis": "-Z",
+  "identity_transform_tolerance": 0.0001,
+  "profiles": {
+    "character": {
+      "pivot": "foot_center",
+      "min_height_m": 1.5,
+      "max_height_m": 2.2,
+      "min_y_m": -0.05,
+      "max_y_m": 2.2
+    },
+    "vehicle": {
+      "pivot": "body_center",
+      "min_width_m": 0.8,
+      "max_width_m": 3.2,
+      "min_height_m": 0.4,
+      "max_height_m": 3.0,
+      "min_depth_m": 1.0,
+      "max_depth_m": 5.0,
+      "must_cross_ground_origin": true
+    },
+    "environment": {
+      "pivot": "base_center",
+      "min_y_m": -0.05
+    },
+    "prop": {
+      "pivot": "base_center",
+      "min_y_m": -0.05,
+      "max_height_m": 3.0
+    }
+  },
+  "policy": "技术契约通过不等于视觉、权利、目标设备或发布验收通过；失败时资产停留在候选生产阶段"
+}

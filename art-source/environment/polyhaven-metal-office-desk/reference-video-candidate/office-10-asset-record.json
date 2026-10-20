@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "asset_id": "office-10-video-authored-backdrop-candidate-v1",
+  "asset_type": "office_reference_backdrop_candidate",
+  "status": "candidate_only",
+  "usage_scope": "隔离办公室坐姿打字候选采集与内部视觉对照",
+  "source": {
+    "owner_statement": "用户明确说明参考视频由其使用人工智能生成并授权本项目直接使用",
+    "reference_video": "reference-evidence/manifest.json#video-2-office",
+    "exact_frame": "reference-video-candidate/office-10-video-backdrop.jpg",
+    "playable_edit": "reference-video-candidate/office-10-video-playable-backdrop-v1.png",
+    "edit_method": "人工智能图像编辑：移除烘焙坐姿玩家和 HUD，为运行时坐姿角色与 typing_default 表现层叠加留出位置"
+  },
+  "rights_gate": {
+    "user_authorization_recorded": true,
+    "final_rights_signoff": "pending",
+    "release_allowed": false,
+    "reason": "仍需把视频来源、编辑版本和商店发布主体的权利声明写入最终发布材料"
+  },
+  "runtime_contract": {
+    "visual_only": true,
+    "does_not_own": ["collision", "navigation", "input", "mission", "save", "npc_perception"],
+    "dynamic_actor_overlay": "office-10 typing candidate only"
+  }
+}

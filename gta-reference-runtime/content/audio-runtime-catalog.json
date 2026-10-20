@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "audio-runtime-catalog-v1",
+  "version": 1,
+  "policy": "optional_release_audio_with_procedural_graybox_fallback",
+  "events": [
+    {"id": "interaction_success", "stream_path": "res://assets/audio/generated/interaction_success.wav", "fallback_policy": "procedural_graybox"},
+    {"id": "interaction_denied", "stream_path": "res://assets/audio/generated/interaction_denied.wav", "fallback_policy": "procedural_graybox"},
+    {"id": "mission_success", "stream_path": "res://assets/audio/generated/mission_success.wav", "fallback_policy": "procedural_graybox"},
+    {"id": "mission_failed", "stream_path": "res://assets/audio/generated/mission_failed.wav", "fallback_policy": "procedural_graybox"},
+    {"id": "perception_alert", "stream_path": "res://assets/audio/generated/perception_alert.wav", "fallback_policy": "procedural_graybox"},
+    {"id": "conflict_started", "stream_path": "res://assets/audio/generated/conflict_started.wav", "fallback_policy": "procedural_graybox"},
+    {"id": "vehicle_driver", "stream_path": "res://assets/audio/generated/vehicle_driver.wav", "fallback_policy": "procedural_graybox"},
+    {"id": "vehicle_collision", "stream_path": "res://assets/audio/generated/vehicle_collision.wav", "fallback_policy": "procedural_graybox"},
+    {"id": "vehicle_destroyed", "stream_path": "res://assets/audio/generated/vehicle_destroyed.wav", "fallback_policy": "procedural_graybox"},
+    {"id": "scan_registered", "stream_path": "res://assets/audio/generated/scan_registered.wav", "fallback_policy": "procedural_graybox"},
+    {"id": "checkpoint_loaded", "stream_path": "res://assets/audio/generated/checkpoint_loaded.wav", "fallback_policy": "procedural_graybox"},
+    {"id": "mission_restart", "stream_path": "res://assets/audio/generated/mission_restart.wav", "fallback_policy": "procedural_graybox"},
+    {"id": "footstep", "stream_path": "res://assets/audio/generated/footstep.wav", "fallback_policy": "procedural_graybox"},
+    {"id": "vehicle_engine", "stream_path": "res://assets/audio/generated/vehicle_engine.wav", "fallback_policy": "procedural_graybox"}
+  ]
+}

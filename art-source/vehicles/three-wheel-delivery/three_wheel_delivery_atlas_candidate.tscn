@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://../art-source/vehicles/three-wheel-delivery/three_wheel_delivery_atlas_candidate.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://../art-source/vehicles/three-wheel-delivery/three_wheel_delivery_atlas_candidate.glb" id="2_glb"]
+
+[node name="Visual" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="ThreeWheelDelivery" parent="." instance=ExtResource("2_glb")]
+
+[node name="驾驶座挂点" type="Marker3D" parent="."]
+position = Vector3(0, 0.62, 0.02)
+
+[node name="上下车点" type="Marker3D" parent="."]
+position = Vector3(1.3, 0, 0.02)
+
+[node name="前轮接触点" type="Marker3D" parent="."]
+position = Vector3(0, -0.38, -0.96)
+
+[node name="左后轮接触点" type="Marker3D" parent="."]
+position = Vector3(-0.88, -0.38, 0.70)
+
+[node name="右后轮接触点" type="Marker3D" parent="."]
+position = Vector3(0.88, -0.38, 0.70)
+
+[node name="货架挂点" type="Marker3D" parent="."]
+position = Vector3(0, 0.92, 0.66)

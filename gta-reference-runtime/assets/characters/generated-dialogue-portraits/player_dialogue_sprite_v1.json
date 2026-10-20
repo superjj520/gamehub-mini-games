@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "asset_id": "player-dialogue-sprite-v1-generated",
+  "asset_kind": "original_generated_dialogue_sprite",
+  "source_kind": "ai_generated_original_bitmap",
+  "generator": "内置图像生成工具",
+  "source_reference": "art-source/characters/player-design/new-era-awakener-player-turnaround-v1-generated.png",
+  "file": "player_dialogue_sprite_v1.png",
+  "sha256": "debca65db8ca3162633cf92768f232456359e5036534b3955a1ab3fb6585966c",
+  "usage": "仅用于 office-08/office-09 固定对话采集态的透明表现层；不参与碰撞、导航、任务、感知、存档或普通自由移动",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "rights_status": "original_candidate_pending_final_owner_signoff"
+}

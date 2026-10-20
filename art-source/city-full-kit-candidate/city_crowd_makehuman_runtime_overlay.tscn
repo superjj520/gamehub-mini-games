@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate.glb" id="1_character"]
+[ext_resource type="Script" path="res://art-source/city-full-kit-candidate/city_crowd_makehuman_candidate.gd" id="2_script"]
+
+[node name="CityCrowdMakeHumanCandidate" type="Node3D"]
+script = ExtResource("2_script")
+preserve_imported_materials = true
+reference_office_materials = true
+use_elegant_suit_skinned = true
+
+[node name="Character" parent="." instance=ExtResource("1_character")]
+rotation_degrees = Vector3(0, 180, 0)
+scale = Vector3(0.94, 0.94, 0.94)

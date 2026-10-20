@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "status": "candidate_reimport_verified",
+  "candidate": "makehuman_player_and_office_npc",
+  "scope": "隔离副本，不改变正式运行时资产槽位",
+  "procedure": [
+    "复制候选运行时到临时目录",
+    "删除临时副本的 .godot 与资产 .import 缓存",
+    "执行 Godot 无头编辑器导入预热",
+    "使用真实图形窗口采集 office-10",
+    "检查日志中不存在 invalid UID、SCRIPT ERROR 或资源加载错误"
+  ],
+  "result": {
+    "import_warmup": "passed",
+    "graphical_capture": "generated",
+    "visual_status": "unverified",
+    "release_allowed": false,
+    "reproducible_candidate_package": {
+      "root": "build/internal-full-candidate",
+      "character_variant": "makehuman",
+      "sha256": "1fa8243361e4f515cc6366858ae0cc34856e5ad56186aa4c5c5454d80097feec",
+      "file_count": 323,
+      "verification": "npm run verify:candidate:full"
+    },
+    "capture": {
+      "path": "reference-evidence/candidate-runtime/asset-ab-20261014/makehuman-character/office-10-clean-import.png",
+      "sha256": "636f5473cae5e3dd15bfa7fb2972120f6356470e438280deb537dad9d33ddbf8",
+      "width": 1280,
+      "height": 720
+    },
+    "office_10_camera_probe": {
+      "path": "reference-evidence/candidate-runtime/asset-ab-20261014/makehuman-character/office-10-close-candidate.png",
+      "sha256": "b52c77079ca4ec5ffb4ecb101d8921e6d1b8f19561314bf0c642e57aad2ec779",
+      "visual_status": "unverified",
+      "note": "近景比例更接近参考，但隔断、桌体遮挡和手部接触仍需返工"
+    }
+  },
+  "remaining_gates": [
+    "逐项视觉签收",
+    "办公室全矩阵重新采集",
+    "城市人物与载具构图验收",
+    "最终权利清单确认",
+    "Windows 10/11 目标设备验收"
+  ]
+}

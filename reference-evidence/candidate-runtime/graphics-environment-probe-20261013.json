@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "status": "graphics_environment_probe_failed",
+  "generated_at": "2026-10-13T10:00:23Z",
+  "source": {
+    "sha256": "8407ff266a4cd1eff9f3aba16feab2f876675be7812974ae5e7dff9bc298be17",
+    "file_count": 233
+  },
+  "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+  "probes": [
+    {
+      "kind": "visible_window_background",
+      "scenario": "city-08",
+      "result": "failed",
+      "error": "macOS com.apple.hiservices-xpcservice returned Connection Invalid; no PNG or progress file was produced",
+      "mouse_automation": false
+    },
+    {
+      "kind": "headless_diagnostic_only",
+      "scenario": "city-08",
+      "result": "rejected_for_visual_evidence",
+      "error": "Godot dummy renderer returned Parameter t is null and the black/transparent viewport assertion failed",
+      "mouse_automation": false
+    },
+    {
+      "kind": "background_visible_window",
+      "scenario": "city-08",
+      "result": "failed_unverified",
+      "error": "启动器先报告 Godot.app 缺少可执行体，回退二进制后触发 macOS com.apple.hiservices-xpcservice Connection Invalid；日志虽声称生成 21 个场景，但当前验证器仍发现 0/21 个与源指纹绑定的 PNG，因此不采纳为视觉证据",
+      "log_path": "/tmp/新时代觉醒者-reference-capture-background.log",
+      "generated_current_source_png_count": 0,
+      "mouse_automation": false
+    },
+    {
+      "kind": "timeout_wrapped_direct_binary",
+      "scenario": "city-08",
+      "result": "failed_unverified",
+      "timeout_seconds": 30,
+      "error": "直接 Godot 二进制在 macOS 图形服务初始化阶段触发 Connection Invalid，30 秒超时后由有界包装器结束；独立进度文件、日志和输出目录均未生成，因此没有可绑定的 PNG",
+      "progress_path": "/tmp/new-era-awakener-city-08-progress.json",
+      "output_directory": "/tmp/new-era-awakener-city-08-output",
+      "mouse_automation": false
+    },
+    {
+      "kind": "timeout_wrapped_default_display_backend",
+      "scenario": "city-08",
+      "result": "failed_unverified",
+      "timeout_seconds": 30,
+      "error": "移除显式 macOS 显示驱动后仍在图形服务初始化阶段触发 Connection Invalid，并由有界包装器以 124 结束；独立进度文件、日志和输出目录均未生成",
+      "progress_path": "/tmp/new-era-awakener-city-08-default-progress.json",
+      "output_directory": "/tmp/new-era-awakener-city-08-default-output",
+      "mouse_automation": false
+    }
+  ],
+  "policy": "该记录只证明当前图形环境探针失败，不构成视觉证据，不允许绑定旧 PNG 或提升 visual_status。"
+}

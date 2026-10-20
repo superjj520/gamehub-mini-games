@@ -1,0 +1,51 @@
+{
+  "id": "city-free-eggs-v1",
+  "version": 1,
+  "display_name": "中国街区任务",
+  "targets": [
+    {"id": "collect_eggs", "label": "免费鸡蛋", "position": [-9.0, 0.7, -9.1], "color": "f0c752"},
+    {"id": "leave_store", "label": "离开商店", "position": [-9.0, 0.7, -6.8], "color": "75b6d0"},
+    {"id": "register", "label": "扫码登记", "position": [8.5, 0.7, 5.5], "color": "6eaa71"},
+    {"id": "enter_backlot", "label": "进入后场仓储", "position": [11.5, 0.9, -11.5], "color": "8d7ad6"},
+    {"id": "load_stock", "label": "装载店铺货物", "position": [-7.6, 0.7, -4.9], "color": "c48855"},
+    {"id": "new_shop", "label": "旺铺转让", "position": [10.0, 0.7, 11.0], "color": "cb6f6f"}
+  ],
+  "side_activities": [
+    {"id": "vendor_delivery", "label": "帮摊主送货", "position": [-4.8, 0.7, 1.2], "color": "e0a45d", "unlock_after": "register", "reward": 35, "failure_message": "需要驾驶三轮车接单", "delivery": {"label": "把货送到街角仓库", "position": [7.6, 0.7, 8.4], "color": "7db6c8"}},
+    {"id": "backlot_delivery", "label": "帮仓库送货", "position": [12.2, 0.7, -9.0], "color": "d18f63", "unlock_after": "enter_backlot", "reward": 45, "failure_message": "需要驾驶三轮车接单", "delivery": {"label": "把货送到街边装卸点", "position": [4.6, 0.7, 4.2], "color": "7d9bc8"}},
+    {"id": "repair_shop_pickup", "label": "帮维修摊取件", "position": [-12.4, 0.7, 4.5], "color": "c48a55", "unlock_after": "load_stock", "reward": 55, "failure_message": "需要驾驶三轮车接单", "delivery": {"label": "把配件送到维修摊", "position": [-12.5, 0.7, 9.6], "color": "7da9c8"}}
+  ],
+  "stages": [
+    {"id": "collect_eggs", "objective": "领取免费鸡蛋", "reward": 30, "stars": 1, "effects": {"add_items": [{"item_id": "egg_tray", "amount": 1}], "message": "已领取一托鸡蛋"}},
+    {"id": "leave_store", "objective": "带着鸡蛋离开商店", "reward": 10, "stars": 1, "requirements": [{"type": "item", "item_id": "egg_tray", "amount": 1, "failure_message": "需要先领取鸡蛋"}], "effects": {"message": "已离开商店"}},
+    {"id": "register", "objective": "前往登记点完成登记", "reward": 50, "stars": 1, "requirements": [{"type": "item", "item_id": "egg_tray", "amount": 1, "failure_message": "登记需要携带鸡蛋"}], "effects": {"remove_items": [{"item_id": "egg_tray", "amount": 1}], "set_registered": true, "message": "登记成功，前往巷道入口", "trace_events": [{"id": "clerk_interaction", "payload": {"actor": "登记员", "action": "scan"}}], "audio_events": [{"id": "scan_registered", "payload": {"actor": "登记员"}}]}},
+    {"id": "enter_backlot", "objective": "前往巷道入口进入后场", "reward": 25, "stars": 1, "requirements": [{"type": "flag", "flag": "registered", "failure_message": "需要先完成登记"}], "effects": {"set_neighborhood_active": true, "message": "后场已开放，前往仓储装货", "trace_events": [{"id": "neighborhood_entered", "payload": {"zone": "back_lot_warehouse", "source": "mission"}}], "audio_events": [{"id": "neighborhood_entered", "payload": {"zone": "back_lot_warehouse"}}]}},
+    {"id": "load_stock", "objective": "在后场装载店铺货物", "reward": 45, "stars": 1, "requirements": [{"type": "flag", "flag": "neighborhood_active", "failure_message": "需要先进入后场仓储"}], "effects": {"add_items": [{"item_id": "stock_crate", "amount": 1}], "message": "货物已装车，送往旺铺", "trace_events": [{"id": "stock_loaded", "payload": {"location": "后场仓储"}}], "audio_events": [{"id": "stock_loaded", "payload": {"location": "后场仓储"}}]}},
+    {"id": "new_shop", "objective": "将货物送到旺铺转让处", "reward": 100, "stars": 2, "requirements": [{"type": "item", "item_id": "stock_crate", "amount": 1, "failure_message": "需要先在后场装载货物"}], "effects": {"remove_items": [{"item_id": "stock_crate", "amount": 1}], "message": "目标完成：店铺开张", "trace_events": [{"id": "stock_delivered", "payload": {"destination": "旺铺转让处"}}], "audio_events": [{"id": "stock_delivered", "payload": {"destination": "旺铺转让处"}}]}}
+  ],
+  "runtime": {
+    "player": {"walk_speed": 4.2, "crouch_speed": 2.0},
+    "vehicle": {"max_speed": 8.0, "acceleration": 10.0, "braking": 14.0, "turn_speed": 1.8, "enter_radius": 2.5, "camera_distance": 5.2, "camera_height": 2.3, "camera_pitch_degrees": -12.0, "collision_damage_per_speed": 3.5, "driver_seat_offset": [0.0, 1.12, 0.18]},
+    "vehicle_service": {"enabled": true, "cost": 30, "repair_amount": 100.0, "interaction_radius": 2.4, "message": "三轮车已修复"},
+    "conflict": {"max_health": 100.0, "damage_per_second": 10.0, "opponent_max_health": 100.0, "player_attack_damage": 34.0, "defeat_bonus": 30, "dodge_window_seconds": 0.42, "dodge_cooldown_seconds": 0.70, "pursuit_speed": 1.8, "trigger_radius": 2.4, "damage_radius": 1.35, "escape_distance": 8.5, "escape_hold_seconds": 0.9, "escape_bonus": 20},
+    "wanted": {"max_level": 5, "decay_delay_seconds": 8.0, "decay_step_seconds": 4.0},
+    "crowd": {
+      "walk_speed": 1.4,
+      "routes": [
+        [[-4.0, 0.9, -2.0], [4.0, 0.9, -2.0]],
+        [[6.0, 0.9, 4.0], [6.0, 0.9, 12.0]],
+        [[-10.0, 0.9, 4.0], [-10.0, 0.9, -4.0]],
+        [[3.0, 0.9, 12.0], [10.0, 0.9, 12.0]]
+      ]
+    },
+    "traffic": {
+      "vehicles": [
+        {"id": "街道车辆_北行", "travel_speed": 2.2, "color": "7b3f3f", "route": [[-2.0, 0.55, 15.0], [-2.0, 0.55, -15.0]]},
+        {"id": "街道车辆_南行", "travel_speed": 2.2, "color": "3b6076", "route": [[2.0, 0.55, -15.0], [2.0, 0.55, 15.0]]},
+        {"id": "街道车辆_东行", "travel_speed": 1.8, "color": "9b7c3a", "route": [[-15.0, 0.55, 1.2], [15.0, 0.55, 1.2]]}
+      ]
+    },
+    "neighborhood": {"enabled": true, "entry": [-4.0, 0.9, -4.0], "landmark": "后场仓储"},
+    "visual_profiles": {"default": "day", "supported": ["day", "dusk", "rain_after"]}
+  }
+}

@@ -1,0 +1,88 @@
+{
+	"capture_entry": "editor_scene_runner",
+	"captures": [
+		{
+			"capture_entry": "editor_scene_runner",
+			"event_types": [
+				"camera_state",
+				"mission_state",
+				"hud_state",
+				"input",
+				"visual_capture_ready"
+			],
+			"id": "office-01",
+			"input_event_count": 1,
+			"scene": "office",
+			"state_setup": "canonical_graybox_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 1.95,
+						"pitch": -11.0,
+						"position": [
+							0.550000011920929,
+							1.55999994277954,
+							1.95000004768372
+						],
+						"rotation": [
+							-10.9999990463257,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.550000011920929,
+							0.0399999991059303,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"reason": "",
+						"status": 1
+					},
+					"time": 0.0,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": true,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.45,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "office"
+					},
+					"time": 0.467,
+					"type": "visual_capture_ready"
+				}
+			]
+		}
+	],
+	"policy": "编辑器真实图形采集必须绑定运行时事件时间轴；事件证据不自动批准视觉",
+	"version": 1,
+	"visual_status": "unverified"
+}

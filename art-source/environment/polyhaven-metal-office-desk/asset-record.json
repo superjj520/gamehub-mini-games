@@ -1,0 +1,41 @@
+{
+  "id": "office-desk-polyhaven-metal-cc0-candidate",
+  "slot_id": "office-environment-kit",
+  "source_kind": "third_party_cc0_gltf_with_original_scene_composition",
+  "source_author": "Ulan Cabanilla / Poly Haven",
+  "source_url": "https://polyhaven.com/a/metal_office_desk",
+  "official_file_api": "https://api.polyhaven.com/files/metal_office_desk",
+  "license": "CC0-1.0",
+  "license_status": "source_page_verified_candidate_not_final_signed",
+  "model": {
+    "path": "metal_office_desk_1k.gltf",
+    "sha256": "f07032a5ee89aacceebf10fd9fa192c22775ae81861cfb0bdb1594497179373c",
+    "official_md5": "723956efef6da35ad41494efa5c3b820"
+  },
+  "godot_probe_model": {
+    "path": "metal_office_desk_1k.glb",
+    "sha256": "bebc7a127bcc102ae4b58fbbbf5ecea1c8c735c53b5cf322ff0196c70c6314be"
+  },
+  "binary": {
+    "path": "metal_office_desk.bin",
+    "sha256": "65b558f41a75ad4822e31cc2a97eb34ed359199279a6bfbd650deb27cef78767",
+    "official_md5": "96f258b9a64d36ca011f44de23da7c65"
+  },
+  "textures": [
+    {"path": "textures/metal_office_desk_diff_1k.jpg", "sha256": "1f02e3e77e8f82a3600664c991bd45c1c187452d61e9ede4336c6f90f7fa3139"},
+    {"path": "textures/metal_office_desk_arm_1k.jpg", "sha256": "752916dd9bf8a163dc7e0d3673900791ee6d558bbe23894263ac92b42387f51b"},
+    {"path": "textures/metal_office_desk_nor_gl_1k.jpg", "sha256": "f57eb004937e46392151b803e0cb1d88983958d01ad11d93df78a82cfcc6c407"}
+  ],
+  "integration_status": "source_intake_and_isolated_office_runtime_override_verified",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "evidence": [
+    "office_desk_import_test.gd",
+    "office_desk_candidate.tscn",
+    "office_desk_candidate.gd",
+    "office_runtime_integration_test.gd",
+    "asset-runtime-catalog-office-desk-override.json",
+    "README.md"
+  ],
+  "next_gate": "办公室固定镜头、碰撞/遮挡、目标设备和最终权利签收"
+}

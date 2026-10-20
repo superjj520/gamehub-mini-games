@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://metal_office_desk_1k.glb" id="1_visual"]
+[ext_resource type="Script" path="res://office_desk_candidate.gd" id="2_script"]
+
+[node name="OfficeDeskCandidate" type="StaticBody3D"]
+script = ExtResource("2_script")
+
+[node name="Geometry" parent="." instance=ExtResource("1_visual")]
+visible = true

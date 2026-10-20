@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "status": "historical_diagnostic_unverified",
+  "product_name": "新时代觉醒者",
+  "capture_type": "visible_macos_runtime_viewport",
+  "capture_id": "office-current",
+  "captured_at": "2026-10-18",
+  "source": {
+    "sha256": "99953a23ef72af940d5089e8faff36db816769c3ab5234379d23c62a2cedb50f",
+    "file_count": 305
+  },
+  "image": {
+    "path": "reference-evidence/candidate-runtime/office-visible-before-launcher-forward.png",
+    "width": 1280,
+    "height": 720
+  },
+  "runtime": {
+    "renderer": "macOS Metal compatibility",
+    "scene": "office",
+    "entry": "launcher -> office candidate",
+    "capture_path": "user://reference-captures/office-current.png"
+  },
+  "visual_acceptance": "unverified",
+  "source_status": "captured_before_launcher_forward_patch",
+  "reason": "该可见窗口截图在启动器转发入口改动前生成；尚未完成与参考视频的逐帧构图、材质、角色比例、灯光和镜头签收，且不再绑定当前源码，不能提升为正式视觉通过。"
+}

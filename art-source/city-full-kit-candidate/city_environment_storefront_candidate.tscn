@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://../art-source/city-full-kit-candidate/city_environment_storefront_candidate.gd" id="1_storefront"]
+
+[node name="CityEnvironmentStorefrontCandidate" type="Node3D"]
+script = ExtResource("1_storefront")

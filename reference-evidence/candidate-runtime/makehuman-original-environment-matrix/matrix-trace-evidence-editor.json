@@ -1,0 +1,6321 @@
+{
+	"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+	"capture_entry": "editor_scene_runner",
+	"capture_profile": "candidate_makehuman_original_environment",
+	"captures": [
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_stage",
+				"audio_event",
+				"crowd_traffic_avoidance",
+				"hud_state",
+				"visual_capture_ready"
+			],
+			"id": "city-01",
+			"input_event_count": 0,
+			"scene": "city",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.4,
+						"pitch": -18.0,
+						"position": [
+							0.0,
+							2.09999990463257,
+							3.40000009536743
+						],
+						"rotation": [
+							-18.0,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.0,
+							0.0,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"objective": "领取免费鸡蛋",
+						"stage": 0
+					},
+					"time": 0.0,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 0
+						}
+					},
+					"time": 0.0,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"active_pedestrians": 0
+					},
+					"time": 0.017,
+					"type": "crowd_traffic_avoidance"
+				},
+				{
+					"payload": {
+						"signature": "领取免费鸡蛋|进行中|0|0|0|无|100|平静|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "city"
+					},
+					"time": 0.283,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 3.4,
+					"pitch": -18.0,
+					"position": [
+						0.0,
+						2.09999990463257,
+						3.40000009536743
+					],
+					"rotation": [
+						-18.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"yaw": 0.0
+				},
+				"conflict": {
+					"alert": 0.0,
+					"health": 100.0,
+					"last_damage_source": "",
+					"status": 0
+				},
+				"inventory": {},
+				"mission": {
+					"current_index": 0,
+					"failure_reason": "",
+					"money": 0,
+					"stars": 0,
+					"status": 1
+				},
+				"mission_stage": "collect_eggs",
+				"player_position": [
+					-9.0,
+					0.9,
+					-3.7
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/city.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.0,
+					0.7,
+					5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_stage",
+				"audio_event",
+				"crowd_traffic_avoidance",
+				"hud_state",
+				"input",
+				"collision",
+				"navigation",
+				"inventory_changed",
+				"interaction",
+				"visual_capture_ready"
+			],
+			"id": "city-02",
+			"input_event_count": 10,
+			"scene": "city",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.4,
+						"pitch": -18.0,
+						"position": [
+							0.0,
+							2.09999990463257,
+							3.40000009536743
+						],
+						"rotation": [
+							-18.0,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.0,
+							0.0,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"objective": "领取免费鸡蛋",
+						"stage": 0
+					},
+					"time": 0.0,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 0
+						}
+					},
+					"time": 0.0,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"active_pedestrians": 0
+					},
+					"time": 0.017,
+					"type": "crowd_traffic_avoidance"
+				},
+				{
+					"payload": {
+						"signature": "领取免费鸡蛋|进行中|0|0|0|无|100|平静|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": -1.0
+					},
+					"time": 0.367,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "footstep",
+						"payload": {
+							"crouching": false,
+							"speed": 4.19999980926514
+						}
+					},
+					"time": 0.367,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"count": 2,
+						"position": [
+							-9.13091373443604,
+							0.900934040546417,
+							-7.38648271560669
+						]
+					},
+					"time": 0.367,
+					"type": "collision"
+				},
+				{
+					"payload": {
+						"signature": "领取免费鸡蛋|进行中|0|0|0|无|100|平静|E  免费鸡蛋"
+					},
+					"time": 0.367,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": -1.0
+					},
+					"time": 0.467,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"count": 1,
+						"position": [
+							-9.13091373443604,
+							0.900934040546417,
+							-7.97296524047852
+						]
+					},
+					"time": 0.467,
+					"type": "collision"
+				},
+				{
+					"payload": {
+						"entered": true,
+						"zone": "store_aisle"
+					},
+					"time": 0.467,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": -1.0
+					},
+					"time": 0.567,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"count": 1,
+						"position": [
+							-9.13091373443604,
+							0.900934040546417,
+							-8.55944728851318
+						]
+					},
+					"time": 0.567,
+					"type": "collision"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": -1.0
+					},
+					"time": 0.667,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"count": 1,
+						"position": [
+							-9.13091373443604,
+							0.900934040546417,
+							-9.14592933654785
+						]
+					},
+					"time": 0.667,
+					"type": "collision"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": -1.0
+					},
+					"time": 0.767,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"count": 1,
+						"position": [
+							-9.13091373443604,
+							0.900934040546417,
+							-9.73241138458252
+						]
+					},
+					"time": 0.767,
+					"type": "collision"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": -1.0
+					},
+					"time": 0.867,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "footstep",
+						"payload": {
+							"crouching": false,
+							"speed": 4.19999980926514
+						}
+					},
+					"time": 0.867,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"count": 1,
+						"position": [
+							-9.13091373443604,
+							0.900934040546417,
+							-10.3188934326172
+						]
+					},
+					"time": 0.867,
+					"type": "collision"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": -1.0
+					},
+					"time": 0.967,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"count": 1,
+						"position": [
+							-9.13091373443604,
+							0.900934040546417,
+							-10.9053754806519
+						]
+					},
+					"time": 0.967,
+					"type": "collision"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": -1.0
+					},
+					"time": 1.067,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"count": 1,
+						"position": [
+							-9.13091373443604,
+							0.900934040546417,
+							-11.3967838287354
+						]
+					},
+					"time": 1.067,
+					"type": "collision"
+				},
+				{
+					"payload": {
+						"signature": "领取免费鸡蛋|进行中|0|0|0|无|100|平静|"
+					},
+					"time": 1.067,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 1.083,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"amount": 1,
+						"item_id": "egg_tray"
+					},
+					"time": 1.083,
+					"type": "inventory_changed"
+				},
+				{
+					"payload": {
+						"id": "inventory_changed",
+						"payload": {
+							"amount": 1,
+							"item_id": "egg_tray"
+						}
+					},
+					"time": 1.083,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "collect_eggs"
+					},
+					"time": 1.083,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "collect_eggs"
+						}
+					},
+					"time": 1.083,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "带着鸡蛋离开商店",
+						"stage": 1
+					},
+					"time": 1.083,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 1
+						}
+					},
+					"time": 1.083,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "带着鸡蛋离开商店|进行中|30|1|0|鸡蛋×1|100|平静|"
+					},
+					"time": 1.083,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": -1.0,
+						"y": 0.0
+					},
+					"time": 1.283,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"count": 1,
+						"position": [
+							-9.58648204803467,
+							0.899999976158142,
+							-8.80000019073486
+						]
+					},
+					"time": 1.283,
+					"type": "collision"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "city"
+					},
+					"time": 1.316,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 2.5,
+					"pitch": -12.0,
+					"position": [
+						0.0,
+						1.75,
+						2.5
+					],
+					"rotation": [
+						-12.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"yaw": 180.0
+				},
+				"conflict": {
+					"alert": 0.0,
+					"health": 100.0,
+					"last_damage_source": "",
+					"status": 0
+				},
+				"inventory": {
+					"egg_tray": 1
+				},
+				"mission": {
+					"current_index": 1,
+					"failure_reason": "",
+					"money": 30,
+					"stars": 1,
+					"status": 1
+				},
+				"mission_stage": "leave_store",
+				"player_position": [
+					-9.586,
+					0.9,
+					-8.8
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/city.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.0,
+					0.7,
+					5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_stage",
+				"audio_event",
+				"crowd_traffic_avoidance",
+				"hud_state",
+				"input",
+				"collision",
+				"navigation",
+				"visual_capture_ready"
+			],
+			"id": "city-03",
+			"input_event_count": 1,
+			"scene": "city",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.4,
+						"pitch": -18.0,
+						"position": [
+							0.0,
+							2.09999990463257,
+							3.40000009536743
+						],
+						"rotation": [
+							-18.0,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.0,
+							0.0,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"objective": "领取免费鸡蛋",
+						"stage": 0
+					},
+					"time": 0.0,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 0
+						}
+					},
+					"time": 0.0,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"active_pedestrians": 0
+					},
+					"time": 0.017,
+					"type": "crowd_traffic_avoidance"
+				},
+				{
+					"payload": {
+						"signature": "领取免费鸡蛋|进行中|0|0|0|无|100|平静|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": -1.0,
+						"y": 0.0
+					},
+					"time": 0.467,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "footstep",
+						"payload": {
+							"crouching": false,
+							"speed": 4.19999980926514
+						}
+					},
+					"time": 0.467,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"count": 1,
+						"position": [
+							-9.56218147277832,
+							0.899999976158142,
+							-10.0
+						]
+					},
+					"time": 0.467,
+					"type": "collision"
+				},
+				{
+					"payload": {
+						"entered": true,
+						"zone": "store_aisle"
+					},
+					"time": 0.467,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "领取免费鸡蛋|进行中|0|0|0|无|100|平静|E  免费鸡蛋"
+					},
+					"time": 0.467,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "city"
+					},
+					"time": 0.5,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": true,
+					"collision_distance": 1.763,
+					"pitch": -12.0,
+					"position": [
+						0.0,
+						1.10053169727325,
+						1.48520565032959
+					],
+					"rotation": [
+						-12.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"yaw": 180.0
+				},
+				"conflict": {
+					"alert": 0.0,
+					"health": 100.0,
+					"last_damage_source": "",
+					"status": 0
+				},
+				"inventory": {},
+				"mission": {
+					"current_index": 0,
+					"failure_reason": "",
+					"money": 0,
+					"stars": 0,
+					"status": 1
+				},
+				"mission_stage": "collect_eggs",
+				"player_position": [
+					-9.562,
+					0.9,
+					-10.0
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/city.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.0,
+					0.7,
+					5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_stage",
+				"audio_event",
+				"crowd_traffic_avoidance",
+				"hud_state",
+				"input",
+				"inventory_changed",
+				"interaction",
+				"navigation",
+				"conflict_status",
+				"crowd_displaced",
+				"wanted_level",
+				"visual_capture_ready"
+			],
+			"id": "city-04",
+			"input_event_count": 2,
+			"scene": "city",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.4,
+						"pitch": -18.0,
+						"position": [
+							0.0,
+							2.09999990463257,
+							3.40000009536743
+						],
+						"rotation": [
+							-18.0,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.0,
+							0.0,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"objective": "领取免费鸡蛋",
+						"stage": 0
+					},
+					"time": 0.0,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 0
+						}
+					},
+					"time": 0.0,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"active_pedestrians": 0
+					},
+					"time": 0.017,
+					"type": "crowd_traffic_avoidance"
+				},
+				{
+					"payload": {
+						"signature": "领取免费鸡蛋|进行中|0|0|0|无|100|平静|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.283,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"amount": 1,
+						"item_id": "egg_tray"
+					},
+					"time": 0.283,
+					"type": "inventory_changed"
+				},
+				{
+					"payload": {
+						"id": "inventory_changed",
+						"payload": {
+							"amount": 1,
+							"item_id": "egg_tray"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "collect_eggs"
+					},
+					"time": 0.283,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "collect_eggs"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "带着鸡蛋离开商店",
+						"stage": 1
+					},
+					"time": 0.283,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 1
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"entered": true,
+						"zone": "store_aisle"
+					},
+					"time": 0.283,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "带着鸡蛋离开商店|进行中|30|1|0|鸡蛋×1|100|平静|E  离开商店"
+					},
+					"time": 0.283,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": true,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.299,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"status": 1
+					},
+					"time": 0.299,
+					"type": "conflict_status"
+				},
+				{
+					"payload": {
+						"count": 13,
+						"pedestrian_count": 4
+					},
+					"time": 0.299,
+					"type": "crowd_displaced"
+				},
+				{
+					"payload": {
+						"id": "crowd_displaced",
+						"payload": {
+							"count": 13,
+							"pedestrian_count": 4
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "conflict_status",
+						"payload": {
+							"status": 1
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"current": 2,
+						"previous": 0,
+						"source": "街区冲突"
+					},
+					"time": 0.299,
+					"type": "wanted_level"
+				},
+				{
+					"payload": {
+						"id": "conflict_started",
+						"payload": {}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"status": 2
+					},
+					"time": 0.299,
+					"type": "conflict_status"
+				},
+				{
+					"payload": {
+						"id": "conflict_status",
+						"payload": {
+							"status": 2
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "带着鸡蛋离开商店|进行中|30|1|2|鸡蛋×1|100|追踪|"
+					},
+					"time": 0.299,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "city"
+					},
+					"time": 0.349,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": true,
+					"collision_distance": 1.407,
+					"pitch": -12.0,
+					"position": [
+						0.0,
+						0.908531427383423,
+						1.18520545959473
+					],
+					"rotation": [
+						-12.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"yaw": 180.0
+				},
+				"conflict": {
+					"alert": 1.0,
+					"health": 100.0,
+					"last_damage_source": "街区冲突",
+					"status": 2
+				},
+				"inventory": {
+					"egg_tray": 1
+				},
+				"mission": {
+					"current_index": 1,
+					"failure_reason": "",
+					"money": 30,
+					"stars": 1,
+					"status": 1
+				},
+				"mission_stage": "leave_store",
+				"player_position": [
+					-9.0,
+					0.9,
+					-10.3
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/city.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.0,
+					0.7,
+					5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_stage",
+				"audio_event",
+				"crowd_traffic_avoidance",
+				"hud_state",
+				"input",
+				"inventory_changed",
+				"interaction",
+				"navigation",
+				"conflict_status",
+				"crowd_displaced",
+				"wanted_level",
+				"visual_capture_ready"
+			],
+			"id": "city-05",
+			"input_event_count": 2,
+			"scene": "city",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.4,
+						"pitch": -18.0,
+						"position": [
+							0.0,
+							2.09999990463257,
+							3.40000009536743
+						],
+						"rotation": [
+							-18.0,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.0,
+							0.0,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"objective": "领取免费鸡蛋",
+						"stage": 0
+					},
+					"time": 0.0,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 0
+						}
+					},
+					"time": 0.0,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"active_pedestrians": 0
+					},
+					"time": 0.017,
+					"type": "crowd_traffic_avoidance"
+				},
+				{
+					"payload": {
+						"signature": "领取免费鸡蛋|进行中|0|0|0|无|100|平静|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.283,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"amount": 1,
+						"item_id": "egg_tray"
+					},
+					"time": 0.283,
+					"type": "inventory_changed"
+				},
+				{
+					"payload": {
+						"id": "inventory_changed",
+						"payload": {
+							"amount": 1,
+							"item_id": "egg_tray"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "collect_eggs"
+					},
+					"time": 0.283,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "collect_eggs"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "带着鸡蛋离开商店",
+						"stage": 1
+					},
+					"time": 0.283,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 1
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"entered": true,
+						"zone": "store_aisle"
+					},
+					"time": 0.283,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "带着鸡蛋离开商店|进行中|30|1|0|鸡蛋×1|100|平静|E  离开商店"
+					},
+					"time": 0.283,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": true,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.299,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"status": 1
+					},
+					"time": 0.299,
+					"type": "conflict_status"
+				},
+				{
+					"payload": {
+						"count": 13,
+						"pedestrian_count": 4
+					},
+					"time": 0.299,
+					"type": "crowd_displaced"
+				},
+				{
+					"payload": {
+						"id": "crowd_displaced",
+						"payload": {
+							"count": 13,
+							"pedestrian_count": 4
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "conflict_status",
+						"payload": {
+							"status": 1
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"current": 2,
+						"previous": 0,
+						"source": "街区冲突"
+					},
+					"time": 0.299,
+					"type": "wanted_level"
+				},
+				{
+					"payload": {
+						"id": "conflict_started",
+						"payload": {}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"status": 2
+					},
+					"time": 0.299,
+					"type": "conflict_status"
+				},
+				{
+					"payload": {
+						"id": "conflict_status",
+						"payload": {
+							"status": 2
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "带着鸡蛋离开商店|进行中|30|1|2|鸡蛋×1|100|追踪|"
+					},
+					"time": 0.299,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"entered": false,
+						"zone": "store_aisle"
+					},
+					"time": 0.315,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "带着鸡蛋离开商店|进行中|30|1|2|鸡蛋×1|100|追踪|E  离开商店"
+					},
+					"time": 0.315,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "city"
+					},
+					"time": 0.349,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 3.4,
+					"pitch": -18.0,
+					"position": [
+						0.0,
+						2.09999990463257,
+						3.40000009536743
+					],
+					"rotation": [
+						-18.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"yaw": 0.0
+				},
+				"conflict": {
+					"alert": 1.0,
+					"health": 100.0,
+					"last_damage_source": "街区冲突",
+					"status": 2
+				},
+				"inventory": {
+					"egg_tray": 1
+				},
+				"mission": {
+					"current_index": 1,
+					"failure_reason": "",
+					"money": 30,
+					"stars": 1,
+					"status": 1
+				},
+				"mission_stage": "leave_store",
+				"player_position": [
+					-9.131,
+					0.901,
+					-6.2
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/city.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.0,
+					0.7,
+					5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_stage",
+				"audio_event",
+				"crowd_traffic_avoidance",
+				"hud_state",
+				"input",
+				"inventory_changed",
+				"interaction",
+				"navigation",
+				"vehicle_driver",
+				"visual_capture_ready"
+			],
+			"id": "city-06",
+			"input_event_count": 3,
+			"scene": "city",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.4,
+						"pitch": -18.0,
+						"position": [
+							0.0,
+							2.09999990463257,
+							3.40000009536743
+						],
+						"rotation": [
+							-18.0,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.0,
+							0.0,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"objective": "领取免费鸡蛋",
+						"stage": 0
+					},
+					"time": 0.0,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 0
+						}
+					},
+					"time": 0.0,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"active_pedestrians": 0
+					},
+					"time": 0.017,
+					"type": "crowd_traffic_avoidance"
+				},
+				{
+					"payload": {
+						"signature": "领取免费鸡蛋|进行中|0|0|0|无|100|平静|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.283,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"amount": 1,
+						"item_id": "egg_tray"
+					},
+					"time": 0.283,
+					"type": "inventory_changed"
+				},
+				{
+					"payload": {
+						"id": "inventory_changed",
+						"payload": {
+							"amount": 1,
+							"item_id": "egg_tray"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "collect_eggs"
+					},
+					"time": 0.283,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "collect_eggs"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "带着鸡蛋离开商店",
+						"stage": 1
+					},
+					"time": 0.283,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 1
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"entered": true,
+						"zone": "store_aisle"
+					},
+					"time": 0.283,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "带着鸡蛋离开商店|进行中|30|1|0|鸡蛋×1|100|平静|E  离开商店"
+					},
+					"time": 0.283,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.299,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "leave_store"
+					},
+					"time": 0.299,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "leave_store"
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "前往登记点完成登记",
+						"stage": 2
+					},
+					"time": 0.299,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 2
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"entered": false,
+						"zone": "store_aisle"
+					},
+					"time": 0.299,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "前往登记点完成登记|进行中|40|2|0|鸡蛋×1|100|平静|"
+					},
+					"time": 0.299,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": true,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.315,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"has_driver": true
+					},
+					"time": 0.315,
+					"type": "vehicle_driver"
+				},
+				{
+					"payload": {
+						"id": "vehicle_driver",
+						"payload": {
+							"has_driver": true
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "前往登记点完成登记|进行中|40|2|0|鸡蛋×1|100|平静|E  扫码登记"
+					},
+					"time": 0.315,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "city"
+					},
+					"time": 0.348,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 5.2,
+					"pitch": -18.0,
+					"position": [
+						0.0,
+						2.29999995231628,
+						5.19999980926514
+					],
+					"rotation": [
+						-18.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"yaw": 0.0
+				},
+				"conflict": {
+					"alert": 0.0,
+					"health": 100.0,
+					"last_damage_source": "",
+					"status": 0
+				},
+				"inventory": {
+					"egg_tray": 1
+				},
+				"mission": {
+					"current_index": 2,
+					"failure_reason": "",
+					"money": 40,
+					"stars": 2,
+					"status": 1
+				},
+				"mission_stage": "register",
+				"player_position": [
+					7.0,
+					1.82,
+					5.32
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/city.tscn",
+				"vehicle_driver_present": true,
+				"vehicle_position": [
+					7.0,
+					0.7,
+					5.5
+				],
+				"vehicle_rotation": [
+					0.0,
+					-180.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_stage",
+				"audio_event",
+				"crowd_traffic_avoidance",
+				"hud_state",
+				"input",
+				"inventory_changed",
+				"interaction",
+				"navigation",
+				"clerk_interaction",
+				"vehicle_driver",
+				"visual_capture_ready"
+			],
+			"id": "city-07",
+			"input_event_count": 4,
+			"scene": "city",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.4,
+						"pitch": -18.0,
+						"position": [
+							0.0,
+							2.09999990463257,
+							3.40000009536743
+						],
+						"rotation": [
+							-18.0,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.0,
+							0.0,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"objective": "领取免费鸡蛋",
+						"stage": 0
+					},
+					"time": 0.0,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 0
+						}
+					},
+					"time": 0.0,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"active_pedestrians": 0
+					},
+					"time": 0.017,
+					"type": "crowd_traffic_avoidance"
+				},
+				{
+					"payload": {
+						"signature": "领取免费鸡蛋|进行中|0|0|0|无|100|平静|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.283,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"amount": 1,
+						"item_id": "egg_tray"
+					},
+					"time": 0.283,
+					"type": "inventory_changed"
+				},
+				{
+					"payload": {
+						"id": "inventory_changed",
+						"payload": {
+							"amount": 1,
+							"item_id": "egg_tray"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "collect_eggs"
+					},
+					"time": 0.283,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "collect_eggs"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "带着鸡蛋离开商店",
+						"stage": 1
+					},
+					"time": 0.283,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 1
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"entered": true,
+						"zone": "store_aisle"
+					},
+					"time": 0.283,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "带着鸡蛋离开商店|进行中|30|1|0|鸡蛋×1|100|平静|E  离开商店"
+					},
+					"time": 0.283,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.299,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "leave_store"
+					},
+					"time": 0.299,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "leave_store"
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "前往登记点完成登记",
+						"stage": 2
+					},
+					"time": 0.299,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 2
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"entered": false,
+						"zone": "store_aisle"
+					},
+					"time": 0.299,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "前往登记点完成登记|进行中|40|2|0|鸡蛋×1|100|平静|"
+					},
+					"time": 0.299,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.315,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"amount": 0,
+						"item_id": "egg_tray"
+					},
+					"time": 0.315,
+					"type": "inventory_changed"
+				},
+				{
+					"payload": {
+						"id": "inventory_changed",
+						"payload": {
+							"amount": 0,
+							"item_id": "egg_tray"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"action": "scan",
+						"actor": "登记员"
+					},
+					"time": 0.315,
+					"type": "clerk_interaction"
+				},
+				{
+					"payload": {
+						"id": "scan_registered",
+						"payload": {
+							"actor": "登记员"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "register"
+					},
+					"time": 0.315,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "register"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "前往旺铺转让",
+						"stage": 3
+					},
+					"time": 0.315,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 3
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "前往旺铺转让|进行中|90|3|0|无|100|平静|"
+					},
+					"time": 0.315,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": true,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.331,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"has_driver": true
+					},
+					"time": 0.331,
+					"type": "vehicle_driver"
+				},
+				{
+					"payload": {
+						"id": "vehicle_driver",
+						"payload": {
+							"has_driver": true
+						}
+					},
+					"time": 0.331,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "city"
+					},
+					"time": 0.381,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 5.2,
+					"pitch": -18.0,
+					"position": [
+						0.0,
+						2.29999995231628,
+						5.19999980926514
+					],
+					"rotation": [
+						-18.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"yaw": 0.0
+				},
+				"conflict": {
+					"alert": 0.0,
+					"health": 100.0,
+					"last_damage_source": "",
+					"status": 0
+				},
+				"inventory": {},
+				"mission": {
+					"current_index": 3,
+					"failure_reason": "",
+					"money": 90,
+					"stars": 3,
+					"status": 1
+				},
+				"mission_stage": "new_shop",
+				"player_position": [
+					7.0,
+					1.82,
+					5.32
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/city.tscn",
+				"vehicle_driver_present": true,
+				"vehicle_position": [
+					7.0,
+					0.7,
+					5.5
+				],
+				"vehicle_rotation": [
+					0.0,
+					-180.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_stage",
+				"audio_event",
+				"crowd_traffic_avoidance",
+				"hud_state",
+				"input",
+				"inventory_changed",
+				"interaction",
+				"navigation",
+				"clerk_interaction",
+				"vehicle_driver",
+				"visual_capture_ready"
+			],
+			"id": "city-08",
+			"input_event_count": 5,
+			"scene": "city",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.4,
+						"pitch": -18.0,
+						"position": [
+							0.0,
+							2.09999990463257,
+							3.40000009536743
+						],
+						"rotation": [
+							-18.0,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.0,
+							0.0,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"objective": "领取免费鸡蛋",
+						"stage": 0
+					},
+					"time": 0.0,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 0
+						}
+					},
+					"time": 0.0,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"active_pedestrians": 0
+					},
+					"time": 0.017,
+					"type": "crowd_traffic_avoidance"
+				},
+				{
+					"payload": {
+						"signature": "领取免费鸡蛋|进行中|0|0|0|无|100|平静|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.283,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"amount": 1,
+						"item_id": "egg_tray"
+					},
+					"time": 0.283,
+					"type": "inventory_changed"
+				},
+				{
+					"payload": {
+						"id": "inventory_changed",
+						"payload": {
+							"amount": 1,
+							"item_id": "egg_tray"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "collect_eggs"
+					},
+					"time": 0.283,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "collect_eggs"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "带着鸡蛋离开商店",
+						"stage": 1
+					},
+					"time": 0.283,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 1
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"entered": true,
+						"zone": "store_aisle"
+					},
+					"time": 0.283,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "带着鸡蛋离开商店|进行中|30|1|0|鸡蛋×1|100|平静|E  离开商店"
+					},
+					"time": 0.283,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.299,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "leave_store"
+					},
+					"time": 0.299,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "leave_store"
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "前往登记点完成登记",
+						"stage": 2
+					},
+					"time": 0.299,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 2
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"entered": false,
+						"zone": "store_aisle"
+					},
+					"time": 0.299,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "前往登记点完成登记|进行中|40|2|0|鸡蛋×1|100|平静|"
+					},
+					"time": 0.299,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.315,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"amount": 0,
+						"item_id": "egg_tray"
+					},
+					"time": 0.315,
+					"type": "inventory_changed"
+				},
+				{
+					"payload": {
+						"id": "inventory_changed",
+						"payload": {
+							"amount": 0,
+							"item_id": "egg_tray"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"action": "scan",
+						"actor": "登记员"
+					},
+					"time": 0.315,
+					"type": "clerk_interaction"
+				},
+				{
+					"payload": {
+						"id": "scan_registered",
+						"payload": {
+							"actor": "登记员"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "register"
+					},
+					"time": 0.315,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "register"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "前往旺铺转让",
+						"stage": 3
+					},
+					"time": 0.315,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 3
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "前往旺铺转让|进行中|90|3|0|无|100|平静|"
+					},
+					"time": 0.315,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": true,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.331,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"has_driver": true
+					},
+					"time": 0.331,
+					"type": "vehicle_driver"
+				},
+				{
+					"payload": {
+						"id": "vehicle_driver",
+						"payload": {
+							"has_driver": true
+						}
+					},
+					"time": 0.331,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": -1.0
+					},
+					"time": 0.581,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "vehicle_engine",
+						"payload": {
+							"speed": 2.5
+						}
+					},
+					"time": 0.581,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "city"
+					},
+					"time": 0.631,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 2.85,
+					"pitch": -9.0,
+					"position": [
+						0.0,
+						1.41999995708466,
+						2.84999990463257
+					],
+					"rotation": [
+						-9.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"yaw": 158.0
+				},
+				"conflict": {
+					"alert": 0.0,
+					"health": 100.0,
+					"last_damage_source": "",
+					"status": 0
+				},
+				"inventory": {},
+				"mission": {
+					"current_index": 3,
+					"failure_reason": "",
+					"money": 90,
+					"stars": 3,
+					"status": 1
+				},
+				"mission_stage": "new_shop",
+				"player_position": [
+					5.0,
+					1.82,
+					3.547
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/city.tscn",
+				"vehicle_driver_present": true,
+				"vehicle_position": [
+					5.0,
+					0.7,
+					3.727
+				],
+				"vehicle_rotation": [
+					0.0,
+					-180.0,
+					0.0
+				],
+				"vehicle_speed": 1.8
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_stage",
+				"audio_event",
+				"crowd_traffic_avoidance",
+				"hud_state",
+				"input",
+				"inventory_changed",
+				"interaction",
+				"navigation",
+				"clerk_interaction",
+				"vehicle_driver",
+				"visual_capture_ready"
+			],
+			"id": "city-09",
+			"input_event_count": 5,
+			"scene": "city",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.4,
+						"pitch": -18.0,
+						"position": [
+							0.0,
+							2.09999990463257,
+							3.40000009536743
+						],
+						"rotation": [
+							-18.0,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.0,
+							0.0,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"objective": "领取免费鸡蛋",
+						"stage": 0
+					},
+					"time": 0.0,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 0
+						}
+					},
+					"time": 0.0,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"active_pedestrians": 0
+					},
+					"time": 0.017,
+					"type": "crowd_traffic_avoidance"
+				},
+				{
+					"payload": {
+						"signature": "领取免费鸡蛋|进行中|0|0|0|无|100|平静|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.283,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"amount": 1,
+						"item_id": "egg_tray"
+					},
+					"time": 0.283,
+					"type": "inventory_changed"
+				},
+				{
+					"payload": {
+						"id": "inventory_changed",
+						"payload": {
+							"amount": 1,
+							"item_id": "egg_tray"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "collect_eggs"
+					},
+					"time": 0.283,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "collect_eggs"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "带着鸡蛋离开商店",
+						"stage": 1
+					},
+					"time": 0.283,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 1
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"entered": true,
+						"zone": "store_aisle"
+					},
+					"time": 0.283,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "带着鸡蛋离开商店|进行中|30|1|0|鸡蛋×1|100|平静|E  离开商店"
+					},
+					"time": 0.283,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.299,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "leave_store"
+					},
+					"time": 0.299,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "leave_store"
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "前往登记点完成登记",
+						"stage": 2
+					},
+					"time": 0.299,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 2
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"entered": false,
+						"zone": "store_aisle"
+					},
+					"time": 0.299,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "前往登记点完成登记|进行中|40|2|0|鸡蛋×1|100|平静|"
+					},
+					"time": 0.299,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.315,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"amount": 0,
+						"item_id": "egg_tray"
+					},
+					"time": 0.315,
+					"type": "inventory_changed"
+				},
+				{
+					"payload": {
+						"id": "inventory_changed",
+						"payload": {
+							"amount": 0,
+							"item_id": "egg_tray"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"action": "scan",
+						"actor": "登记员"
+					},
+					"time": 0.315,
+					"type": "clerk_interaction"
+				},
+				{
+					"payload": {
+						"id": "scan_registered",
+						"payload": {
+							"actor": "登记员"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "register"
+					},
+					"time": 0.315,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "register"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "前往旺铺转让",
+						"stage": 3
+					},
+					"time": 0.315,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 3
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "前往旺铺转让|进行中|90|3|0|无|100|平静|"
+					},
+					"time": 0.315,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": true,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.331,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"has_driver": true
+					},
+					"time": 0.331,
+					"type": "vehicle_driver"
+				},
+				{
+					"payload": {
+						"id": "vehicle_driver",
+						"payload": {
+							"has_driver": true
+						}
+					},
+					"time": 0.331,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": -1.0
+					},
+					"time": 0.581,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "vehicle_engine",
+						"payload": {
+							"speed": 2.5
+						}
+					},
+					"time": 0.581,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "city"
+					},
+					"time": 0.631,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 5.2,
+					"pitch": -18.0,
+					"position": [
+						0.0,
+						2.29999995231628,
+						5.19999980926514
+					],
+					"rotation": [
+						-18.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"yaw": 0.0
+				},
+				"conflict": {
+					"alert": 0.0,
+					"health": 100.0,
+					"last_damage_source": "",
+					"status": 0
+				},
+				"inventory": {},
+				"mission": {
+					"current_index": 3,
+					"failure_reason": "",
+					"money": 90,
+					"stars": 3,
+					"status": 1
+				},
+				"mission_stage": "new_shop",
+				"player_position": [
+					1.0,
+					1.82,
+					1.547
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/city.tscn",
+				"vehicle_driver_present": true,
+				"vehicle_position": [
+					1.0,
+					0.7,
+					1.727
+				],
+				"vehicle_rotation": [
+					0.0,
+					-180.0,
+					0.0
+				],
+				"vehicle_speed": 1.8
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_stage",
+				"audio_event",
+				"crowd_traffic_avoidance",
+				"hud_state",
+				"input",
+				"inventory_changed",
+				"interaction",
+				"navigation",
+				"clerk_interaction",
+				"vehicle_driver",
+				"wanted_level",
+				"vehicle_damage",
+				"visual_capture_ready"
+			],
+			"id": "city-10",
+			"input_event_count": 5,
+			"scene": "city",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.4,
+						"pitch": -18.0,
+						"position": [
+							0.0,
+							2.09999990463257,
+							3.40000009536743
+						],
+						"rotation": [
+							-18.0,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.0,
+							0.0,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"objective": "领取免费鸡蛋",
+						"stage": 0
+					},
+					"time": 0.0,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 0
+						}
+					},
+					"time": 0.0,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"active_pedestrians": 0
+					},
+					"time": 0.017,
+					"type": "crowd_traffic_avoidance"
+				},
+				{
+					"payload": {
+						"signature": "领取免费鸡蛋|进行中|0|0|0|无|100|平静|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.283,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"amount": 1,
+						"item_id": "egg_tray"
+					},
+					"time": 0.283,
+					"type": "inventory_changed"
+				},
+				{
+					"payload": {
+						"id": "inventory_changed",
+						"payload": {
+							"amount": 1,
+							"item_id": "egg_tray"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "collect_eggs"
+					},
+					"time": 0.283,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "collect_eggs"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "带着鸡蛋离开商店",
+						"stage": 1
+					},
+					"time": 0.283,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 1
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"entered": true,
+						"zone": "store_aisle"
+					},
+					"time": 0.283,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "带着鸡蛋离开商店|进行中|30|1|0|鸡蛋×1|100|平静|E  离开商店"
+					},
+					"time": 0.283,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.299,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "leave_store"
+					},
+					"time": 0.299,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "leave_store"
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "前往登记点完成登记",
+						"stage": 2
+					},
+					"time": 0.299,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 2
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"entered": false,
+						"zone": "store_aisle"
+					},
+					"time": 0.299,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "前往登记点完成登记|进行中|40|2|0|鸡蛋×1|100|平静|"
+					},
+					"time": 0.299,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.315,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"amount": 0,
+						"item_id": "egg_tray"
+					},
+					"time": 0.315,
+					"type": "inventory_changed"
+				},
+				{
+					"payload": {
+						"id": "inventory_changed",
+						"payload": {
+							"amount": 0,
+							"item_id": "egg_tray"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"action": "scan",
+						"actor": "登记员"
+					},
+					"time": 0.315,
+					"type": "clerk_interaction"
+				},
+				{
+					"payload": {
+						"id": "scan_registered",
+						"payload": {
+							"actor": "登记员"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "register"
+					},
+					"time": 0.315,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "register"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "前往旺铺转让",
+						"stage": 3
+					},
+					"time": 0.315,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 3
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "前往旺铺转让|进行中|90|3|0|无|100|平静|"
+					},
+					"time": 0.315,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": true,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.331,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"has_driver": true
+					},
+					"time": 0.331,
+					"type": "vehicle_driver"
+				},
+				{
+					"payload": {
+						"id": "vehicle_driver",
+						"payload": {
+							"has_driver": true
+						}
+					},
+					"time": 0.331,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": -1.0
+					},
+					"time": 0.531,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "vehicle_engine",
+						"payload": {
+							"speed": 2.0
+						}
+					},
+					"time": 0.531,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"current": 1,
+						"previous": 0,
+						"source": "环境碰撞"
+					},
+					"time": 0.547,
+					"type": "wanted_level"
+				},
+				{
+					"payload": {
+						"amount": 8.0,
+						"integrity": 92.0,
+						"source": "环境碰撞"
+					},
+					"time": 0.547,
+					"type": "vehicle_damage"
+				},
+				{
+					"payload": {
+						"id": "vehicle_collision",
+						"payload": {
+							"amount": 8.0,
+							"integrity": 92.0,
+							"source": "环境碰撞"
+						}
+					},
+					"time": 0.547,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "前往旺铺转让|进行中|90|3|1|无|100|平静|"
+					},
+					"time": 0.547,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "city"
+					},
+					"time": 0.581,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 5.2,
+					"pitch": -18.0,
+					"position": [
+						0.0,
+						2.29999995231628,
+						5.19999980926514
+					],
+					"rotation": [
+						-18.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"yaw": 0.0
+				},
+				"conflict": {
+					"alert": 0.0,
+					"health": 100.0,
+					"last_damage_source": "",
+					"status": 0
+				},
+				"inventory": {},
+				"mission": {
+					"current_index": 3,
+					"failure_reason": "",
+					"money": 90,
+					"stars": 3,
+					"status": 1
+				},
+				"mission_stage": "new_shop",
+				"player_position": [
+					6.599,
+					1.82,
+					8.297
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/city.tscn",
+				"vehicle_driver_present": true,
+				"vehicle_position": [
+					6.599,
+					0.7,
+					8.477
+				],
+				"vehicle_rotation": [
+					0.0,
+					-180.0,
+					0.0
+				],
+				"vehicle_speed": 1.3
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_stage",
+				"audio_event",
+				"crowd_traffic_avoidance",
+				"hud_state",
+				"input",
+				"inventory_changed",
+				"interaction",
+				"navigation",
+				"clerk_interaction",
+				"mission_completed",
+				"vehicle_driver",
+				"visual_capture_ready"
+			],
+			"id": "city-11",
+			"input_event_count": 5,
+			"scene": "city",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.4,
+						"pitch": -18.0,
+						"position": [
+							0.0,
+							2.09999990463257,
+							3.40000009536743
+						],
+						"rotation": [
+							-18.0,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.0,
+							0.0,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"objective": "领取免费鸡蛋",
+						"stage": 0
+					},
+					"time": 0.0,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 0
+						}
+					},
+					"time": 0.0,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"active_pedestrians": 0
+					},
+					"time": 0.017,
+					"type": "crowd_traffic_avoidance"
+				},
+				{
+					"payload": {
+						"signature": "领取免费鸡蛋|进行中|0|0|0|无|100|平静|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.283,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"amount": 1,
+						"item_id": "egg_tray"
+					},
+					"time": 0.283,
+					"type": "inventory_changed"
+				},
+				{
+					"payload": {
+						"id": "inventory_changed",
+						"payload": {
+							"amount": 1,
+							"item_id": "egg_tray"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "collect_eggs"
+					},
+					"time": 0.283,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "collect_eggs"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "带着鸡蛋离开商店",
+						"stage": 1
+					},
+					"time": 0.283,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 1
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"entered": true,
+						"zone": "store_aisle"
+					},
+					"time": 0.283,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "带着鸡蛋离开商店|进行中|30|1|0|鸡蛋×1|100|平静|E  离开商店"
+					},
+					"time": 0.283,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.299,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "leave_store"
+					},
+					"time": 0.299,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "leave_store"
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "前往登记点完成登记",
+						"stage": 2
+					},
+					"time": 0.299,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 2
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"entered": false,
+						"zone": "store_aisle"
+					},
+					"time": 0.299,
+					"type": "navigation"
+				},
+				{
+					"payload": {
+						"signature": "前往登记点完成登记|进行中|40|2|0|鸡蛋×1|100|平静|"
+					},
+					"time": 0.299,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.315,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"amount": 0,
+						"item_id": "egg_tray"
+					},
+					"time": 0.315,
+					"type": "inventory_changed"
+				},
+				{
+					"payload": {
+						"id": "inventory_changed",
+						"payload": {
+							"amount": 0,
+							"item_id": "egg_tray"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"action": "scan",
+						"actor": "登记员"
+					},
+					"time": 0.315,
+					"type": "clerk_interaction"
+				},
+				{
+					"payload": {
+						"id": "scan_registered",
+						"payload": {
+							"actor": "登记员"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"id": "register"
+					},
+					"time": 0.315,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "register"
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"objective": "前往旺铺转让",
+						"stage": 3
+					},
+					"time": 0.315,
+					"type": "mission_stage"
+				},
+				{
+					"payload": {
+						"id": "mission_stage",
+						"payload": {
+							"stage": 3
+						}
+					},
+					"time": 0.315,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "前往旺铺转让|进行中|90|3|0|无|100|平静|"
+					},
+					"time": 0.315,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.331,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "new_shop"
+					},
+					"time": 0.331,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"id": "interaction_success",
+						"payload": {
+							"id": "new_shop"
+						}
+					},
+					"time": 0.331,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"money": 190,
+						"stars": 5
+					},
+					"time": 0.331,
+					"type": "mission_completed"
+				},
+				{
+					"payload": {
+						"id": "mission_success",
+						"payload": {
+							"money": 190,
+							"stars": 5
+						}
+					},
+					"time": 0.331,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "|任务完成|190|5|0|无|100|平静|"
+					},
+					"time": 0.331,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": true,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.347,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"has_driver": true
+					},
+					"time": 0.347,
+					"type": "vehicle_driver"
+				},
+				{
+					"payload": {
+						"id": "vehicle_driver",
+						"payload": {
+							"has_driver": true
+						}
+					},
+					"time": 0.347,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "city"
+					},
+					"time": 0.397,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 6.0,
+					"pitch": -18.0,
+					"position": [
+						0.0,
+						2.45000004768372,
+						6.0
+					],
+					"rotation": [
+						-18.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.0,
+						0.0,
+						0.0
+					],
+					"yaw": 180.0
+				},
+				"conflict": {
+					"alert": 0.0,
+					"health": 100.0,
+					"last_damage_source": "",
+					"status": 0
+				},
+				"inventory": {},
+				"mission": {
+					"current_index": 4,
+					"failure_reason": "",
+					"money": 190,
+					"stars": 5,
+					"status": 2
+				},
+				"mission_stage": "",
+				"player_position": [
+					9.099,
+					1.82,
+					13.18
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/city.tscn",
+				"vehicle_driver_present": true,
+				"vehicle_position": [
+					9.099,
+					0.7,
+					13.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_state",
+				"hud_state",
+				"input",
+				"visual_capture_ready"
+			],
+			"id": "office-01",
+			"input_event_count": 1,
+			"scene": "office",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.05,
+						"pitch": -10.0,
+						"position": [
+							0.620000004768372,
+							1.74000000953674,
+							3.04999995231628
+						],
+						"rotation": [
+							-9.99999904632568,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.620000004768372,
+							0.0599999986588955,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"reason": "",
+						"status": 1
+					},
+					"time": 0.0,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 1.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.283,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "office"
+					},
+					"time": 0.333,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 2.65,
+					"pitch": -10.0,
+					"position": [
+						0.720000028610229,
+						1.45000004768372,
+						2.76999998092651
+					],
+					"rotation": [
+						-9.99999904632568,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.720000028610229,
+						0.0500000007450581,
+						0.119999997317791
+					],
+					"yaw": 78.0
+				},
+				"mission": {
+					"clock_minutes": 1079,
+					"completion_minute": 1080,
+					"failure_reason": "",
+					"objective": "准点下班",
+					"status": 1
+				},
+				"player_position": [
+					0.0,
+					1.001,
+					-0.841
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/benchmark.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.9,
+					0.7,
+					-5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_state",
+				"hud_state",
+				"input",
+				"collision",
+				"perception_state",
+				"audio_event",
+				"npc_search_started",
+				"visual_capture_ready"
+			],
+			"id": "office-02",
+			"input_event_count": 1,
+			"scene": "office",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.05,
+						"pitch": -10.0,
+						"position": [
+							0.620000004768372,
+							1.74000000953674,
+							3.04999995231628
+						],
+						"rotation": [
+							-9.99999904632568,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.620000004768372,
+							0.0599999986588955,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"reason": "",
+						"status": 1
+					},
+					"time": 0.0,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": -1.0
+					},
+					"time": 0.617,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"count": 1,
+						"position": [
+							0.0,
+							1.00082683563232,
+							1.68980526924133
+						]
+					},
+					"time": 0.617,
+					"type": "collision"
+				},
+				{
+					"payload": {
+						"status": 1,
+						"suspicion": 0.63
+					},
+					"time": 0.617,
+					"type": "perception_state"
+				},
+				{
+					"payload": {
+						"id": "perception_suspicious",
+						"payload": {}
+					},
+					"time": 0.617,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"last_seen_position": [
+							0.0,
+							0.899999976158142,
+							1.68980526924133
+						],
+						"stimulus": "sight"
+					},
+					"time": 0.617,
+					"type": "npc_search_started"
+				},
+				{
+					"payload": {
+						"id": "npc_search_started",
+						"payload": {}
+					},
+					"time": 0.617,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|上司产生怀疑|"
+					},
+					"time": 0.617,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "office"
+					},
+					"time": 0.667,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 3.05,
+					"pitch": -15.0,
+					"position": [
+						0.620000004768372,
+						1.74000000953674,
+						3.04999995231628
+					],
+					"rotation": [
+						-15.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.620000004768372,
+						0.0599999986588955,
+						0.0
+					],
+					"yaw": 0.0
+				},
+				"mission": {
+					"clock_minutes": 1079,
+					"completion_minute": 1080,
+					"failure_reason": "",
+					"objective": "准点下班",
+					"status": 1
+				},
+				"player_position": [
+					0.0,
+					1.001,
+					1.69
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/benchmark.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.9,
+					0.7,
+					-5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_state",
+				"hud_state",
+				"perception_state",
+				"audio_event",
+				"npc_search_started",
+				"visual_capture_ready"
+			],
+			"id": "office-03",
+			"input_event_count": 0,
+			"scene": "office",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.05,
+						"pitch": -10.0,
+						"position": [
+							0.620000004768372,
+							1.74000000953674,
+							3.04999995231628
+						],
+						"rotation": [
+							-9.99999904632568,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.620000004768372,
+							0.0599999986588955,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"reason": "",
+						"status": 1
+					},
+					"time": 0.0,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"status": 1,
+						"suspicion": 0.36
+					},
+					"time": 0.467,
+					"type": "perception_state"
+				},
+				{
+					"payload": {
+						"id": "perception_suspicious",
+						"payload": {}
+					},
+					"time": 0.467,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"last_seen_position": [
+							3.0,
+							0.899999976158142,
+							-2.0
+						],
+						"stimulus": "sight"
+					},
+					"time": 0.467,
+					"type": "npc_search_started"
+				},
+				{
+					"payload": {
+						"id": "npc_search_started",
+						"payload": {}
+					},
+					"time": 0.467,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|上司产生怀疑|"
+					},
+					"time": 0.467,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "office"
+					},
+					"time": 0.7,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 3.05,
+					"pitch": -15.0,
+					"position": [
+						0.620000004768372,
+						1.74000000953674,
+						3.04999995231628
+					],
+					"rotation": [
+						-15.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.620000004768372,
+						0.0599999986588955,
+						0.0
+					],
+					"yaw": 0.0
+				},
+				"mission": {
+					"clock_minutes": 1079,
+					"completion_minute": 1080,
+					"failure_reason": "",
+					"objective": "准点下班",
+					"status": 1
+				},
+				"player_position": [
+					3.0,
+					0.999,
+					-2.0
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/benchmark.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.9,
+					0.7,
+					-5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_state",
+				"hud_state",
+				"perception_state",
+				"audio_event",
+				"npc_search_started",
+				"visual_capture_ready"
+			],
+			"id": "office-04",
+			"input_event_count": 0,
+			"scene": "office",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.05,
+						"pitch": -10.0,
+						"position": [
+							0.620000004768372,
+							1.74000000953674,
+							3.04999995231628
+						],
+						"rotation": [
+							-9.99999904632568,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.620000004768372,
+							0.0599999986588955,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"reason": "",
+						"status": 1
+					},
+					"time": 0.0,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"status": 1,
+						"suspicion": 0.54
+					},
+					"time": 0.567,
+					"type": "perception_state"
+				},
+				{
+					"payload": {
+						"id": "perception_suspicious",
+						"payload": {}
+					},
+					"time": 0.567,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"last_seen_position": [
+							3.0,
+							0.899999976158142,
+							-0.800000011920929
+						],
+						"stimulus": "sight"
+					},
+					"time": 0.567,
+					"type": "npc_search_started"
+				},
+				{
+					"payload": {
+						"id": "npc_search_started",
+						"payload": {}
+					},
+					"time": 0.567,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|上司产生怀疑|"
+					},
+					"time": 0.567,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|18:00|进行中|上司产生怀疑|"
+					},
+					"time": 1.0,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "office"
+					},
+					"time": 1.017,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 3.05,
+					"pitch": -15.0,
+					"position": [
+						0.620000004768372,
+						1.74000000953674,
+						3.04999995231628
+					],
+					"rotation": [
+						-15.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.620000004768372,
+						0.0599999986588955,
+						0.0
+					],
+					"yaw": 0.0
+				},
+				"mission": {
+					"clock_minutes": 1080,
+					"completion_minute": 1080,
+					"failure_reason": "",
+					"objective": "准点下班",
+					"status": 1
+				},
+				"player_position": [
+					-4.0,
+					1.0,
+					6.0
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/benchmark.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.9,
+					0.7,
+					-5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_state",
+				"hud_state",
+				"input",
+				"interaction",
+				"interaction_blocked",
+				"audio_event",
+				"hallway_encounter",
+				"mission_failed",
+				"visual_capture_ready"
+			],
+			"id": "office-05",
+			"input_event_count": 1,
+			"scene": "office",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.05,
+						"pitch": -10.0,
+						"position": [
+							0.620000004768372,
+							1.74000000953674,
+							3.04999995231628
+						],
+						"rotation": [
+							-9.99999904632568,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.620000004768372,
+							0.0599999986588955,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"reason": "",
+						"status": 1
+					},
+					"time": 0.0,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.283,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "office_exit",
+						"result": "attempted"
+					},
+					"time": 0.283,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"reason": "尚未到下班时间"
+					},
+					"time": 0.283,
+					"type": "interaction_blocked"
+				},
+				{
+					"payload": {
+						"id": "interaction_denied",
+						"payload": {
+							"reason": "尚未到下班时间"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|E  离开办公室"
+					},
+					"time": 0.283,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"crouching": false,
+						"distance": 0.57
+					},
+					"time": 0.299,
+					"type": "hallway_encounter"
+				},
+				{
+					"payload": {
+						"id": "hallway_encounter",
+						"payload": {
+							"crouching": false
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"reason": "走廊突遇",
+						"status": 3
+					},
+					"time": 0.299,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"reason": "走廊突遇"
+					},
+					"time": 0.299,
+					"type": "mission_failed"
+				},
+				{
+					"payload": {
+						"id": "mission_failed",
+						"payload": {
+							"reason": "走廊突遇"
+						}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|失败：走廊突遇|未被发现|"
+					},
+					"time": 0.299,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "office"
+					},
+					"time": 0.316,
+					"type": "visual_capture_ready"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.316,
+					"type": "hud_state"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 3.2,
+					"pitch": -10.0,
+					"position": [
+						0.620000004768372,
+						1.50999999046326,
+						3.20000004768372
+					],
+					"rotation": [
+						-9.99999904632568,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.620000004768372,
+						0.0599999986588955,
+						0.0
+					],
+					"yaw": 0.0
+				},
+				"mission": {
+					"clock_minutes": 1079,
+					"completion_minute": 1080,
+					"failure_reason": "",
+					"objective": "准点下班",
+					"status": 1
+				},
+				"player_position": [
+					7.0,
+					1.0,
+					-4.65
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/benchmark.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.9,
+					0.7,
+					-5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_state",
+				"hud_state",
+				"hallway_encounter",
+				"audio_event",
+				"mission_failed",
+				"visual_capture_ready"
+			],
+			"id": "office-06",
+			"input_event_count": 0,
+			"scene": "office",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.05,
+						"pitch": -10.0,
+						"position": [
+							0.620000004768372,
+							1.74000000953674,
+							3.04999995231628
+						],
+						"rotation": [
+							-9.99999904632568,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.620000004768372,
+							0.0599999986588955,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"reason": "",
+						"status": 1
+					},
+					"time": 0.0,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"crouching": false,
+						"distance": 0.62
+					},
+					"time": 0.283,
+					"type": "hallway_encounter"
+				},
+				{
+					"payload": {
+						"id": "hallway_encounter",
+						"payload": {
+							"crouching": false
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"reason": "走廊突遇",
+						"status": 3
+					},
+					"time": 0.283,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"reason": "走廊突遇"
+					},
+					"time": 0.283,
+					"type": "mission_failed"
+				},
+				{
+					"payload": {
+						"id": "mission_failed",
+						"payload": {
+							"reason": "走廊突遇"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|失败：走廊突遇|未被发现|"
+					},
+					"time": 0.283,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "office"
+					},
+					"time": 0.316,
+					"type": "visual_capture_ready"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.316,
+					"type": "hud_state"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 2.8,
+					"pitch": -8.0,
+					"position": [
+						0.620000004768372,
+						1.4099999666214,
+						2.79999995231628
+					],
+					"rotation": [
+						-7.99999952316284,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.620000004768372,
+						0.0599999986588955,
+						0.0
+					],
+					"yaw": 0.0
+				},
+				"mission": {
+					"clock_minutes": 1079,
+					"completion_minute": 1080,
+					"failure_reason": "",
+					"objective": "准点下班",
+					"status": 1
+				},
+				"player_position": [
+					7.0,
+					1.0,
+					-4.65
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/benchmark.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.9,
+					0.7,
+					-5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_state",
+				"hud_state",
+				"perception_state",
+				"audio_event",
+				"npc_search_started",
+				"mission_failed",
+				"visual_capture_ready"
+			],
+			"id": "office-07",
+			"input_event_count": 0,
+			"scene": "office",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.05,
+						"pitch": -10.0,
+						"position": [
+							0.620000004768372,
+							1.74000000953674,
+							3.04999995231628
+						],
+						"rotation": [
+							-9.99999904632568,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.620000004768372,
+							0.0599999986588955,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"reason": "",
+						"status": 1
+					},
+					"time": 0.0,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"status": 1,
+						"suspicion": 0.36
+					},
+					"time": 0.467,
+					"type": "perception_state"
+				},
+				{
+					"payload": {
+						"id": "perception_suspicious",
+						"payload": {}
+					},
+					"time": 0.467,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"last_seen_position": [
+							3.0,
+							0.899999976158142,
+							-2.0
+						],
+						"stimulus": "sight"
+					},
+					"time": 0.467,
+					"type": "npc_search_started"
+				},
+				{
+					"payload": {
+						"id": "npc_search_started",
+						"payload": {}
+					},
+					"time": 0.467,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|上司产生怀疑|"
+					},
+					"time": 0.467,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"status": 2,
+						"suspicion": 1.0
+					},
+					"time": 0.867,
+					"type": "perception_state"
+				},
+				{
+					"payload": {
+						"id": "perception_alert",
+						"payload": {}
+					},
+					"time": 0.867,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"reason": "被上司发现",
+						"status": 3
+					},
+					"time": 0.867,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"reason": "被上司发现"
+					},
+					"time": 0.867,
+					"type": "mission_failed"
+				},
+				{
+					"payload": {
+						"id": "mission_failed",
+						"payload": {
+							"reason": "被上司发现"
+						}
+					},
+					"time": 0.867,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|失败：被上司发现|已被发现|"
+					},
+					"time": 0.867,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "office"
+					},
+					"time": 1.9,
+					"type": "visual_capture_ready"
+				},
+				{
+					"payload": {
+						"status": 0,
+						"suspicion": 1.0
+					},
+					"time": 1.9,
+					"type": "perception_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 1.9,
+					"type": "hud_state"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 4.2,
+					"pitch": -18.0,
+					"position": [
+						0.620000004768372,
+						1.61000001430511,
+						4.19999980926514
+					],
+					"rotation": [
+						-18.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.620000004768372,
+						0.0599999986588955,
+						0.0
+					],
+					"yaw": 0.0
+				},
+				"mission": {
+					"clock_minutes": 1079,
+					"completion_minute": 1080,
+					"failure_reason": "",
+					"objective": "准点下班",
+					"status": 1
+				},
+				"player_position": [
+					7.0,
+					1.0,
+					-5.25
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/benchmark.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.9,
+					0.7,
+					-5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_state",
+				"hud_state",
+				"perception_state",
+				"audio_event",
+				"npc_search_started",
+				"hallway_encounter",
+				"mission_failed",
+				"visual_capture_ready"
+			],
+			"id": "office-08",
+			"input_event_count": 0,
+			"scene": "office",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.05,
+						"pitch": -10.0,
+						"position": [
+							0.620000004768372,
+							1.74000000953674,
+							3.04999995231628
+						],
+						"rotation": [
+							-9.99999904632568,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.620000004768372,
+							0.0599999986588955,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"reason": "",
+						"status": 1
+					},
+					"time": 0.0,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"status": 1,
+						"suspicion": 0.36
+					},
+					"time": 0.467,
+					"type": "perception_state"
+				},
+				{
+					"payload": {
+						"id": "perception_suspicious",
+						"payload": {}
+					},
+					"time": 0.467,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"last_seen_position": [
+							7.0,
+							0.899999976158142,
+							-5.40000009536743
+						],
+						"stimulus": "sight"
+					},
+					"time": 0.467,
+					"type": "npc_search_started"
+				},
+				{
+					"payload": {
+						"id": "npc_search_started",
+						"payload": {}
+					},
+					"time": 0.467,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"crouching": false,
+						"distance": 1.54
+					},
+					"time": 0.467,
+					"type": "hallway_encounter"
+				},
+				{
+					"payload": {
+						"id": "hallway_encounter",
+						"payload": {
+							"crouching": false
+						}
+					},
+					"time": 0.467,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"reason": "走廊突遇",
+						"status": 3
+					},
+					"time": 0.467,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"reason": "走廊突遇"
+					},
+					"time": 0.467,
+					"type": "mission_failed"
+				},
+				{
+					"payload": {
+						"id": "mission_failed",
+						"payload": {
+							"reason": "走廊突遇"
+						}
+					},
+					"time": 0.467,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|失败：走廊突遇|上司产生怀疑|"
+					},
+					"time": 0.467,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"reason": "被上司发现",
+						"status": 3
+					},
+					"time": 1.883,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"reason": "被上司发现"
+					},
+					"time": 1.883,
+					"type": "mission_failed"
+				},
+				{
+					"payload": {
+						"id": "mission_failed",
+						"payload": {
+							"reason": "被上司发现"
+						}
+					},
+					"time": 1.883,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|失败：被上司发现|已被发现|"
+					},
+					"time": 1.883,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "office"
+					},
+					"time": 1.9,
+					"type": "visual_capture_ready"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|已被发现|"
+					},
+					"time": 1.9,
+					"type": "hud_state"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 4.1,
+					"pitch": -8.0,
+					"position": [
+						0.620000004768372,
+						1.55999994277954,
+						4.09999990463257
+					],
+					"rotation": [
+						-7.99999952316284,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.620000004768372,
+						0.0599999986588955,
+						0.0
+					],
+					"yaw": 82.0
+				},
+				"mission": {
+					"clock_minutes": 1079,
+					"completion_minute": 1080,
+					"failure_reason": "",
+					"objective": "准点下班",
+					"status": 1
+				},
+				"player_position": [
+					7.0,
+					1.0,
+					-5.4
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/benchmark.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.9,
+					0.7,
+					-5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_state",
+				"hud_state",
+				"hallway_encounter",
+				"audio_event",
+				"mission_failed",
+				"input",
+				"checkpoint_loaded",
+				"perception_state",
+				"visual_capture_ready"
+			],
+			"id": "office-09",
+			"input_event_count": 1,
+			"scene": "office",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.05,
+						"pitch": -10.0,
+						"position": [
+							0.620000004768372,
+							1.74000000953674,
+							3.04999995231628
+						],
+						"rotation": [
+							-9.99999904632568,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.620000004768372,
+							0.0599999986588955,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"reason": "",
+						"status": 1
+					},
+					"time": 0.0,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"crouching": false,
+						"distance": 1.29
+					},
+					"time": 0.283,
+					"type": "hallway_encounter"
+				},
+				{
+					"payload": {
+						"id": "hallway_encounter",
+						"payload": {
+							"crouching": false
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"reason": "走廊突遇",
+						"status": 3
+					},
+					"time": 0.283,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"reason": "走廊突遇"
+					},
+					"time": 0.283,
+					"type": "mission_failed"
+				},
+				{
+					"payload": {
+						"id": "mission_failed",
+						"payload": {
+							"reason": "走廊突遇"
+						}
+					},
+					"time": 0.283,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|失败：走廊突遇|未被发现|"
+					},
+					"time": 0.283,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": true,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 0.299,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"player_position": [
+							7.0,
+							1.0,
+							-5.40000009536743
+						]
+					},
+					"time": 0.299,
+					"type": "checkpoint_loaded"
+				},
+				{
+					"payload": {
+						"id": "checkpoint_loaded",
+						"payload": {}
+					},
+					"time": 0.299,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"status": 3,
+						"suspicion": 0.990833333333333
+					},
+					"time": 0.315,
+					"type": "perception_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.315,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "office"
+					},
+					"time": 0.332,
+					"type": "visual_capture_ready"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|已被发现|"
+					},
+					"time": 0.332,
+					"type": "hud_state"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 4.1,
+					"pitch": -6.0,
+					"position": [
+						0.620000004768372,
+						1.55999994277954,
+						4.09999990463257
+					],
+					"rotation": [
+						-6.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.620000004768372,
+						0.0599999986588955,
+						0.0
+					],
+					"yaw": 82.0
+				},
+				"mission": {
+					"clock_minutes": 1079,
+					"completion_minute": 1080,
+					"failure_reason": "",
+					"objective": "准点下班",
+					"status": 1
+				},
+				"player_position": [
+					7.0,
+					1.0,
+					-5.4
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/benchmark.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.9,
+					0.7,
+					-5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		},
+		{
+			"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "candidate_makehuman_original_environment",
+			"event_types": [
+				"camera_state",
+				"mission_state",
+				"hud_state",
+				"perception_state",
+				"audio_event",
+				"npc_search_started",
+				"mission_failed",
+				"input",
+				"mission_restart",
+				"interaction",
+				"workstation_typing_enter",
+				"visual_capture_ready"
+			],
+			"id": "office-10",
+			"input_event_count": 2,
+			"scene": "office",
+			"source_file_count": 0,
+			"source_fingerprint": "",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.05,
+						"pitch": -10.0,
+						"position": [
+							0.620000004768372,
+							1.74000000953674,
+							3.04999995231628
+						],
+						"rotation": [
+							-9.99999904632568,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.620000004768372,
+							0.0599999986588955,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"reason": "",
+						"status": 1
+					},
+					"time": 0.0,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"status": 1,
+						"suspicion": 0.36
+					},
+					"time": 0.467,
+					"type": "perception_state"
+				},
+				{
+					"payload": {
+						"id": "perception_suspicious",
+						"payload": {}
+					},
+					"time": 0.467,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"last_seen_position": [
+							3.0,
+							0.899999976158142,
+							-2.0
+						],
+						"stimulus": "sight"
+					},
+					"time": 0.467,
+					"type": "npc_search_started"
+				},
+				{
+					"payload": {
+						"id": "npc_search_started",
+						"payload": {}
+					},
+					"time": 0.467,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|上司产生怀疑|"
+					},
+					"time": 0.467,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"status": 2,
+						"suspicion": 1.0
+					},
+					"time": 0.867,
+					"type": "perception_state"
+				},
+				{
+					"payload": {
+						"id": "perception_alert",
+						"payload": {}
+					},
+					"time": 0.867,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"reason": "被上司发现",
+						"status": 3
+					},
+					"time": 0.867,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"reason": "被上司发现"
+					},
+					"time": 0.867,
+					"type": "mission_failed"
+				},
+				{
+					"payload": {
+						"id": "mission_failed",
+						"payload": {
+							"reason": "被上司发现"
+						}
+					},
+					"time": 0.867,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|失败：被上司发现|已被发现|"
+					},
+					"time": 0.867,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": true,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 1.883,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"reason": "",
+						"status": 1
+					},
+					"time": 1.883,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"status": 0,
+						"suspicion": 1.0
+					},
+					"time": 1.883,
+					"type": "perception_state"
+				},
+				{
+					"payload": {},
+					"time": 1.883,
+					"type": "mission_restart"
+				},
+				{
+					"payload": {
+						"id": "mission_restart",
+						"payload": {}
+					},
+					"time": 1.883,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 1.883,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 1.899,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "office_workstation_01",
+						"result": "attempted"
+					},
+					"time": 1.899,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"animation": {
+							"animation_player": true,
+							"animation_tree": false,
+							"candidate_visual": true,
+							"driven": true,
+							"state": "typing_default"
+						},
+						"camera": {
+							"collision": false,
+							"collision_distance": 1.6,
+							"pitch": -6.0,
+							"position": [
+								0.699999988079071,
+								1.24000000953674,
+								1.87999999523163
+							],
+							"rotation": [
+								-6.0,
+								0.0,
+								0.0
+							],
+							"shoulder_offset": [
+								0.699999988079071,
+								0.0199999995529652,
+								0.280000001192093
+							],
+							"yaw": 98.0
+						},
+						"camera_contract": {
+							"distance": 1.6,
+							"height": 1.22,
+							"pitch_degrees": -6.0,
+							"shoulder_offset": [
+								0.7,
+								0.02,
+								0.28
+							],
+							"yaw_degrees": 98.0
+						},
+						"player_position": [
+							0.0,
+							1.0,
+							3.04999995231628
+						],
+						"target": "office_workstation_01"
+					},
+					"time": 1.899,
+					"type": "workstation_typing_enter"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|E  离开工位"
+					},
+					"time": 1.899,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "office"
+					},
+					"time": 1.949,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 1.6,
+					"pitch": -6.0,
+					"position": [
+						0.699999988079071,
+						1.24000000953674,
+						1.87999999523163
+					],
+					"rotation": [
+						-6.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.699999988079071,
+						0.0199999995529652,
+						0.280000001192093
+					],
+					"yaw": 98.0
+				},
+				"mission": {
+					"clock_minutes": 1079,
+					"completion_minute": 1080,
+					"failure_reason": "",
+					"objective": "准点下班",
+					"status": 1
+				},
+				"player_position": [
+					0.0,
+					1.0,
+					3.05
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/benchmark.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.9,
+					0.7,
+					-5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		}
+	],
+	"evidence_prefix": "makehuman-original-environment",
+	"policy": "编辑器真实图形采集必须绑定运行时事件时间轴；事件证据不自动批准视觉",
+	"source_file_count": 0,
+	"source_fingerprint": "",
+	"version": 1,
+	"visual_status": "unverified"
+}

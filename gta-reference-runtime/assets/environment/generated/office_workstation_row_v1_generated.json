@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "asset_id": "office-workstation-row-v1-generated-candidate",
+  "slot_id": "office-environment-kit",
+  "source_kind": "ai_generated_original_bitmap",
+  "generator": "内置图像生成工具",
+  "license": "项目原创候选；需在最终发布前完成权利与负责人签收",
+  "runtime_asset": "office_workstation_row_v1_generated.png",
+  "runtime_sha256": "9a30f549c018d2dc4673e52271b025fcc0441101565000733a4aa9186386fb5d",
+  "dimensions": [2172, 724],
+  "intended_use": "办公室连续工位区背景立面候选材质",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "constraints": [
+    "无品牌标识",
+    "无可读文字",
+    "不承担碰撞、导航、交互或任务逻辑",
+    "必须通过当前源码固定镜头截图和 Windows 目标设备验收"
+  ]
+}

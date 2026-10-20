@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_visual_capture_unverified",
+  "candidate_id": "office-npc-makehuman-elegant-suit-skinned-512-atlas-candidate",
+  "candidate_variant": "reference_office_elegant_suit_512_material_atlas_v2",
+  "candidate_sha256": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+  "auxiliary_asset_sha256": null,
+  "retouch_script_sha256": "17229e11c35ad297bd4dd37b0bcde6b6052e6c849482ca16a95110c4d18eab3b",
+  "capture_options": {
+    "preserve_imported_materials": true,
+    "reference_office_materials": true,
+    "close_capture": true,
+    "use_elegant_suit_candidate": false,
+    "use_elegant_suit_skinned": true
+  },
+  "environment": "temporary copy of gta-reference-runtime",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "captures": [
+    {
+      "id": "makehuman-office-npc-idle_default",
+      "state": "idle_default",
+      "path": "candidate-runtime/makehuman-office-npc-visual/makehuman-office-npc-idle_default.png",
+      "sha256": "45ebda6c74d07f365737e955d17ffda3fb19aa414827739b7cfffd26d0c4032f",
+      "width": 1280,
+      "height": 720,
+      "visual_status": "unverified"
+    },
+    {
+      "id": "makehuman-office-npc-search_default",
+      "state": "search_default",
+      "path": "candidate-runtime/makehuman-office-npc-visual/makehuman-office-npc-search_default.png",
+      "sha256": "97e6667895baf2d13b060e381db01dab896279b646d143e2e6dd273b4dcdd185",
+      "width": 1280,
+      "height": 720,
+      "visual_status": "unverified"
+    },
+    {
+      "id": "makehuman-office-npc-alert_default",
+      "state": "alert_default",
+      "path": "candidate-runtime/makehuman-office-npc-visual/makehuman-office-npc-alert_default.png",
+      "sha256": "f2c1fdba8c2eb944c18e84f99ca25a35548e7abb6fab884e07d49252f2f54311",
+      "width": 1280,
+      "height": 720,
+      "visual_status": "unverified"
+    }
+  ],
+  "captured_at": "2026-10-07T14:48:06.749Z"
+}

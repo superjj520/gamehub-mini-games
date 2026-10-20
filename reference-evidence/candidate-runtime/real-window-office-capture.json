@@ -1,0 +1,29 @@
+{
+  "status": "real_graphical_capture_diagnostic",
+  "source_stale_since_capture": {
+    "reason": "该诊断截图绑定 180 个正式运行时文件，当前正式源为 181 个文件；它只能说明历史灰盒链路，不是当前候选视觉证据。",
+    "current_source_file_count": 181
+  },
+  "capture": "real-window-office-viewport.png",
+  "capture_sha256": "33c78724fc2cfd2ca73c94acdba0d1f25590fb6a9add3b248c5ca0d5a8993970",
+  "resolution": "1278x719",
+  "source_fingerprint": {
+    "sha256": "1ef4f095c96b9613fc0e1f72a7b16c6669ecc625ac812359e6e9c478a3e967dd",
+    "files": 180
+  },
+  "runtime": "正式运行时办公室场景",
+  "evidence_scope": "真实 Godot 图形窗口取证，不是候选资产视觉签收，不是商店素材",
+  "observations": {
+    "behavior": [
+      "第三人称角色、任务状态、时间 HUD、生命/体力和输入提示均可见",
+      "截图前后暂停菜单与返回游戏操作可用"
+    ],
+    "visual_blockers": [
+      "角色仍为灰盒几何体，不符合参考视频角色外观",
+      "办公室墙地材质、灯光和空间细节仍为灰盒，不符合参考视频",
+      "当前镜头过近且角色被环境几何遮挡，构图未达到参考视频验收标准"
+    ]
+  },
+  "visual_acceptance": "unverified",
+  "release_allowed": false
+}

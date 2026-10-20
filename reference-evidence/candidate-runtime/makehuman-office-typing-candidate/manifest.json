@@ -1,0 +1,10 @@
+{
+	"asset_catalog_path": "res://tests/asset-runtime-catalog-full-candidates.json",
+	"image": "/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/makehuman-office-typing-candidate/makehuman-office-typing.png",
+	"notes": "候选角色已使用真实 Skeleton3D 坐姿骨骼；不代表最终视觉、权利或目标设备通过",
+	"release_allowed": false,
+	"schema_version": 1,
+	"state": "typing_default",
+	"status": "candidate_makehuman_office_typing_captured",
+	"visual_status": "unverified"
+}

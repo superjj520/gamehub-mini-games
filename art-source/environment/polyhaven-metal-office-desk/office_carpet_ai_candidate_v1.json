@@ -1,0 +1,12 @@
+{
+  "id": "office-carpet-ai-candidate-v1",
+  "asset_path": "office_carpet_ai_candidate_v1.png",
+  "source_kind": "project_original_ai_generated_bitmap_candidate",
+  "generation_mode": "built_in_image_generation",
+  "prompt_summary": "无缝深灰蓝色低绒商用办公室地毯材质，正交平铺、无文字、无标识、无物体",
+  "sha256": "4a6cab846323e238c1a8d528d51c37769e0c68b42034fe679e3cabc7e05c969b",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "integration_scope": "isolated_office_candidate_composition_only",
+  "notes": "仅覆盖候选办公室组合的地面材质，不承担碰撞、导航或任务判定；待人工逐帧、目标设备和最终发布权利复核。"
+}

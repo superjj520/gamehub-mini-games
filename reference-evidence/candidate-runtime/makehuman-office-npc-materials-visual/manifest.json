@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_visual_capture_unverified",
+  "candidate_id": "office-npc-makehuman-sanitized-materials-candidate",
+  "candidate_sha256": "b58756eeff9642f463dadf753fa129cc108bc2591a734282fd19131e24fce2be",
+  "environment": "temporary copy of gta-reference-runtime",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "captures": [
+    {
+      "id": "makehuman-office-npc-idle_default",
+      "state": "idle_default",
+      "path": "candidate-runtime/makehuman-office-npc-materials-visual/makehuman-office-npc-idle_default.png",
+      "sha256": "70bc747ae847ada000667b427f603aa87ff00e01109c085990b674e15f17304e",
+      "width": 1280,
+      "height": 720,
+      "visual_status": "unverified"
+    },
+    {
+      "id": "makehuman-office-npc-search_default",
+      "state": "search_default",
+      "path": "candidate-runtime/makehuman-office-npc-materials-visual/makehuman-office-npc-search_default.png",
+      "sha256": "d3a2564ed5f4668a1bf41503f9ac83de65bbebbfd85497058c214297bf702296",
+      "width": 1280,
+      "height": 720,
+      "visual_status": "unverified"
+    },
+    {
+      "id": "makehuman-office-npc-alert_default",
+      "state": "alert_default",
+      "path": "candidate-runtime/makehuman-office-npc-materials-visual/makehuman-office-npc-alert_default.png",
+      "sha256": "52fe27c1cd8a3741c63335ef57edd21ae112cf435b6830a83b0406c56b0b284e",
+      "width": 1280,
+      "height": 720,
+      "visual_status": "unverified"
+    }
+  ],
+  "captured_at": "2026-10-07T03:21:16.399Z"
+}

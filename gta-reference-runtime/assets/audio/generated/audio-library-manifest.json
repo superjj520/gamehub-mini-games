@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "id": "original-procedural-audio-library-v1",
+  "status": "internal_candidate_only",
+  "generator": "art-source/audio/generated/build_audio_library.mjs",
+  "generator_sha256": "ec53115bd0c7a05ec2c47a02194fb18a5bff931423d0c4e03473eaa4fd022ba5",
+  "synthesis": "确定性 PCM 16-bit 单声道波形；不含第三方录音、采样或参考视频音频",
+  "files": [
+    {
+      "id": "interaction_success",
+      "profile": "ascending_double",
+      "path": "res://assets/audio/generated/interaction_success.wav",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 0.18,
+      "bytes": 7982,
+      "sha256": "0d20c1fb112db4a17f60cd420a89835c4f01a644950fb9f2ed2eb1335539b85c"
+    },
+    {
+      "id": "interaction_denied",
+      "profile": "descending_buzz",
+      "path": "res://assets/audio/generated/interaction_denied.wav",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 0.2,
+      "bytes": 8864,
+      "sha256": "7265615e49be27af2954ad8fa7b8f9004b0ddb642af49eb84ba10b9ffb521842"
+    },
+    {
+      "id": "mission_success",
+      "profile": "success_arpeggio",
+      "path": "res://assets/audio/generated/mission_success.wav",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 0.52,
+      "bytes": 22976,
+      "sha256": "7e6c4a306a7fe19ed28ff105d1d4378253d48f6d57f97e280be3cb276555595a"
+    },
+    {
+      "id": "mission_failed",
+      "profile": "failure_drop",
+      "path": "res://assets/audio/generated/mission_failed.wav",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 0.46,
+      "bytes": 20330,
+      "sha256": "5fda71402d412060380a9f5710d5be59f2bff301dbd1c031b86c7f911bb67d6c"
+    },
+    {
+      "id": "perception_alert",
+      "profile": "alert_pulse",
+      "path": "res://assets/audio/generated/perception_alert.wav",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 0.28,
+      "bytes": 12392,
+      "sha256": "9fbfb311e0103ee17234e27a8bb5236da380e216e8e3bc48e2e2b0d4a4ec8c40"
+    },
+    {
+      "id": "conflict_started",
+      "profile": "conflict_rise",
+      "path": "res://assets/audio/generated/conflict_started.wav",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 0.36,
+      "bytes": 15920,
+      "sha256": "9e4daeb4deceecd86bb9cdf174454e3ecf093a6a87524925ffae719d620cdf8e"
+    },
+    {
+      "id": "vehicle_driver",
+      "profile": "vehicle_click",
+      "path": "res://assets/audio/generated/vehicle_driver.wav",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 0.22,
+      "bytes": 9746,
+      "sha256": "00ddb8e50a59c1841d92ca193223a1a4c460653f10a59e6513a9d7b74e79925b"
+    },
+    {
+      "id": "vehicle_collision",
+      "profile": "collision_thud",
+      "path": "res://assets/audio/generated/vehicle_collision.wav",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 0.2,
+      "bytes": 8864,
+      "sha256": "7a73f15e4b156fa90007ef7dcd2b8cc547ee1c684b9c2c3ea481452694de34d1"
+    },
+    {
+      "id": "vehicle_destroyed",
+      "profile": "destruction_alarm",
+      "path": "res://assets/audio/generated/vehicle_destroyed.wav",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 0.48,
+      "bytes": 21212,
+      "sha256": "00b7c657288da3c58fa92a6332e37cbe911cae66dfcd869dd036ecad94610056"
+    },
+    {
+      "id": "scan_registered",
+      "profile": "scan_sweep",
+      "path": "res://assets/audio/generated/scan_registered.wav",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 0.3,
+      "bytes": 13274,
+      "sha256": "f3bde4f378a59bdd2714e8d5be543ee60c5108769b1b5ac9a466ab8ba4f2dd96"
+    },
+    {
+      "id": "checkpoint_loaded",
+      "profile": "checkpoint_soft",
+      "path": "res://assets/audio/generated/checkpoint_loaded.wav",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 0.24,
+      "bytes": 10628,
+      "sha256": "273cf8bbb5f4b6797c96c43e5f951007b92fca1fc5848fd4c0c4f4535f2b1e34"
+    },
+    {
+      "id": "mission_restart",
+      "profile": "restart_reset",
+      "path": "res://assets/audio/generated/mission_restart.wav",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 0.26,
+      "bytes": 11510,
+      "sha256": "49193c4ef536a32527950145aff23abf175839c6ec2091f8ea82e9a06b7039e6"
+    },
+    {
+      "id": "footstep",
+      "profile": "footstep",
+      "path": "res://assets/audio/generated/footstep.wav",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 0.11,
+      "bytes": 4896,
+      "sha256": "65f64035339fec03c8b1664502b63ff7bcfc4b8f62060b15e77c3e37a4735fe6"
+    },
+    {
+      "id": "vehicle_engine",
+      "profile": "vehicle_engine",
+      "path": "res://assets/audio/generated/vehicle_engine.wav",
+      "sample_rate": 22050,
+      "channels": 1,
+      "duration_seconds": 0.24,
+      "bytes": 10628,
+      "sha256": "1b6e0f467e88c1496293a4de2d789969b0e13c5a3b7f407617a2d989a290a8e3"
+    }
+  ],
+  "release_allowed": false,
+  "remaining_gates": [
+    "人工听感与混音审阅",
+    "音量开关回放",
+    "Windows 目标设备验证",
+    "最终发布权利复核"
+  ]
+}

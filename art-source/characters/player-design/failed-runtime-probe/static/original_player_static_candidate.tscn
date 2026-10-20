@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/characters/original-procedural-office-characters/original_player_static_probe.glb" id="1_character"]
+[ext_resource type="Script" path="res://assets/characters/original-procedural-office-characters/original_player_static_candidate.gd" id="2_script"]
+
+[node name="OriginalPlayerStaticCandidate" type="Node3D"]
+script = ExtResource("2_script")
+
+[node name="候选主角身体" parent="." instance=ExtResource("1_character")]
+rotation_degrees = Vector3(0, 180, 0)

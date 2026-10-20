@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "status": "technical_budget_failed",
+  "strict": false,
+  "policy": "技术预算通过不代表视觉、权利、目标设备或发布验收通过",
+  "profiles": {
+    "player": {
+      "maxTriangles": 35000,
+      "maxMaterials": 4,
+      "maxTextureSize": 2048,
+      "maxBones": 128
+    },
+    "npc": {
+      "maxTriangles": 18000,
+      "maxMaterials": 3,
+      "maxTextureSize": 1024,
+      "maxBones": 96
+    },
+    "office_environment": {
+      "maxTriangles": 12000,
+      "maxMaterials": 3,
+      "maxTextureSize": 1024,
+      "maxBones": 0
+    },
+    "city_environment": {
+      "maxTriangles": 12000,
+      "maxMaterials": 5,
+      "maxTextureSize": 2048,
+      "maxBones": 0
+    },
+    "vehicle": {
+      "maxTriangles": 25000,
+      "maxMaterials": 5,
+      "maxTextureSize": 2048,
+      "maxBones": 32
+    },
+    "prop": {
+      "maxTriangles": 4000,
+      "maxMaterials": 3,
+      "maxTextureSize": 512,
+      "maxBones": 0
+    }
+  },
+  "results": [
+    {
+      "id": "player-character-makehuman-elegant-suit-1024-candidate",
+      "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_1024.glb",
+      "profile": "player",
+      "profile_limits": {
+        "maxTriangles": 35000,
+        "maxMaterials": 4,
+        "maxTextureSize": 2048,
+        "maxBones": 128
+      },
+      "sha256": "88577acfc12be0a994f35b30f6f07dc6e968aaebdc290b4c3f9d611f55641485",
+      "metrics": {
+        "triangles": 52970,
+        "materials": 9,
+        "bones": 53,
+        "textures": 10,
+        "max_texture_dimension": 1024,
+        "meshes": [
+          {
+            "name": "eyebrow001.001",
+            "triangles": 192,
+            "primitives": 1
+          },
+          {
+            "name": "eyelashes01.001",
+            "triangles": 368,
+            "primitives": 1
+          },
+          {
+            "name": "low-poly.001",
+            "triangles": 172,
+            "primitives": 1
+          },
+          {
+            "name": "male_worksuit01.001",
+            "triangles": 6986,
+            "primitives": 1
+          },
+          {
+            "name": "shoes02.001",
+            "triangles": 3064,
+            "primitives": 1
+          },
+          {
+            "name": "short02.001",
+            "triangles": 3344,
+            "primitives": 1
+          },
+          {
+            "name": "teeth_base.001",
+            "triangles": 7120,
+            "primitives": 1
+          },
+          {
+            "name": "base.002",
+            "triangles": 16768,
+            "primitives": 1
+          },
+          {
+            "name": "male_elegantsuit01_skinned",
+            "triangles": 14956,
+            "primitives": 1
+          }
+        ],
+        "texture_details": [
+          {
+            "name": "eyebrow001",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 512,
+              "height": 512,
+              "maxDimension": 512
+            }
+          },
+          {
+            "name": "eyelashes01",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 512,
+              "height": 512,
+              "maxDimension": 512
+            }
+          },
+          {
+            "name": "brown_eye",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "male_worksuit01_normal",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "male_worksuit01_diffuse",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "shoes02_diffuse",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "short02_diffuse",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "teeth",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "young_lightskinned_male_diffuse",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "male_elegantsuit01_diffuse",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          }
+        ]
+      },
+      "checks": {
+        "file_exists": true,
+        "registry_entry_present": true,
+        "registry_hash_present": true,
+        "registry_path_matches": true,
+        "registry_hash_matches": true,
+        "triangles_within_budget": false,
+        "materials_within_budget": false,
+        "textures_within_budget": true,
+        "bones_within_budget": true
+      },
+      "status": "technical_budget_fail",
+      "visual_status": "unverified",
+      "release_allowed": false
+    }
+  ],
+  "verified_at": "2026-10-17T03:53:42.977Z"
+}

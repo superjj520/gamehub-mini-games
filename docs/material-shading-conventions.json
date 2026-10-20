@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "title": "新时代觉醒者材质与着色规范",
+  "status": "candidate_runtime_only",
+  "engine": "Godot 4 StandardMaterial3D",
+  "policy": "只约束当前原创候选运行时；外部候选、测试夹具和灰盒不自动提升为发布材质",
+  "color_space": {
+    "albedo_color": "sRGB",
+    "albedo_texture": "sRGB",
+    "roughness": "linear_0_to_1",
+    "metallic": "linear_0_to_1",
+    "emission_color": "sRGB"
+  },
+  "material_families": {
+    "character_matte": {
+      "roughness_range": [0.55, 0.95],
+      "metallic_max": 0.05,
+      "use": "原创玩家、办公室 NPC、城市人群的皮肤、布料、鞋服"
+    },
+    "painted_prop": {
+      "roughness_range": [0.35, 0.9],
+      "metallic_max": 0.35,
+      "use": "办公桌、交互道具、车辆车身等涂装表面"
+    },
+    "metal_trim": {
+      "roughness_range": [0.2, 0.65],
+      "metallic_range": [0.2, 0.95],
+      "use": "金属边框、车辆金属件、门框和结构件"
+    },
+    "glass_alpha": {
+      "roughness_range": [0.15, 0.45],
+      "metallic_max": 0.1,
+      "transparency": "alpha",
+      "use": "办公室玻璃隔断与三轮车前挡风玻璃；必须保留实体碰撞，透明只作用于视觉层"
+    },
+    "emissive_light": {
+      "roughness_range": [0.5, 1.0],
+      "metallic_max": 0.0,
+      "emission": "仅用于灯带、屏幕、尾灯和必要的顶灯补偿"
+    },
+    "facade_card": {
+      "roughness_range": [0.7, 1.0],
+      "metallic_max": 0.05,
+      "texture": "原创生成贴图；按 sRGB 采样；只作为远景或低交互表面"
+    },
+    "road_asphalt": {
+      "roughness_range": [0.82, 1.0],
+      "metallic_max": 0.0,
+      "texture": "道路可使用原创程序材质或已完成权利记录的纹理；不能伪装成原创"
+    }
+  },
+  "runtime_scope": {
+    "roots": [
+      "gta-reference-runtime/assets/characters/original-procedural-office-characters",
+      "gta-reference-runtime/assets/characters/original-procedural-city-crowd",
+      "gta-reference-runtime/assets/environment/original-procedural-city-environment",
+      "gta-reference-runtime/assets/props/original-procedural-interaction-props",
+      "gta-reference-runtime/assets/vehicles/three-wheel-delivery",
+      "gta-reference-runtime/content/candidates"
+    ],
+    "allowed_material_types": ["StandardMaterial3D"],
+    "forbidden_material_types": ["ShaderMaterial"],
+    "texture_sources": [
+      "gta-reference-runtime/assets/environment/generated"
+    ],
+    "transparent_surface_paths": [
+      "original_office_desk_runtime_candidate.gd",
+      "gta-reference-runtime/assets/characters/original-procedural-office-characters/original_player_candidate.gd",
+      "gta-reference-runtime/assets/vehicles/three-wheel-delivery/original_city_vehicle_candidate.gd"
+    ]
+  },
+  "scene_budgets": {
+    "office_material_variants_target": 24,
+    "city_material_variants_target": 32,
+    "transparent_surface_families_max": 1,
+    "custom_shader_count_target": 0,
+    "note": "预算是候选运行时门槛，不替代真实窗口性能测试和目标设备验收"
+  },
+  "release_gate": {
+    "technical_convention_pass": true,
+    "visual_signoff_required": true,
+    "rights_signoff_required": true,
+    "windows_device_qa_required": true
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "policy": "candidate_city_full_kit_makehuman_crowd_overlay",
+  "slots": [
+    {"id": "player-character", "category": "characters", "root_name": "Visual", "scene_path": "res://assets/characters/quaternius-superhero-male/player_character_quaternius_candidate.tscn", "fallback_policy": "forbid"},
+    {"id": "city-player-character", "category": "characters", "root_name": "Visual", "scene_path": "res://art-source/characters/quaternius-superhero-male/player_character_visual_candidate.tscn", "fallback_policy": "forbid"},
+    {"id": "office-npc-set", "category": "characters", "root_name": "Visual", "scene_path": "", "fallback_policy": "procedural_graybox"},
+    {"id": "city-crowd-set", "category": "characters", "root_name": "Visual", "scene_path": "res://art-source/city-full-kit-candidate/city_crowd_makehuman_runtime_overlay.tscn", "fallback_policy": "forbid"},
+    {"id": "three-wheel-vehicle", "category": "vehicles", "root_name": "Visual", "scene_path": "res://art-source/vehicles/three-wheel-delivery/three_wheel_delivery_atlas_candidate.tscn", "fallback_policy": "forbid"},
+    {"id": "office-environment-kit", "category": "environment", "root_name": "Visual", "scene_path": "", "fallback_policy": "procedural_graybox"},
+    {"id": "city-environment-kit", "category": "environment", "root_name": "Visual", "scene_path": "res://art-source/city-full-kit-candidate/city_environment_storefront_candidate.tscn", "fallback_policy": "forbid"},
+    {"id": "interaction-props", "category": "props", "root_name": "Visual", "scene_path": "res://art-source/props/original-interaction-kit/interaction_props_kit.glb", "fallback_policy": "forbid"},
+    {"id": "final-audio-library", "category": "audio", "root_name": "Audio", "scene_path": "", "fallback_policy": "procedural_graybox"}
+  ]
+}

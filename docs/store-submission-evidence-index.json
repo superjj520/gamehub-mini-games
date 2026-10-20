@@ -1,0 +1,367 @@
+{
+  "schema_version": 1,
+  "status": "internal_no_go",
+  "decision": "仅允许内部开发验证，不得提交 Steam 商店",
+  "generated_at": "2026-10-18T18:06:42.460Z",
+  "build_identity": {
+    "project_name": "新时代觉醒者",
+    "project_version": "0.1.0-dev",
+    "engine": "4.7.1.stable.official.a13da4feb",
+    "runtime_root": "gta-reference-runtime",
+    "source_sha256": "bbf3de5eac55aa8fe0fa59847e881bad726e559452cdd86f4982755ec5e9aad4",
+    "source_file_count": 305
+  },
+  "metadata_profile": {
+    "product_name": "新时代觉醒者",
+    "version": "0.1.0-dev",
+    "launch_platforms": [
+      "steam_windows"
+    ],
+    "launch_devices": [
+      "windows_10_11_1080p_keyboard_mouse_gamepad"
+    ],
+    "launch_regions_and_languages": [
+      "中国大陆_简体中文"
+    ],
+    "commercialization": "首发免费测试版_不接真实支付",
+    "copyright_boundary": "original_assets_only",
+    "localization_status": "简体中文基线已确认，其他语言未承诺",
+    "support_status": "客服邮箱和公开反馈入口待确认",
+    "privacy_status": "无网络数据收集基线已验证，正式隐私政策地址待确认",
+    "age_rating_status": "内部问卷草案，正式提交结果待确认",
+    "entitlement_status": "首发免费测试版，不接真实支付；Steam 应用编号待确认",
+    "release_date_status": "公开测试日期待确认"
+  },
+  "evidence_policy": {
+    "reference_videos": "仅内部对照，不进入任何候选包或商店材料",
+    "candidate_assets": "只能作为候选评审证据，不等同于最终资产或发布授权",
+    "visual_evidence": "截图和扩展矩阵必须绑定同一源指纹，并经过人工验收后才可改为 passed",
+    "owner_fields": "客服、隐私、Steam 应用编号、年龄分级、日期和运营主体不得由工程猜测"
+  },
+  "packages": [
+    {
+      "path": "build/新时代觉醒者-完整候选-windows-qa.zip",
+      "metadata_path": "reference-evidence/candidate-runtime/full-candidate-windows-qa-bundle.json",
+      "exists": true,
+      "status": "internal_candidate_windows_qa_bundle_generated",
+      "bytes": 147018355,
+      "sha256": "254e13578dcee7c7e4a80f932e1802c353384346a4d72cc05f0f2fc6caca4731",
+      "source_sha256": "bbf3de5eac55aa8fe0fa59847e881bad726e559452cdd86f4982755ec5e9aad4",
+      "source_file_count": 305,
+      "entry_count": 429
+    },
+    {
+      "path": "build/新时代觉醒者-原创角色候选-windows-qa.zip",
+      "metadata_path": "reference-evidence/candidate-runtime/full-candidate-windows-original-qa-bundle.json",
+      "exists": true,
+      "status": "internal_candidate_windows_qa_bundle_generated",
+      "bytes": 143964089,
+      "sha256": "2cc29d415111578676dd4d02989738d144c43886f3bef12c523f7ee15dac21cd",
+      "source_sha256": "bbf3de5eac55aa8fe0fa59847e881bad726e559452cdd86f4982755ec5e9aad4",
+      "source_file_count": 305,
+      "entry_count": 425
+    },
+    {
+      "path": "build/新时代觉醒者-原创边界候选-windows-qa.zip",
+      "metadata_path": "reference-evidence/candidate-runtime/full-candidate-windows-original-only-qa-bundle.json",
+      "exists": true,
+      "status": "internal_candidate_windows_qa_bundle_generated",
+      "bytes": 105568891,
+      "sha256": "010a959b2c6198b9d0a425976d987d713fb442e30a9e7e87c9b1284456e8bbc6",
+      "source_sha256": "bbf3de5eac55aa8fe0fa59847e881bad726e559452cdd86f4982755ec5e9aad4",
+      "source_file_count": 305,
+      "entry_count": 269
+    },
+    {
+      "path": "build/p0-office-candidate-review-bbf3de5e.zip",
+      "metadata_path": "build/p0-office-candidate-review-bbf3de5e.json",
+      "exists": true,
+      "status": "internal_candidate_review_only",
+      "bytes": 18860357,
+      "sha256": "31a7a4a0637684c391373ae5f55aa76db340657713dc9cbe6c0ea4e8adfbd137",
+      "source_sha256": "bbf3de5eac55aa8fe0fa59847e881bad726e559452cdd86f4982755ec5e9aad4",
+      "source_file_count": 305,
+      "entry_count": null
+    },
+    {
+      "path": "build/city-candidate-review-bbf3de5e.zip",
+      "metadata_path": "build/city-candidate-review-bbf3de5e.json",
+      "exists": true,
+      "status": "internal_candidate_review_only",
+      "bytes": 49082966,
+      "sha256": "8e0cf4a67e940738a92e61e1b0187624130cf1043ac8c2b1652ae41dcd411010",
+      "source_sha256": "bbf3de5eac55aa8fe0fa59847e881bad726e559452cdd86f4982755ec5e9aad4",
+      "source_file_count": 305,
+      "entry_count": 159
+    }
+  ],
+  "candidate_playtest": {
+    "path": "reference-evidence/candidate-runtime/full-candidate-playtest.json",
+    "status": "candidate_isolated_full_playtest_verified",
+    "source_sha256": "bbf3de5eac55aa8fe0fa59847e881bad726e559452cdd86f4982755ec5e9aad4",
+    "source_file_count": 305,
+    "entries": [
+      "office-candidate",
+      "city-candidate",
+      "city-market-candidate"
+    ],
+    "visual_status": "unverified",
+    "release_allowed": false
+  },
+  "release_candidate": {
+    "variant": "original_only",
+    "package_root": "build/internal-full-candidate-original-only",
+    "playtest_path": "reference-evidence/candidate-runtime/full-candidate-playtest-original-only.json",
+    "qa_bundle_path": "reference-evidence/candidate-runtime/full-candidate-windows-original-only-qa-bundle.json",
+    "status": "candidate_isolated_full_playtest_verified",
+    "source_sha256": "bbf3de5eac55aa8fe0fa59847e881bad726e559452cdd86f4982755ec5e9aad4",
+    "source_file_count": 305,
+    "visual_status": "unverified",
+    "release_allowed": false,
+    "policy": "产品基线为 original_assets_only；只有原创边界候选可以进入后续发布验收，其他候选仅用于内部对比。"
+  },
+  "gate_matrix": [
+    {
+      "id": "product_baseline",
+      "status": "approved",
+      "evidence": [
+        "docs/product-baseline-decision.json"
+      ]
+    },
+    {
+      "id": "behavior_matrix",
+      "status": "passed",
+      "counts": {
+        "total": 10,
+        "graybox": 0,
+        "passed": 10
+      },
+      "evidence": [
+        "reference-evidence/acceptance-status.json",
+        "reference-evidence/expanded-runtime-matrix/behavior-evidence.json"
+      ],
+      "expanded_behavior": {
+        "status": "expanded_behavior_verified",
+        "visual_status": "unverified",
+        "release_allowed": false,
+        "source_sha256": "bbf3de5eac55aa8fe0fa59847e881bad726e559452cdd86f4982755ec5e9aad4",
+        "source_file_count": 305
+      }
+    },
+    {
+      "id": "visual_matrix",
+      "status": "blocked_unverified",
+      "counts": {
+        "total": 10,
+        "unverified": 10,
+        "passed": 0
+      },
+      "evidence": [
+        "reference-evidence/runtime-matrix/manifest.json",
+        "reference-evidence/runtime-captures/manifest.json"
+      ],
+      "binding": {
+        "current_source_sha256": "bbf3de5eac55aa8fe0fa59847e881bad726e559452cdd86f4982755ec5e9aad4",
+        "current_source_file_count": 305,
+        "recorded_source_sha256": "42dca8722414f9fc73d731d8b0211e235c9c32f93633603e928d3657d47dd5f1",
+        "recorded_source_file_count": 285,
+        "status": "unverified_and_binding_mismatch"
+      }
+    },
+    {
+      "id": "expanded_visual_matrix",
+      "status": "blocked_unverified",
+      "counts": {
+        "total": 0,
+        "passed": 0,
+        "unverified": 0
+      },
+      "evidence": [
+        "reference-evidence/expanded-runtime-matrix/manifest.json",
+        "reference-evidence/expanded-runtime-matrix/behavior-evidence.json"
+      ],
+      "binding": {
+        "current_source_sha256": "bbf3de5eac55aa8fe0fa59847e881bad726e559452cdd86f4982755ec5e9aad4",
+        "current_source_file_count": 305,
+        "recorded_source_sha256": "bbf3de5eac55aa8fe0fa59847e881bad726e559452cdd86f4982755ec5e9aad4",
+        "recorded_source_file_count": 305
+      }
+    },
+    {
+      "id": "final_assets",
+      "status": "blocked_incomplete",
+      "counts": {
+        "total": 6,
+        "graybox": 6
+      },
+      "evidence": [
+        "docs/asset-production-manifest.json",
+        "docs/asset-candidate-registry.json",
+        "docs/asset-rights-register.md"
+      ]
+    },
+    {
+      "id": "rights_boundary",
+      "status": "blocked_assets",
+      "evidence": [
+        "gta-reference-runtime/content/rights-manifest.json",
+        "gta-reference-runtime/THIRD_PARTY_NOTICES.md"
+      ]
+    },
+    {
+      "id": "target_platform",
+      "status": "blocked_target_device_unverified",
+      "evidence": [
+        "docs/windows-build-manifest.json",
+        "docs/steam-windows-export-plan.md",
+        "docs/windows-device-qa-runbook.md"
+      ],
+      "current_builds": [
+        {
+          "name": "新时代觉醒者 Windows 内部测试",
+          "path": "build/windows/新时代觉醒者.exe",
+          "status": "unverified",
+          "includes_tests": true,
+          "sha256": "ea7f17462005d04a926617c21f24b41292370a16d45f8e5dc1ec6b171afe8618",
+          "bytes": 216094536
+        },
+        {
+          "name": "新时代觉醒者 Windows 首发候选",
+          "path": "build/windows/新时代觉醒者-首发候选.exe",
+          "status": "unverified",
+          "includes_tests": false,
+          "sha256": "4546da2470fb14468e6170e3d7caede146e4487e2b325308ec84aa4afd742253",
+          "bytes": 166962576
+        }
+      ]
+    },
+    {
+      "id": "store_compliance",
+      "status": "blocked_draft_only",
+      "evidence": [
+        "docs/store-submission-checklist.md",
+        "docs/store-metadata-draft.md",
+        "docs/privacy-policy-draft-zh-CN.md",
+        "docs/support-and-rollback-plan.md",
+        "docs/age-rating-questionnaire-zh-CN.md"
+      ],
+      "strict_materials": {
+        "mode": "strict",
+        "status": "blocked_pending_owner_inputs",
+        "command": "npm run verify:store-materials:strict",
+        "unresolved_count": 6,
+        "owner_input_ids": [
+          "support_email",
+          "privacy_policy_url",
+          "steam_app_id",
+          "age_rating_submission",
+          "public_test_date",
+          "operating_entity"
+        ]
+      }
+    },
+    {
+      "id": "rollback",
+      "status": "internal_rehearsal_passed_target_platform_pending",
+      "evidence": [
+        "reference-evidence/release-rollback-rehearsal.json",
+        "docs/support-and-rollback-plan.md"
+      ]
+    }
+  ],
+  "owner_inputs": [
+    {
+      "id": "support_email",
+      "label": "客服邮箱",
+      "status": "pending_user_confirmation",
+      "required_before": [
+        "store_submission",
+        "privacy_policy",
+        "public_test"
+      ],
+      "value_present": false
+    },
+    {
+      "id": "privacy_policy_url",
+      "label": "正式隐私政策地址",
+      "status": "pending_user_confirmation",
+      "required_before": [
+        "store_submission",
+        "public_test"
+      ],
+      "value_present": false
+    },
+    {
+      "id": "steam_app_id",
+      "label": "Steam 应用编号",
+      "status": "pending_publisher_setup",
+      "required_before": [
+        "steam_upload",
+        "steam_branch",
+        "store_submission"
+      ],
+      "value_present": false
+    },
+    {
+      "id": "age_rating_submission",
+      "label": "正式年龄分级提交结果",
+      "status": "pending_legal_review",
+      "required_before": [
+        "store_submission"
+      ],
+      "value_present": false
+    },
+    {
+      "id": "public_test_date",
+      "label": "公开测试日期",
+      "status": "pending_release_owner_confirmation",
+      "required_before": [
+        "store_submission",
+        "public_test"
+      ],
+      "value_present": false
+    },
+    {
+      "id": "operating_entity",
+      "label": "运营主体与隐私责任主体",
+      "status": "pending_legal_review",
+      "required_before": [
+        "privacy_policy",
+        "store_submission"
+      ],
+      "value_present": false
+    }
+  ],
+  "next_actions": [
+    {
+      "id": "visual_capture_and_signoff",
+      "owner": "视觉负责人",
+      "status": "pending_manual_visual_signoff",
+      "evidence": "reference-evidence/runtime-matrix/manifest.json"
+    },
+    {
+      "id": "final_asset_rights_signoff",
+      "owner": "美术/音频/权利负责人",
+      "status": "pending",
+      "evidence": "docs/asset-production-manifest.json"
+    },
+    {
+      "id": "windows_device_qa",
+      "owner": "发布工程负责人",
+      "status": "pending",
+      "evidence": "docs/windows-device-qa-runbook.md"
+    },
+    {
+      "id": "store_owner_inputs",
+      "owner": "产品/发行/法务负责人",
+      "status": "pending_user_confirmation",
+      "evidence": "docs/release-owner-inputs.json"
+    }
+  ],
+  "forbidden_content": [
+    "reference-evidence/video-1/",
+    "reference-evidence/video-2/",
+    "参考视频",
+    "未授权商业资产"
+  ]
+}

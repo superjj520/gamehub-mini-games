@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "asset_id": "three-wheel-delivery-final-candidate-detailed-v2",
+  "category": "vehicles",
+  "source": {
+    "type": "original_procedural_generation",
+    "source_file": "art-source/vehicles/three-wheel-delivery/build_three_wheel_delivery_glb.py",
+    "license": "原创生成，项目方自有候选源"
+  },
+  "conventions": {
+    "unit": "meter",
+    "up_axis": "+Y",
+    "forward_axis": "-Z",
+    "pivot": "body_center"
+  },
+  "technical_budget_variant": "five_material_slots_detailed_v2",
+  "runtime_file": "art-source/vehicles/three-wheel-delivery/final-candidate/three_wheel_delivery_final_candidate.glb",
+  "runtime_sha256": "8c1dbcfff34cba5e73d1805021aebcf5f15d0ba98b173392580bba72e236d897",
+  "release_allowed": false,
+  "visual_status": "unverified",
+  "remaining_acceptance": [
+    "当前 Godot 图形运行时截图",
+    "Windows 10/11 性能",
+    "产品负责人视觉签收",
+    "正式候选场景挂载与版本绑定"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_manual_acceptance_pending",
+  "product_name": "新时代觉醒者",
+  "capture_id": "city-08",
+  "reference_frame": "reference-evidence/video-1/city-08.jpg",
+  "candidate_image": "reference-evidence/candidate-runtime/city-storefront-candidate-city-08.png",
+  "candidate_image_sha256": "9f85f8d7ab5d7fa91c8135871eac6fd2ff310aeda1ae57c65225437db98cc320",
+  "formal_source_fingerprint": "6b0aaa2811cead9b10ddd1645cfdb4da2f5b1c8c07d68038f8ebc67da59ef98f",
+  "formal_source_file_count": 242,
+  "candidate_package_fingerprint": "2938069a9c93d39f67d770b3a72836167019c2dfc5e19fdadc39d914b12517c4",
+  "candidate_package_file_count": 332,
+  "capture_method": "visible_graphics_window",
+  "resolution": [1280, 720],
+  "camera_contract": {
+    "mode": "vehicle_relative_fixed_rear_capture_only",
+    "fov_degrees": 58.0,
+    "vehicle_distance": 7.4,
+    "height": 3.05
+  },
+  "runtime_validation": {
+    "vehicle_visible": true,
+    "driver_is_player": true,
+    "traffic_visible": 3,
+    "drive_background_visible": true,
+    "formal_runtime_logic_changed": false
+  },
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "manual_visual_signoff": false,
+  "findings": [
+    "三轮车完整车体、驾驶员、道路中线、前方交通和城市纵深已在真实图形窗口中同时可见。",
+    "候选道路卡已完整覆盖 1280×720 画面，前景车辆与 HUD 没有被背景层遮挡。",
+    "与参考帧相比，载具比例、人物动作、背景层级、HUD 和材质仍需人工逐帧签收。",
+    "该截图是候选改进证据，不是最终视觉签收或商店素材。"
+  ],
+  "captured_at": "2026-10-15"
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "status": "graphical_capture_failed",
+  "failure_kind": "timeout",
+  "generated_at": "2026-10-14T17:48:32.580Z",
+  "process": {
+    "pid": 24470,
+    "timeout_seconds": 90
+  },
+  "source": {
+    "sha256": "72dc6f9e47dd9ea6f4d4674192f974123fa8ef16c0bd261ed0cd7bab504fd7e3",
+    "file_count": 242
+  },
+  "log_path": "/tmp/新时代觉醒者-reference-capture-background.log",
+  "command": "timeout /Users/superjj/gamehub-mini-games 24470 90 --path gta-reference-runtime --scene res://tests/reference_capture_runner.tscn --display-driver macos --audio-driver Dummy --rendering-driver opengl3 --rendering-method gl_compatibility --single-window --windowed --resolution 1280x720 --log-file /tmp/新时代觉醒者-reference-capture-background.log --quit-after 12000",
+  "policy": "失败记录只用于诊断，不构成 PNG、视觉验收或发布证据"
+}

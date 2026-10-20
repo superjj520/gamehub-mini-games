@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "asset_id": "office-elevator-lobby-v2-generated-candidate",
+  "asset_type": "original_generated_environment_background_card",
+  "project": "新时代觉醒者",
+  "source_author": "新时代觉醒者项目原创图像候选",
+  "generation_mode": "built_in_image_generation",
+  "prompt_summary": "原创办公室电梯厅；双电梯门、暖米色墙、深色门框、线性荧光灯、傍晚侧窗暖光；无人物、无界面、无品牌文字",
+  "source_reference_policy": "仅借鉴参考视频的空间关系和光线，不复用人物、界面、品牌或可识别文字",
+  "file": "office_elevator_lobby_v2_generated.png",
+  "sha256": "4a1acc92f49e3ca5923399d7f775f3a5dbb34afd9b7941b99d801e98e6f631da",
+  "dimensions": [1672, 941],
+  "integration_role": "isolated_office_candidate_elevator_lobby_visual_only",
+  "collision_or_logic": false,
+  "visual_status": "unverified",
+  "rights_status": "original_generated_candidate_not_final_signed",
+  "release_allowed": false,
+  "open_findings": [
+    "需要在办公室固定镜头中验收门体比例、地面反射、角色遮挡关系和灯光统一性",
+    "需要完成 Windows 目标设备截图、性能和最终权利签收"
+  ]
+}

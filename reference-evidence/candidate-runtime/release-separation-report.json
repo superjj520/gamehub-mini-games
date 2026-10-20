@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "status": "passed_internal_boundary",
+  "generated_at": "2026-10-20T03:12:56.508Z",
+  "formal_runtime": {
+    "path": "gta-reference-runtime",
+    "source_fingerprint": "37e951e2f2b1f105bad2be4bb124b4d457a0b779b15653fb3d4c31971f70ba6e",
+    "file_count": 327,
+    "launch_profile": "approved"
+  },
+  "export_presets": {
+    "internal_test": {
+      "name": "新时代觉醒者 Windows 内部测试",
+      "runnable": "true",
+      "export_path": "../build/windows/新时代觉醒者.exe"
+    },
+    "first_launch_candidate": {
+      "name": "新时代觉醒者 Windows 首发候选",
+      "runnable": "false",
+      "export_path": "../build/windows/新时代觉醒者-首发候选.exe",
+      "exclude_filter_count": 13
+    }
+  },
+  "launch_profile_asset_catalogs": [
+    {
+      "entry_id": "office",
+      "path": "res://content/asset-runtime-catalog.json",
+      "status": "internal_only_candidate_assets",
+      "blocked_scene_paths": [
+        "assets/characters/original-procedural-office-characters/original_player_candidate.tscn",
+        "assets/characters/original-procedural-office-characters/original_office_npc_candidate.tscn",
+        "assets/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.tscn",
+        "assets/environment/original-procedural-city-environment/original_city_environment_candidate.tscn",
+        "assets/props/original-procedural-interaction-props/original_interaction_props_candidate.tscn"
+      ]
+    },
+    {
+      "entry_id": "city",
+      "path": "res://content/asset-runtime-catalog.json",
+      "status": "internal_only_candidate_assets",
+      "blocked_scene_paths": [
+        "assets/characters/original-procedural-office-characters/original_player_candidate.tscn",
+        "assets/characters/original-procedural-office-characters/original_office_npc_candidate.tscn",
+        "assets/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.tscn",
+        "assets/environment/original-procedural-city-environment/original_city_environment_candidate.tscn",
+        "assets/props/original-procedural-interaction-props/original_interaction_props_candidate.tscn"
+      ]
+    }
+  ],
+  "candidate_package": {
+    "path": "build/internal-full-candidate",
+    "character_variant": "makehuman",
+    "status": "internal_candidate_review_only",
+    "release_allowed": false,
+    "sha256": "deb8676fe13010f1869f15251e1f569107af9afe1f33f9d17b999d6fac2b3490",
+    "file_count": 451
+  },
+  "candidate_packages": [
+    {
+      "path": "build/internal-full-candidate",
+      "character_variant": "makehuman",
+      "status": "internal_candidate_review_only",
+      "release_allowed": false,
+      "sha256": "deb8676fe13010f1869f15251e1f569107af9afe1f33f9d17b999d6fac2b3490",
+      "file_count": 451
+    },
+    {
+      "path": "build/internal-full-candidate-original",
+      "character_variant": "original",
+      "status": "internal_candidate_review_only",
+      "release_allowed": false,
+      "sha256": "91287ab11dbd1d57febcff2bcfce550409b08e8a5769ec21bb8b1a9cd58b366f",
+      "file_count": 447
+    }
+  ],
+  "policy": "正式运行时、内部测试构建和完整候选包必须分离；候选包不得升级为 release_allowed=true。",
+  "errors": []
+}

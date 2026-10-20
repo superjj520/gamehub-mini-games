@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_visual_rejected",
+  "capture_scope": "MakeHuman 主角候选与 Quaternius 城市人群/城市环境的三段 A/B 视觉采集",
+  "candidate_catalog": "art-source/city-full-kit-candidate/asset-runtime-catalog-city-full-kit-makehuman-player-override.json",
+  "candidate_catalog_sha256": "c6aaa69cf726f4ae762b29abbd656fea290b9e885499dd3c753a7b8238454d1b",
+  "runtime_source_fingerprint": "eef75fe2e8fbd6b30ad2306564182486451345e915baf886bb44a63dcd2802f0",
+  "runtime_source_file_count": 227,
+  "backend": "Godot 4.7.1 OpenGL compatibility viewport capture",
+  "resolution": "1280x720",
+  "captures": [
+    {
+      "id": "city-01",
+      "image": "reference-evidence/candidate-runtime/city-makehuman-player-candidate-city-01-v27.png",
+      "sha256": "7c5cd7f8cf6ec0f660f136696fa8228e5d611724108afb221e54c65bbf374267",
+      "manual_decision": "retain_for_next_player_visual_iteration",
+      "finding": "主角轮廓和店铺写实纹理明显优于 Quaternius 主角，但城市人群比例、遮挡密度和 HUD 仍拒收"
+    },
+    {
+      "id": "city-08",
+      "image": "reference-evidence/candidate-runtime/city-makehuman-player-candidate-city-08-v27.png",
+      "sha256": "e0517f7d335c786e1ddebf2c5ed935716b43354589da661dd48f13cd0c427073",
+      "manual_decision": "retain_for_next_player_visual_iteration",
+      "finding": "驾驶镜头中主角比例更接近真人，但载具坐姿、城市右前方体块、道路材质和 HUD 仍拒收"
+    },
+    {
+      "id": "city-11",
+      "image": "reference-evidence/candidate-runtime/city-makehuman-player-candidate-city-11-v27.png",
+      "sha256": "09bb65e2b1a1034c2649d3fd6263f82aa4ec1b16b72c53a831a89bb36dae49dd",
+      "manual_decision": "reject_for_runtime_state",
+      "finding": "终点镜头仍显示旧灰盒角色表现，MakeHuman 驾驶状态未稳定接管；必须先修复载具状态下的主角挂载再进入视觉签收"
+    }
+  ],
+  "release_allowed": false,
+  "next_gate": "修复 MakeHuman 主角 vehicle_default 状态的真实挂载与坐姿，重新采集 city-08/city-11，再决定主角候选是否进入 P0 成品生产"
+}

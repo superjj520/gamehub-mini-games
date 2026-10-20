@@ -1,0 +1,618 @@
+{
+	"asset_catalog_path": "res://tests/asset-runtime-catalog-full-candidates.json",
+	"camera_contract": {
+		"distance": 1.45,
+		"height": 1.22,
+		"pitch_degrees": -20.0,
+		"shoulder_offset": [
+			0.649999976158142,
+			0.0199999995529652,
+			0.280000001192093
+		],
+		"yaw_degrees": 90.0
+	},
+	"camera_probe_override": {},
+	"capture_mode": "graphical_window",
+	"image": "/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/makehuman-office-typing-candidate-current/makehuman-office-typing-current.png",
+	"notes": "候选角色已使用真实 Skeleton3D 坐姿骨骼；不代表最终视觉、权利或目标设备通过",
+	"release_allowed": false,
+	"runtime_debug": {
+		"active_workstation": "office_workstation_01",
+		"active_workstation_global_position": [
+			0.0,
+			1.0,
+			3.04999995231628
+		],
+		"nearby_large_meshes": [
+			{
+				"global_position": [
+					0.0,
+					0.860000014305115,
+					1.48000001907349
+				],
+				"local_bounds_size": [
+					2.29999995231628,
+					0.860000014305115,
+					0.0700000002980232
+				],
+				"path": "/root/BenchmarkScene/原创办公室工位半高屏风-01",
+				"visible": false
+			},
+			{
+				"global_position": [
+					0.0,
+					0.75,
+					0.800000011920929
+				],
+				"local_bounds_size": [
+					3.0,
+					1.5,
+					1.39999997615814
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@124/@MeshInstance3D@125",
+				"visible": false
+			},
+			{
+				"global_position": [
+					0.0799999237060547,
+					1.27999997138977,
+					3.84000015258789
+				],
+				"local_bounds_size": [
+					0.819999992847443,
+					0.560000002384186,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/办公桌/原创右前显示器外框",
+				"visible": true
+			},
+			{
+				"global_position": [
+					-1.20000028610229,
+					1.54999995231628,
+					0.649999976158142
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/办公桌/@MeshInstance3D@186",
+				"visible": false
+			},
+			{
+				"global_position": [
+					-1.20000028610229,
+					1.54999995231628,
+					6.15000009536743
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/办公桌/@MeshInstance3D@194",
+				"visible": false
+			},
+			{
+				"global_position": [
+					2.39999961853027,
+					1.54999995231628,
+					0.649999976158142
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/办公桌/@MeshInstance3D@202",
+				"visible": false
+			},
+			{
+				"global_position": [
+					2.39999961853027,
+					1.54999995231628,
+					6.15000009536743
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/办公桌/@MeshInstance3D@210",
+				"visible": false
+			},
+			{
+				"global_position": [
+					0.0799999982118607,
+					1.27999997138977,
+					1.8400000333786
+				],
+				"local_bounds_size": [
+					0.819999992847443,
+					0.560000002384186,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@359/原创显示器外框",
+				"visible": true
+			},
+			{
+				"global_position": [
+					-3.59999990463257,
+					1.54999995231628,
+					0.649999976158142
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@359/@MeshInstance3D@372",
+				"visible": false
+			},
+			{
+				"global_position": [
+					0.0,
+					1.54999995231628,
+					0.649999976158142
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@359/@MeshInstance3D@388",
+				"visible": false
+			},
+			{
+				"global_position": [
+					0.0,
+					1.54999995231628,
+					6.15000009536743
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@359/@MeshInstance3D@396",
+				"visible": false
+			},
+			{
+				"global_position": [
+					3.59999990463257,
+					1.54999995231628,
+					0.649999976158142
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@359/@MeshInstance3D@404",
+				"visible": false
+			},
+			{
+				"global_position": [
+					0.0,
+					1.79999995231628,
+					-1.15000009536743
+				],
+				"local_bounds_size": [
+					10.8000001907349,
+					3.59999990463257,
+					0.0
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@359/原创办公室走廊近景连续工位图卡",
+				"visible": false
+			},
+			{
+				"global_position": [
+					0.0799999237060547,
+					1.27999997138977,
+					3.84000015258789
+				],
+				"local_bounds_size": [
+					0.819999992847443,
+					0.560000002384186,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@577/原创左前显示器外框",
+				"visible": true
+			},
+			{
+				"global_position": [
+					-2.39999961853027,
+					1.54999995231628,
+					0.649999976158142
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@577/原创玻璃隔断",
+				"visible": false
+			},
+			{
+				"global_position": [
+					-2.39999961853027,
+					1.54999995231628,
+					6.15000009536743
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@577/@MeshInstance3D@582",
+				"visible": false
+			},
+			{
+				"global_position": [
+					1.20000028610229,
+					1.54999995231628,
+					0.649999976158142
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@577/@MeshInstance3D@590",
+				"visible": false
+			},
+			{
+				"global_position": [
+					1.20000028610229,
+					1.54999995231628,
+					6.15000009536743
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@577/@MeshInstance3D@598",
+				"visible": false
+			},
+			{
+				"global_position": [
+					-1.20000028610229,
+					1.54999995231628,
+					0.850000143051147
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@795/@MeshInstance3D@848",
+				"visible": false
+			},
+			{
+				"global_position": [
+					2.39999961853027,
+					1.54999995231628,
+					0.850000143051147
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@795/@MeshInstance3D@864",
+				"visible": false
+			},
+			{
+				"global_position": [
+					-2.39999961853027,
+					1.54999995231628,
+					0.850000143051147
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@1013/@MeshInstance3D@1018",
+				"visible": false
+			},
+			{
+				"global_position": [
+					1.20000028610229,
+					1.54999995231628,
+					0.850000143051147
+				],
+				"local_bounds_size": [
+					3.15000009536743,
+					1.82000005245209,
+					0.0599999986588955
+				],
+				"path": "/root/BenchmarkScene/@StaticBody3D@1013/@MeshInstance3D@1034",
+				"visible": false
+			},
+			{
+				"global_position": [
+					0.0,
+					2.0,
+					5.80000019073486
+				],
+				"local_bounds_size": [
+					16.0,
+					4.0,
+					0.119999997317791
+				],
+				"path": "/root/BenchmarkScene/Visual/后墙",
+				"visible": true
+			},
+			{
+				"global_position": [
+					0.0,
+					2.15000009536743,
+					5.67999982833862
+				],
+				"local_bounds_size": [
+					8.5,
+					1.41999995708466,
+					0.0450000017881393
+				],
+				"path": "/root/BenchmarkScene/Visual/后墙玻璃隔断",
+				"visible": false
+			},
+			{
+				"global_position": [
+					0.0,
+					1.70000004768372,
+					5.65999984741211
+				],
+				"local_bounds_size": [
+					5.40000009536743,
+					3.09999990463257,
+					0.100000001490116
+				],
+				"path": "/root/BenchmarkScene/Visual/电梯厅墙面",
+				"visible": true
+			},
+			{
+				"global_position": [
+					-1.41999995708466,
+					1.26999998092651,
+					5.57000017166138
+				],
+				"local_bounds_size": [
+					1.27999997138977,
+					2.25,
+					0.0799999982118607
+				],
+				"path": "/root/BenchmarkScene/Visual/电梯门",
+				"visible": true
+			},
+			{
+				"global_position": [
+					1.41999995708466,
+					1.26999998092651,
+					5.57000017166138
+				],
+				"local_bounds_size": [
+					1.27999997138977,
+					2.25,
+					0.0799999982118607
+				],
+				"path": "/root/BenchmarkScene/Visual/@MeshInstance3D@1331",
+				"visible": true
+			},
+			{
+				"global_position": [
+					0.0,
+					1.86000001430511,
+					5.40000009536743
+				],
+				"local_bounds_size": [
+					5.01999998092651,
+					2.94000005722046,
+					0.0799999982118607
+				],
+				"path": "/root/BenchmarkScene/Visual/原创办公室电梯厅背景卡边框",
+				"visible": true
+			},
+			{
+				"global_position": [
+					0.0,
+					1.86000001430511,
+					5.34999990463257
+				],
+				"local_bounds_size": [
+					4.8600001335144,
+					2.74000000953674,
+					0.0
+				],
+				"path": "/root/BenchmarkScene/Visual/原创办公室电梯厅写实背景卡",
+				"visible": true
+			},
+			{
+				"global_position": [
+					-2.09999990463257,
+					1.91999995708466,
+					5.42000007629395
+				],
+				"local_bounds_size": [
+					9.05000019073486,
+					3.09999990463257,
+					0.0799999982118607
+				],
+				"path": "/root/BenchmarkScene/Visual/办公室连续工位背景框",
+				"visible": true
+			},
+			{
+				"global_position": [
+					-2.09999990463257,
+					1.91999995708466,
+					5.35500001907349
+				],
+				"local_bounds_size": [
+					8.76000022888184,
+					2.8199999332428,
+					0.0
+				],
+				"path": "/root/BenchmarkScene/Visual/原创办公室连续工位写实背景卡",
+				"visible": true
+			},
+			{
+				"global_position": [
+					0.0,
+					0.879999995231628,
+					-1.29999995231628
+				],
+				"local_bounds_size": [
+					1.54999995231628,
+					0.720000028610229,
+					0.0700000002980232
+				],
+				"path": "/root/BenchmarkScene/Visual/@Node3D@1367/桌后隐私隔断",
+				"visible": false
+			},
+			{
+				"global_position": [
+					-2.04999995231628,
+					0.0,
+					2.0
+				],
+				"local_bounds_size": [
+					2.00000047683716,
+					0.787500023841858,
+					0.917082488536835
+				],
+				"path": "/root/BenchmarkScene/Visual/@StaticBody3D@1390/Geometry/metal_office_desk",
+				"visible": true
+			},
+			{
+				"global_position": [
+					-2.04999995231628,
+					0.879999995231628,
+					1.29999995231628
+				],
+				"local_bounds_size": [
+					1.54999995231628,
+					0.720000028610229,
+					0.0700000002980232
+				],
+				"path": "/root/BenchmarkScene/Visual/@Node3D@1391/桌后隐私隔断",
+				"visible": false
+			},
+			{
+				"global_position": [
+					0.0,
+					0.0,
+					2.0
+				],
+				"local_bounds_size": [
+					2.00000047683716,
+					0.787500023841858,
+					0.917082488536835
+				],
+				"path": "/root/BenchmarkScene/Visual/@StaticBody3D@1396/Geometry/metal_office_desk",
+				"visible": true
+			},
+			{
+				"global_position": [
+					-0.0000000611959407592622,
+					0.879999995231628,
+					1.29999995231628
+				],
+				"local_bounds_size": [
+					1.54999995231628,
+					0.720000028610229,
+					0.0700000002980232
+				],
+				"path": "/root/BenchmarkScene/Visual/@Node3D@1397/桌后隐私隔断",
+				"visible": false
+			},
+			{
+				"global_position": [
+					2.04999995231628,
+					0.0,
+					2.0
+				],
+				"local_bounds_size": [
+					2.00000047683716,
+					0.787500023841858,
+					0.917082488536835
+				],
+				"path": "/root/BenchmarkScene/Visual/@StaticBody3D@1402/Geometry/metal_office_desk",
+				"visible": true
+			},
+			{
+				"global_position": [
+					2.04999995231628,
+					0.879999995231628,
+					1.29999995231628
+				],
+				"local_bounds_size": [
+					1.54999995231628,
+					0.720000028610229,
+					0.0700000002980232
+				],
+				"path": "/root/BenchmarkScene/Visual/@Node3D@1403/桌后隐私隔断",
+				"visible": false
+			},
+			{
+				"global_position": [
+					0.0,
+					0.100000023841858,
+					2.79999995231628
+				],
+				"local_bounds_size": [
+					1.19494020938873,
+					1.01598024368286,
+					0.470630139112473
+				],
+				"path": "/root/BenchmarkScene/玩家/Visual/候选主角身体/Human_rig_export/Skeleton3D/Human_export",
+				"visible": true
+			},
+			{
+				"global_position": [
+					0.0,
+					0.100000023841858,
+					2.79999995231628
+				],
+				"local_bounds_size": [
+					1.05290007591248,
+					1.47712004184723,
+					0.368809998035431
+				],
+				"path": "/root/BenchmarkScene/玩家/Visual/候选主角身体/Human_rig_export/Skeleton3D/Human_male_elegantsuit01_skinned_export",
+				"visible": true
+			}
+		],
+		"player_global_position": [
+			0.0,
+			1.0,
+			3.04999995231628
+		],
+		"player_rotation_degrees": [
+			0.0,
+			0.0,
+			0.0
+		],
+		"visual": {
+			"child_count": 3,
+			"global_position": [
+				0.0,
+				1.0,
+				3.04999995231628
+			],
+			"global_scale": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"root_name": "Visual",
+			"visible": true
+		}
+	},
+	"schema_version": 1,
+	"state": "typing_default",
+	"status": "candidate_makehuman_office_typing_captured",
+	"visual_status": "unverified"
+}

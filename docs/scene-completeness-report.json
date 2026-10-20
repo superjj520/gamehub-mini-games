@@ -1,0 +1,843 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-19T02:25:38.315Z",
+  "source": {
+    "sha256": "1e8a096045408aa6e47749bd84a6d73f064310ae14ba92faf159c5aac6e5bf38",
+    "file_count": 323
+  },
+  "status": "scene_assembly_graybox",
+  "completion_proven": false,
+  "core_reference_scope": {
+    "expected_states": 21,
+    "city": {
+      "expected": 11,
+      "visual_builder_present": 11,
+      "runtime_selector_present": 11,
+      "reference_record_present": 11,
+      "visual_contract_present": 11,
+      "missing_visual_contracts": [],
+      "empty_visual_contract_layers": [],
+      "missing_visual_builders": [],
+      "missing_runtime_selectors": [],
+      "missing_reference_records": [],
+      "visual_builder_states": [
+        "city-01",
+        "city-02",
+        "city-03",
+        "city-04",
+        "city-05",
+        "city-06",
+        "city-07",
+        "city-08",
+        "city-09",
+        "city-10",
+        "city-11"
+      ],
+      "runtime_selector_states": [
+        "city-01",
+        "city-02",
+        "city-03",
+        "city-04",
+        "city-05",
+        "city-06",
+        "city-07",
+        "city-08",
+        "city-09",
+        "city-10",
+        "city-11"
+      ],
+      "reference_record_states": [
+        "city-01",
+        "city-02",
+        "city-03",
+        "city-04",
+        "city-05",
+        "city-06",
+        "city-07",
+        "city-08",
+        "city-09",
+        "city-10",
+        "city-11"
+      ],
+      "visual_contract_layers": {
+        "city-01": [
+          "storefront",
+          "shutter",
+          "entrance",
+          "crowd",
+          "sidewalk_depth",
+          "shop_lighting"
+        ],
+        "city-02": [
+          "storefront",
+          "crowd_density",
+          "crowd_buffer",
+          "sidewalk_depth",
+          "shop_lighting"
+        ],
+        "city-03": [
+          "shelves",
+          "product_bands",
+          "floor",
+          "store_light"
+        ],
+        "city-04": [
+          "store_aisle",
+          "egg_tray",
+          "eggs",
+          "conflict_feedback"
+        ],
+        "city-05": [
+          "road",
+          "lane_marking",
+          "backlot",
+          "dusk_light"
+        ],
+        "city-06": [
+          "registration_desk",
+          "qr_panel",
+          "feedback_light"
+        ],
+        "city-07": [
+          "registration_desk",
+          "qr_panel",
+          "feedback_light"
+        ],
+        "city-08": [
+          "road",
+          "lane_marking",
+          "curb",
+          "street_lights"
+        ],
+        "city-09": [
+          "road",
+          "lane_marking",
+          "curb",
+          "street_lights"
+        ],
+        "city-10": [
+          "drive",
+          "traffic",
+          "destination_facade"
+        ],
+        "city-11": [
+          "endpoint_facade",
+          "shutter",
+          "delivery_mark",
+          "warm_light"
+        ]
+      }
+    },
+    "office": {
+      "expected": 10,
+      "visual_builder_present": 10,
+      "runtime_selector_present": 10,
+      "reference_record_present": 10,
+      "visual_contract_present": 10,
+      "missing_visual_contracts": [],
+      "empty_visual_contract_layers": [],
+      "missing_visual_builders": [],
+      "missing_runtime_selectors": [],
+      "missing_reference_records": [],
+      "visual_builder_states": [
+        "office-01",
+        "office-02",
+        "office-03",
+        "office-04",
+        "office-05",
+        "office-06",
+        "office-07",
+        "office-08",
+        "office-09",
+        "office-10"
+      ],
+      "runtime_selector_states": [
+        "office-01",
+        "office-02",
+        "office-03",
+        "office-04",
+        "office-05",
+        "office-06",
+        "office-07",
+        "office-08",
+        "office-09",
+        "office-10"
+      ],
+      "reference_record_states": [
+        "office-01",
+        "office-02",
+        "office-03",
+        "office-04",
+        "office-05",
+        "office-06",
+        "office-07",
+        "office-08",
+        "office-09",
+        "office-10"
+      ],
+      "visual_contract_layers": {
+        "office-01": [
+          "workstation",
+          "monitor",
+          "chair",
+          "warm_light",
+          "background_depth",
+          "contact_detail",
+          "office_detail"
+        ],
+        "office-02": [
+          "cover",
+          "cover_edge",
+          "cover_inset",
+          "props",
+          "doorway_depth",
+          "ceiling_lighting",
+          "floor_marking"
+        ],
+        "office-03": [
+          "door_frame",
+          "corridor_light",
+          "threshold",
+          "interior_desk",
+          "interior_monitor",
+          "wall_art"
+        ],
+        "office-04": [
+          "perception_zone",
+          "interior_desk",
+          "interior_monitor",
+          "wall_sign",
+          "window_band",
+          "alert_light",
+          "warm_threshold"
+        ],
+        "office-05": [
+          "elevator_doors",
+          "floor_indicator",
+          "call_panel",
+          "warm_light"
+        ],
+        "office-06": [
+          "elevator_doors",
+          "floor_indicator",
+          "call_panel",
+          "warm_light"
+        ],
+        "office-07": [
+          "stairs",
+          "rails",
+          "emergency_light",
+          "door_frame",
+          "ceiling_shadow",
+          "landing_detail"
+        ],
+        "office-08": [
+          "corridor",
+          "window_band",
+          "alert_edge",
+          "dialogue_light",
+          "window_frame",
+          "floor_detail",
+          "conversation_staging"
+        ],
+        "office-09": [
+          "corridor",
+          "window_band",
+          "alert_edge",
+          "dialogue_light",
+          "window_frame",
+          "floor_detail",
+          "conversation_staging"
+        ],
+        "office-10": [
+          "workstation",
+          "monitor",
+          "chair",
+          "warm_light",
+          "background_depth",
+          "contact_detail",
+          "office_detail"
+        ]
+      }
+    },
+    "scene_assembly": "passed",
+    "playable_scope": "behavior_verified_visual_unverified",
+    "runtime_visual_probe": {
+      "status": "passed",
+      "state_count": 21,
+      "expected_state_count": 21,
+      "boundary": "runtime_structure_only_not_framewise_visual_signoff"
+    },
+    "current_source_visual_evidence": "0/21",
+    "visual_acceptance": "0/21",
+    "final_assets": "8/8 graybox_or_candidate_unverified"
+  },
+  "product_scope": {
+    "launch_scope": {
+      "id": "office_vertical_slice",
+      "expected_states": 10,
+      "states": [
+        "office-01",
+        "office-02",
+        "office-03",
+        "office-04",
+        "office-05",
+        "office-06",
+        "office-07",
+        "office-08",
+        "office-09",
+        "office-10"
+      ],
+      "scene_assembly": "passed",
+      "playability": "passed_graybox",
+      "current_source_visual_evidence": "0/10",
+      "visual_acceptance": "0/10",
+      "release_role": "首发验收范围"
+    },
+    "second_content_scope": {
+      "id": "city_mission_pack",
+      "expected_states": 11,
+      "states": [
+        "city-01",
+        "city-02",
+        "city-03",
+        "city-04",
+        "city-05",
+        "city-06",
+        "city-07",
+        "city-08",
+        "city-09",
+        "city-10",
+        "city-11"
+      ],
+      "scene_assembly": "passed",
+      "playability": "passed_graybox",
+      "current_source_visual_evidence": "0/11",
+      "visual_acceptance": "0/11",
+      "release_role": "第二内容包，不阻塞办公室首发范围的场景补全，但仍阻塞城市内容发布"
+    }
+  },
+  "expanded_scope": {
+    "planned_states": 18,
+    "runtime_visual_evidence": "0/18",
+    "visual_acceptance": "0/18",
+    "status": "planned_unverified"
+  },
+  "scene_matrix": [
+    {
+      "id": "office-01",
+      "scope": "office",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "workstation",
+        "monitor",
+        "chair",
+        "warm_light",
+        "background_depth",
+        "contact_detail",
+        "office_detail"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "office-02",
+      "scope": "office",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "cover",
+        "cover_edge",
+        "cover_inset",
+        "props",
+        "doorway_depth",
+        "ceiling_lighting",
+        "floor_marking"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "office-03",
+      "scope": "office",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "door_frame",
+        "corridor_light",
+        "threshold",
+        "interior_desk",
+        "interior_monitor",
+        "wall_art"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "office-04",
+      "scope": "office",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "perception_zone",
+        "interior_desk",
+        "interior_monitor",
+        "wall_sign",
+        "window_band",
+        "alert_light",
+        "warm_threshold"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "office-05",
+      "scope": "office",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "elevator_doors",
+        "floor_indicator",
+        "call_panel",
+        "warm_light"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "office-06",
+      "scope": "office",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "elevator_doors",
+        "floor_indicator",
+        "call_panel",
+        "warm_light"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "office-07",
+      "scope": "office",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "stairs",
+        "rails",
+        "emergency_light",
+        "door_frame",
+        "ceiling_shadow",
+        "landing_detail"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "office-08",
+      "scope": "office",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "corridor",
+        "window_band",
+        "alert_edge",
+        "dialogue_light",
+        "window_frame",
+        "floor_detail",
+        "conversation_staging"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "office-09",
+      "scope": "office",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "corridor",
+        "window_band",
+        "alert_edge",
+        "dialogue_light",
+        "window_frame",
+        "floor_detail",
+        "conversation_staging"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "office-10",
+      "scope": "office",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "workstation",
+        "monitor",
+        "chair",
+        "warm_light",
+        "background_depth",
+        "contact_detail",
+        "office_detail"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "city-01",
+      "scope": "city",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "storefront",
+        "shutter",
+        "entrance",
+        "crowd",
+        "sidewalk_depth",
+        "shop_lighting"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "办公室首发范围完成后，当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "city-02",
+      "scope": "city",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "storefront",
+        "crowd_density",
+        "crowd_buffer",
+        "sidewalk_depth",
+        "shop_lighting"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "办公室首发范围完成后，当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "city-03",
+      "scope": "city",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "shelves",
+        "product_bands",
+        "floor",
+        "store_light"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "办公室首发范围完成后，当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "city-04",
+      "scope": "city",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "store_aisle",
+        "egg_tray",
+        "eggs",
+        "conflict_feedback"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "办公室首发范围完成后，当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "city-05",
+      "scope": "city",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "road",
+        "lane_marking",
+        "backlot",
+        "dusk_light"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "办公室首发范围完成后，当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "city-06",
+      "scope": "city",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "registration_desk",
+        "qr_panel",
+        "feedback_light"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "办公室首发范围完成后，当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "city-07",
+      "scope": "city",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "registration_desk",
+        "qr_panel",
+        "feedback_light"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "办公室首发范围完成后，当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "city-08",
+      "scope": "city",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "road",
+        "lane_marking",
+        "curb",
+        "street_lights"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "办公室首发范围完成后，当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "city-09",
+      "scope": "city",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "road",
+        "lane_marking",
+        "curb",
+        "street_lights"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "办公室首发范围完成后，当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "city-10",
+      "scope": "city",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "drive",
+        "traffic",
+        "destination_facade"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "办公室首发范围完成后，当前源真实窗口采集→逐帧对照→人工视觉签收"
+    },
+    {
+      "id": "city-11",
+      "scope": "city",
+      "scene_assembly": "passed",
+      "behavior_evidence": "passed_graybox",
+      "visual_builder": "present",
+      "runtime_selector": "present",
+      "visual_contract_layers": [
+        "endpoint_facade",
+        "shutter",
+        "delivery_mark",
+        "warm_light"
+      ],
+      "reference_record": "registered",
+      "current_source_binding": "stale_or_missing",
+      "current_source_visual_capture": "unverified",
+      "visual_acceptance": "unverified",
+      "final_asset_signoff": "blocked_global_asset_gate",
+      "next_action": "办公室首发范围完成后，当前源真实窗口采集→逐帧对照→人工视觉签收"
+    }
+  ],
+  "delivery_order": [
+    {
+      "phase": 1,
+      "scope": "office",
+      "states": [
+        "office-01",
+        "office-02",
+        "office-03",
+        "office-04",
+        "office-05",
+        "office-06",
+        "office-07",
+        "office-08",
+        "office-09",
+        "office-10"
+      ],
+      "gate": "办公室 10 段完成当前源真实窗口采集、逐段视觉签收后，才进入首发验收"
+    },
+    {
+      "phase": 2,
+      "scope": "city",
+      "states": [
+        "city-01",
+        "city-02",
+        "city-03",
+        "city-04",
+        "city-05",
+        "city-06",
+        "city-07",
+        "city-08",
+        "city-09",
+        "city-10",
+        "city-11"
+      ],
+      "gate": "城市 11 段完成当前源真实窗口采集、逐段视觉签收后，才进入第二内容包验收"
+    },
+    {
+      "phase": 3,
+      "scope": "expanded",
+      "states": [
+        "launcher-cold-boot",
+        "launcher-focus-navigation",
+        "office-success-feedback",
+        "office-search-loop",
+        "office-failure-overlay",
+        "office-checkpoint-recovery",
+        "office-pause-overlay",
+        "office-resolution-variants",
+        "city-store-transition",
+        "city-crowd-variants",
+        "city-traffic-near-miss",
+        "city-vehicle-damage-feedback",
+        "city-delivery-completion",
+        "city-neighborhood-extension",
+        "city-weather-lighting-extension",
+        "global-audio-disabled-fallback",
+        "global-crash-recovery-prompt",
+        "global-missing-asset-blocked"
+      ],
+      "gate": "核心 21 段完成后，再验收 18 项原创扩展场景"
+    }
+  ],
+  "gates": {
+    "core_scene_state_coverage": "passed",
+    "core_scene_playability": "passed_graybox",
+    "runtime_visual_scene_probe": "passed_structure_only",
+    "current_source_capture": "blocked_graphics_capture_or_stale_manifest",
+    "visual_acceptance": "blocked_unverified",
+    "final_asset_signoff": "blocked_graybox_or_candidate",
+    "release": "internal_no_go"
+  },
+  "next_action": "先完成办公室 10 段的当前源真实窗口采集与逐段视觉签收；城市 11 段作为第二内容包继续保留，核心 21 段都通过后再扩展 18 项原创场景。扩展项不能替代核心验收。逐场景状态见 scene_matrix。",
+  "policy": "场景构建存在不等于最终美术完成；行为通过、视觉通过、资产权利和目标设备验收必须分开证明。"
+}

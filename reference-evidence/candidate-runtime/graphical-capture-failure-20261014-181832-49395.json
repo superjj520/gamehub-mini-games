@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "status": "graphical_capture_failed",
+  "failure_kind": "timeout",
+  "generated_at": "2026-10-14T10:18:32.297Z",
+  "process": {
+    "pid": 49395,
+    "timeout_seconds": 45
+  },
+  "source": {
+    "sha256": "6d84a57efab36870246ef8f002079648fee965bd55fa5a81d2881cf759310b69",
+    "file_count": 241
+  },
+  "log_path": "/tmp/新时代觉醒者-metal-office10/godot.log",
+  "command": "timeout /Users/superjj/gamehub-mini-games 49395 45 --path gta-reference-runtime --scene res://tests/reference_capture_runner.tscn --display-driver macos --audio-driver Dummy --rendering-driver metal --rendering-method mobile --single-window --windowed --resolution 1280x720 --log-file /tmp/新时代觉醒者-metal-office10/godot.log --quit-after 1200",
+  "policy": "失败记录只用于诊断，不构成 PNG、视觉验收或发布证据"
+}

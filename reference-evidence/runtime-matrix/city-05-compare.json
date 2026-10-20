@@ -1,0 +1,25 @@
+{
+	"candidate_path": "reference-evidence/runtime-matrix/matrix-city-05.png",
+	"candidate_sha256": "1c05e12b5cb2c0b0eb22a5118e62a5542f217821c76e41479d59eae3cb5faa2f",
+	"candidate_source_size": [
+		1280,
+		720
+	],
+	"comparison_size": [
+		480,
+		270
+	],
+	"decision": "工具只产生对照指标，不自动批准视觉还原；必须由人工逐项复核参考帧与运行时截图",
+	"exact_pixel_ratio": 0.00000771604938271605,
+	"max_channel_error": 237,
+	"mean_absolute_channel_error": 100.823348765432,
+	"reference_path": "reference-evidence/video-1/city-05.jpg",
+	"reference_sha256": "a51336cfe9945dd4885c0c981d7f36539a25f3d8b8b1f178f9a527776f8b28a5",
+	"reference_size": [
+		480,
+		270
+	],
+	"version": 1,
+	"visual_status": "unverified",
+	"within_8_level_ratio": 0.000470679012345679
+}

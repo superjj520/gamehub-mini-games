@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "audio-runtime-catalog-original-only-v1",
+  "version": 1,
+  "policy": "original_candidate_audio_without_graybox_fallback",
+  "events": [
+    {"id": "interaction_success", "stream_path": "res://assets/audio/generated/interaction_success.wav", "fallback_policy": "forbid"},
+    {"id": "interaction_denied", "stream_path": "res://assets/audio/generated/interaction_denied.wav", "fallback_policy": "forbid"},
+    {"id": "mission_success", "stream_path": "res://assets/audio/generated/mission_success.wav", "fallback_policy": "forbid"},
+    {"id": "mission_failed", "stream_path": "res://assets/audio/generated/mission_failed.wav", "fallback_policy": "forbid"},
+    {"id": "perception_alert", "stream_path": "res://assets/audio/generated/perception_alert.wav", "fallback_policy": "forbid"},
+    {"id": "conflict_started", "stream_path": "res://assets/audio/generated/conflict_started.wav", "fallback_policy": "forbid"},
+    {"id": "vehicle_driver", "stream_path": "res://assets/audio/generated/vehicle_driver.wav", "fallback_policy": "forbid"},
+    {"id": "vehicle_collision", "stream_path": "res://assets/audio/generated/vehicle_collision.wav", "fallback_policy": "forbid"},
+    {"id": "vehicle_destroyed", "stream_path": "res://assets/audio/generated/vehicle_destroyed.wav", "fallback_policy": "forbid"},
+    {"id": "scan_registered", "stream_path": "res://assets/audio/generated/scan_registered.wav", "fallback_policy": "forbid"},
+    {"id": "checkpoint_loaded", "stream_path": "res://assets/audio/generated/checkpoint_loaded.wav", "fallback_policy": "forbid"},
+    {"id": "mission_restart", "stream_path": "res://assets/audio/generated/mission_restart.wav", "fallback_policy": "forbid"},
+    {"id": "footstep", "stream_path": "res://assets/audio/generated/footstep.wav", "fallback_policy": "forbid"},
+    {"id": "vehicle_engine", "stream_path": "res://assets/audio/generated/vehicle_engine.wav", "fallback_policy": "forbid"}
+  ]
+}

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://content/candidates/original_office_desk_runtime_candidate.gd" id="1_script"]
+
+[node name="OriginalOfficeDeskRuntimeCandidate" type="StaticBody3D"]
+script = ExtResource("1_script")

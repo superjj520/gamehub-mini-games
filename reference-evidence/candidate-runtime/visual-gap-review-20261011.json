@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "status": "candidate_gap_review_only",
+  "reviewed_at": "2026-10-11",
+  "method": "本地文件可视化检查",
+  "purpose": "记录当前可见候选帧与参考帧的差异，不升级正式视觉验收状态",
+  "acceptance_binding": {
+    "current_runtime_source_fingerprint": "0266b389cf0f069921bff1444d2e6dfe0a73a186440a9db63ff483ec1957ba8f",
+    "visual_matrix_bound": false,
+    "visual_status": "unverified",
+    "release_allowed": false,
+    "human_signoff_required": true,
+    "reason": "候选帧不是当前源指纹下的目标设备采集，且当前 Mac 可见图形窗口不可用；不得把候选审阅帧写入正式通过状态"
+  },
+  "comparisons": [
+    {
+      "segment": "office-01",
+      "reference": {
+        "path": "reference-evidence/video-2/office-01.jpg",
+        "sha256": "c7cc59ae818c6644f5252c015beb2337484554a5ef706b403f683ac59fef1aae"
+      },
+      "candidate": {
+        "path": "reference-evidence/candidate-runtime/p0-candidate-office-movie-current-v900000063.png",
+        "sha256": "444df1f117fd3965e09fe167aefd48e24a570178ed33c1288fcaccdb87ef0e86",
+        "size": "1280x720",
+        "source_status": "stale_since_capture"
+      },
+      "observations": [
+        "参考帧是贴近角色的肩后镜头，角色和背包占据明显画面比例；候选帧镜头更高更远，角色偏小，天花和地面占比过大。",
+        "参考帧有真实办公桌、显示器、隔断和暖色窗光层次；候选帧仍有大面积平坦灰色墙面、隔断和低细节材质。",
+        "候选帧保留了办公室任务 HUD 与第三人称玩法骨架，但角色服装、背包、动作姿态和材质可信度未达到参考画面。"
+      ],
+      "decision": "rejected",
+      "next_gate": "用当前源在可见窗口或 Windows 目标设备重新采集 office-01；先修正肩后镜头距离、角色占比、办公室材质层次和暖色局部光，再进行逐帧签收"
+    },
+    {
+      "segment": "office-06",
+      "reference": {
+        "path": "reference-evidence/video-2/office-06.jpg",
+        "sha256": "b2af317b68abf81be831e5f03da034160304c27e0b40fd0426ca8d5244280b84"
+      },
+      "candidate": {
+        "path": "reference-evidence/candidate-runtime/p0-candidate-office-detail-movie-current-v900000063.png",
+        "sha256": "db8a2124aa1559d8b3149761526395699c088a27bf8c4687b16fe3440709b758",
+        "size": "1280x720",
+        "source_status": "stale_since_capture"
+      },
+      "observations": [
+        "参考帧的核心是电梯门、楼层牌、按钮和角色侧身关系；候选近景仍以普通工位和远端窗光为主，电梯厅没有成为同等级视觉锚点。",
+        "候选画面有较完整的办公空间几何，但材质、标识、按钮可读性和真实光照仍明显不足。"
+      ],
+      "decision": "rejected",
+      "next_gate": "补齐电梯厅构图专用相机站位、门体/按钮/楼层牌材质与交互提示，再采集当前源窗口帧"
+    },
+    {
+      "segment": "city-08",
+      "reference": {
+        "path": "reference-evidence/video-1/city-08.jpg",
+        "sha256": "c1f0203d92d5f856fd9c71060143311eda9d65921f412eea4cfa6af7cf195e1b"
+      },
+      "candidate": {
+        "path": "reference-evidence/candidate-runtime/p0-candidate-city-movie-current-v900000063.png",
+        "sha256": "4f0e44479a0dabbee6c5f69ecb2d3c13611950179a3182404067e371d4aae075",
+        "size": "1280x720",
+        "source_status": "stale_since_capture"
+      },
+      "observations": [
+        "参考帧是沿街道路驾驶视角，车辆位于画面下方中部，前方有连续道路、建筑和交通层；候选帧更像狭窄巷道，建筑体块和街道纵深不足。",
+        "候选三轮车已经具备开放货斗、车灯和驾驶位置等可读结构，但城市建筑、招牌、树木、交通和行人仍偏低多边形/程序化。",
+        "候选 HUD 具备任务、生命、金钱、星级和雷达结构，但尚未达到参考视频的 HUD 比例、位置和信息密度。"
+      ],
+      "decision": "rejected",
+      "next_gate": "把车辆放入连续沿街道路构图，增加前方交通和店铺层次，校准黄昏光照与镜头高度，再用当前源重新采集"
+    },
+    {
+      "segment": "city-11",
+      "reference": {
+        "path": "reference-evidence/video-1/city-11.jpg",
+        "sha256": "acfc820d8959b42b041df4fd5f972047a33a953922f503a839347a47b52c965b"
+      },
+      "candidate": {
+        "path": "reference-evidence/candidate-runtime/p0-candidate-vehicle-detail-movie-current-v900000063.png",
+        "sha256": "cc920060c724d4551782fd651534957f4c3a8fc9180a7ceb3e8062dcfd3d027a",
+        "size": "1280x720",
+        "source_status": "stale_since_capture"
+      },
+      "observations": [
+        "参考帧的任务终点是卷帘门、门头文字、黄色目标标记和车辆尾部的近距离关系；候选帧没有形成同样明确的终点门面与任务焦点。",
+        "候选车辆轮廓与货斗细节优于灰盒，但门面、文字标识、路边杂物和近景光照仍不够接近参考。"
+      ],
+      "decision": "rejected",
+      "next_gate": "将 city-11 作为独立终点构图验收段，锁定卷帘门、门头标识、目标标记、车辆尾部和交互提示的相对位置"
+    }
+  ]
+}

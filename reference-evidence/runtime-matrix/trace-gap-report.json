@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "status": "complete",
+  "policy": "期望事件缺失必须保留缺口，不能自动提升行为或视觉验收状态",
+  "segment_count": 21,
+  "gap_count": 0,
+  "gaps": []
+}

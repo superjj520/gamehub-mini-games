@@ -1,0 +1,46 @@
+{
+  "status": "candidate_graphical_visual_capture_unverified",
+  "source_stale_since_capture": {
+    "reason": "补充截图来自旧候选源和旧办公室构图；当前候选包已更新，未重新采集前不得用于视觉验收。",
+    "current_candidate_package": "750d0587ea0420b0158f48f5e446ef8cb6e8845b5acca974dac5bc0f8d3d3468"
+  },
+  "profile": "office_reference_frame_supplement_v1",
+  "image": {
+    "path": "reference-evidence/candidate-runtime/office-visual-supplement-preview.png",
+    "sha256": "923060aa428f8af0d8a13adab2b79610e3d6d34eb5e77ec5a5babe66b61a35f8",
+    "width": 1280,
+    "height": 720,
+    "backend": "Godot 4.7.1 OpenGL compatibility visible window"
+  },
+  "candidates": [
+    {
+      "id": "office-npc-makehuman-elegant-suit-skinned-512-atlas-candidate",
+      "runtime_sha256": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+      "role": "player_and_office_npc_with_isolated_backpack_retouch"
+    },
+    {
+      "id": "office-desk-polyhaven-metal-cc0-candidate",
+      "runtime_sha256": "f07032a5ee89aacceebf10fd9fa192c22775ae81861cfb0bdb1594497179373c",
+      "source_asset_path": "art-source/environment/polyhaven-metal-office-desk/metal_office_desk_1k.gltf",
+      "preview_asset_path": "art-preview/candidate-asset-preview/assets/metal_office_desk_1k.glb",
+      "preview_asset_sha256": "bebc7a127bcc102ae4b58fbbbf5ecea1c8c735c53b5cf322ff0196c70c6314be",
+      "role": "real_office_desk_candidate"
+    }
+  ],
+  "reference_comparison": {
+    "reference_frame": "reference-evidence/video-2/office-01.jpg",
+    "improvements": [
+      "第三人称近景构图已加入前景背包角色",
+      "真实办公桌、落地窗、暖色灯板、品牌墙、绿植和 HUD 已进入候选预览",
+      "候选 NPC 与玩家均由实际 GLB 渲染，未使用角色几何回退"
+    ],
+    "remaining_gaps": [
+      "人物面部、服装材质和动画姿态仍低于参考视频的写实度",
+      "办公室仍是候选组合场景，缺少正式运行时碰撞、导航和任务状态绑定",
+      "镜头遮挡、角色比例和办公桌细节仍需逐帧对齐验收"
+    ]
+  },
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "rights_status": "candidate_only_internal_r_and_d"
+}

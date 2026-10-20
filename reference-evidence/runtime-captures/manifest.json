@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "policy": "运行时截图是视觉验收输入，不等于视觉通过；必须与对应参考帧逐项对照后才能改变 visual_status",
+  "capture_policy": "场景加载后等待固定帧数，冻结动态模拟，再进行重复截图；重复截图必须字节级一致",
+  "captured_at": "2026-10-05",
+  "captures": [
+    {
+      "id": "office-test",
+      "path": "runtime-captures/office-test.png",
+      "scene": "benchmark",
+      "resolution": [1280, 720],
+      "sha256": "2a736b045c9daa9a0c57f70b6eae7cd3109f76ba8bc845670aef20641b7f5eaf",
+      "candidate_segments": ["office-01", "office-02"],
+      "repeat_capture_check": "passed",
+      "comparison_reports": ["compare-reports/office-01.json"],
+      "visual_status": "unverified"
+    },
+    {
+      "id": "city-test",
+      "path": "runtime-captures/city-test.png",
+      "scene": "city",
+      "resolution": [1280, 720],
+      "sha256": "9d164b13d7fe9fbb35c7ca58fc93fb0706149dba9615b07d331c32a981c61d19",
+      "candidate_segments": ["city-01", "city-02", "city-03"],
+      "repeat_capture_check": "passed",
+      "comparison_reports": ["compare-reports/city-01.json"],
+      "visual_status": "unverified"
+    }
+  ]
+}

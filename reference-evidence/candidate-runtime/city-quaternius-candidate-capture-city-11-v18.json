@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_visual_rejected",
+  "product_name": "新时代觉醒者",
+  "capture_id": "city-11-v18",
+  "reference_frame": "reference-evidence/video-1/city-11.jpg",
+  "source": {
+    "sha256": "eef75fe2e8fbd6b30ad2306564182486451345e915baf886bb44a63dcd2802f0",
+    "file_count": 227
+  },
+  "candidate_package": {
+    "sha256": "8d7b657f0e6e01a7baea68cbc90bbb9f8451882488f095f61a1b44537045b3f6",
+    "file_count": 315
+  },
+  "capture": {
+    "method": "visible_graphics_window",
+    "resolution": [1280, 720],
+    "rendering_driver": "opengl3",
+    "profile": "city_full_candidate",
+    "camera": {"distance": 8.0, "height": 3.6, "shoulder_offset_x": 0.35},
+    "visual_status": "unverified",
+    "manual_visual_decision": "reject_for_reference_fidelity",
+    "image_path": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-11-v18.png",
+    "image_sha256": "ce9f679badba4bf4f4883d5e8413a39627dd626a4bb93cb8ceff9de732095bfc",
+    "image_dimensions": [1280, 720]
+  },
+  "findings": [
+    "后场仓储写实立面卡保持稳定显示，门面已移到玩家后方，玩家与三轮车同框可见。",
+    "候选灰盒细节已按 city-11 场景关闭，但左侧仍有未定位的城市层，整体构图仍未达到参考帧。",
+    "本次结果证明遮挡修复有效，但剩余城市层与参考逐帧一致性仍需继续验收，不能发布。"
+  ],
+  "release_allowed": false
+}

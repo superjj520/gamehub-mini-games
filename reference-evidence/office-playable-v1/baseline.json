@@ -1,0 +1,25 @@
+{
+  "scope": "办公室可玩修复第一阶段",
+  "captured_at": "2026-10-20T11:20:00+08:00",
+  "project_root": "/Users/superjj/gamehub-mini-games",
+  "godot_project": "gta-reference-runtime/project.godot",
+  "main_scene": "res://scenes/launcher.tscn",
+  "branch_before": "main",
+  "branch_after": "codex/office-playable-v1",
+  "head_before": null,
+  "head_note": "初始化仓库尚无提交，当前本地代码全部作为未提交现场保留。",
+  "working_tree_before": "未提交文件全部为未跟踪状态；未执行重置、删除或清理。",
+  "godot_version": "4.7.1.stable.official.a13da4feb",
+  "rules": {
+    "root_agents_file": false,
+    "user_supplied_project_rules": true,
+    "language": "中文"
+  },
+  "reproduction": {
+    "launcher_to_office": "可进入",
+    "first_blocker": "办公室首屏相机与几何空间发生穿插，画面被大面积蓝色几何面、墙体和天花板切开，无法作为正常第三人称游玩起点。",
+    "hud_evidence": "任务显示为准点下班，距离约 8m，警觉 0%，说明任务节点已初始化。",
+    "pause_evidence": "Esc 可打开暂停菜单，说明输入循环并未完全锁死。",
+    "editor_output": "Godot 编辑器调试输出未见错误计数，显示 Embedded window can't be resized；视觉阻塞来自运行时空间/相机状态，不能用无错误日志判定可玩。"
+  }
+}

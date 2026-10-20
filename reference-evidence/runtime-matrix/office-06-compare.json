@@ -1,0 +1,25 @@
+{
+	"candidate_path": "reference-evidence/runtime-matrix/matrix-office-06.png",
+	"candidate_sha256": "b9a163ff01c8e1c9a7302cf4a6f27147d71490d064d98a2f3881fdf9f85f5e08",
+	"candidate_source_size": [
+		1280,
+		720
+	],
+	"comparison_size": [
+		480,
+		270
+	],
+	"decision": "工具只产生对照指标，不自动批准视觉还原；必须由人工逐项复核参考帧与运行时截图",
+	"exact_pixel_ratio": 0.0000154320987654321,
+	"max_channel_error": 243,
+	"mean_absolute_channel_error": 75.5763734567901,
+	"reference_path": "reference-evidence/video-2/office-06.jpg",
+	"reference_sha256": "b2af317b68abf81be831e5f03da034160304c27e0b40fd0426ca8d5244280b84",
+	"reference_size": [
+		480,
+		270
+	],
+	"version": 1,
+	"visual_status": "unverified",
+	"within_8_level_ratio": 0.00714506172839506
+}

@@ -1,0 +1,74 @@
+{
+	"asset_catalog_path": "res://content/asset-runtime-catalog-makehuman-office-candidate.json",
+	"capture_entry": "editor_scene_runner",
+	"capture_profile": "makehuman-office-candidate",
+	"captures": [
+		{
+			"asset_catalog_path": "res://content/asset-runtime-catalog-makehuman-office-candidate.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "makehuman-office-candidate",
+			"id": "office-10",
+			"path": "makehuman-office-zoomed2/office-10.png",
+			"scene": "office",
+			"source_file_count": 254,
+			"source_fingerprint": "0b047647a6f69b28e08d6971800bde946485e986378aa764bedb6646effaf57e",
+			"state_setup": "canonical_candidate_state",
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 1.15,
+					"pitch": -12.0,
+					"position": [
+						0.379999995231628,
+						1.41999995708466,
+						1.30999994277954
+					],
+					"rotation": [
+						-12.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.379999995231628,
+						0.0399999991059303,
+						0.159999996423721
+					],
+					"yaw": 90.0
+				},
+				"mission": {
+					"clock_minutes": 1079,
+					"completion_minute": 1080,
+					"failure_reason": "",
+					"objective": "准点下班",
+					"status": 1
+				},
+				"player_position": [
+					0.0,
+					1.0,
+					3.05
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/benchmark.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.9,
+					0.7,
+					-5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			},
+			"visual_status": "unverified"
+		}
+	],
+	"evidence_prefix": "makehuman-office-zoomed2",
+	"policy": "编辑器真实图形采集是视觉验收输入，不等于视觉通过",
+	"source_file_count": 254,
+	"source_fingerprint": "0b047647a6f69b28e08d6971800bde946485e986378aa764bedb6646effaf57e",
+	"version": 1,
+	"visual_status": "unverified"
+}

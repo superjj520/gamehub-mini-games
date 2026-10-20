@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MakeHuman P0 人物候选视觉审阅</title>
+  <style>
+    :root { color-scheme: dark; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; }
+    body { margin: 0; background: #101827; color: #eef3fb; }
+    main { max-width: 1500px; margin: 0 auto; padding: 28px; }
+    h1 { margin: 0 0 8px; font-size: 26px; } h2 { margin-top: 28px; font-size: 19px; }
+    p { color: #b7c4d8; line-height: 1.6; } .warning { color: #ffd58a; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    figure { margin: 0; background: #182338; border: 1px solid #354561; border-radius: 10px; padding: 10px; }
+    figcaption { color: #c9d5e7; margin-bottom: 8px; font-size: 13px; }
+    img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain; background: #0b111d; border-radius: 6px; }
+    .status { display: inline-block; padding: 4px 9px; border-radius: 999px; background: #4b3d25; color: #ffd58a; font-size: 12px; }
+    .panel { background: #182338; border: 1px solid #354561; border-radius: 10px; padding: 16px; }
+    code { color: #9fd0ff; } li { margin: 8px 0; color: #c9d5e7; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>MakeHuman P0 人物候选视觉审阅</h1>
+    <p><span class="status">视觉状态：unverified</span>　候选仅用于隔离预览、动作接口和镜头调校，不进入正式运行时或发布候选树。</p>
+    <p class="warning">本页不是人工签收表。没有目标设备截图、动作过程截图和逐项结论，不得把候选标记为通过。</p>
+
+    <h2>office-06 三图对照</h2>
+    <section class="grid">
+      <figure><figcaption>参考视频帧：office-06</figcaption><img src="../reference-evidence/video-2/office-06.jpg" alt="参考视频 office-06"></figure>
+      <figure><figcaption>当前正式运行时：灰盒基线</figcaption><img src="../reference-evidence/runtime-matrix/office-06.png" alt="当前正式运行时 office-06"></figure>
+      <figure><figcaption>MakeHuman 返工候选：隔离预览</figcaption><img src="../reference-evidence/candidate-makehuman-retouch-office-06.png" alt="MakeHuman 返工候选 office-06"></figure>
+    </section>
+
+    <h2>当前证据</h2>
+    <section class="panel">
+      <ul>
+        <li>候选 GLB：<code>makehuman_office_worker_candidate_recolor.glb</code></li>
+        <li>候选哈希：<code>f0de96ac46b5134f86a6049edbec8c243cb7bd22444cfc2a774bb0a7bcd71189</code></li>
+        <li>骨骼契约：待机、行走、搜索、警觉均已在真实 <code>Skeleton3D</code> 上产生旋转变化。</li>
+        <li>视觉未通过原因：人物比例、脸部气质、服装细节、手臂比例、动作姿态和环境材质仍与参考帧存在明显差异。</li>
+        <li>发布边界：<code>release_allowed=false</code>；候选不复制到 <code>gta-reference-runtime/</code>。</li>
+      </ul>
+    </section>
+
+    <h2>下一次签收必须补齐</h2>
+    <section class="panel">
+      <ul>
+        <li>可用图形环境下的待机、行走、搜索、警觉真实动作截图。</li>
+        <li>办公室近景、侧面行走、背包交互三个固定镜头。</li>
+        <li>Windows 10/11 目标设备截图与性能记录。</li>
+        <li>人物比例、服装、面部、材质和动作逐项人工结论。</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

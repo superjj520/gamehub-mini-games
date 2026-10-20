@@ -1,0 +1,40 @@
+{
+  "asset_id": "city-07-video-authored-backdrop-candidate-v1",
+  "status": "candidate_only",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "source": {
+    "authorization": "user_authorized_ai_video_frame_edit",
+    "reference_video": "reference-evidence/video-1/video-1-china-gta-480.mp4",
+    "reference_frame": "reference-evidence/video-1/city-07.jpg",
+    "exact_frame": "reference-video-candidate/city-07-video-backdrop.jpg",
+    "playable_edit": "reference-video-candidate/city-07-video-playable-backdrop-v1.png",
+    "playable_edit_sha256": "0e59bf503b271bfd556ad4293e3eb9dc797a53a642f3d526ad22b24f4885b0ef"
+  },
+  "role": "city-07 免费鸡蛋任务的黄昏登记成功、三轮车停靠、扫码牌与登记员前景背景候选",
+  "dynamic_overlay": [
+    "正式运行时三轮车、驾驶员和已登记任务状态",
+    "正式扫码登记牌、登记员、注册成功 HUD 与扫描反馈音频",
+    "正式输入、碰撞、导航、NPC 感知、任务链和存档"
+  ],
+  "rights": {
+    "source_authorization": "user_authorized",
+    "final_rights_signoff": "pending",
+    "note": "原始 AI 参考视频及编辑背景只进入隔离候选运行时，不得直接进入发布包。"
+  },
+  "acceptance": {
+    "required_runtime_state": "mission_stage_new_shop_and_registered_true",
+    "required_dynamic_state": [
+      "player_visible",
+      "vehicle_visible_and_driver_is_player",
+      "scan_board_visible",
+      "clerk_visible",
+      "registration_success_feedback_preserved"
+    ],
+    "required_visual_review": [
+      "真实图形窗口或 Windows 目标设备截图",
+      "原始 city-07 帧与候选帧逐帧核对街道透视、黄昏色温、三轮车比例、登记员姿态、扫码牌位置和注册成功反馈",
+      "最终权利签署"
+    ]
+  }
+}

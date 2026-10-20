@@ -1,0 +1,7 @@
+{
+	"capture_entry": "editor_scene_runner",
+	"captures": [],
+	"policy": "编辑器真实图形采集是视觉验收输入，不等于视觉通过",
+	"version": 1,
+	"visual_status": "unverified"
+}

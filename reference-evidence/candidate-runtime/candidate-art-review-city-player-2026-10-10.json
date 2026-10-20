@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "review_id": "candidate-art-review-city-player-2026-10-10",
+  "reviewed_at": "2026-10-10T08:00:00+08:00",
+  "review_method": "城市候选集成运行时断言、候选脚本与场景哈希核对；未将无头输出或旧截图当作视觉通过",
+  "runtime_source_fingerprint": "f9baaaeb0fb1631b3d4d36095acdc7e460ce3e6a1a8bc48844ad5a21c9b877ab",
+  "runtime_source_file_count": 195,
+  "review_status": "candidate_provisional",
+  "visual_acceptance_status": "unverified",
+  "release_allowed": false,
+  "candidate": {
+    "id": "city-player-character-quaternius-brick-red-jacket-candidate",
+    "slot": "city-player-character",
+    "scene_path": "art-source/characters/quaternius-superhero-male/player_character_visual_candidate.tscn",
+    "script_path": "art-source/characters/quaternius-superhero-male/player_character_visual_candidate.gd",
+    "script_sha256": "d829d8162dfb8a5245a373e177bdcde2251529d3dd51b2c5b09ff5a824247e6a",
+    "scene_sha256": "032bfed2ef1732664437ed1eb497d442b6b058b4ca81b7bda40721465542da59",
+    "catalog_sha256": "d1b2e122b32d79fa8fe9e28ca309c406b9fd910d79f1896d37b83d5e450c55cf",
+    "visual_contract": ["砖红外套", "深色背包", "深色裤装", "低饱和反光条", "驾驶姿态"]
+  },
+  "verified_behavior": [
+    "城市候选目录契约",
+    "独立城市玩家脚本路径",
+    "砖红夹克材质通道",
+    "三轮车上下车与驾驶",
+    "城市任务成功链路",
+    "第三人称镜头所有权"
+  ],
+  "gates": [
+    "city-01、city-08、city-11 当前源真实图形截图",
+    "Windows 10/11 目标设备输入与性能报告",
+    "人工逐帧视觉签收",
+    "最终资产权利与发布授权"
+  ]
+}

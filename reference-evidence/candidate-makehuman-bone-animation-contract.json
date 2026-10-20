@@ -1,0 +1,13 @@
+{
+  "candidate": "art-source/characters/makehuman-office-worker/makehuman_office_worker_candidate_recolor.glb",
+  "candidate_sha256": "f0de96ac46b5134f86a6049edbec8c243cb7bd22444cfc2a774bb0a7bcd71189",
+  "engine": "Godot 4.7.1",
+  "renderer": "headless",
+  "scope": "隔离候选真实骨骼姿态契约，不代表视觉通过或发布许可",
+  "states": {
+    "alert_default": {"changed_bones": ["head", "spine_03"], "passed": true},
+    "idle_default": {"changed_bones": ["spine_02"], "passed": true},
+    "search_default": {"changed_bones": ["head", "spine_02"], "passed": true},
+    "walk_default": {"changed_bones": ["upperarm_l", "thigh_l"], "passed": true}
+  }
+}

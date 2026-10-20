@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_visual_rejected",
+  "capture_scope": "Quaternius 城市真实模型接入后的三段固定参考镜头",
+  "candidate_package_sha256": "ce8d6c4712edb6dbc8e527dad29facd72c29993e7384ed8126f55fed69fc3ffa",
+  "runtime_source_fingerprint": "eef75fe2e8fbd6b30ad2306564182486451345e915baf886bb44a63dcd2802f0",
+  "runtime_source_file_count": 227,
+  "backend": "Godot 4.7.1 OpenGL compatibility viewport capture",
+  "resolution": "1280x720",
+  "captures": [
+    {
+      "id": "city-01",
+      "image": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-01-v24.png",
+      "sha256": "41d7bbd022d2dd27dab61c8e7f9186282a1a8173e61a33b514f5600fc001621d",
+      "visual_status": "unverified",
+      "manual_decision": "reject_for_reference_fidelity",
+      "finding": "真实城市模型已挂载，但首店人群、角色比例、侧向程序化体块和 HUD 仍与参考不一致"
+    },
+    {
+      "id": "city-08",
+      "image": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-08-v24.png",
+      "sha256": "2993c177161088665022615e4440c2da0d0412cd83d9282827d4f4e39f572034",
+      "visual_status": "unverified",
+      "manual_decision": "reject_for_reference_fidelity",
+      "finding": "驾驶空间关系已更清楚，但建筑材质、右侧体块、角色坐姿、交通密度和参考光照仍不一致"
+    },
+    {
+      "id": "city-11",
+      "image": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-11-v24.png",
+      "sha256": "be207f99d9298abed1f086d3348b70a3eb3429ea787e938d98a4011d7e238607",
+      "visual_status": "unverified",
+      "manual_decision": "reject_for_reference_fidelity",
+      "finding": "后场店铺可读性提高，但终点立面、玩家与载具比例、城市背景和黄昏氛围仍不一致"
+    }
+  ],
+  "release_allowed": false,
+  "next_gate": "建立参考人物与建筑比例尺，替换程序化近景立面，并重新采集三段镜头"
+}

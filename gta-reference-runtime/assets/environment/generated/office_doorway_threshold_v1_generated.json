@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "asset_id": "office-doorway-threshold-v1-generated-candidate",
+  "slot_id": "office-environment-kit",
+  "source_kind": "project_original_ai_generated_bitmap_candidate",
+  "generator": "内置图像生成工具",
+  "license": "项目原创候选；需在最终发布前完成权利与负责人签收",
+  "runtime_asset": "office_doorway_threshold_v1_generated.png",
+  "runtime_sha256": "a5368acf69faeec3478a5320b5e4802ae09751ebeb203dd42927ccaa7c87935d",
+  "dimensions": [1672, 941],
+  "intended_use": "office-03 门口窥视与进入过渡的候选背景卡",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "constraints": ["原创生成，不包含参考视频像素", "不承担碰撞、导航、交互或任务逻辑", "必须通过当前源码固定镜头截图、人工视觉和 Windows 目标设备验收"]
+}

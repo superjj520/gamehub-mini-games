@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "asset_id": "office-workstation-row-v2-worker-generated",
+  "source_type": "project_generated_bitmap",
+  "source": "项目内置图像生成工具生成的原创办公室连续工位与坐姿工作者背景候选",
+  "runtime_asset": "office_workstation_row_v2_worker_generated.png",
+  "source_sha256": "5905d08c367f00b5a44a9043f5177884e78839d22647112cb411969704d1b475",
+  "dimensions": [2172, 724],
+  "reference_role": "仅以本地 office-10 参考帧的构图、光线和遮挡关系作为研究输入；不含参考视频像素、HUD、品牌或商标",
+  "intended_use": "办公室 vertical slice 近景背景卡候选",
+  "rights": "项目原创开发候选；生成记录已登记；最终权利负责人尚未签收",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "notes": "含一个原创办公室工作者、工位、显示器、隔断、暖色顶灯和右侧窗外城市光线；需真实图形窗口截图、逐帧视觉签收、Windows 目标设备 QA 和权利负责人签收后才能升级"
+}

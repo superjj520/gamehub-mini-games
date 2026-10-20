@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "asset_id": "office-elevator-hall-v1-generated-candidate",
+  "slot_id": "office-environment-kit",
+  "source_kind": "ai_generated_original_bitmap",
+  "generator": "内置图像生成工具",
+  "license": "项目原创候选；需在最终发布前完成权利与负责人签收",
+  "runtime_asset": "office_elevator_hall_v1_generated.png",
+  "runtime_sha256": "9d4635f22a3398b320b8d07b96204bcafa0b9bcf44202db89f5f8a92b54d7e0b",
+  "dimensions": [1813, 868],
+  "intended_use": "办公室电梯厅背景立面候选材质",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "constraints": [
+    "无品牌标识",
+    "无可读文字",
+    "不承担碰撞、导航、交互或任务逻辑",
+    "必须通过当前源码固定镜头截图和 Windows 目标设备验收"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+	"asset_catalog_path": "res://tests/asset-runtime-catalog-full-candidates.json",
+	"capture_profile": "candidate_makehuman",
+	"evidence_prefix": "candidate-makehuman",
+	"message": "全部参考矩阵场景完成",
+	"phase": "complete",
+	"scenario_id": "",
+	"source_file_count": 0,
+	"source_fingerprint": "",
+	"updated_at": "2026-10-14T17:58:49",
+	"version": 1
+}

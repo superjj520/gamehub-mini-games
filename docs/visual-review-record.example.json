@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-06T20:00:00.000Z",
+  "reviewer": "示例记录，不得直接写入",
+  "method": "manual_frame_review",
+  "reviewed_at": "2026-10-06T20:00:00.000Z",
+  "runtime_source_fingerprint": "76a739e00034b90e875750b3fce92db6321bcb5b8afc993ce4b008f0f9c56741",
+  "segments": [
+    {"id":"city-01","decision":"unverified","findings":[]},
+    {"id":"city-02","decision":"unverified","findings":[]},
+    {"id":"city-03","decision":"unverified","findings":[]},
+    {"id":"city-04","decision":"unverified","findings":[]},
+    {"id":"city-05","decision":"unverified","findings":[]},
+    {"id":"city-06","decision":"unverified","findings":[]},
+    {"id":"city-07","decision":"unverified","findings":[]},
+    {"id":"city-08","decision":"unverified","findings":[]},
+    {"id":"city-09","decision":"unverified","findings":[]},
+    {"id":"city-10","decision":"unverified","findings":[]},
+    {"id":"city-11","decision":"unverified","findings":[]},
+    {"id":"office-01","decision":"unverified","findings":[]},
+    {"id":"office-02","decision":"unverified","findings":[]},
+    {"id":"office-03","decision":"unverified","findings":[]},
+    {"id":"office-04","decision":"unverified","findings":[]},
+    {"id":"office-05","decision":"unverified","findings":[]},
+    {"id":"office-06","decision":"unverified","findings":[]},
+    {"id":"office-07","decision":"unverified","findings":[]},
+    {"id":"office-08","decision":"unverified","findings":[]},
+    {"id":"office-09","decision":"unverified","findings":[]},
+    {"id":"office-10","decision":"unverified","findings":[]}
+  ]
+}

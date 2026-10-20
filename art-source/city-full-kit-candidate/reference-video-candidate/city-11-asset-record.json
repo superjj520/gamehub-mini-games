@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "asset_id": "city-11-video-authored-backdrop-candidate-v1",
+  "status": "candidate_only",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "source": {
+    "kind": "user_authorized_ai_video_frame_edit",
+    "reference_frame": "reference-evidence/video-1/city-11.jpg",
+    "exact_frame": "reference-video-candidate/city-11-video-backdrop.jpg",
+    "playable_edit": "reference-video-candidate/city-11-video-playable-backdrop-v1.png",
+    "user_authorization": "本轮对话中用户明确要求直接使用并优化其 AI 生成视频"
+  },
+  "integration_contract": {
+    "role": "city-11 配送终点卷帘门和旺铺转让门面背景候选",
+    "dynamic_overlay": ["正式玩家角色", "正式三轮配送车", "正式 HUD", "正式任务交互", "正式碰撞与存档"],
+    "visual_only": true,
+    "candidate_video_backdrop_id": "city-11"
+  },
+  "rights_status": "user_authorized_candidate_rights_pending_final_signoff",
+  "final_acceptance_required": ["当前源版本真实图形窗口采集", "逐帧视觉签收", "最终资产权利确认", "目标设备回归"]
+}

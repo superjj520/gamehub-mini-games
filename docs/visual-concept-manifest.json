@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "product": "新时代觉醒者",
+  "status": "concept_ready_runtime_binding_pending",
+  "rights_status": "project_generated_concept_candidate",
+  "source_boundary": "本项目原创生成稿；不直接复制参考视频中的人物身份、品牌或原始资产",
+  "concepts": [
+    {
+      "id": "office-state-storyboard-v1",
+      "path": "art-source/visual-concepts/office-state-storyboard-v1.png",
+      "sha256": "4d46e73c977283a63ce2985f0ddaa0fedb086986acb29104c15ddb31948ae77e",
+      "asset_class": "office_state_storyboard",
+      "logic_states": ["office-01", "office-02", "office-03", "office-04", "office-05", "office-06", "office-07", "office-08", "office-09", "office-10"],
+      "required_scene_layers": ["camera_framing", "player_pose", "npc_perception", "cover_occlusion", "failure_feedback", "checkpoint_recovery"],
+      "required_props": ["工位", "隔断", "走廊", "电梯厅", "警觉 NPC", "检查点"],
+      "runtime_target": "gta-reference-runtime/tests/reference_capture_matrix.gd",
+      "acceptance": "10 个办公室状态使用同一角色、同一空间尺度和连续灯光；每格都能由真实任务状态机触发，不以静态分镜替代运行时画面"
+    },
+    {
+      "id": "city-state-storyboard-v1",
+      "path": "art-source/visual-concepts/city-state-storyboard-v1.png",
+      "sha256": "9ac7c0eb389d2d6841b34a96d6ebd5cbfdc9168d9a1a0e011c3b60351090979f",
+      "asset_class": "city_state_storyboard",
+      "logic_states": ["city-01", "city-02", "city-03", "city-04", "city-05", "city-06", "city-07", "city-08", "city-09", "city-10", "city-11"],
+      "required_scene_layers": ["storefront", "crowd", "store_interior", "pickup_prop", "conflict", "registration", "vehicle_drive", "wet_road", "endpoint_shutter"],
+      "required_props": ["鸡蛋托盘", "货架", "登记台", "蓝色三轮车", "道路标线", "卷帘门"],
+      "runtime_target": "gta-reference-runtime/tests/reference_capture_matrix.gd",
+      "acceptance": "11 个城市状态保持角色、砖红外套、蓝色三轮车和黄昏湿路面的连续性；步行、交互、登记、驾驶和到达必须由真实输入与任务状态触发"
+    },
+    {
+      "id": "player-visual-board-v1",
+      "path": "art-source/visual-concepts/player-visual-board-v1.png",
+      "sha256": "4115fcaa86240b0c7da3bc681be5a54e1f393239bb2cde5301f4aac4c20f7712",
+      "asset_class": "player_character",
+      "logic_states": ["office-01", "office-02", "office-08", "office-10", "city-05", "city-08", "city-11"],
+      "required_animation_states": ["idle_default", "walk_default", "crouch_default", "typing_default", "interact_default", "vehicle_default", "hit_default", "fail_default"],
+      "required_mount_points": ["交互手部挂点", "载具挂点", "视线起点", "脚底碰撞参考点"],
+      "runtime_target": "art-source/characters/makehuman-office-player/makehuman_player_visual_candidate.tscn",
+      "acceptance": "同一角色脸部、服装、背包在办公室和城市状态保持一致；蹲伏、打字和驾驶接触关系逐帧检查"
+    },
+    {
+      "id": "office-stealth-visual-board-v1",
+      "path": "art-source/visual-concepts/office-stealth-visual-board-v1.png",
+      "sha256": "ad38c48b0465c6dff8ed6ae6624d638080a753789b01e1a825a61d5079df6145",
+      "asset_class": "office_environment",
+      "logic_states": ["office-01", "office-04", "office-05", "office-06", "office-10"],
+      "required_scene_layers": ["collision", "navigation", "interaction", "lighting", "visual_detail"],
+      "required_props": ["办公桌", "显示器", "键盘", "文件盒", "办公椅", "玻璃隔断", "电梯门", "呼叫面板"],
+      "runtime_target": "gta-reference-runtime/content/candidates/original_office_desk_runtime_candidate.tscn",
+      "acceptance": "玩家、工位、NPC和出口在同一空间中可走、可遮挡、可追踪；暖暗灯光和肩后构图保持一致"
+    },
+    {
+      "id": "city-delivery-visual-board-v1",
+      "path": "art-source/visual-concepts/city-delivery-visual-board-v1.png",
+      "sha256": "33695c3ba173b12b54c1af1d3bed2a17f339901fdb67fbf9db08cfae715ca922",
+      "asset_class": "city_environment",
+      "logic_states": ["city-01", "city-04", "city-08", "city-11"],
+      "required_scene_layers": ["road_collision", "sidewalk_collision", "storefront_interaction", "traffic", "weather_lighting", "distant_city"],
+      "required_props": ["店铺门头", "鸡蛋托盘", "登记牌", "卷帘门", "路灯", "树", "道路标线"],
+      "runtime_target": "gta-reference-runtime/assets/environment/original-procedural-city-environment/original_city_environment_candidate.tscn",
+      "acceptance": "道路消失点、店铺入口、三轮车后视构图和终点门面与任务状态一致；城市不以静态背景替代碰撞和交互"
+    },
+    {
+      "id": "npc-crowd-visual-board-v1",
+      "path": "art-source/visual-concepts/npc-crowd-visual-board-v1.png",
+      "sha256": "7a9bdca6bc2ad9da3f952d363a555f332b214481b24f25eb2b515c4f5d57b7ad",
+      "asset_class": "npc_and_crowd",
+      "logic_states": ["office-04", "office-06", "office-07", "city-01", "city-02", "city-04"],
+      "required_animation_states": ["idle_default", "patrol_default", "alert_default", "search_default", "pursuit_default", "conflict_default", "walk_default", "panic_default"],
+      "required_mount_points": ["视线起点", "手持物挂点", "脚底接触点"],
+      "runtime_target": "gta-reference-runtime/assets/characters/original-procedural-office-characters/original_office_npc_candidate.tscn",
+      "acceptance": "NPC警觉、搜索、追踪与城市人群避让由真实状态机驱动，远景身份仍可区分，近景不穿模"
+    },
+    {
+      "id": "three-wheel-vehicle-visual-board-v1",
+      "path": "art-source/visual-concepts/three-wheel-vehicle-visual-board-v1.png",
+      "sha256": "100459cf4ef8d28120f83492682b3cc3e49e7e5f2c5e8e58548c71cc5ebd25cb",
+      "asset_class": "three_wheel_vehicle",
+      "logic_states": ["city-06", "city-07", "city-08", "city-09", "city-10", "city-11"],
+      "required_animation_states": ["idle_default", "drive_default", "brake_default", "collision_default", "damage_default", "destroyed_default"],
+      "required_mount_points": ["驾驶座挂点", "上下车点", "前轮接触点", "左后轮接触点", "右后轮接触点", "货架挂点"],
+      "runtime_target": "gta-reference-runtime/assets/vehicles/three-wheel-delivery/three_wheel_delivery_candidate.tscn",
+      "acceptance": "驾驶员坐姿、双手、座椅、方向盘、货斗和三只轮胎接触关系正确；损伤由碰撞事件驱动"
+    }
+  ],
+  "next_production_steps": [
+    "把主角稿拆成可绑定的角色模型、材质、骨骼姿态和动画状态",
+    "把办公室稿拆成碰撞/导航/交互/灯光/表现五层场景",
+    "把三轮车稿拆成车体、座椅、货斗、车轮、灯光和损伤反馈节点",
+    "把城市稿拆成可驾驶道路、店铺交互、交通、人群和天气配置",
+    "在真实图形窗口逐个场景采集并逐帧人工签收"
+  ]
+}

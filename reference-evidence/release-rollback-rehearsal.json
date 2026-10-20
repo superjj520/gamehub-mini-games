@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "status": "internal_rehearsal_passed_target_platform_pending",
+  "rehearsal_scope": "本地文件级候选构建切换与恢复",
+  "generated_at": "2026-10-19T03:28:48.451Z",
+  "previous_build": {
+    "name": "新时代觉醒者 Windows 内部测试",
+    "path": "build/windows/新时代觉醒者.exe",
+    "sha256": "ea7f17462005d04a926617c21f24b41292370a16d45f8e5dc1ec6b171afe8618",
+    "bytes": 216094536
+  },
+  "candidate_build": {
+    "name": "新时代觉醒者 Windows 首发候选",
+    "path": "build/windows/新时代觉醒者-首发候选.exe",
+    "sha256": "4546da2470fb14468e6170e3d7caede146e4487e2b325308ec84aa4afd742253",
+    "bytes": 166962576
+  },
+  "restored_sha256": "ea7f17462005d04a926617c21f24b41292370a16d45f8e5dc1ec6b171afe8618",
+  "target_platform_status": "unverified",
+  "remaining": [
+    "Steam 分支/Depot 回滚演练",
+    "Windows 10/11 目标设备回滚验证",
+    "正式发布负责人签署"
+  ]
+}

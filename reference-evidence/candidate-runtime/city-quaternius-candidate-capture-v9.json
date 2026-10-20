@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_visual_rejected",
+  "product_name": "新时代觉醒者",
+  "capture_id": "city-01-v9",
+  "scene": "city",
+  "reference_frame": "reference-evidence/video-1/city-01.jpg",
+  "candidate_ids": [
+    "city-player-character-quaternius-brick-red-jacket-candidate",
+    "city-crowd-quaternius-cc0-candidate",
+    "city-environment-original-procedural-v3-candidate"
+  ],
+  "source": {
+    "sha256": "eef75fe2e8fbd6b30ad2306564182486451345e915baf886bb44a63dcd2802f0",
+    "file_count": 227
+  },
+  "candidate_package": {
+    "sha256": "8484d638f0e77b88297fcdca901b88e597f65457a4d75905f08a8e181e49f0f1",
+    "file_count": 315
+  },
+  "catalog": {
+    "path": "art-source/city-full-kit-candidate/asset-runtime-catalog-city-full-kit-quaternius-override.json",
+    "sha256": "2ae09871419b5ec6e2de140d063becb6163218d0f1d01905cb75c8c344423707",
+    "crowd_scene_sha256": "c5de677bbe3d11f36bd57df6a5453c0d3cc9776351e07658892ef4a29732900b"
+  },
+  "capture": {
+    "method": "visible_graphics_window",
+    "resolution": [1280, 720],
+    "rendering_driver": "opengl3",
+    "profile": "city_full_candidate",
+    "camera": {
+      "distance": 5.4,
+      "height": 2.8,
+      "shoulder_offset_x": 0.25,
+      "store_interior_visible": false,
+      "store_interior_node_count": 60,
+      "store_interior_visible_node_count": 0
+    },
+    "visual_status": "unverified",
+    "manual_visual_decision": "reject_for_reference_fidelity",
+    "image_path": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-01-v9.png",
+    "image_sha256": "92b0c706c11866efbb6210c746b21fbe1a230bad279486238af26dee1280a1bc",
+    "image_dimensions": [1280, 720]
+  },
+  "comparison_findings": [
+    "近中景相机已能同时呈现砖红外套玩家、首店招牌、入口人群与道路层次，构图门槛通过。",
+    "店内候选货架与灯光在店外视角已全部隐藏，确认不存在店内视觉穿模；这是技术修复，不代表美术通过。",
+    "Quaternius 人群轮廓稳定，但低多边形比例、帽体造型、材质和动作节奏仍与参考视频明显不同。",
+    "店铺两侧仍有程序化盒体与拼接式背景，缺少参考视频的真实建筑材质、阴影、反射和景深。",
+    "同构测试的 MakeHuman 人群候选出现白色头部与比例异常，因此暂不替换 Quaternius，需先修复材质绑定与姿态。",
+    "本证据只证明候选在真实图形窗口中可运行，不证明视觉通过、最终权利签收或可发布。"
+  ],
+  "release_allowed": false,
+  "next_gates": [
+    "建立参考视频人物、店铺和镜头的逐帧标尺，重新制作城市人群与首店立面。",
+    "修复 MakeHuman 候选的头部材质、骨骼姿态和角色比例后再做第二轮对比。",
+    "补齐 city-08 与 city-11 的同一候选目录截图，并进行逐帧视觉签收。",
+    "完成 Windows 10/11 目标设备输入、性能和导出回归。",
+    "完成最终资产权利、商店素材和 Steam 发布门禁。"
+  ]
+}

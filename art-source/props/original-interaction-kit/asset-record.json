@@ -1,0 +1,27 @@
+{
+  "id": "interaction-props-original-kit-candidate",
+  "slot_id": "interaction-props",
+  "source_kind": "original_node_generated_glb",
+  "source_builder": "build_interaction_props_glb.mjs",
+  "source_fallback_builder": "build_interaction_props.py",
+  "license": "本项目原创生成；候选，不代表最终发布签收",
+  "runtime_asset": "interaction_props_kit.glb",
+  "runtime_sha256": "2c490b5e28df3171326434d1e763afc6c7fd6f1d1b464708419823a7fb715ec9",
+  "material_atlas": "interaction_props_atlas_v1.png",
+  "material_atlas_sha256": "71b72e2d70408a6a8c42ee9785eb4cc6ee7f8e74010e8cf3682b01edf94bf706",
+  "root_name": "InteractionPropsKit",
+  "units": "meters",
+  "up_axis": "+Y",
+  "integration_status": "verified_isolated_city_runtime_mount_and_mission",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "required_evidence": [
+    "GLB 结构与尺寸探针",
+    "隔离城市运行时挂载与完整任务回放",
+    "办公室/城市运行时接入截图",
+    "交互成功与阻断回放",
+    "库存与任务状态回放",
+    "目标设备性能报告",
+    "人工视觉签收"
+  ]
+}

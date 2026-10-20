@@ -1,0 +1,466 @@
+{
+  "version": 1,
+  "project": "reference-runtime",
+  "policy": "只允许原创或已明确授权的资产进入发布构建",
+  "assets": [
+    {
+      "id": "graybox_geometry",
+      "type": "model",
+      "source": "本项目程序化生成",
+      "rights": "原创开发",
+      "release_scope_ids": ["office_vertical_slice", "office_and_city"],
+      "release_candidate_required": true,
+      "release_allowed": true
+    },
+    {
+      "id": "procedural_ui",
+      "type": "ui",
+      "source": "本项目脚本生成",
+      "rights": "原创开发",
+      "release_scope_ids": ["office_vertical_slice", "office_and_city"],
+      "release_candidate_required": true,
+      "release_allowed": true
+    },
+    {
+      "id": "procedural_audio_cues",
+      "type": "audio",
+      "source": "本项目运行时程序化生成",
+      "rights": "原创开发",
+      "release_scope_ids": ["office_vertical_slice", "office_and_city"],
+      "release_candidate_required": true,
+      "release_allowed": true
+    },
+    {
+      "id": "original_procedural_audio_library_candidate",
+      "type": "audio",
+      "source": "本项目确定性 PCM 波形生成器；工程内候选见 assets/audio/generated/",
+      "rights": "原创开发；不含第三方录音、采样或参考视频音频",
+      "release_scope_ids": ["office_vertical_slice", "office_and_city"],
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/audio/generated/audio-library-manifest.json",
+        "assets/audio/generated/interaction_success.wav",
+        "assets/audio/generated/interaction_denied.wav",
+        "assets/audio/generated/mission_success.wav",
+        "assets/audio/generated/mission_failed.wav",
+        "assets/audio/generated/perception_alert.wav",
+        "assets/audio/generated/conflict_started.wav",
+        "assets/audio/generated/vehicle_driver.wav",
+        "assets/audio/generated/vehicle_collision.wav",
+        "assets/audio/generated/vehicle_destroyed.wav",
+        "assets/audio/generated/scan_registered.wav",
+        "assets/audio/generated/checkpoint_loaded.wav",
+        "assets/audio/generated/mission_restart.wav",
+        "assets/audio/generated/footstep.wav",
+        "assets/audio/generated/vehicle_engine.wav"
+      ],
+      "derived_source_files": [
+        "art-source/audio/generated/build_audio_library.mjs",
+        "art-source/audio/generated/README.md"
+      ],
+      "conditions": "完成人工听感与混音审阅、音量开关回放、Windows 目标设备验证，并由发布清单重新确认后才能升级"
+    },
+    {
+      "id": "quaternius_universal_base_character_candidate",
+      "type": "model",
+      "source": "Quaternius Universal Base Characters；工程内候选见 assets/characters/quaternius-superhero-male/",
+      "rights": "CC0 1.0 Universal；许可证副本随候选目录保存",
+      "release_scope_ids": [],
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "source_url": "https://quaternius.com/packs/universalbasecharacters.html",
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/characters/quaternius-superhero-male/character_outfitted.glb",
+        "assets/characters/quaternius-superhero-male/character_npc_outfitted.glb"
+      ],
+      "derived_source_files": [
+        "art-source/characters/quaternius-superhero-male/character_outfitted.blend",
+        "art-source/characters/quaternius-superhero-male/character_npc_outfitted.blend",
+        "art-source/characters/quaternius-superhero-male/build_character_outfit.py",
+        "art-source/characters/quaternius-superhero-male/build_character_npc_outfit.py"
+      ],
+      "conditions": "原创服装网格仍是第一版候选；完成服装和动画定稿、视觉人工签收、目标设备验证，并由发布清单重新确认后才能升级"
+    },
+    {
+      "id": "quaternius_downtown_city_standard_candidate",
+      "type": "model",
+      "source": "Quaternius Downtown City MegaKit 标准版；工程内候选见 assets/environment/quaternius-downtown/",
+      "rights": "CC0 1.0 Universal；许可证副本随候选目录保存",
+      "release_scope_ids": [],
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "source_url": "https://quaternius.com/packs/downtowncitymegakit.html",
+      "download_url": "https://quaternius.itch.io/downtown-city-megakit",
+      "source_mirror_url": "https://github.com/anshaneja5/skyline-run/tree/main/public/assets/models",
+      "license_copy": "gta-reference-runtime/assets/environment/quaternius-downtown/LICENSE-quaternius.txt",
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/environment/quaternius-downtown/b_small.glb",
+        "assets/environment/quaternius-downtown/b_medium.glb",
+        "assets/environment/quaternius-downtown/b_large.glb",
+        "assets/environment/quaternius-downtown/prop_ac.glb"
+      ],
+      "conditions": "完成镜像与官方包逐文件核对、场景视觉签收、Windows 目标设备性能验证，并由发布清单重新确认后才能升级"
+    },
+    {
+      "id": "original_three_wheel_delivery_candidate",
+      "type": "model",
+      "source": "本项目原创几何生成；工程内候选见 assets/vehicles/three-wheel-delivery/",
+      "rights": "原创开发；不含第三方网格或纹理",
+      "release_scope_ids": ["office_vertical_slice", "office_and_city"],
+      "asset_slot_ids": ["three-wheel-vehicle"],
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/vehicles/three-wheel-delivery/three_wheel_delivery.glb"
+      ],
+      "derived_source_files": [
+        "art-source/vehicles/three-wheel-delivery/build_final_candidate_procedural.py",
+        "art-source/vehicles/three-wheel-delivery/build_three_wheel_delivery_glb.py",
+        "art-source/vehicles/three-wheel-delivery/build_three_wheel_delivery.py"
+      ],
+      "conditions": "完成纹理与材质定稿、车轮/驾驶/损伤动态验收、人工视觉签收、Windows 目标设备验证，并由发布清单重新确认后才能升级"
+    },
+    {
+      "id": "original_generated_urban_storefront_v1",
+      "type": "bitmap",
+      "source": "OpenAI image generation from a project-specific prompt; generated during internal development",
+      "rights": "本项目原创开发候选；不含参考视频帧、品牌或商标",
+      "release_scope_ids": ["office_and_city"],
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/environment/generated/urban_storefront_v1.png"
+      ],
+      "conditions": "完成生成记录、材质接入、视觉人工签收、Windows 目标设备性能验证，并由发布清单重新确认后才能升级"
+    },
+    {
+      "id": "original_generated_office_glass_partition_v1",
+      "type": "bitmap",
+      "source": "OpenAI image generation from a project-specific prompt; generated during internal development",
+      "rights": "本项目原创开发候选；不含参考视频帧、品牌或商标",
+      "release_scope_ids": ["office_vertical_slice", "office_and_city"],
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/environment/generated/office_glass_partition_v1.png"
+      ],
+      "conditions": "完成生成记录、材质接入、办公室固定镜头视觉人工签收、Windows 目标设备性能验证，并由发布清单重新确认后才能升级"
+    },
+    {
+      "id": "polyhaven_worn_asphalt_1k_candidate",
+      "type": "texture",
+      "source": "Poly Haven Worn Asphalt；官方页面与工程内 1K PBR 文件已登记",
+      "rights": "CC0 1.0；作者 Amal Kumar；可商用，但本项目仍需完成视觉与平台验收",
+      "release_scope_ids": [],
+      "license": "CC0-1.0",
+      "license_url": "https://polyhaven.com/license",
+      "source_url": "https://polyhaven.com/a/worn_asphalt",
+      "author": "Amal Kumar",
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/environment/cc0/worn_asphalt/worn_asphalt_ao_1k.jpg",
+        "assets/environment/cc0/worn_asphalt/worn_asphalt_arm_1k.jpg",
+        "assets/environment/cc0/worn_asphalt/worn_asphalt_diff_1k.jpg",
+        "assets/environment/cc0/worn_asphalt/worn_asphalt_nor_gl_1k.jpg",
+        "assets/environment/cc0/worn_asphalt/worn_asphalt_rough_1k.jpg"
+      ],
+      "sha256": {
+        "worn_asphalt_ao_1k.jpg": "c07b7d9608e73ed9732abbfe6e5afcd01da5ebeee227093855ebd0299b2abb73",
+        "worn_asphalt_arm_1k.jpg": "df8f97e3739be52933907f92527c79aac7c3d0e6f7c76fa0ce709815bfd0fe51",
+        "worn_asphalt_diff_1k.jpg": "3bf71ad290730092ad2aee85e246b2e43318bc1f32261826ba91250e815b5f72",
+        "worn_asphalt_nor_gl_1k.jpg": "5f835d192dac296674229a763553f356f5e206bb7f6d812bca5b0f38fc5302a4",
+        "worn_asphalt_rough_1k.jpg": "ad63ece01a94cb43f57a9d628fa9d28a560bffc8878749998ad3601831ab843f"
+      },
+      "conditions": "仅作为城市道路 PBR 候选；完成视觉人工签收、目标设备性能验证、发布包第三方声明和发布清单复核后才能升级"
+    },
+    {
+      "id": "original_procedural_player_character_candidate",
+      "type": "model",
+      "source": "本项目原创程序化玩家角色；工程内候选见 assets/characters/original-procedural-office-characters/",
+      "rights": "原创开发；不含第三方网格、纹理或参考视频像素",
+      "release_scope_ids": ["office_vertical_slice", "office_and_city"],
+      "asset_slot_ids": ["player-character"],
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/characters/original-procedural-office-characters/original_player_candidate.gd",
+        "assets/characters/original-procedural-office-characters/original_player_candidate.tscn"
+      ],
+      "conditions": "完成写实细节、动画集、碰撞与目标设备回放、人工视觉签收，并由发布清单重新确认后才能升级"
+    },
+    {
+      "id": "original_procedural_office_npc_candidate",
+      "type": "model",
+      "source": "本项目原创程序化办公室 NPC；工程内候选见 assets/characters/original-procedural-office-characters/",
+      "rights": "原创开发；不含第三方网格、纹理或参考视频像素",
+      "release_scope_ids": ["office_vertical_slice", "office_and_city"],
+      "asset_slot_ids": ["office-npc-set"],
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/characters/original-procedural-office-characters/original_office_npc_candidate.gd",
+        "assets/characters/original-procedural-office-characters/original_office_npc_candidate.tscn"
+      ],
+      "conditions": "完成巡查状态动画、碰撞与目标设备回放、人工视觉签收，并由发布清单重新确认后才能升级"
+    },
+    {
+      "id": "original_procedural_city_crowd_candidate",
+      "type": "model",
+      "source": "本项目原创程序化城市人群；工程内候选见 assets/characters/original-procedural-city-crowd/",
+      "rights": "原创开发；不含第三方网格、纹理或参考视频像素",
+      "release_scope_ids": ["office_and_city"],
+      "asset_slot_ids": ["city-crowd-set"],
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.gd",
+        "assets/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.tscn"
+      ],
+      "conditions": "完成入口密度、冲突恢复、远近距离性能、人工视觉签收，并由发布清单重新确认后才能升级"
+    },
+    {
+      "id": "original_procedural_office_environment_candidate",
+      "type": "model",
+      "source": "本项目原创程序化办公室环境；工程内候选见 content/candidates/",
+      "rights": "原创开发；不含第三方网格、纹理或参考视频像素",
+      "release_scope_ids": ["office_vertical_slice", "office_and_city"],
+      "asset_slot_ids": ["office-environment-kit"],
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "content/candidates/original_office_desk_runtime_candidate.gd",
+        "content/candidates/original_office_desk_runtime_candidate.tscn"
+      ],
+      "conditions": "完成隔断、工位、走廊、电梯出口的材质与构图验收、目标设备验证，并由发布清单重新确认后才能升级"
+    },
+    {
+      "id": "original_procedural_city_environment_candidate",
+      "type": "model",
+      "source": "本项目原创程序化城市环境；工程内候选见 assets/environment/original-procedural-city-environment/",
+      "rights": "原创开发；不含第三方网格、纹理或参考视频像素",
+      "release_scope_ids": ["office_and_city"],
+      "asset_slot_ids": ["city-environment-kit"],
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/environment/original-procedural-city-environment/original_city_environment_candidate.gd",
+        "assets/environment/original-procedural-city-environment/original_city_environment_candidate.tscn",
+        "assets/environment/generated/city_drive_lane_day_v1_candidate.png",
+        "assets/environment/generated/city_drive_lane_day_v1_candidate.json",
+        "assets/environment/generated/city_drive_lane_day_v2_clear_foreground_candidate.png",
+        "assets/environment/generated/city_drive_lane_day_v2_clear_foreground_candidate.json"
+      ],
+      "conditions": "完成街区入口、道路、店铺、后场仓储、天气光照与目标设备验证、人工视觉签收，并由发布清单重新确认后才能升级"
+    },
+    {
+      "id": "original_procedural_interaction_props_candidate",
+      "type": "model",
+      "source": "本项目原创程序化交互道具；工程内候选见 assets/props/original-procedural-interaction-props/",
+      "rights": "原创开发；不含第三方网格、纹理、品牌或参考视频像素",
+      "release_scope_ids": ["office_vertical_slice", "office_and_city"],
+      "asset_slot_ids": ["interaction-props"],
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/props/original-procedural-interaction-props/original_interaction_props_candidate.gd",
+        "assets/props/original-procedural-interaction-props/original_interaction_props_candidate.tscn"
+      ],
+      "conditions": "完成交互挂点、库存反馈、原创标识审查和目标设备验证，并由发布清单重新确认后才能升级"
+    },
+    {
+      "id": "authorized_ai_office10_backdrop_candidate",
+      "type": "bitmap",
+      "source": "用户声明为自有 AI 视频的 office-10 本地抽帧；源证据 reference-evidence/video-2/office-10.jpg",
+      "rights": "用户声明拥有生成与商业使用权；当前仅登记为内部候选，尚未完成最终权利负责人签收",
+      "release_scope_ids": ["office_vertical_slice", "office_and_city"],
+      "asset_slot_ids": ["office-10-reference-backdrop-candidate"],
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/environment/generated/office_10_authorized_ai_backdrop_candidate.png"
+      ],
+      "sha256": {
+        "office_10_authorized_ai_backdrop_candidate.png": "67158e53b18736d534dc6e7b6f8fd7ccc8629ac9499b30fbe70f30e574b499f1"
+      },
+      "conditions": "仅用于内部工位镜头验收；如需进入商业发布包，必须补充原始生成记录、权利负责人签收、逐段视觉验收和目标设备验证，并将 release_allowed 升级为 true"
+    },
+    {
+      "id": "authorized_ai_city08_backdrop_candidate",
+      "type": "bitmap",
+      "source": "用户声明为自有 AI 视频的 city-08 本地抽帧；源证据 reference-evidence/video-1/city-08.jpg",
+      "rights": "用户声明拥有生成与商业使用权；当前仅登记为内部候选，尚未完成最终权利负责人签收",
+      "release_scope_ids": ["office_and_city"],
+      "asset_slot_ids": ["city-08-reference-backdrop-candidate"],
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/environment/generated/city_08_authorized_ai_backdrop_candidate.png"
+      ],
+      "sha256": {
+        "city_08_authorized_ai_backdrop_candidate.png": "acae9294790ff1d7148498f239a1ee0c570716e930f4d5a3d12e35fe5ad09d71"
+      },
+      "conditions": "仅用于内部混合渲染验收；如需进入商业发布包，必须补充原始生成记录、权利负责人签收、最终视觉验收和目标设备验证，并将 release_allowed 升级为 true"
+    },
+    {
+      "id": "city_storefront_crowd_v3_generated_candidate",
+      "type": "bitmap",
+      "source": "项目内置图像生成工具生成的原创城市店铺人群背景候选；参考构图来自 reference-evidence/video-1/city-01.jpg",
+      "rights": "项目原创候选；生成记录已登记，最终权利负责人签收尚未完成",
+      "release_scope_ids": ["office_and_city"],
+      "candidate_slot_reference": "city-environment-kit",
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/environment/generated/city_storefront_crowd_v3_generated.png",
+        "assets/environment/generated/city_storefront_crowd_v3_generated.json"
+      ],
+      "sha256": {
+        "city_storefront_crowd_v3_generated.png": "d40ca4fc01cae0b5af1fc865e1d15bd28ca1d8334556762aea8894c0edc3fb00"
+      },
+      "conditions": "仅用于城市首店内部候选与当前源固定镜头验收；如需进入商业发布包，必须补充生成记录、权利负责人签收、逐段视觉验收和目标设备验证，并将 release_allowed 升级为 true"
+    },
+    {
+      "id": "city_drive_lane_dusk_v1_generated_candidate",
+      "type": "bitmap",
+      "source": "项目内置图像生成工具生成的原创城市驾驶远景候选；参考构图来自 reference-evidence/video-1/city-08.jpg，但不包含参考视频像素、HUD 或品牌文字",
+      "rights": "项目原创候选；生成记录已登记，最终权利负责人签收尚未完成",
+      "release_scope_ids": ["office_and_city"],
+      "candidate_slot_reference": "city-environment-kit",
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/environment/generated/city_drive_lane_dusk_v1_generated.png",
+        "assets/environment/generated/city_drive_lane_dusk_v1_generated.json"
+      ],
+      "sha256": {
+        "city_drive_lane_dusk_v1_generated.png": "451e87e65eaaba2dad625222bf98860ca72cccd4a43afeb42ba028eaddfe2bb2"
+      },
+      "conditions": "仅用于城市 city-08 内部驾驶远景候选与当前源固定镜头验收；如需进入商业发布包，必须补充生成记录、权利负责人签收、逐段视觉验收和目标设备验证，并将 release_allowed 升级为 true"
+    },
+    {
+      "id": "office_workstation_row_v1_generated_candidate",
+      "type": "bitmap",
+      "source": "项目内置图像生成工具生成的原创办公室连续工位背景候选；参考构图来自 reference-evidence/video-2/office-01.jpg，但不包含参考视频像素、HUD 或品牌文字",
+      "rights": "项目原创候选；生成记录已登记，最终权利负责人签收尚未完成",
+      "release_scope_ids": ["office_vertical_slice", "office_and_city"],
+      "candidate_slot_reference": "office-environment-kit",
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/environment/generated/office_workstation_row_v1_generated.png",
+        "assets/environment/generated/office_workstation_row_v1_generated.json"
+      ],
+      "sha256": {
+        "office_workstation_row_v1_generated.png": "9a30f549c018d2dc4673e52271b025fcc0441101565000733a4aa9186386fb5d"
+      },
+      "conditions": "仅用于办公室 office-10 内部坐姿打字与固定镜头验收；如需进入商业发布包，必须补充生成记录、权利负责人签收、逐段视觉验收和目标设备验证，并将 release_allowed 升级为 true"
+    },
+    {
+      "id": "office_workstation_row_v2_worker_generated_candidate",
+      "type": "bitmap",
+      "source": "项目内置图像生成工具生成的原创办公室连续工位与坐姿工作者背景候选；参考构图来自 reference-evidence/video-2/office-10.jpg，但不包含参考视频像素、HUD 或品牌文字",
+      "rights": "项目原创候选；生成记录已登记，最终权利负责人签收尚未完成",
+      "release_scope_ids": ["office_vertical_slice", "office_and_city"],
+      "candidate_slot_reference": "office-environment-kit",
+      "status": "internal_candidate_only",
+      "release_candidate_required": true,
+      "release_allowed": false,
+      "derived_runtime_files": [
+        "assets/environment/generated/office_workstation_row_v2_worker_generated.png",
+        "assets/environment/generated/office_workstation_row_v2_worker_generated.json"
+      ],
+      "sha256": {
+        "office_workstation_row_v2_worker_generated.png": "5905d08c367f00b5a44a9043f5177884e78839d22647112cb411969704d1b475"
+      },
+      "conditions": "仅用于办公室 office-10 内部坐姿打字与固定镜头验收；如需进入商业发布包，必须补充生成记录、权利负责人签收、逐段视觉验收和目标设备验证，并将 release_allowed 升级为 true"
+    },
+    {
+      "id": "reference_videos",
+      "type": "reference_only",
+      "source": "本地下载的外部视频",
+      "rights": "未确认商业复用授权",
+      "release_scope_ids": [],
+      "release_candidate_required": false,
+      "release_allowed": false
+    },
+    {
+      "id": "reference_evidence_frames",
+      "type": "reference_only",
+      "source": "研发参考证据及其抽帧文件（仅内部，不随发布构建交付）",
+      "rights": "仅内部验收，未确认商业复用授权",
+      "release_scope_ids": [],
+      "release_candidate_required": false,
+      "release_allowed": false
+    },
+    {
+      "id": "commercial_game_assets",
+      "type": "external_asset",
+      "source": "禁止导入",
+      "rights": "未授权",
+      "release_scope_ids": [],
+      "release_candidate_required": false,
+      "release_allowed": false
+    }
+  ],
+  "third_party_components": [
+    {
+      "id": "godot_engine",
+      "type": "runtime",
+      "source": "https://godotengine.org/",
+      "version": "4.7.1.stable",
+      "license": "MIT",
+      "status": "in_use",
+      "release_allowed": true,
+      "conditions": "发布包或致谢页面必须包含许可证与第三方声明"
+    },
+    {
+      "id": "godot_jolt_extension",
+      "type": "candidate_plugin",
+      "source": "https://github.com/godot-jolt/godot-jolt",
+      "license": "MIT",
+      "status": "audited_not_integrated",
+      "release_allowed": false,
+      "conditions": "完成当前引擎版本、平台和回放回归后再决定"
+    },
+    {
+      "id": "terrain3d",
+      "type": "candidate_plugin",
+      "source": "https://github.com/TokisanGames/Terrain3D",
+      "license": "MIT",
+      "status": "audited_not_integrated",
+      "release_allowed": false,
+      "conditions": "城市地图扩大且平台渲染性能门禁通过后再决定"
+    },
+    {
+      "id": "gpl_vehicle_reference",
+      "type": "rejected_reference",
+      "source": "https://github.com/Janorico/Vehicle",
+      "license": "GPL-3.0",
+      "status": "rejected_for_current_commercial_plan",
+      "release_allowed": false,
+      "conditions": "不得复制其代码、模型或第三方依赖"
+    }
+  ]
+}

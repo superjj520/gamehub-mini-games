@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "reference-content-packs-v1",
+  "version": 1,
+  "display_name": "参考还原基准内容包注册表",
+  "policy": "场景只通过注册表加载已校验内容包；新增内容包不修改运行时核心",
+  "packs": [
+    {
+      "id": "office-leave-on-time-v1",
+      "kind": "office",
+      "path": "res://content/office_mission.json",
+      "content_version": 1,
+      "enabled": true,
+      "release_allowed": true
+    },
+    {
+      "id": "city-free-eggs-v1",
+      "kind": "city",
+      "path": "res://content/city_mission.json",
+      "content_version": 1,
+      "enabled": true,
+      "release_allowed": true
+    },
+    {
+      "id": "city-market-delivery-v1",
+      "kind": "city",
+      "path": "res://content/city-market-delivery-v1.json",
+      "content_version": 1,
+      "enabled": true,
+      "release_allowed": false,
+      "note": "扩展内容包；先通过内部行为、视觉、权利和目标设备验收"
+    }
+  ]
+}

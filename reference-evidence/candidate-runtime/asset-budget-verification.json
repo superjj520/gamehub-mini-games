@@ -1,0 +1,1255 @@
+{
+  "schema_version": 1,
+  "status": "technical_budget_passed",
+  "strict": true,
+  "policy": "技术预算通过不代表视觉、权利、目标设备或发布验收通过",
+  "profiles": {
+    "player": {
+      "maxTriangles": 35000,
+      "maxMaterials": 4,
+      "maxTextureSize": 2048,
+      "maxBones": 128
+    },
+    "npc": {
+      "maxTriangles": 18000,
+      "maxMaterials": 3,
+      "maxTextureSize": 1024,
+      "maxBones": 96
+    },
+    "office_environment": {
+      "maxTriangles": 12000,
+      "maxMaterials": 3,
+      "maxTextureSize": 1024,
+      "maxBones": 0
+    },
+    "city_environment": {
+      "maxTriangles": 12000,
+      "maxMaterials": 5,
+      "maxTextureSize": 2048,
+      "maxBones": 0
+    },
+    "vehicle": {
+      "maxTriangles": 25000,
+      "maxMaterials": 5,
+      "maxTextureSize": 2048,
+      "maxBones": 32
+    },
+    "prop": {
+      "maxTriangles": 4000,
+      "maxMaterials": 3,
+      "maxTextureSize": 512,
+      "maxBones": 0
+    }
+  },
+  "results": [
+    {
+      "id": "player-character-makehuman-elegant-suit-atlas-candidate",
+      "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate.glb",
+      "profile": "player",
+      "profile_limits": {
+        "maxTriangles": 35000,
+        "maxMaterials": 4,
+        "maxTextureSize": 2048,
+        "maxBones": 128
+      },
+      "sha256": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+      "metrics": {
+        "triangles": 17482,
+        "materials": 3,
+        "bones": 53,
+        "textures": 6,
+        "max_texture_dimension": 1024,
+        "meshes": [
+          {
+            "name": "eyebrow001.001",
+            "triangles": 86,
+            "primitives": 1
+          },
+          {
+            "name": "eyelashes01.001",
+            "triangles": 164,
+            "primitives": 1
+          },
+          {
+            "name": "low-poly.001",
+            "triangles": 76,
+            "primitives": 1
+          },
+          {
+            "name": "shoes02.001",
+            "triangles": 1378,
+            "primitives": 1
+          },
+          {
+            "name": "short02.001",
+            "triangles": 1504,
+            "primitives": 1
+          },
+          {
+            "name": "base.002",
+            "triangles": 7544,
+            "primitives": 1
+          },
+          {
+            "name": "male_elegantsuit01_skinned",
+            "triangles": 6730,
+            "primitives": 1
+          }
+        ],
+        "texture_details": [
+          {
+            "name": "makehuman_atlas_skin_base_color_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_skin_metallic_roughness_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_hair_detail_base_color_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_hair_detail_metallic_roughness_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_outfit_base_color_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_outfit_metallic_roughness_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          }
+        ]
+      },
+      "checks": {
+        "file_exists": true,
+        "registry_entry_present": true,
+        "registry_hash_present": true,
+        "registry_path_matches": true,
+        "registry_hash_matches": true,
+        "triangles_within_budget": true,
+        "materials_within_budget": true,
+        "textures_within_budget": true,
+        "bones_within_budget": true
+      },
+      "status": "technical_budget_pass",
+      "visual_status": "unverified",
+      "release_allowed": false
+    },
+    {
+      "id": "office-npc-makehuman-elegant-suit-skinned-512-atlas-candidate",
+      "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate.glb",
+      "profile": "npc",
+      "profile_limits": {
+        "maxTriangles": 18000,
+        "maxMaterials": 3,
+        "maxTextureSize": 1024,
+        "maxBones": 96
+      },
+      "sha256": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+      "metrics": {
+        "triangles": 17482,
+        "materials": 3,
+        "bones": 53,
+        "textures": 6,
+        "max_texture_dimension": 1024,
+        "meshes": [
+          {
+            "name": "eyebrow001.001",
+            "triangles": 86,
+            "primitives": 1
+          },
+          {
+            "name": "eyelashes01.001",
+            "triangles": 164,
+            "primitives": 1
+          },
+          {
+            "name": "low-poly.001",
+            "triangles": 76,
+            "primitives": 1
+          },
+          {
+            "name": "shoes02.001",
+            "triangles": 1378,
+            "primitives": 1
+          },
+          {
+            "name": "short02.001",
+            "triangles": 1504,
+            "primitives": 1
+          },
+          {
+            "name": "base.002",
+            "triangles": 7544,
+            "primitives": 1
+          },
+          {
+            "name": "male_elegantsuit01_skinned",
+            "triangles": 6730,
+            "primitives": 1
+          }
+        ],
+        "texture_details": [
+          {
+            "name": "makehuman_atlas_skin_base_color_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_skin_metallic_roughness_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_hair_detail_base_color_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_hair_detail_metallic_roughness_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_outfit_base_color_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_outfit_metallic_roughness_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          }
+        ]
+      },
+      "checks": {
+        "file_exists": true,
+        "registry_entry_present": true,
+        "registry_hash_present": true,
+        "registry_path_matches": true,
+        "registry_hash_matches": true,
+        "triangles_within_budget": true,
+        "materials_within_budget": true,
+        "textures_within_budget": true,
+        "bones_within_budget": true
+      },
+      "status": "technical_budget_pass",
+      "visual_status": "unverified",
+      "release_allowed": false
+    },
+    {
+      "id": "city-crowd-makehuman-elegant-suit-atlas-candidate",
+      "path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate.glb",
+      "profile": "npc",
+      "profile_limits": {
+        "maxTriangles": 18000,
+        "maxMaterials": 3,
+        "maxTextureSize": 1024,
+        "maxBones": 96
+      },
+      "sha256": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+      "metrics": {
+        "triangles": 17482,
+        "materials": 3,
+        "bones": 53,
+        "textures": 6,
+        "max_texture_dimension": 1024,
+        "meshes": [
+          {
+            "name": "eyebrow001.001",
+            "triangles": 86,
+            "primitives": 1
+          },
+          {
+            "name": "eyelashes01.001",
+            "triangles": 164,
+            "primitives": 1
+          },
+          {
+            "name": "low-poly.001",
+            "triangles": 76,
+            "primitives": 1
+          },
+          {
+            "name": "shoes02.001",
+            "triangles": 1378,
+            "primitives": 1
+          },
+          {
+            "name": "short02.001",
+            "triangles": 1504,
+            "primitives": 1
+          },
+          {
+            "name": "base.002",
+            "triangles": 7544,
+            "primitives": 1
+          },
+          {
+            "name": "male_elegantsuit01_skinned",
+            "triangles": 6730,
+            "primitives": 1
+          }
+        ],
+        "texture_details": [
+          {
+            "name": "makehuman_atlas_skin_base_color_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_skin_metallic_roughness_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_hair_detail_base_color_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_hair_detail_metallic_roughness_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_outfit_base_color_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "makehuman_atlas_outfit_metallic_roughness_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          }
+        ]
+      },
+      "checks": {
+        "file_exists": true,
+        "registry_entry_present": true,
+        "registry_hash_present": true,
+        "registry_path_matches": true,
+        "registry_hash_matches": true,
+        "triangles_within_budget": true,
+        "materials_within_budget": true,
+        "textures_within_budget": true,
+        "bones_within_budget": true
+      },
+      "status": "technical_budget_pass",
+      "visual_status": "unverified",
+      "release_allowed": false
+    },
+    {
+      "id": "city-vehicle-three-wheel-delivery-atlas-candidate",
+      "path": "art-source/vehicles/three-wheel-delivery/three_wheel_delivery_atlas_candidate.glb",
+      "profile": "vehicle",
+      "profile_limits": {
+        "maxTriangles": 25000,
+        "maxMaterials": 5,
+        "maxTextureSize": 2048,
+        "maxBones": 32
+      },
+      "sha256": "59706c3a50e7e66a6ca927c9976613cce86304e60e439c2458f2197bb949f085",
+      "metrics": {
+        "triangles": 964,
+        "materials": 3,
+        "bones": 0,
+        "textures": 2,
+        "max_texture_dimension": 2048,
+        "meshes": [
+          {
+            "name": "候选三轮车车体",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车底盘",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车前挡板",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车前饰条",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗底板",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗左栏",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗右栏",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗后栏",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗门板",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左货物托盘",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右货物托盘",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左托盘隔条",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右托盘隔条",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车座椅",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车靠背",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车车把立柱",
+            "triangles": 64,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车车把",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车前灯",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左转向灯",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右转向灯",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左后视镜",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右后视镜",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左后视镜杆",
+            "triangles": 48,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右后视镜杆",
+            "triangles": 48,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车车牌",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车后保险杠",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左后轮胎",
+            "triangles": 96,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左后轮毂",
+            "triangles": 80,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右后轮胎",
+            "triangles": 96,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右后轮毂",
+            "triangles": 80,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车前轮胎",
+            "triangles": 96,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车前轮毂",
+            "triangles": 80,
+            "primitives": 1
+          }
+        ],
+        "texture_details": [
+          {
+            "name": "three_wheel_opaque_base_color_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 2048,
+              "height": 1024,
+              "maxDimension": 2048
+            }
+          },
+          {
+            "name": "three_wheel_opaque_metallic_roughness_atlas",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 2048,
+              "height": 1024,
+              "maxDimension": 2048
+            }
+          }
+        ]
+      },
+      "checks": {
+        "file_exists": true,
+        "registry_entry_present": true,
+        "registry_hash_present": true,
+        "registry_path_matches": true,
+        "registry_hash_matches": true,
+        "triangles_within_budget": true,
+        "materials_within_budget": true,
+        "textures_within_budget": true,
+        "bones_within_budget": true
+      },
+      "status": "technical_budget_pass",
+      "visual_status": "unverified",
+      "release_allowed": false
+    },
+    {
+      "id": "city-vehicle-three-wheel-delivery-final-procedural-candidate",
+      "path": "art-source/vehicles/three-wheel-delivery/final-candidate/three_wheel_delivery_final_candidate.glb",
+      "profile": "vehicle",
+      "profile_limits": {
+        "maxTriangles": 25000,
+        "maxMaterials": 5,
+        "maxTextureSize": 2048,
+        "maxBones": 32
+      },
+      "sha256": "e43ed4fa5bb9254e68cd4a608b67e678a9b98c7151414e2da8f4bd33656e2e51",
+      "metrics": {
+        "triangles": 1396,
+        "materials": 5,
+        "bones": 0,
+        "textures": 0,
+        "max_texture_dimension": 0,
+        "meshes": [
+          {
+            "name": "候选三轮车车体",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车底盘",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车前挡板",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车前饰条",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗底板",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗左栏",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗右栏",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗后栏",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗门板",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左货物托盘",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右货物托盘",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左托盘隔条",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右托盘隔条",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车座椅",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车靠背",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车车把立柱",
+            "triangles": 64,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车车把",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车前灯",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左转向灯",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右转向灯",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左后视镜",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右后视镜",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左后视镜杆",
+            "triangles": 48,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右后视镜杆",
+            "triangles": 48,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车车牌",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车后保险杠",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左后轮胎",
+            "triangles": 96,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左后轮毂",
+            "triangles": 80,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右后轮胎",
+            "triangles": 96,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右后轮毂",
+            "triangles": 80,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车前轮胎",
+            "triangles": 96,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车前轮毂",
+            "triangles": 80,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗左前立柱",
+            "triangles": 48,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗左后立柱",
+            "triangles": 48,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗左上沿",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗右前立柱",
+            "triangles": 48,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗右后立柱",
+            "triangles": 48,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗右上沿",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗后上沿",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左侧裙",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左脚踏",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左侧防护条",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右侧裙",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右脚踏",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右侧防护条",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车仪表台",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车仪表屏",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车前灯外壳",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车前保险杠",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车左尾灯",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车右尾灯",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车尾部反光条",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗前固定带",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车货斗后固定带",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车座椅底座",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "候选三轮车座椅靠背包边",
+            "triangles": 12,
+            "primitives": 1
+          }
+        ],
+        "texture_details": []
+      },
+      "checks": {
+        "file_exists": true,
+        "registry_entry_present": true,
+        "registry_hash_present": true,
+        "registry_path_matches": true,
+        "registry_hash_matches": true,
+        "triangles_within_budget": true,
+        "materials_within_budget": true,
+        "textures_within_budget": true,
+        "bones_within_budget": true
+      },
+      "status": "technical_budget_pass",
+      "visual_status": "unverified",
+      "release_allowed": false
+    },
+    {
+      "id": "office-desk-polyhaven-metal-cc0-candidate",
+      "path": "art-source/environment/polyhaven-metal-office-desk/metal_office_desk_1k.gltf",
+      "profile": "office_environment",
+      "profile_limits": {
+        "maxTriangles": 12000,
+        "maxMaterials": 3,
+        "maxTextureSize": 1024,
+        "maxBones": 0
+      },
+      "sha256": "f07032a5ee89aacceebf10fd9fa192c22775ae81861cfb0bdb1594497179373c",
+      "metrics": {
+        "triangles": 6898,
+        "materials": 1,
+        "bones": 0,
+        "textures": 3,
+        "max_texture_dimension": 1024,
+        "meshes": [
+          {
+            "name": "Cube.009",
+            "triangles": 368,
+            "primitives": 1
+          },
+          {
+            "name": "Cube.011",
+            "triangles": 252,
+            "primitives": 1
+          },
+          {
+            "name": "Plane.006",
+            "triangles": 4186,
+            "primitives": 1
+          },
+          {
+            "name": "Cube.002",
+            "triangles": 368,
+            "primitives": 1
+          },
+          {
+            "name": "Cube.004",
+            "triangles": 368,
+            "primitives": 1
+          },
+          {
+            "name": "Cube.006",
+            "triangles": 368,
+            "primitives": 1
+          },
+          {
+            "name": "Cube.008",
+            "triangles": 368,
+            "primitives": 1
+          },
+          {
+            "name": "Cube.012",
+            "triangles": 368,
+            "primitives": 1
+          },
+          {
+            "name": "Cube.014",
+            "triangles": 252,
+            "primitives": 1
+          }
+        ],
+        "texture_details": [
+          {
+            "name": "metal_office_desk_nor_gl",
+            "uri": "textures/metal_office_desk_nor_gl_1k.jpg",
+            "mimeType": "image/jpeg",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "metal_office_desk_diff",
+            "uri": "textures/metal_office_desk_diff_1k.jpg",
+            "mimeType": "image/jpeg",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          },
+          {
+            "name": "metal_office_desk_metal-metal_office_desk_rough",
+            "uri": "textures/metal_office_desk_arm_1k.jpg",
+            "mimeType": "image/jpeg",
+            "size": {
+              "width": 1024,
+              "height": 1024,
+              "maxDimension": 1024
+            }
+          }
+        ]
+      },
+      "checks": {
+        "file_exists": true,
+        "registry_entry_present": true,
+        "registry_hash_present": true,
+        "registry_path_matches": true,
+        "registry_hash_matches": true,
+        "triangles_within_budget": true,
+        "materials_within_budget": true,
+        "textures_within_budget": true,
+        "bones_within_budget": true
+      },
+      "status": "technical_budget_pass",
+      "visual_status": "unverified",
+      "release_allowed": false
+    },
+    {
+      "id": "interaction-props-original-kit-candidate",
+      "path": "art-source/props/original-interaction-kit/interaction_props_kit.glb",
+      "profile": "prop",
+      "profile_limits": {
+        "maxTriangles": 4000,
+        "maxMaterials": 3,
+        "maxTextureSize": 512,
+        "maxBones": 0
+      },
+      "sha256": "2c490b5e28df3171326434d1e763afc6c7fd6f1d1b464708419823a7fb715ec9",
+      "metrics": {
+        "triangles": 2756,
+        "materials": 1,
+        "bones": 0,
+        "textures": 1,
+        "max_texture_dimension": 512,
+        "meshes": [
+          {
+            "name": "托盘底",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "鸡蛋_0_0",
+            "triangles": 256,
+            "primitives": 1
+          },
+          {
+            "name": "鸡蛋_0_1",
+            "triangles": 256,
+            "primitives": 1
+          },
+          {
+            "name": "鸡蛋_0_2",
+            "triangles": 256,
+            "primitives": 1
+          },
+          {
+            "name": "鸡蛋_0_3",
+            "triangles": 256,
+            "primitives": 1
+          },
+          {
+            "name": "鸡蛋_0_4",
+            "triangles": 256,
+            "primitives": 1
+          },
+          {
+            "name": "鸡蛋_1_0",
+            "triangles": 256,
+            "primitives": 1
+          },
+          {
+            "name": "鸡蛋_1_1",
+            "triangles": 256,
+            "primitives": 1
+          },
+          {
+            "name": "鸡蛋_1_2",
+            "triangles": 256,
+            "primitives": 1
+          },
+          {
+            "name": "鸡蛋_1_3",
+            "triangles": 256,
+            "primitives": 1
+          },
+          {
+            "name": "鸡蛋_1_4",
+            "triangles": 256,
+            "primitives": 1
+          },
+          {
+            "name": "扫码台底座",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "扫码台台面",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "扫码屏",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "扫码灯",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "标识柱",
+            "triangles": 40,
+            "primitives": 1
+          },
+          {
+            "name": "交付标识牌",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "交付灯带",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "篮筐底",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "篮筐侧边",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "篮筐侧边",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "篮筐前后边",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "篮筐前后边",
+            "triangles": 12,
+            "primitives": 1
+          },
+          {
+            "name": "篮筐提手",
+            "triangles": 12,
+            "primitives": 1
+          }
+        ],
+        "texture_details": [
+          {
+            "name": "",
+            "uri": "",
+            "mimeType": "image/png",
+            "size": {
+              "width": 512,
+              "height": 512,
+              "maxDimension": 512
+            }
+          }
+        ]
+      },
+      "checks": {
+        "file_exists": true,
+        "registry_entry_present": true,
+        "registry_hash_present": true,
+        "registry_path_matches": true,
+        "registry_hash_matches": true,
+        "triangles_within_budget": true,
+        "materials_within_budget": true,
+        "textures_within_budget": true,
+        "bones_within_budget": true
+      },
+      "status": "technical_budget_pass",
+      "visual_status": "unverified",
+      "release_allowed": false
+    }
+  ],
+  "verified_at": "2026-10-14T10:43:06.026Z"
+}

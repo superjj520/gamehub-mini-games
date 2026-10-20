@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "asset_id": "city-05-video-authored-backdrop-candidate-v1",
+  "status": "candidate_only",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "source": {
+    "kind": "user_authorized_ai_video_frame_edit",
+    "reference_video": "reference-evidence/video-1/video-1-china-gta-480.mp4",
+    "reference_frame": "reference-evidence/video-1/city-05.jpg",
+    "exact_frame": "reference-video-candidate/city-05-video-backdrop.jpg",
+    "playable_edit": "reference-video-candidate/city-05-video-playable-backdrop-v1.png",
+    "playable_edit_sha256": "00aef9b1c016f8dc0b5d4b70b72e7043145c965a7db1e18ced247479c4eaa7ba"
+  },
+  "role": "city-05 免费鸡蛋任务的黄昏离店与携带物奔跑背景候选",
+  "dynamic_overlay": [
+    "正式运行时玩家与携带物表现",
+    "正式人群推开、冲突、通缉和任务状态",
+    "正式 HUD、输入、碰撞、导航、NPC 感知和存档"
+  ],
+  "rights": {
+    "source_authorization": "user_authorized",
+    "final_rights_signoff": "pending",
+    "note": "原始 AI 参考视频及编辑背景只进入隔离候选运行时，不得直接进入发布包。"
+  },
+  "acceptance": {
+    "required": [
+      "真实图形窗口或 Windows 目标设备截图",
+      "city-05 逐帧黄昏光照、携带物、奔跑动作、人群推开和 HUD 验收",
+      "最终资产权利签收"
+    ],
+    "blocking_until_complete": true
+  }
+}

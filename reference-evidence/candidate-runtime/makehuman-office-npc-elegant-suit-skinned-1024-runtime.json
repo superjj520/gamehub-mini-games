@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "status": "candidate_isolated_office_runtime_verified",
+  "candidate_id": "office-npc-makehuman-elegant-suit-skinned-1024-candidate",
+  "candidate_variant": "reference_office_elegant_suit_nearest_neighbor_skinned_1024_v1",
+  "candidate_sha256": "88577acfc12be0a994f35b30f6f07dc6e968aaebdc290b4c3f9d611f55641485",
+  "retouch_script_sha256": "abaee173322b90e5976f2ae2d67784b88c1d562b05e8ff67fbabac5e38f4eb6f",
+  "runtime_options": {
+    "preserve_imported_materials": true,
+    "reference_office_materials": true,
+    "use_elegant_suit_candidate": true,
+    "use_elegant_suit_skinned": true
+  },
+  "auxiliary_asset_sha256": null,
+  "formal_runtime_source_fingerprint": "3a016e81a0218a39ed3d260a54d577a69d7fb377732653e3f4a992dc9237e8b8",
+  "formal_runtime_source_file_count": 169,
+  "environment": "temporary copy of gta-reference-runtime",
+  "checks": [
+    "Godot GLB import",
+    "office NPC Visual mount with fallback forbidden",
+    "Skeleton3D bone-count and meter-scale contract",
+    "retouch script and four candidate pose states",
+    "backpack visual mount",
+    "full office stealth, perception and save replay"
+  ],
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "captured_at": "2026-10-07T08:43:08.294Z"
+}

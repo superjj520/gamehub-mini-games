@@ -1,0 +1,18 @@
+; 候选资产图形预览工程，不属于正式发布运行时。
+config_version=5
+
+[application]
+config/name="新时代觉醒者候选资产视觉预览"
+run/main_scene="res://preview.tscn"
+
+[display]
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/size/window_width_override=1280
+window/size/window_height_override=720
+window/stretch/mode="canvas_items"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.055, 0.07, 0.085, 1)

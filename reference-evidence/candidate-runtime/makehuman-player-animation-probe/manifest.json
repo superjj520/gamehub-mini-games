@@ -1,0 +1,65 @@
+{
+  "image": "/Users/superjj/gamehub-mini-games/reference-evidence/candidate-runtime/makehuman-player-animation-probe/makehuman-player-animation-probe.png",
+  "motion_policy": "gameplay_driven_in_place_animation",
+  "release_allowed": false,
+  "schema_version": 1,
+  "states": [
+    {
+      "animation_player": true,
+      "id": "idle_default",
+      "passed": true,
+      "phase": 0
+    },
+    {
+      "animation_player": true,
+      "id": "walk_default",
+      "passed": true,
+      "phase": 0.22
+    },
+    {
+      "animation_player": true,
+      "id": "crouch_default",
+      "passed": true,
+      "phase": 0
+    },
+    {
+      "animation_player": true,
+      "id": "interact_default",
+      "passed": true,
+      "phase": 0
+    },
+    {
+      "animation_player": true,
+      "id": "typing_default",
+      "passed": true,
+      "phase": 0
+    },
+    {
+      "animation_player": true,
+      "id": "vehicle_default",
+      "passed": true,
+      "phase": 0.36
+    },
+    {
+      "animation_player": true,
+      "id": "hit_default",
+      "passed": true,
+      "phase": 0
+    },
+    {
+      "animation_player": true,
+      "id": "fail_default",
+      "passed": true,
+      "phase": 0
+    }
+  ],
+  "status": "candidate_player_animation_probe_captured",
+  "visual_status": "unverified",
+  "source": {
+    "asset_sha256": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9",
+    "player_script_sha256": "a6653cbda2ee38ca7e1cbc3d9a7e23f96240aec6271a06ee0100ba6af77a4a47",
+    "probe_script_sha256": "dd26ff3d7ac3f8532ea0d622f75de8ba62826dee8b4fab9870e51f1773d0e4a9",
+    "runtime_source_fingerprint": "1c1c7823bf5f50ebca3e21c54a8da5d280f5faf962e5f8d45f1e4cbcc000be2d",
+    "runtime_file_count": 242
+  }
+}

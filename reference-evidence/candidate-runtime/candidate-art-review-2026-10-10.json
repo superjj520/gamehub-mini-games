@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "review_id": "candidate-art-review-2026-10-10",
+  "reviewed_at": "2026-10-10T05:00:00+08:00",
+  "review_method": "本地原始 PNG 逐项人工观察加文件尺寸与 SHA-256 核对；未将静态图当作运行时截图",
+  "runtime_source_fingerprint": "b4c744ed6af8ac21a9eb6d8073451b0de8302916d5e6fd53502e5788e2680c8b",
+  "runtime_source_file_count": 191,
+  "review_status": "candidate_provisional",
+  "visual_acceptance_status": "unverified",
+  "release_allowed": false,
+  "common_gates": [
+    "需要当前源码身份下的真实 Godot 图形运行时截图",
+    "需要办公室或城市固定镜头接入后的比例、透视、光照和遮挡验收",
+    "需要 Windows 目标设备性能与窗口缩放验证",
+    "需要负责人逐项人工签收后才能升级视觉状态"
+  ],
+  "assets": [
+    {
+      "id": "office-elevator-hall-v1",
+      "path": "gta-reference-runtime/assets/environment/generated/office_elevator_hall_v1_generated.png",
+      "slot": "office-environment-kit",
+      "dimensions": [1813, 868],
+      "sha256": "9d4635f22a3398b320b8d07b96204bcafa0b9bcf44202db89f5f8a92b54d7e0b",
+      "visual_observation": "对称双电梯、中央呼叫面板、暖色金属与地面反射能清楚表达电梯厅；中心构图适合 office-06 的固定镜头。",
+      "strengths": ["地标语义明确", "中轴构图稳定", "材质层次比灰盒完整"],
+      "required_rework": ["转为可碰撞的三维电梯门和门框组合", "校准 Godot 相机视场下的门宽与玩家比例", "补齐楼层牌、呼叫面板交互挂点与暗部细节"],
+      "runtime_acceptance": "pending_current_graphical_capture"
+    },
+    {
+      "id": "office-workstation-row-v1",
+      "path": "gta-reference-runtime/assets/environment/generated/office_workstation_row_v1_generated.png",
+      "slot": "office-environment-kit",
+      "dimensions": [2172, 724],
+      "sha256": "9a30f549c018d2dc4673e52271b025fcc0441101565000733a4aa9186386fb5d",
+      "visual_observation": "连续工位、显示器、文件夹、绿植和夕阳窗景能建立办公楼层的工作密度；适合办公室后墙和近景背景层。",
+      "strengths": ["重复工位节奏清楚", "暖色窗光可作为视觉锚点", "道具密度足以支撑近景"],
+      "required_rework": ["避免平面背景在镜头移动时产生视差错误", "制作可拆分的桌面、隔断和屏幕几何体", "补齐 NPC 路线的可通行空隙与遮挡验证"],
+      "runtime_acceptance": "pending_current_graphical_capture"
+    },
+    {
+      "id": "warehouse-backlot-facade-v1",
+      "path": "gta-reference-runtime/assets/environment/generated/warehouse_backlot_facade_v1_generated.png",
+      "slot": "city-environment-kit",
+      "dimensions": [2172, 724],
+      "sha256": "208c9e62d45b4c4f53d3b22cf402ffb5179e9552a45edb60252d57a9717e92a7",
+      "visual_observation": "卷帘门、装卸台、黄色防撞条和管线能让玩家读懂后场仓储入口；适合城市扩展的交付地标。",
+      "strengths": ["装卸功能语义强", "远景轮廓干净", "工业材质与街区任务一致"],
+      "required_rework": ["把卷帘门、台阶和防撞柱拆为独立可碰撞节点", "补充进入仓储区的导航边界和遮挡测试", "固定白天/黄昏/雨后材质响应并测量性能"],
+      "runtime_acceptance": "pending_current_graphical_capture"
+    },
+    {
+      "id": "urban-storefront-v2",
+      "path": "gta-reference-runtime/assets/environment/generated/urban_storefront_v2_generated.png",
+      "slot": "city-environment-kit",
+      "dimensions": [1536, 1024],
+      "sha256": "15c4f5d031260ba4969a0462c9a6a340de0d5e8a087caf734d44218297d1d0e3",
+      "visual_observation": "暖色店内、玻璃门、雨后路面和红色遮阳棚能快速表达城市商铺；适合作为城市入口的原创立面候选。",
+      "strengths": ["入口识别度高", "室内外光照对比明确", "雨后街面提供可读环境状态"],
+      "required_rework": ["拆分门、橱窗、遮阳棚和店内货架为真实几何层", "确认招牌不含第三方品牌或不可控文字", "在城市人群和三轮车镜头中验证遮挡与可读性"],
+      "runtime_acceptance": "pending_current_graphical_capture"
+    }
+  ]
+}

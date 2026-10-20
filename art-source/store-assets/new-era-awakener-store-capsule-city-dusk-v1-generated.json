@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "candidate_id": "new-era-awakener-store-capsule-city-dusk-v1-generated-candidate",
+  "asset_type": "store_capsule_key_art",
+  "file": "new-era-awakener-store-capsule-city-dusk-v1-generated.png",
+  "dimensions": {
+    "width": 1672,
+    "height": 941,
+    "aspect_ratio": "16:9_candidate"
+  },
+  "source": {
+    "kind": "built_in_image_generation",
+    "tool_mode": "built_in",
+    "reference_videos_used": false,
+    "prompt_role": "original_store_key_art_candidate"
+  },
+  "rights": {
+    "status": "candidate_provenance_recorded_pending_final_review",
+    "third_party_logos": false,
+    "recognizable_brands": false,
+    "reference_video_pixels": false,
+    "release_allowed": false
+  },
+  "visual_acceptance": {
+    "status": "unverified",
+    "review_notes": [
+      "已检查主体、构图、光照、雨后城市氛围和左侧留白；适合作为商店主视觉候选。",
+      "未进行 Steam 目标尺寸导出、缩略图可读性人工签收或最终品牌排版验收。"
+    ]
+  },
+  "sha256": "50ad47dc3c3ec56fbabe3948e39302da1d65d9a1cf003b7120010080cced0d1a"
+}

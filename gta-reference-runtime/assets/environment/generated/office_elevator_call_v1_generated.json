@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "asset_id": "office-elevator-call-v1-generated-candidate",
+  "slot_id": "office-environment-kit",
+  "source_kind": "project_original_ai_generated_bitmap_candidate",
+  "generator": "内置图像生成工具",
+  "license": "项目原创候选；需在最终发布前完成权利与负责人签收",
+  "runtime_asset": "office_elevator_call_v1_generated.png",
+  "runtime_sha256": "ae9360d6e109b15de183239f32d6e70f34461bcfb440e56068fa33e54a0335f1",
+  "dimensions": [1536, 1024],
+  "intended_use": "office-06 电梯呼叫面板互动状态的候选背景卡",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "constraints": ["原创生成，不包含参考视频像素", "不承担碰撞、导航、交互或任务逻辑", "必须通过当前源码固定镜头截图、人工视觉和 Windows 目标设备验收"]
+}

@@ -1,0 +1,12 @@
+{
+	"asset_catalog_path": "res://tests/asset-runtime-catalog-original-office-makehuman.json",
+	"capture_profile": "candidate_makehuman_original_environment",
+	"evidence_prefix": "makehuman-original-environment",
+	"message": "全部参考矩阵场景完成",
+	"phase": "complete",
+	"scenario_id": "",
+	"source_file_count": 0,
+	"source_fingerprint": "",
+	"updated_at": "2026-10-14T17:59:25",
+	"version": 1
+}

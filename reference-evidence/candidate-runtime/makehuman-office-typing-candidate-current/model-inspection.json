@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "status": "inspection_only",
+  "visual_status": "unverified",
+  "asset_path": "art-source/characters/makehuman-office-worker/makehuman_office_worker_elegant_suit_skinned_probe_512_atlas_candidate.glb",
+  "asset_sha256": "74ab88aaac8da57e1231f0766fb37bf4457699224236ff4b275080233ceae1b9b",
+  "inspection_tool": "gltf-transform inspect",
+  "scene_bounds": {
+    "min": [-0.52397, -0.01432, -0.12193],
+    "max": [0.52893, 1.67432, 0.32147]
+  },
+  "asset_structure": {
+    "mesh_count": 7,
+    "material_count": 3,
+    "texture_count": 6,
+    "animation_count": 0,
+    "skinned_meshes": true
+  },
+  "skeleton_reference": {
+    "pelvis_translation": [0.0, -0.013216560706496239, 0.8744488954544067],
+    "root_translation": [0.0, -0.000562518835067749, 0.000000061001628637],
+    "root_rotation_quaternion": [-0.7071067690849304, 0.0, 0.0, 0.7071067690849304]
+  },
+  "runtime_decision": {
+    "old_typing_body_position_y": -1.45,
+    "new_typing_body_position_y": -0.9,
+    "reason": "旧偏移将角色主体压到候选工位隔断以下；新偏移只调整候选表现层，不改变玩家根节点、碰撞、交互和存档坐标",
+    "requires_visual_recapture": true
+  },
+  "notes": "该文件只证明模型结构和偏移决策，不证明角色已经通过参考帧视觉验收、商业权利验收或目标设备验收。"
+}

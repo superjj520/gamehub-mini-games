@@ -1,0 +1,154 @@
+{
+	"captures": [
+		{
+			"id": "city-01",
+			"path": "runtime-matrix/city-01.png",
+			"scene": "city",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "city-02",
+			"path": "runtime-matrix/city-02.png",
+			"scene": "city",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "city-03",
+			"path": "runtime-matrix/city-03.png",
+			"scene": "city",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "city-04",
+			"path": "runtime-matrix/city-04.png",
+			"scene": "city",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "city-05",
+			"path": "runtime-matrix/city-05.png",
+			"scene": "city",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "city-06",
+			"path": "runtime-matrix/city-06.png",
+			"scene": "city",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "city-07",
+			"path": "runtime-matrix/city-07.png",
+			"scene": "city",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "city-08",
+			"path": "runtime-matrix/city-08.png",
+			"scene": "city",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "city-09",
+			"path": "runtime-matrix/city-09.png",
+			"scene": "city",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "city-10",
+			"path": "runtime-matrix/city-10.png",
+			"scene": "city",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "city-11",
+			"path": "runtime-matrix/city-11.png",
+			"scene": "city",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "office-01",
+			"path": "runtime-matrix/office-01.png",
+			"scene": "office",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "office-02",
+			"path": "runtime-matrix/office-02.png",
+			"scene": "office",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "office-03",
+			"path": "runtime-matrix/office-03.png",
+			"scene": "office",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "office-04",
+			"path": "runtime-matrix/office-04.png",
+			"scene": "office",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "office-05",
+			"path": "runtime-matrix/office-05.png",
+			"scene": "office",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "office-06",
+			"path": "runtime-matrix/office-06.png",
+			"scene": "office",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "office-07",
+			"path": "runtime-matrix/office-07.png",
+			"scene": "office",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "office-08",
+			"path": "runtime-matrix/office-08.png",
+			"scene": "office",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "office-09",
+			"path": "runtime-matrix/office-09.png",
+			"scene": "office",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		},
+		{
+			"id": "office-10",
+			"path": "runtime-matrix/office-10.png",
+			"scene": "office",
+			"state_setup": "canonical_graybox_state",
+			"visual_status": "unverified"
+		}
+	],
+	"policy": "分段截图是视觉验收输入，不等于视觉通过",
+	"version": 1,
+	"visual_status": "unverified"
+}

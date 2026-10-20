@@ -1,0 +1,362 @@
+{
+	"asset_catalog_path": "res://content/asset-runtime-catalog-makehuman-office-candidate.json",
+	"capture_entry": "editor_scene_runner",
+	"capture_profile": "makehuman-office-candidate",
+	"captures": [
+		{
+			"asset_catalog_path": "res://content/asset-runtime-catalog-makehuman-office-candidate.json",
+			"capture_entry": "editor_scene_runner",
+			"capture_profile": "makehuman-office-candidate",
+			"event_types": [
+				"camera_state",
+				"mission_state",
+				"hud_state",
+				"perception_state",
+				"audio_event",
+				"npc_search_started",
+				"mission_failed",
+				"input",
+				"mission_restart",
+				"interaction",
+				"workstation_typing_enter",
+				"visual_capture_ready"
+			],
+			"id": "office-10",
+			"input_event_count": 2,
+			"scene": "office",
+			"source_file_count": 254,
+			"source_fingerprint": "0b047647a6f69b28e08d6971800bde946485e986378aa764bedb6646effaf57e",
+			"state_setup": "canonical_candidate_state",
+			"trace_events": [
+				{
+					"payload": {
+						"collision": false,
+						"collision_distance": 3.05,
+						"pitch": -10.0,
+						"position": [
+							0.620000004768372,
+							1.74000000953674,
+							3.04999995231628
+						],
+						"rotation": [
+							-9.99999904632568,
+							0.0,
+							0.0
+						],
+						"shoulder_offset": [
+							0.620000004768372,
+							0.0599999986588955,
+							0.0
+						],
+						"yaw": 0.0
+					},
+					"time": 0.0,
+					"type": "camera_state"
+				},
+				{
+					"payload": {
+						"reason": "",
+						"status": 1
+					},
+					"time": 0.0,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 0.017,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"status": 1,
+						"suspicion": 0.36
+					},
+					"time": 0.45,
+					"type": "perception_state"
+				},
+				{
+					"payload": {
+						"id": "perception_suspicious",
+						"payload": {}
+					},
+					"time": 0.45,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"last_seen_position": [
+							3.0,
+							0.899999976158142,
+							-2.0
+						],
+						"stimulus": "sight"
+					},
+					"time": 0.45,
+					"type": "npc_search_started"
+				},
+				{
+					"payload": {
+						"id": "npc_search_started",
+						"payload": {}
+					},
+					"time": 0.45,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|上司产生怀疑|"
+					},
+					"time": 0.45,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"status": 2,
+						"suspicion": 1.0
+					},
+					"time": 0.85,
+					"type": "perception_state"
+				},
+				{
+					"payload": {
+						"id": "perception_alert",
+						"payload": {}
+					},
+					"time": 0.85,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"reason": "被上司发现",
+						"status": 3
+					},
+					"time": 0.85,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"reason": "被上司发现"
+					},
+					"time": 0.85,
+					"type": "mission_failed"
+				},
+				{
+					"payload": {
+						"id": "mission_failed",
+						"payload": {
+							"reason": "被上司发现"
+						}
+					},
+					"time": 0.85,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|失败：被上司发现|已被发现|"
+					},
+					"time": 0.85,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": false,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": true,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 1.866,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"reason": "",
+						"status": 1
+					},
+					"time": 1.866,
+					"type": "mission_state"
+				},
+				{
+					"payload": {
+						"status": 0,
+						"suspicion": 1.0
+					},
+					"time": 1.866,
+					"type": "perception_state"
+				},
+				{
+					"payload": {},
+					"time": 1.866,
+					"type": "mission_restart"
+				},
+				{
+					"payload": {
+						"id": "mission_restart",
+						"payload": {}
+					},
+					"time": 1.866,
+					"type": "audio_event"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|"
+					},
+					"time": 1.866,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"attack": false,
+						"crouch": false,
+						"interact": true,
+						"load_checkpoint": false,
+						"look_x": 0.0,
+						"look_y": 0.0,
+						"restart": false,
+						"vehicle_enter_exit": false,
+						"x": 0.0,
+						"y": 0.0
+					},
+					"time": 1.882,
+					"type": "input"
+				},
+				{
+					"payload": {
+						"id": "office_workstation_01",
+						"result": "attempted"
+					},
+					"time": 1.882,
+					"type": "interaction"
+				},
+				{
+					"payload": {
+						"animation": {
+							"animation_player": true,
+							"animation_tree": false,
+							"candidate_visual": true,
+							"driven": true,
+							"state": "typing_default"
+						},
+						"camera": {
+							"collision": false,
+							"collision_distance": 1.15,
+							"pitch": -12.0,
+							"position": [
+								0.379999995231628,
+								1.41999995708466,
+								1.30999994277954
+							],
+							"rotation": [
+								-12.0,
+								0.0,
+								0.0
+							],
+							"shoulder_offset": [
+								0.379999995231628,
+								0.0399999991059303,
+								0.159999996423721
+							],
+							"yaw": 90.0
+						},
+						"camera_contract": {
+							"distance": 1.15,
+							"height": 1.38,
+							"pitch_degrees": -12.0,
+							"shoulder_offset": [
+								0.38,
+								0.04,
+								0.16
+							],
+							"yaw_degrees": 90.0
+						},
+						"player_position": [
+							0.0,
+							1.0,
+							3.04999995231628
+						],
+						"target": "office_workstation_01"
+					},
+					"time": 1.882,
+					"type": "workstation_typing_enter"
+				},
+				{
+					"payload": {
+						"signature": "准点下班|17:59|进行中|未被发现|E  离开工位"
+					},
+					"time": 1.882,
+					"type": "hud_state"
+				},
+				{
+					"payload": {
+						"dynamic_entities_frozen": true,
+						"scene": "office"
+					},
+					"time": 1.932,
+					"type": "visual_capture_ready"
+				}
+			],
+			"visual_state": {
+				"camera": {
+					"collision": false,
+					"collision_distance": 1.15,
+					"pitch": -12.0,
+					"position": [
+						0.379999995231628,
+						1.41999995708466,
+						1.30999994277954
+					],
+					"rotation": [
+						-12.0,
+						0.0,
+						0.0
+					],
+					"shoulder_offset": [
+						0.379999995231628,
+						0.0399999991059303,
+						0.159999996423721
+					],
+					"yaw": 90.0
+				},
+				"mission": {
+					"clock_minutes": 1079,
+					"completion_minute": 1080,
+					"failure_reason": "",
+					"objective": "准点下班",
+					"status": 1
+				},
+				"player_position": [
+					0.0,
+					1.0,
+					3.05
+				],
+				"reference_capture_mode": true,
+				"scene": "res://scenes/benchmark.tscn",
+				"vehicle_driver_present": false,
+				"vehicle_position": [
+					-6.9,
+					0.7,
+					-5.0
+				],
+				"vehicle_rotation": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"vehicle_speed": 0.0
+			}
+		}
+	],
+	"evidence_prefix": "makehuman-office-zoomed2",
+	"policy": "编辑器真实图形采集必须绑定运行时事件时间轴；事件证据不自动批准视觉",
+	"source_file_count": 254,
+	"source_fingerprint": "0b047647a6f69b28e08d6971800bde946485e986378aa764bedb6646effaf57e",
+	"version": 1,
+	"visual_status": "unverified"
+}

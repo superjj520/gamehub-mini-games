@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "audit_id": "quaternius-city-asset-audit-2026-10-12",
+  "status": "candidate_integrated_visual_rejected",
+  "scope": "城市候选远景真实三维资产接入",
+  "source": {
+    "name": "Quaternius Downtown City MegaKit 标准版",
+    "author": "Quaternius",
+    "license": "CC0-1.0",
+    "license_copy": "gta-reference-runtime/assets/environment/quaternius-downtown/LICENSE-quaternius.txt",
+    "source_url": "https://quaternius.com/packs/downtowncitymegakit.html",
+    "download_url": "https://quaternius.itch.io/downtown-city-megakit"
+  },
+  "assets": [
+    {
+      "id": "b_small",
+      "path": "gta-reference-runtime/assets/environment/quaternius-downtown/b_small.glb",
+      "bytes": 1202148,
+      "sha256": "3e8e432d69253d4f459094850508ef55379b188f43a6884c92774aac0d5d97b4",
+      "height_m": 17.02597,
+      "triangles": 15726,
+      "import_gate": "passed"
+    },
+    {
+      "id": "b_medium",
+      "path": "gta-reference-runtime/assets/environment/quaternius-downtown/b_medium.glb",
+      "bytes": 1858336,
+      "sha256": "5a3133c67f2f2ade760156b27f882d43b18dadd97703ade11b350b9cb163a41d",
+      "height_m": 25.00866,
+      "triangles": 23213,
+      "import_gate": "passed"
+    },
+    {
+      "id": "b_large",
+      "path": "gta-reference-runtime/assets/environment/quaternius-downtown/b_large.glb",
+      "bytes": 2434972,
+      "sha256": "7cc886d3a817f1538a96139b2642d2923925a340e7249f588be1dd8229e1e780",
+      "height_m": 28.00004,
+      "triangles": 34960,
+      "import_gate": "passed"
+    },
+    {
+      "id": "prop_ac",
+      "path": "gta-reference-runtime/assets/environment/quaternius-downtown/prop_ac.glb",
+      "bytes": 33608,
+      "sha256": "5fe0e996c5b54563dac30a79020a07c22fcc74e7ff49dccc7d939dad6a409225",
+      "height_m": 0.6,
+      "triangles": 132,
+      "import_gate": "passed"
+    }
+  ],
+  "runtime_integration": {
+    "candidate_script": "art-source/city-full-kit-candidate/city_environment_storefront_candidate.gd",
+    "candidate_package_sha256": "d574b1b2a6efcd0887c445e7b07a19e51e46cad5cc39bfb42c710b3691c44e89",
+    "formal_runtime_source_sha256": "eef75fe2e8fbd6b30ad2306564182486451345e915baf886bb44a63dcd2802f0",
+    "formal_runtime_source_file_count": 227,
+    "behavior_preflight": "passed",
+    "fallback_policy": "forbid",
+    "collision_navigation_mission_ownership": "formal_runtime_unchanged"
+  },
+  "visual_evidence": {
+    "resolution": "1280x720",
+    "backend": "Godot 4.7.1 OpenGL compatibility viewport capture",
+    "city-01": {
+      "path": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-01-v26.png",
+      "sha256": "1e077fdb0765a3fe6e06db5e0a66bbf119fdcf70e4a2995118b3bf9646a0fab2",
+      "decision": "reject_for_reference_fidelity"
+    },
+    "city-08": {
+      "path": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-08-v26.png",
+      "sha256": "7ecef55f3d70cb248cc03e2f0208b0969bfdbc4b97a102d1972fdecb9d8fadf5",
+      "decision": "reject_for_reference_fidelity"
+    },
+    "city-11": {
+      "path": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-11-v26.png",
+      "sha256": "76a8e150d650bba684ebe443231fed4edddec85c050151ab5ca808c2d36f53d3",
+      "decision": "reject_for_reference_fidelity"
+    }
+  },
+  "release_allowed": false,
+  "open_findings": [
+    "Quaternius 模型已通过导入门禁并进入候选城市视觉层，但低多边形风格与参考视频的写实材质仍不一致",
+    "三个固定镜头仍存在程序化城市、候选角色比例、光照和 HUD 差异",
+    "Windows 目标设备性能与最终商业发布权利仍未签收"
+  ]
+}

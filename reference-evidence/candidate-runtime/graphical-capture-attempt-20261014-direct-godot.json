@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "capture_id": "current-source-direct-godot-20261014-125400",
+  "status": "graphical_capture_failed",
+  "failure_kind": "macos_appkit_hiservices_abort",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "method": "direct_signed_godot_binary",
+  "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+  "source_sha256": {
+    "runtime_source_fingerprint": "e7dd57e26d49b933dc7a359079d02446443e86f5204c3fdd83e34ccff95dc7a2",
+    "runtime_file_count": 235
+  },
+  "exit_code": 134,
+  "image": null,
+  "observed_errors": [
+    "使用 /Applications/Godot.app/Contents/MacOS/Godot 直接启动",
+    "进程在 macOS AppKit/HIServices 应用注册阶段以 SIGABRT 退出",
+    "没有写入当前源 PNG，旧矩阵未覆盖"
+  ],
+  "diagnostic_report": "/Users/superjj/Library/Logs/DiagnosticReports/Godot-2026-10-13-131206.ips",
+  "next_action": "使用可用的 Windows 图形设备或恢复 macOS 图形会话后重新采集；不得把旧 PNG 重新绑定到当前源"
+}

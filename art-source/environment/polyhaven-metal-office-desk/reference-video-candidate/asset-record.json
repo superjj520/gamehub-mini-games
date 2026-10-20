@@ -1,0 +1,29 @@
+{
+  "asset_id": "office-01-video-authored-backdrop-candidate-v1",
+  "name": "办公室 office-01 用户授权视频帧可玩背景候选",
+  "status": "candidate_only",
+  "source_type": "user_authorized_ai_video_frame_edit",
+  "reference_video": "video-2-off-work-480.mp4",
+  "exact_frame": "reference-video-candidate/office-01-video-backdrop.jpg",
+  "playable_edit": "reference-video-candidate/office-01-video-playable-backdrop-v1.png",
+  "edit_method": "AI 图像编辑：移除视频帧中烘焙的主角与 HUD，保留办公室、工位、窗光、透视和色调",
+  "usage_scope": [
+    "office-01 隔离候选采集",
+    "内部视觉对比",
+    "候选运行时背景卡实验"
+  ],
+  "user_authorization_recorded": true,
+  "final_rights_signoff": "pending",
+  "release_allowed": false,
+  "release_block_reason": "最终权利签署、逐帧视觉验收、目标设备 QA 和 Steam 负责人资料未完成",
+  "runtime_contract": {
+    "visual_only": true,
+    "collision": false,
+    "navigation": false,
+    "input": false,
+    "mission": false,
+    "npc_perception": false,
+    "save": false,
+    "dynamic_overlay": "玩家蹲伏姿态、NPC 和 HUD 仍由运行时独立绘制"
+  }
+}

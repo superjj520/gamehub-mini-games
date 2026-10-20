@@ -1,0 +1,12 @@
+{
+	"asset_catalog_path": "",
+	"capture_profile": "formal_runtime",
+	"evidence_prefix": "runtime-matrix",
+	"message": "图形采集入口已启动",
+	"phase": "starting",
+	"scenario_id": "",
+	"source_file_count": 0,
+	"source_fingerprint": "",
+	"updated_at": "2026-10-16T18:40:22",
+	"version": 1
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "status": "candidate_graphical_capture_visual_rejected",
+  "product_name": "新时代觉醒者",
+  "candidate_package_sha256": "3f8fec6b67265a904c6dc45c2aab9caf70f4ca24d133d862901bec163c3ae3b4",
+  "source": {
+    "sha256": "eef75fe2e8fbd6b30ad2306564182486451345e915baf886bb44a63dcd2802f0",
+    "file_count": 227
+  },
+  "catalog_path": "art-source/city-full-kit-candidate/asset-runtime-catalog-city-full-kit-quaternius-override.json",
+  "capture_method": "visible_graphics_window",
+  "resolution": [1280, 720],
+  "rendering_driver": "opengl3",
+  "captures": [
+    {
+      "capture_id": "city-08",
+      "image_path": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-08-v1.png",
+      "image_sha256": "9b0aef3d4041825bfb0da84a4e070d0be3ac243f4e0e1ffc2d4f32dc76c84796",
+      "visual_status": "unverified",
+      "manual_visual_decision": "reject_for_reference_fidelity",
+      "findings": [
+        "三轮车、道路和任务 HUD 可见，但城市远景出现大面积未完成墙体与贴图卡。",
+        "车体、人群、道路材质和参考视频的比例、质感与镜头节奏仍不一致。"
+      ]
+    },
+    {
+      "capture_id": "city-11",
+      "image_path": "reference-evidence/candidate-runtime/city-quaternius-candidate-city-11-v1.png",
+      "image_sha256": "f2126054299cd74ec46923b5d4b11f2ec1482f18a772fb8be472fa2a15e5a2cf",
+      "visual_status": "unverified",
+      "manual_visual_decision": "reject_for_reference_fidelity",
+      "findings": [
+        "当前固定采集镜头在任务完成状态下被墙体或近景几何占满，无法作为参考帧构图。",
+        "该问题属于候选场景镜头与遮挡关系未完成，不代表正式逻辑回放失败。"
+      ]
+    }
+  ],
+  "release_allowed": false,
+  "next_gates": [
+    "为 city-08 与 city-11 建立独立的参考镜头、遮挡和玩家相对位置标尺。",
+    "替换大面积盒体建筑与贴图卡，补齐可见城市背景和交通层。",
+    "重新采集 city-01、city-08、city-11 后再进行逐帧视觉签收。"
+  ]
+}

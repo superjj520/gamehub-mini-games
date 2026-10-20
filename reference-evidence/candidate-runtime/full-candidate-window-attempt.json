@@ -1,0 +1,18 @@
+{
+  "status": "candidate_isolated_graphical_capture_failed",
+  "scope": "统一办公室/城市候选试玩真实窗口启动",
+  "source_fingerprint": {
+    "sha256": "1ef4f095c96b9613fc0e1f72a7b16c6669ecc625ac812359e6e9c478a3e967dd",
+    "files": 180
+  },
+  "preflight_evidence": "reference-evidence/candidate-runtime/full-candidate-playtest.json",
+  "failure_class": "macos_graphics_service_failure",
+  "observed_error": "Connection Invalid error for service com.apple.hiservices-xpcservice.",
+  "attempts": [
+    "关闭正式 Godot 调试窗口后重新启动候选窗口",
+    "候选行为预检和资源导入均已先行通过"
+  ],
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "generated_at": "2026-10-09T03:07:00.000Z"
+}

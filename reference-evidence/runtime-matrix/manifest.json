@@ -1,0 +1,1462 @@
+{
+  "version": 1,
+  "policy": "21 个运行时状态截图仅作为视觉验收输入；视觉状态必须保持 unverified，不能自动批准",
+  "captured_at": "2026-10-16",
+  "capture_script": "gta-reference-runtime/tests/reference_capture_matrix.gd",
+  "captures": [
+    {
+      "id": "city-01",
+      "scene": "city",
+      "path": "runtime-matrix/city-01.png",
+      "sha256": "119b5b73a12efceabc1e809f32a121399f03cc19be4b0003573d3438eeca0a9f",
+      "comparison_report": "runtime-matrix/compare-reports/city-01.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 4.35,
+          "pitch": -18,
+          "position": [
+            0,
+            2.34999990463257,
+            4.34999990463257
+          ],
+          "rotation": [
+            -18,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0,
+            0,
+            0
+          ],
+          "yaw": 0
+        },
+        "conflict": {
+          "alert": 0,
+          "health": 100,
+          "last_damage_source": "",
+          "opponent_defeated": false,
+          "opponent_health": 100,
+          "status": 0
+        },
+        "inventory": {},
+        "mission": {
+          "current_index": 0,
+          "failure_reason": "",
+          "money": 0,
+          "stars": 0,
+          "status": 1
+        },
+        "mission_stage": "collect_eggs",
+        "player_position": [
+          -9,
+          0.9,
+          -3.7
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/city.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6,
+          0.7,
+          5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "city-02",
+      "scene": "city",
+      "path": "runtime-matrix/city-02.png",
+      "sha256": "3bd8b3c1b58e973f1b98d2637bac03bfdd8377c807967544e8826809966507a9",
+      "comparison_report": "runtime-matrix/compare-reports/city-02.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": true,
+          "collision_distance": 2.597,
+          "pitch": -12,
+          "position": [
+            0,
+            1.55000007152557,
+            2.1875
+          ],
+          "rotation": [
+            -12,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0,
+            0,
+            0
+          ],
+          "yaw": 180
+        },
+        "conflict": {
+          "alert": 0,
+          "health": 100,
+          "last_damage_source": "",
+          "opponent_defeated": false,
+          "opponent_health": 100,
+          "status": 0
+        },
+        "inventory": {
+          "egg_tray": 1
+        },
+        "mission": {
+          "current_index": 1,
+          "failure_reason": "",
+          "money": 30,
+          "stars": 1,
+          "status": 1
+        },
+        "mission_stage": "leave_store",
+        "player_position": [
+          -9.761,
+          0.9,
+          -9.266
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/city.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6,
+          0.7,
+          5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "city-03",
+      "scene": "city",
+      "path": "runtime-matrix/city-03.png",
+      "sha256": "2c21be689b8097815ed1ecd152c53fda19eada66bbc8fb73fb118df19a7e6b03",
+      "comparison_report": "runtime-matrix/compare-reports/city-03.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": true,
+          "collision_distance": 1.763,
+          "pitch": -12,
+          "position": [
+            0,
+            1.10053169727325,
+            1.48520565032959
+          ],
+          "rotation": [
+            -12,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0,
+            0,
+            0
+          ],
+          "yaw": 180
+        },
+        "conflict": {
+          "alert": 0,
+          "health": 100,
+          "last_damage_source": "",
+          "opponent_defeated": false,
+          "opponent_health": 100,
+          "status": 0
+        },
+        "inventory": {},
+        "mission": {
+          "current_index": 0,
+          "failure_reason": "",
+          "money": 0,
+          "stars": 0,
+          "status": 1
+        },
+        "mission_stage": "collect_eggs",
+        "player_position": [
+          -9.844,
+          0.9,
+          -10
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/city.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6,
+          0.7,
+          5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "city-04",
+      "scene": "city",
+      "path": "runtime-matrix/city-04.png",
+      "sha256": "a50a6f1ae01a25d59e8a0c210dede57c45597e06bd12ed36bd2b0f3587e1b02c",
+      "comparison_report": "runtime-matrix/compare-reports/city-04.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 3.7,
+          "pitch": -12,
+          "position": [
+            0,
+            1.89999997615814,
+            3.70000004768372
+          ],
+          "rotation": [
+            -12,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0,
+            0,
+            0
+          ],
+          "yaw": 0
+        },
+        "conflict": {
+          "alert": 1,
+          "health": 99,
+          "last_damage_source": "街区冲突",
+          "opponent_defeated": false,
+          "opponent_health": 100,
+          "status": 2
+        },
+        "inventory": {
+          "egg_tray": 1
+        },
+        "mission": {
+          "current_index": 1,
+          "failure_reason": "",
+          "money": 30,
+          "stars": 1,
+          "status": 1
+        },
+        "mission_stage": "leave_store",
+        "player_position": [
+          -9,
+          0.9,
+          -10.3
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/city.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6,
+          0.7,
+          5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "city-05",
+      "scene": "city",
+      "path": "runtime-matrix/city-05.png",
+      "sha256": "bdf5471c52c043c87df94ce6b35fc606ab9bce8c4a2f23e1d007fc84a20ce00e",
+      "comparison_report": "runtime-matrix/compare-reports/city-05.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 3.4,
+          "pitch": -18,
+          "position": [
+            0,
+            2.09999990463257,
+            3.40000009536743
+          ],
+          "rotation": [
+            -18,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0,
+            0,
+            0
+          ],
+          "yaw": 0
+        },
+        "conflict": {
+          "alert": 1,
+          "health": 100,
+          "last_damage_source": "街区冲突",
+          "opponent_defeated": false,
+          "opponent_health": 100,
+          "status": 2
+        },
+        "inventory": {
+          "egg_tray": 1
+        },
+        "mission": {
+          "current_index": 1,
+          "failure_reason": "",
+          "money": 30,
+          "stars": 1,
+          "status": 1
+        },
+        "mission_stage": "leave_store",
+        "player_position": [
+          -9.131,
+          0.901,
+          -6.2
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/city.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6,
+          0.7,
+          5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "city-06",
+      "scene": "city",
+      "path": "runtime-matrix/city-06.png",
+      "sha256": "f66b2a780c7cde048d69727897d4306206e4399924265d2cfde14f3bcadf05b5",
+      "comparison_report": "runtime-matrix/compare-reports/city-06.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 5.2,
+          "pitch": -18,
+          "position": [
+            0,
+            2.29999995231628,
+            5.19999980926514
+          ],
+          "rotation": [
+            -18,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0,
+            0,
+            0
+          ],
+          "yaw": 0
+        },
+        "conflict": {
+          "alert": 0,
+          "health": 100,
+          "last_damage_source": "",
+          "opponent_defeated": false,
+          "opponent_health": 100,
+          "status": 0
+        },
+        "inventory": {
+          "egg_tray": 1
+        },
+        "mission": {
+          "current_index": 2,
+          "failure_reason": "",
+          "money": 40,
+          "stars": 2,
+          "status": 1
+        },
+        "mission_stage": "register",
+        "player_position": [
+          7,
+          1.82,
+          5.32
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/city.tscn",
+        "vehicle_driver_present": true,
+        "vehicle_position": [
+          7,
+          0.7,
+          5.5
+        ],
+        "vehicle_rotation": [
+          0,
+          -180,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "city-07",
+      "scene": "city",
+      "path": "runtime-matrix/city-07.png",
+      "sha256": "8a140bd635db9707a3313c66f47e71e350f7f852ce644c6dff0c36ad9f42dfa2",
+      "comparison_report": "runtime-matrix/compare-reports/city-07.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 5.2,
+          "pitch": -18,
+          "position": [
+            0,
+            2.29999995231628,
+            5.19999980926514
+          ],
+          "rotation": [
+            -18,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0,
+            0,
+            0
+          ],
+          "yaw": 0
+        },
+        "conflict": {
+          "alert": 0,
+          "health": 100,
+          "last_damage_source": "",
+          "opponent_defeated": false,
+          "opponent_health": 100,
+          "status": 0
+        },
+        "inventory": {},
+        "mission": {
+          "current_index": 3,
+          "failure_reason": "",
+          "money": 90,
+          "stars": 3,
+          "status": 1
+        },
+        "mission_stage": "enter_backlot",
+        "player_position": [
+          7,
+          1.82,
+          5.32
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/city.tscn",
+        "vehicle_driver_present": true,
+        "vehicle_position": [
+          7,
+          0.7,
+          5.5
+        ],
+        "vehicle_rotation": [
+          0,
+          -180,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "city-08",
+      "scene": "city",
+      "path": "runtime-matrix/city-08.png",
+      "sha256": "8f8dbdde915af140711e52ea99d71706a5984e02d1b4ea768f4bda2a83df01a3",
+      "comparison_report": "runtime-matrix/compare-reports/city-08.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 5.2,
+          "pitch": -12,
+          "position": [
+            0,
+            2.29999995231628,
+            5.19999980926514
+          ],
+          "rotation": [
+            -12,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0,
+            0,
+            0
+          ],
+          "yaw": 180
+        },
+        "conflict": {
+          "alert": 0,
+          "health": 100,
+          "last_damage_source": "",
+          "opponent_defeated": false,
+          "opponent_health": 100,
+          "status": 0
+        },
+        "inventory": {},
+        "mission": {
+          "current_index": 3,
+          "failure_reason": "",
+          "money": 90,
+          "stars": 3,
+          "status": 1
+        },
+        "mission_stage": "enter_backlot",
+        "player_position": [
+          5,
+          1.82,
+          3.638
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/city.tscn",
+        "vehicle_driver_present": true,
+        "vehicle_position": [
+          5,
+          0.7,
+          3.818
+        ],
+        "vehicle_rotation": [
+          0,
+          -180,
+          0
+        ],
+        "vehicle_speed": 0.633
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "city-09",
+      "scene": "city",
+      "path": "runtime-matrix/city-09.png",
+      "sha256": "cadba8f7bce5c1e56233fa6f7b0497b50b784b73fb74f0af106f6f2bd968b7d2",
+      "comparison_report": "runtime-matrix/compare-reports/city-09.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 5.2,
+          "pitch": -18,
+          "position": [
+            0,
+            2.29999995231628,
+            5.19999980926514
+          ],
+          "rotation": [
+            -18,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0,
+            0,
+            0
+          ],
+          "yaw": 0
+        },
+        "conflict": {
+          "alert": 0,
+          "health": 100,
+          "last_damage_source": "",
+          "opponent_defeated": false,
+          "opponent_health": 100,
+          "status": 0
+        },
+        "inventory": {},
+        "mission": {
+          "current_index": 3,
+          "failure_reason": "",
+          "money": 90,
+          "stars": 3,
+          "status": 1
+        },
+        "mission_stage": "enter_backlot",
+        "player_position": [
+          1,
+          1.82,
+          1.638
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/city.tscn",
+        "vehicle_driver_present": true,
+        "vehicle_position": [
+          1,
+          0.7,
+          1.818
+        ],
+        "vehicle_rotation": [
+          0,
+          -180,
+          0
+        ],
+        "vehicle_speed": 0.633
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "city-10",
+      "scene": "city",
+      "path": "runtime-matrix/city-10.png",
+      "sha256": "9e94a74cd4c52c52e5b1f95efe4c555c1560bd507bbfe341e02361a41192d0ad",
+      "comparison_report": "runtime-matrix/compare-reports/city-10.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 5.2,
+          "pitch": -18,
+          "position": [
+            0,
+            2.29999995231628,
+            5.19999980926514
+          ],
+          "rotation": [
+            -18,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0,
+            0,
+            0
+          ],
+          "yaw": 0
+        },
+        "conflict": {
+          "alert": 0,
+          "health": 100,
+          "last_damage_source": "",
+          "opponent_defeated": false,
+          "opponent_health": 100,
+          "status": 0
+        },
+        "inventory": {},
+        "mission": {
+          "current_index": 3,
+          "failure_reason": "",
+          "money": 90,
+          "stars": 3,
+          "status": 1
+        },
+        "mission_stage": "enter_backlot",
+        "player_position": [
+          6.599,
+          1.82,
+          8.347
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/city.tscn",
+        "vehicle_driver_present": true,
+        "vehicle_position": [
+          6.599,
+          0.7,
+          8.527
+        ],
+        "vehicle_rotation": [
+          0,
+          -180,
+          0
+        ],
+        "vehicle_speed": 0.133
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "city-11",
+      "scene": "city",
+      "path": "runtime-matrix/city-11.png",
+      "sha256": "879ddefac1d9fa97cff20b16a9b0ddb45411b0850cfa962bb921486d5a4e1fd9",
+      "comparison_report": "runtime-matrix/compare-reports/city-11.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 6,
+          "pitch": -18,
+          "position": [
+            0,
+            2.45000004768372,
+            6
+          ],
+          "rotation": [
+            -18,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0,
+            0,
+            0
+          ],
+          "yaw": 180
+        },
+        "conflict": {
+          "alert": 0,
+          "health": 100,
+          "last_damage_source": "",
+          "opponent_defeated": false,
+          "opponent_health": 100,
+          "status": 0
+        },
+        "inventory": {},
+        "mission": {
+          "current_index": 6,
+          "failure_reason": "",
+          "money": 260,
+          "stars": 5,
+          "status": 2
+        },
+        "mission_stage": "",
+        "player_position": [
+          9.099,
+          1.82,
+          13.18
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/city.tscn",
+        "vehicle_driver_present": true,
+        "vehicle_position": [
+          9.099,
+          0.7,
+          13
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "office-01",
+      "scene": "office",
+      "path": "runtime-matrix/office-01.png",
+      "sha256": "2150961505170f84d7648e45bfca8e48806fad5f2e0ec9c4a19fa6eb24156877",
+      "comparison_report": "runtime-matrix/compare-reports/office-01.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 2.65,
+          "pitch": -10,
+          "position": [
+            0.720000028610229,
+            1.45000004768372,
+            2.76999998092651
+          ],
+          "rotation": [
+            -9.99999904632568,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0.720000028610229,
+            0.0500000007450581,
+            0.119999997317791
+          ],
+          "yaw": 78
+        },
+        "mission": {
+          "clock_minutes": 1079,
+          "completion_minute": 1080,
+          "failure_reason": "",
+          "objective": "准点下班",
+          "status": 1
+        },
+        "player_position": [
+          0,
+          1.001,
+          -0.841
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/benchmark.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6.9,
+          0.7,
+          -5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "office-02",
+      "scene": "office",
+      "path": "runtime-matrix/office-02.png",
+      "sha256": "e8d46a8ba0f5d9a7943d7c04afed0d5bee5d2d155929cbbce7b70c6449fc4985",
+      "comparison_report": "runtime-matrix/compare-reports/office-02.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 3.05,
+          "pitch": -15,
+          "position": [
+            0.620000004768372,
+            1.74000000953674,
+            3.04999995231628
+          ],
+          "rotation": [
+            -15,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0.620000004768372,
+            0.0599999986588955,
+            0
+          ],
+          "yaw": 0
+        },
+        "mission": {
+          "clock_minutes": 1079,
+          "completion_minute": 1080,
+          "failure_reason": "",
+          "objective": "准点下班",
+          "status": 1
+        },
+        "player_position": [
+          0,
+          1.001,
+          1.69
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/benchmark.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6.9,
+          0.7,
+          -5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "office-03",
+      "scene": "office",
+      "path": "runtime-matrix/office-03.png",
+      "sha256": "ff64a56e41f02a5c879c3cd0fb83e46ad2ebfcf2f30f6914d77371e5994ebf00",
+      "comparison_report": "runtime-matrix/compare-reports/office-03.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 3.05,
+          "pitch": -15,
+          "position": [
+            0.620000004768372,
+            1.74000000953674,
+            3.04999995231628
+          ],
+          "rotation": [
+            -15,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0.620000004768372,
+            0.0599999986588955,
+            0
+          ],
+          "yaw": 0
+        },
+        "mission": {
+          "clock_minutes": 1079,
+          "completion_minute": 1080,
+          "failure_reason": "",
+          "objective": "准点下班",
+          "status": 1
+        },
+        "player_position": [
+          3,
+          0.999,
+          -2
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/benchmark.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6.9,
+          0.7,
+          -5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "office-04",
+      "scene": "office",
+      "path": "runtime-matrix/office-04.png",
+      "sha256": "a03e242f7e74d8b524da67e2deb03b7d63bd362c9ae77b030a061088e0deefd5",
+      "comparison_report": "runtime-matrix/compare-reports/office-04.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 3.05,
+          "pitch": -15,
+          "position": [
+            0.620000004768372,
+            1.74000000953674,
+            3.04999995231628
+          ],
+          "rotation": [
+            -15,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0.620000004768372,
+            0.0599999986588955,
+            0
+          ],
+          "yaw": 0
+        },
+        "mission": {
+          "clock_minutes": 1080,
+          "completion_minute": 1080,
+          "failure_reason": "",
+          "objective": "准点下班",
+          "status": 1
+        },
+        "player_position": [
+          -4,
+          1,
+          6
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/benchmark.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6.9,
+          0.7,
+          -5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "office-05",
+      "scene": "office",
+      "path": "runtime-matrix/office-05.png",
+      "sha256": "5aaa00fc21878447d1c2fc368f27c668dd8066ac924c02867c08dd100768a376",
+      "comparison_report": "runtime-matrix/compare-reports/office-05.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 3.2,
+          "pitch": -10,
+          "position": [
+            0.620000004768372,
+            1.50999999046326,
+            3.20000004768372
+          ],
+          "rotation": [
+            -9.99994277954102,
+            0,
+            0.00008217465801863
+          ],
+          "shoulder_offset": [
+            0.620000004768372,
+            0.0599999986588955,
+            0
+          ],
+          "yaw": 0
+        },
+        "mission": {
+          "clock_minutes": 1079,
+          "completion_minute": 1080,
+          "failure_reason": "",
+          "objective": "准点下班",
+          "status": 1
+        },
+        "player_position": [
+          7,
+          1,
+          -4.65
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/benchmark.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6.9,
+          0.7,
+          -5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "office-06",
+      "scene": "office",
+      "path": "runtime-matrix/office-06.png",
+      "sha256": "cd9e744a28acbab7c89e5f4bffa12805f1be7b753bea03f71f0e50cd5cb7513f",
+      "comparison_report": "runtime-matrix/compare-reports/office-06.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 2.8,
+          "pitch": -8,
+          "position": [
+            0.620000004768372,
+            1.4099999666214,
+            2.79999995231628
+          ],
+          "rotation": [
+            -7.99999952316284,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            0.620000004768372,
+            0.0599999986588955,
+            0
+          ],
+          "yaw": 0
+        },
+        "mission": {
+          "clock_minutes": 1079,
+          "completion_minute": 1080,
+          "failure_reason": "",
+          "objective": "准点下班",
+          "status": 1
+        },
+        "player_position": [
+          7,
+          1,
+          -4.65
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/benchmark.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6.9,
+          0.7,
+          -5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "office-07",
+      "scene": "office",
+      "path": "runtime-matrix/office-07.png",
+      "sha256": "e21a5115ececb7c0d9575a2731ecc362d6bd237507108b0a94ce92ec3ed51b81",
+      "comparison_report": "runtime-matrix/compare-reports/office-07.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 4.2,
+          "pitch": -18,
+          "position": [
+            0.620000004768372,
+            1.61000001430511,
+            4.19999980926514
+          ],
+          "rotation": [
+            -17.9999446868896,
+            0,
+            0.0000788215984357521
+          ],
+          "shoulder_offset": [
+            0.620000004768372,
+            0.0599999986588955,
+            0
+          ],
+          "yaw": 0
+        },
+        "mission": {
+          "clock_minutes": 1079,
+          "completion_minute": 1080,
+          "failure_reason": "",
+          "objective": "准点下班",
+          "status": 1
+        },
+        "player_position": [
+          7,
+          1,
+          -5.25
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/benchmark.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6.9,
+          0.7,
+          -5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "office-08",
+      "scene": "office",
+      "path": "runtime-matrix/office-08.png",
+      "sha256": "800d42c4f750e4f5407f01254c60ad8e2802cc7c95bc9d7a358d3dcb1b09d290",
+      "comparison_report": "runtime-matrix/compare-reports/office-08.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 4.1,
+          "pitch": -8,
+          "position": [
+            1.25,
+            1.54999995231628,
+            4.21999979019165
+          ],
+          "rotation": [
+            -8.00607872009277,
+            0,
+            -0.00884209852665663
+          ],
+          "shoulder_offset": [
+            1.25,
+            0.0500000007450581,
+            0.119999997317791
+          ],
+          "yaw": 0
+        },
+        "mission": {
+          "clock_minutes": 1079,
+          "completion_minute": 1080,
+          "failure_reason": "",
+          "objective": "准点下班",
+          "status": 1
+        },
+        "player_position": [
+          7,
+          1,
+          -5.4
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/benchmark.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6.9,
+          0.7,
+          -5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "office-09",
+      "scene": "office",
+      "path": "runtime-matrix/office-09.png",
+      "sha256": "bf028570aef17d7d856385d1171bea6c37da86fb67d46b126b56319f812bfc6b",
+      "comparison_report": "runtime-matrix/compare-reports/office-09.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 4.1,
+          "pitch": -6,
+          "position": [
+            1.25,
+            1.54999995231628,
+            4.21999979019165
+          ],
+          "rotation": [
+            -6,
+            0,
+            0
+          ],
+          "shoulder_offset": [
+            1.25,
+            0.0500000007450581,
+            0.119999997317791
+          ],
+          "yaw": 0
+        },
+        "mission": {
+          "clock_minutes": 1079,
+          "completion_minute": 1080,
+          "failure_reason": "",
+          "objective": "准点下班",
+          "status": 1
+        },
+        "player_position": [
+          7,
+          1,
+          -5.4
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/benchmark.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6.9,
+          0.7,
+          -5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    },
+    {
+      "id": "office-10",
+      "scene": "office",
+      "path": "runtime-matrix/office-10.png",
+      "sha256": "d4415dccab1ec0ab287fef2c707bc71262666df5aa91c621713bebf6dd47ac84",
+      "comparison_report": "runtime-matrix/compare-reports/office-10.json",
+      "visual_status": "unverified",
+      "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+      "capture_entry": "editor_scene_runner",
+      "capture_profile": "formal_runtime",
+      "state_setup": "canonical_graybox_state",
+      "visual_state": {
+        "camera": {
+          "collision": false,
+          "collision_distance": 1.75,
+          "pitch": -8,
+          "position": [
+            0.550000011920929,
+            1.32000005245209,
+            1.95000004768372
+          ],
+          "rotation": [
+            -8.00435924530029,
+            0,
+            -0.00634037610143423
+          ],
+          "shoulder_offset": [
+            0.550000011920929,
+            0.0199999995529652,
+            0.200000002980232
+          ],
+          "yaw": 90
+        },
+        "mission": {
+          "clock_minutes": 1080,
+          "completion_minute": 1080,
+          "failure_reason": "",
+          "objective": "准点下班",
+          "status": 1
+        },
+        "player_position": [
+          0,
+          1,
+          3.05
+        ],
+        "reference_capture_mode": true,
+        "scene": "res://scenes/benchmark.tscn",
+        "vehicle_driver_present": false,
+        "vehicle_position": [
+          -6.9,
+          0.7,
+          -5
+        ],
+        "vehicle_rotation": [
+          0,
+          0,
+          0
+        ],
+        "vehicle_speed": 0
+      },
+      "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+      "source_file_count": 321
+    }
+  ],
+  "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+  "source_file_count": 321,
+  "capture_session": {
+    "operator": "Codex 自动化采集",
+    "method": "visible_window",
+    "captured_at": "2026-10-18T22:16:52.000Z",
+    "source_fingerprint": "f45b0ef2b12e5233c2772766bb011d31700e32de5ce4748fc1dd109e56cb1f35",
+    "source_file_count": 321,
+    "asset_catalog_path": "res://content/asset-runtime-catalog-original-only.json",
+    "capture_count": 21,
+    "session_status": "unverified_pending_visual_signoff",
+    "note": "由负责人确认本批 PNG 来自真实可见窗口或 Windows 目标设备；该记录不等于视觉通过"
+  }
+}

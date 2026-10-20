@@ -1,0 +1,290 @@
+{
+	"evidence_boundary": "runtime_structure_only_not_framewise_visual_signoff",
+	"expected_state_count": 21,
+	"failures": [],
+	"generated_at": "2026-10-19T02:25:37",
+	"release_allowed": false,
+	"results": [
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/office_workstation_row_v2_worker_generated.png",
+			"id": "office-01",
+			"required_layers": [
+				"workstation",
+				"monitor",
+				"chair",
+				"warm_light",
+				"background_depth",
+				"contact_detail",
+				"office_detail"
+			],
+			"scope": "office",
+			"visible_meshes": 73
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/office_glass_partition_v1.png",
+			"id": "office-02",
+			"required_layers": [
+				"cover",
+				"cover_edge",
+				"cover_inset",
+				"props",
+				"doorway_depth",
+				"ceiling_lighting",
+				"floor_marking"
+			],
+			"scope": "office",
+			"visible_meshes": 28
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/office_doorway_threshold_v1_generated.png",
+			"id": "office-03",
+			"required_layers": [
+				"door_frame",
+				"corridor_light",
+				"threshold",
+				"interior_desk",
+				"interior_monitor",
+				"wall_art"
+			],
+			"scope": "office",
+			"visible_meshes": 32
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/office_perception_room_v1_generated.png",
+			"id": "office-04",
+			"required_layers": [
+				"perception_zone",
+				"interior_desk",
+				"interior_monitor",
+				"wall_sign",
+				"window_band",
+				"alert_light",
+				"warm_threshold"
+			],
+			"scope": "office",
+			"visible_meshes": 23
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/office_elevator_lobby_v2_generated.png",
+			"id": "office-05",
+			"required_layers": [
+				"elevator_doors",
+				"floor_indicator",
+				"call_panel",
+				"warm_light"
+			],
+			"scope": "office",
+			"visible_meshes": 54
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/office_elevator_call_v1_generated.png",
+			"id": "office-06",
+			"required_layers": [
+				"elevator_doors",
+				"floor_indicator",
+				"call_panel",
+				"warm_light"
+			],
+			"scope": "office",
+			"visible_meshes": 54
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/office_elevator_lobby_v1_generated.png",
+			"id": "office-07",
+			"required_layers": [
+				"stairs",
+				"rails",
+				"emergency_light",
+				"door_frame",
+				"ceiling_shadow",
+				"landing_detail"
+			],
+			"scope": "office",
+			"visible_meshes": 38
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/office_hallway_encounter_v1_generated.png",
+			"id": "office-08",
+			"required_layers": [
+				"corridor",
+				"window_band",
+				"alert_edge",
+				"dialogue_light",
+				"window_frame",
+				"floor_detail",
+				"conversation_staging"
+			],
+			"scope": "office",
+			"visible_meshes": 25
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/office_hallway_dialogue_v1_generated.png",
+			"id": "office-09",
+			"required_layers": [
+				"corridor",
+				"window_band",
+				"alert_edge",
+				"dialogue_light",
+				"window_frame",
+				"floor_detail",
+				"conversation_staging"
+			],
+			"scope": "office",
+			"visible_meshes": 25
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/office_workstation_row_v2_worker_generated.png",
+			"id": "office-10",
+			"required_layers": [
+				"workstation",
+				"monitor",
+				"chair",
+				"warm_light",
+				"background_depth",
+				"contact_detail",
+				"office_detail"
+			],
+			"scope": "office",
+			"visible_meshes": 75
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/city_storefront_crowd_v3_generated.png",
+			"id": "city-01",
+			"required_layers": [
+				"storefront",
+				"shutter",
+				"entrance",
+				"crowd",
+				"sidewalk_depth",
+				"shop_lighting"
+			],
+			"scope": "city",
+			"visible_meshes": 252
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/city_storefront_crowd_v2_generated.png",
+			"id": "city-02",
+			"required_layers": [
+				"storefront",
+				"crowd_density",
+				"crowd_buffer",
+				"sidewalk_depth",
+				"shop_lighting"
+			],
+			"scope": "city",
+			"visible_meshes": 351
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/urban_store_aisle_v1_generated.png",
+			"id": "city-03",
+			"required_layers": [
+				"shelves",
+				"product_bands",
+				"floor",
+				"store_light"
+			],
+			"scope": "city",
+			"visible_meshes": 89
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/city_store_conflict_aisle_v1_generated.png",
+			"id": "city-04",
+			"required_layers": [
+				"store_aisle",
+				"egg_tray",
+				"eggs",
+				"conflict_feedback"
+			],
+			"scope": "city",
+			"visible_meshes": 134
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/warehouse_backlot_facade_v1_generated.png",
+			"id": "city-05",
+			"required_layers": [
+				"road",
+				"lane_marking",
+				"backlot",
+				"dusk_light"
+			],
+			"scope": "city",
+			"visible_meshes": 64
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/city_dusk_corner_storefront_v1_generated.png",
+			"id": "city-06",
+			"required_layers": [
+				"registration_desk",
+				"qr_panel",
+				"feedback_light"
+			],
+			"scope": "city",
+			"visible_meshes": 57
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/city_drive_lane_day_v1_candidate.png",
+			"id": "city-07",
+			"required_layers": [
+				"registration_desk",
+				"qr_panel",
+				"feedback_light"
+			],
+			"scope": "city",
+			"visible_meshes": 57
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/city_drive_lane_dusk_v1_generated.png",
+			"id": "city-08",
+			"required_layers": [
+				"road",
+				"lane_marking",
+				"curb",
+				"street_lights",
+				"vehicle_path"
+			],
+			"scope": "city",
+			"visible_meshes": 155
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/city_drive_lane_day_v2_clear_foreground_candidate.png",
+			"id": "city-09",
+			"required_layers": [
+				"road",
+				"lane_marking",
+				"curb",
+				"street_lights",
+				"traffic"
+			],
+			"scope": "city",
+			"visible_meshes": 168
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/city_destination_drive_v1_generated.png",
+			"id": "city-10",
+			"required_layers": [
+				"drive",
+				"traffic",
+				"destination_facade"
+			],
+			"scope": "city",
+			"visible_meshes": 195
+		},
+		{
+			"backdrop_texture_path": "res://assets/environment/generated/city_endpoint_shutter_v1_generated.png",
+			"id": "city-11",
+			"required_layers": [
+				"endpoint_facade",
+				"shutter",
+				"delivery_mark",
+				"warm_light"
+			],
+			"scope": "city",
+			"visible_meshes": 42
+		}
+	],
+	"schema_version": 1,
+	"scope": "office-01..10 + city-01..11",
+	"state_count": 21,
+	"status": "passed",
+	"visual_acceptance": "unverified"
+}

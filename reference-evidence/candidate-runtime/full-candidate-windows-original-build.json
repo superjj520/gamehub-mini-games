@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "status": "internal_candidate_windows_build_generated",
+  "product_name": "新时代觉醒者",
+  "release_allowed": false,
+  "visual_status": "unverified",
+  "target_device_status": "unverified",
+  "candidate_variant": "original",
+  "package": {
+    "root": "build/internal-full-candidate-original",
+    "sha256": "91287ab11dbd1d57febcff2bcfce550409b08e8a5769ec21bb8b1a9cd58b366f",
+    "file_count": 447,
+    "source_sha256": "37e951e2f2b1f105bad2be4bb124b4d457a0b779b15653fb3d4c31971f70ba6e",
+    "source_file_count": 327
+  },
+  "build": {
+    "path": "build/windows/新时代觉醒者-原创角色候选.exe",
+    "bytes": 230907600,
+    "sha256": "bb6656f7db434e2f56d79b2322483dacf348228f34e3fd438ce2969ac8456993",
+    "platform": "Windows Desktop",
+    "architecture": "x86_64",
+    "pe": {
+      "signature": "PE\\0\\0",
+      "machine": "x86_64",
+      "machine_code": "0x8664"
+    }
+  },
+  "export_log": {
+    "path": "reference-evidence/candidate-runtime/full-candidate-windows-original-export.log",
+    "sha256": "905ec32af3b3f4018ee6819699008c7358bb1c39c4741b3e00efbcedd43ed0da",
+    "errors": 0,
+    "known_environment_noise": 3
+  },
+  "remaining_gates": [
+    "Windows 10/11 目标设备启动与输入回归",
+    "候选视觉人工签收",
+    "最终资产权利签收",
+    "Steam 商店材料和上传前置"
+  ]
+}

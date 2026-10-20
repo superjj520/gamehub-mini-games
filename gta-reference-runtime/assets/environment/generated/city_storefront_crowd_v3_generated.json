@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "asset_id": "city-storefront-crowd-v3-generated-candidate",
+  "slot_id": "city-environment-kit",
+  "source_kind": "ai_generated_original_bitmap",
+  "generator": "内置图像生成工具",
+  "license": "项目原创候选；需在最终发布前完成权利与负责人签收",
+  "runtime_asset": "city_storefront_crowd_v3_generated.png",
+  "runtime_sha256": "d40ca4fc01cae0b5af1fc865e1d15bd28ca1d8334556762aea8894c0edc3fb00",
+  "dimensions": [1672, 941],
+  "intended_use": "城市首店正面密集人群、红色抽象门头、暖色店铺灯光与湿润路面的远景背景卡",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "constraints": [
+    "原创生成，不包含参考视频像素",
+    "门头只使用抽象图形，不包含可读品牌、商标或原视频 HUD",
+    "只作为 MeshInstance3D 表现层，不承担碰撞、导航、交互或任务逻辑",
+    "必须通过当前源码固定镜头截图、人工视觉和 Windows 目标设备验收"
+  ]
+}

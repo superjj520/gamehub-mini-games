@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "asset_id": "office-npc-dialogue-sprite-v1-generated",
+  "asset_kind": "original_generated_dialogue_sprite",
+  "source_kind": "ai_generated_original_bitmap",
+  "generator": "内置图像生成工具",
+  "source_reference": "art-source/characters/office-npc-design/new-era-awakener-office-npc-turnaround-v1-generated.png",
+  "file": "office_npc_dialogue_sprite_v1.png",
+  "sha256": "b1a1eea15a936d4bbd4f79d55b28213767f8a9561cd55981d042f0edd5535532",
+  "usage": "仅用于 office-08/office-09 固定对话采集态的透明表现层；不参与碰撞、导航、任务、感知、存档或普通自由移动",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "rights_status": "original_candidate_pending_final_owner_signoff"
+}

@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "status": "candidate_movie_capture_current_manual_acceptance_pending",
+  "product_name": "新时代觉醒者",
+  "capture_method": "Godot macOS OpenGL Movie Maker，当前完整候选包专用场景脚本",
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "source": {
+    "sha256": "82b375799c7f032f4141b46d011cbdfdc4073f19ae88b53feb85dd2e985575d6",
+    "file_count": 180
+  },
+  "candidate_package": {
+    "root": "build/internal-full-candidate",
+    "sha256": "256b94494f4f47b09a2614196873c6eb6607416db7828308c371f401079b76c7",
+    "file_count": 263
+  },
+  "source_stale_since_capture": {
+    "reason": "截图采集后候选运行包和正式源均已更新；本批 PNG 未重新采集，不能代表当前办公室主角材质或城市人群姿态修正。",
+    "captured_source": {
+      "sha256": "82b375799c7f032f4141b46d011cbdfdc4073f19ae88b53feb85dd2e985575d6",
+      "file_count": 180
+    },
+    "current_source": {
+      "sha256": "499bc752d0a1bd4232eda1ddbe3ef7a7d0be8533905602358f18cbebf3eb6b8a",
+      "file_count": 181
+    },
+    "current_candidate_package": {
+      "sha256": "3ae400da9505f6e90933401d6d91dd048e8e9ae49e714b3a3e5e1af024b2747a",
+      "file_count": 266
+    }
+  },
+  "captures": [
+    {
+      "id": "p0-candidate-office-movie-current",
+      "path": "candidate-runtime/p0-candidate-office-movie-current-v900000063.png",
+      "sha256": "444df1f117fd3965e09fe167aefd48e24a570178ed33c1288fcaccdb87ef0e86",
+      "reference_path": "video-2/office-01.jpg",
+      "visual_status": "unverified",
+      "notes": "当前完整候选包办公室 Movie Maker 帧；可见角色、办公隔断、桌面和暖色灯光，尚未完成人工逐帧签收。"
+    },
+    {
+      "id": "p0-candidate-office-detail-movie-current-frame-63",
+      "path": "candidate-runtime/p0-candidate-office-detail-movie-current-v900000063.png",
+      "sha256": "db8a2124aa1559d8b3149761526395699c088a27bf8c4687b16fe3440709b758",
+      "reference_path": "video-2/office-01.jpg",
+      "visual_status": "unverified",
+      "notes": "当前完整候选包办公室近景 Movie Maker 第 63 帧；用于审阅肩后视角、角色、工位隔断、显示器和顶灯构图，尚未完成人工逐帧签收。"
+    },
+    {
+      "id": "p0-candidate-city-movie-current",
+      "path": "candidate-runtime/p0-candidate-city-movie-current-v900000063.png",
+      "sha256": "4f0e44479a0dabbee6c5f69ecb2d3c13611950179a3182404067e371d4aae075",
+      "reference_path": "video-1/city-08.jpg",
+      "visual_status": "unverified",
+      "notes": "当前完整候选包城市 Movie Maker 帧；可见详细版蓝色开放货斗三轮车、货物、街道和 HUD，尚未完成人工逐帧签收。"
+    },
+    {
+      "id": "p0-candidate-vehicle-detail-movie-current-frame-63",
+      "path": "candidate-runtime/p0-candidate-vehicle-detail-movie-current-v900000063.png",
+      "sha256": "cc920060c724d4551782fd651534957f4c3a8fc9180a7ceb3e8062dcfd3d027a",
+      "reference_path": "video-1/city-08.jpg",
+      "visual_status": "unverified",
+      "notes": "当前完整候选包载具近景 Movie Maker 第 63 帧；用于审阅开放货斗、固定带、驾驶位、灯组和城市镜头构图，尚未完成人工逐帧签收。"
+    },
+    {
+      "id": "p0-candidate-office-npc-idle-movie-current",
+      "path": "candidate-runtime/p0-candidate-office-npc-idle-movie-current-v300000063.png",
+      "sha256": "efcee54f951821a5b4d2f0f41b14bbb0fabad0e141799a4085b38fe4ef584627",
+      "reference_path": "video-2/office-01.jpg",
+      "visual_status": "unverified",
+      "notes": "当前完整候选包办公室 NPC 待机近景 Movie Maker 第 63 帧；用于审阅无背包主管轮廓、浅色衬衣、工牌和办公区身份差异，尚未完成人工逐帧签收。"
+    },
+    {
+      "id": "p0-candidate-office-npc-search-movie-current",
+      "path": "candidate-runtime/p0-candidate-office-npc-search-movie-current-v100000063.png",
+      "sha256": "2031b6d5a914ad13cf6849fbe9587f7cef6f5b1fedc1ac993f503d2cf7c13976",
+      "reference_path": "video-2/office-01.jpg",
+      "visual_status": "unverified",
+      "notes": "当前完整候选包办公室 NPC 搜索状态近景 Movie Maker 第 63 帧；用于审阅头部搜索姿态和对讲机搜索灯色，尚未完成人工逐帧签收。"
+    },
+    {
+      "id": "p0-candidate-office-npc-alert-movie-current",
+      "path": "candidate-runtime/p0-candidate-office-npc-alert-movie-current-v100000063.png",
+      "sha256": "54320c76dcdd7b393eb00a83139c14e7757feb323748ba237418d9009db395a2",
+      "reference_path": "video-2/office-01.jpg",
+      "visual_status": "unverified",
+      "notes": "当前完整候选包办公室 NPC 警觉状态近景 Movie Maker 第 63 帧；用于审阅警觉姿态、对讲机红色告警灯和管理身份层，尚未完成人工逐帧签收。"
+    }
+  ],
+  "rejected_reuse": [
+    "旧 P0 图形截图不替代当前详细版载具帧",
+    "本证据不自动写入 21 段视觉矩阵，也不自动提升为 passed"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "status": "candidate_isolated_full_playtest_verified",
+  "source": {
+    "root": "temporary copy of gta-reference-runtime",
+    "sha256": "d45aa112820eb9fedd6b401bfc71b97e9b4b70191e1b659359fa9ccab5f6418b",
+    "file_count": 233,
+    "catalog_path": "res://tests/asset-runtime-catalog-full-candidates.json",
+    "asset_fallback_policy": "forbid"
+  },
+  "character_variant": "original_only",
+  "active_candidate_ids": [
+    "player-character-p0-procedural-candidate",
+    "office-npc-p0-procedural-candidate",
+    "city-crowd-original-procedural-v1-candidate",
+    "city-vehicle-three-wheel-delivery-final-procedural-candidate",
+    "city-environment-original-only-procedural-v1-candidate",
+    "office-environment-original-procedural-v1-candidate",
+    "interaction-props-original-kit-candidate"
+  ],
+  "active_candidate_slots": {
+    "player-character": "res://assets/characters/original-procedural-office-characters/original_player_candidate.tscn",
+    "office-npc-set": "res://assets/characters/original-procedural-office-characters/original_office_npc_candidate.tscn",
+    "city-crowd-set": "res://art-source/characters/original-procedural-city-crowd/original_procedural_city_crowd_candidate.tscn",
+    "three-wheel-vehicle": "res://art-source/vehicles/three-wheel-delivery/final-candidate/three_wheel_delivery_final_candidate.tscn",
+    "office-environment-kit": "res://office_desk_composition.tscn",
+    "city-environment-kit": "res://art-source/candidate-playtest/original-only/original_only_city_environment_candidate.tscn",
+    "interaction-props": "res://assets/props/original-procedural-interaction-props/original_interaction_props_candidate.tscn",
+    "city-player-character": "res://assets/characters/original-procedural-office-characters/original_player_candidate.tscn"
+  },
+  "entries": [
+    "office-candidate",
+    "city-candidate"
+  ],
+  "audio_catalog_path": "res://content/audio-runtime-catalog.json",
+  "checks": [
+    "统一启动器入口",
+    "办公室候选资产挂载与完整行为回放",
+    "城市候选资产挂载与完整行为回放",
+    "原创交互道具禁止灰盒回退",
+    "14 个音频资源禁止静默回退",
+    "任务、镜头、NPC、载具、存档和交互链路"
+  ],
+  "visual_status": "unverified",
+  "release_allowed": false,
+  "generated_at": "2026-10-13T02:52:21.574Z"
+}
