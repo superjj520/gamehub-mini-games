@@ -122,42 +122,47 @@ func _update_transform() -> void:
 		var parent_node := get_parent()
 		if parent_node is CollisionObject3D:
 			excluded.append(parent_node.get_rid())
-		var query := PhysicsRayQueryParameters3D.create(pivot_global, desired_global, collision_mask, excluded)
-		var hit := get_world_3d().direct_space_state.intersect_ray(query)
-		if not hit.is_empty():
-			var hit_position: Vector3 = hit["position"]
-			var safe_global := hit_position + (pivot_global - hit_position).normalized() * collision_margin
-			camera.global_position = safe_global
-			last_collision = true
-			last_collision_distance = pivot_global.distance_to(safe_global)
-		else:
-			# 中心线没有命中并不等于镜头体积没有穿过柱体或墙角。
-			# 只在射线通过时进行球形探测，保留原有构图和碰撞距离契约。
-			var safe_global := _find_probe_safe_position(pivot_global, desired_global, excluded)
-			if safe_global.distance_squared_to(desired_global) > 0.0001:
-				camera.global_position = safe_global
-				last_collision = true
-				last_collision_distance = pivot_global.distance_to(safe_global)
-			else:
-				camera.position = desired_local
+		# 射线命中时也要尝试侧向避障，不能把镜头停在隔断正面；
+		# 否则玩家虽然没有穿墙，画面却会被墙面永久占满。
+		var safe_global := _find_probe_safe_position(pivot_global, desired_global, excluded)
+		camera.global_position = safe_global
+		last_collision = safe_global.distance_squared_to(desired_global) > 0.0001
+		last_collision_distance = pivot_global.distance_to(safe_global) if last_collision else distance
 	else:
 		camera.position = desired_local
 	camera.rotation_degrees = Vector3(pitch_degrees, 0.0, 0.0)
 
 func _find_probe_safe_position(pivot_global: Vector3, desired_global: Vector3, excluded: Array[RID]) -> Vector3:
-	if _probe_position_is_clear(desired_global, excluded):
+	if _camera_candidate_is_clear(pivot_global, desired_global, excluded):
 		return desired_global
 	var steps := maxi(1, collision_probe_steps)
 	var camera_vector := desired_global - pivot_global
 	for step in range(steps - 1, 0, -1):
 		var candidate := pivot_global + camera_vector * (float(step) / float(steps))
-		if _probe_position_is_clear(candidate, excluded):
+		if _camera_candidate_is_clear(pivot_global, candidate, excluded):
+			return candidate
+	# 玩家贴着桌角或隔断前进时，单纯沿相机后轴收近会把镜头留在
+	# 隔断正面，形成“灰墙占满画面”。在保持相同跟随距离的前提下，
+	# 依次尝试左右小幅侧移，优先找到一条从玩家胸口到镜头的无遮挡路径。
+	# 这不是改变玩家朝向，而是第三人称相机的局部避障，避免把视觉阻塞
+	# 转化成玩家必须盲操作的问题。
+	var orbit_offsets := [-24.0, 24.0, -42.0, 42.0, -66.0, 66.0, -90.0, 90.0]
+	for offset_degrees in orbit_offsets:
+		var candidate_vector := camera_vector.rotated(Vector3.UP, deg_to_rad(offset_degrees))
+		var candidate := pivot_global + candidate_vector
+		if _camera_candidate_is_clear(pivot_global, candidate, excluded):
 			return candidate
 	# 隔断或桌角同时挡住所有探测点时，不能把镜头退回到几乎贴在
 	# 玩家胸口的碰撞余量位置；那会形成贴地、穿模式的“镜头失明”。
 	# 保留一个可读的最小第三人称距离，让玩家仍能看见角色和障碍边界。
 	var fallback_distance := minf(camera_vector.length(), maxf(1.25, collision_margin * 3.0))
 	return pivot_global + camera_vector.normalized() * fallback_distance
+
+func _camera_candidate_is_clear(pivot_global: Vector3, candidate_global: Vector3, excluded: Array[RID]) -> bool:
+	var ray_query := PhysicsRayQueryParameters3D.create(pivot_global, candidate_global, collision_mask, excluded)
+	if not get_world_3d().direct_space_state.intersect_ray(ray_query).is_empty():
+		return false
+	return _probe_position_is_clear(candidate_global, excluded)
 
 func _probe_position_is_clear(position: Vector3, excluded: Array[RID]) -> bool:
 	if collision_probe_shape == null or get_world_3d() == null:

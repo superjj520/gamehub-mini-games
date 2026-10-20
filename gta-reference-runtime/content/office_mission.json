@@ -7,7 +7,7 @@
   "completion_minute": 1080,
   "runtime": {
     "player": {"walk_speed": 4.2, "crouch_speed": 2.0},
-    "camera": {"distance": 3.05, "height": 1.68, "pitch_degrees": -10.0, "shoulder_offset": [0.62, 0.06, 0.0], "fov": 70.0},
+    "camera": {"distance": 3.05, "height": 1.68, "pitch_degrees": -10.0, "shoulder_offset": [0.28, 0.06, 0.0], "fov": 70.0},
     "perception": {"max_distance": 7.0, "field_of_view_degrees": 110.0, "suspicion_gain_per_second": 1.8, "suspicion_loss_per_second": 0.55, "hearing_radius": 10.0, "noise_suspicion_per_strength": 0.45},
     "npc": {"search_speed": 1.35},
     "vehicle": {"max_speed": 8.0, "acceleration": 10.0, "braking": 14.0, "turn_speed": 1.8, "enter_radius": 2.5, "driver_seat_offset": [0.0, 1.12, 0.18]},

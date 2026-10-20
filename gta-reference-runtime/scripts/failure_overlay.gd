@@ -12,6 +12,19 @@ func _ready() -> void:
 	_build_ui()
 	visible = false
 
+func _input(event: InputEvent) -> void:
+	if not visible or not (event is InputEventKey):
+		return
+	var key_event := event as InputEventKey
+	if not key_event.pressed or key_event.echo:
+		return
+	# 失败遮罩会拦截未处理输入，不能只依赖场景的 physics_process
+	# 轮询；直接在覆盖层消费 R，保证普通短按也能触发重试。
+	if key_event.keycode == KEY_R or key_event.physical_keycode == KEY_R or key_event.unicode == 82 or key_event.unicode == 114:
+		hide_failure()
+		restart_requested.emit()
+		get_viewport().set_input_as_handled()
+
 func show_failure(reason: String) -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	if _reason != null:

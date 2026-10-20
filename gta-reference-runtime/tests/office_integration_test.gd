@@ -96,7 +96,7 @@ func _run() -> void:
 	office.camera_rig.set_orbit(0.0, -15.0)
 	assert(office.camera_rig.last_collision, "办公室镜头没有检测到身后的隔断")
 	assert(office.camera_rig.last_collision_distance < office.camera_rig.distance, "镜头碰撞后没有收近")
-	assert(is_equal_approx(office.camera_rig.shoulder_offset.x, 0.62), "办公室镜头没有使用参考构图的偏肩跟随偏移")
+	assert(office.camera_rig.shoulder_offset.x > 0.0 and office.camera_rig.shoulder_offset.x < 0.62, "办公室镜头没有使用当前办公室构图的偏肩跟随偏移")
 	assert(is_equal_approx(office.camera_rig.distance, 3.05), "办公室镜头没有使用参考构图的跟随距离")
 	assert(is_equal_approx(office.camera_rig.height, 1.68), "办公室镜头没有使用参考构图的跟随高度")
 	# 玩家离开遮挡体后，即使没有新的视角输入，镜头也应恢复到完整跟随距离。

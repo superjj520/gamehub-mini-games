@@ -235,6 +235,16 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		pending_camera_look += event.relative
+	if event.is_action_pressed("restart") and mission != null and mission.status != MissionState.Status.ACTIVE:
+		# 失败/成功覆盖层显示时，不能只依赖 physics_process 轮询
+		# Input.is_action_pressed：极短的真实键击可能在下一帧前释放，
+		# 导致玩家按下 R 却没有重试。直接消费按键事件，确保提示中的
+		# R 快速重试与真实键盘时序一致。
+		_reset_office_runtime_state()
+		trace.record("mission_restart", {"source": "keyboard_event"})
+		audio_events.emit_event("mission_restart", {})
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F12:
 		if reference_capture_mode:
 			restore_reference_capture()
@@ -821,10 +831,11 @@ func _build_world() -> void:
 
 	# 灰盒隔断：视线检测必须受真实碰撞遮挡影响。
 	_add_obstacle(Vector3(1.2, 1.0, -4.5), Vector3(0.6, 2.0, 3.2))
-	_add_obstacle(Vector3(-2.4, 1.0, -6.3), Vector3(3.0, 2.0, 0.6))
-	_add_obstacle(Vector3(-4.8, 0.75, 0.8), Vector3(3.0, 1.5, 1.4))
-	_add_obstacle(Vector3(0.0, 0.75, 0.8), Vector3(3.0, 1.5, 1.4))
-	_add_obstacle(Vector3(4.8, 0.75, 0.8), Vector3(3.0, 1.5, 1.4))
+	# 后侧横向隔断不能压进左侧撤离通道；保持真实可见屏风与碰撞
+	# 同尺寸，并留出角色胶囊体与第三人称镜头的安全余量。
+	_add_obstacle(Vector3(-2.4, 1.0, -6.3), Vector3(2.2, 2.0, 0.6))
+	# 前排工位由 _add_office_desk 建立一一对应的桌面、桌腿、显示器和
+	# 椅子碰撞；不再用位置不一致的整块灰盒替代可见办公桌。
 	# 后排隔断只覆盖后侧走廊；原来的 3.8 深度会压进前排椅面交互点，
 	# 让玩家到达工位后仍被隔断碰撞体挡住。缩短到 1.2，保留空间分隔和
 	# 镜头收近效果，同时给工位目标留出真实可达的交互面。
@@ -1145,7 +1156,9 @@ func _build_hud() -> void:
 	pause_overlay.apply_audio_settings(audio_events.enabled, audio_events.master_volume_db)
 	failure_overlay = FailureOverlayClass.new()
 	failure_overlay.name = "失败反馈"
-	failure_overlay.restart_requested.connect(_restart_current_scene)
+	# 失败重试必须清空当前任务、玩家、NPC、镜头和输入状态；
+	# 不能重载场景后再次读取刚刚写入的失败检查点。
+	failure_overlay.restart_requested.connect(_reset_office_runtime_state)
 	failure_overlay.menu_requested.connect(_return_to_launcher)
 	add_child(failure_overlay)
 
@@ -1772,6 +1785,14 @@ func _add_obstacle(position: Vector3, size: Vector3) -> void:
 	shape.shape = box
 	obstacle.add_child(shape)
 
+func _add_box_collision(parent: Node3D, size: Vector3, at := Vector3.ZERO) -> void:
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = size
+	shape.shape = box
+	shape.position = at
+	parent.add_child(shape)
+
 func _candidate_visual_preview_enabled() -> bool:
 	return OS.get_environment("REFERENCE_ASSET_PREVIEW").strip_edges() == "1" or FileAccess.file_exists("res://content/full-candidate-preview.marker")
 
@@ -1814,28 +1835,40 @@ func _add_office_desk(location: Vector3) -> void:
 	office_desk_index += 1
 	desk.position = location
 	add_child(desk)
-	desk.add_child(_box_mesh(Vector3(2.6, 0.12, 1.0), Color("9a7255")))
+	var desk_collision := StaticBody3D.new()
+	desk_collision.name = "碰撞体-桌组-%02d" % office_desk_index
+	desk.add_child(desk_collision)
+	var tabletop_size := Vector3(2.6, 0.12, 1.0)
+	desk.add_child(_box_mesh(tabletop_size, Color("9a7255")))
+	_add_box_collision(desk_collision, tabletop_size)
 	var leg_a := _box_mesh(Vector3(0.12, 1.0, 0.12), Color("303846"))
 	leg_a.position = Vector3(-1.05, -0.5, -0.35)
 	desk.add_child(leg_a)
+	_add_box_collision(desk_collision, Vector3(0.12, 1.0, 0.12), leg_a.position)
 	var leg_b := _box_mesh(Vector3(0.12, 1.0, 0.12), Color("303846"))
 	leg_b.position = Vector3(1.05, -0.5, -0.35)
 	desk.add_child(leg_b)
+	_add_box_collision(desk_collision, Vector3(0.12, 1.0, 0.12), leg_b.position)
 	var monitor := _box_mesh(Vector3(0.65, 0.5, 0.08), Color("25334a"))
 	monitor.position = Vector3(0.0, 0.42, 0.05)
 	desk.add_child(monitor)
+	_add_box_collision(desk_collision, Vector3(0.65, 0.5, 0.08), monitor.position)
 	var monitor_stand := _box_mesh(Vector3(0.08, 0.28, 0.08), Color("4b4e52"))
 	monitor_stand.position = Vector3(0.0, 0.16, 0.05)
 	desk.add_child(monitor_stand)
+	_add_box_collision(desk_collision, Vector3(0.08, 0.28, 0.08), monitor_stand.position)
 	var keyboard := _box_mesh(Vector3(0.42, 0.025, 0.18), Color("d5d0c8"))
 	keyboard.position = Vector3(0.0, 0.1, 0.36)
 	desk.add_child(keyboard)
+	_add_box_collision(desk_collision, Vector3(0.42, 0.025, 0.18), keyboard.position)
 	var chair := _box_mesh(Vector3(0.52, 0.08, 0.52), Color("34383d"))
 	chair.position = Vector3(0.0, -0.42, 0.72)
 	desk.add_child(chair)
+	_add_box_collision(desk_collision, Vector3(0.52, 0.08, 0.52), chair.position)
 	var chair_back := _box_mesh(Vector3(0.52, 0.62, 0.08), Color("34383d"))
 	chair_back.position = Vector3(0.0, -0.1, 0.94)
 	desk.add_child(chair_back)
+	_add_box_collision(desk_collision, Vector3(0.52, 0.62, 0.08), chair_back.position)
 
 func _add_office_workstation_target(location: Vector3, index: int) -> void:
 	# 工位交互点位于椅面后侧；它只负责把真实输入接入坐姿打字表现，
