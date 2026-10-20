@@ -59,14 +59,14 @@ func _run() -> void:
 	assert(office.find_child("电梯组", true, false) != null, "办公室缺少电梯门厅视觉")
 	var elevator_facade := office.find_child("原创写实办公室电梯厅立面候选", true, false) as MeshInstance3D
 	assert(elevator_facade != null, "办公室缺少原创写实电梯厅立面候选")
-	assert(elevator_facade.visible, "办公室电梯厅候选纹理被环境灰盒隐藏流程误关")
+	assert(not elevator_facade.visible, "普通办公室游玩不应显示会遮挡真实空间的电梯厅候选卡")
 	assert(elevator_facade.mesh is QuadMesh, "办公室电梯厅立面候选必须使用平面展示网格")
 	var elevator_material := elevator_facade.material_override as StandardMaterial3D
 	assert(elevator_material != null and elevator_material.albedo_texture != null, "办公室电梯厅立面候选没有加载登记纹理")
 	assert(str(elevator_material.albedo_texture.resource_path).ends_with("office_elevator_hall_v1_generated.png"), "办公室电梯厅没有绑定当前版本原创纹理")
 	var workstation_facade := office.find_child("原创写实办公室连续工位立面候选", true, false) as MeshInstance3D
 	assert(workstation_facade != null, "办公室缺少原创写实连续工位立面候选")
-	assert(workstation_facade.visible, "办公室连续工位候选纹理被环境灰盒隐藏流程误关")
+	assert(not workstation_facade.visible, "普通办公室游玩不应显示会遮挡真实空间的连续工位候选卡")
 	assert(workstation_facade.mesh is QuadMesh, "办公室连续工位立面候选必须使用平面展示网格")
 	var workstation_material := workstation_facade.material_override as StandardMaterial3D
 	assert(workstation_material != null and workstation_material.albedo_texture != null, "办公室连续工位立面候选没有加载登记纹理")
@@ -221,7 +221,8 @@ func _run() -> void:
 	var office_vehicle_load_frame := InputFrameClass.new()
 	office_vehicle_load_frame.load_checkpoint = true
 	office.process_input_frame(office_vehicle_load_frame, 0.016)
-	assert(office.vehicle.position.distance_to(office_vehicle_checkpoint) < 0.001, "办公室读取存档没有恢复驾驶中的载具位置")
+	assert(office.trace.has_event("checkpoint_loaded"), "办公室读取存档事件没有完成：" + office.runtime_message)
+	assert(office.vehicle.position.distance_to(office_vehicle_checkpoint) < 0.001, "办公室读取存档没有恢复驾驶中的载具位置，实际=" + str(office.vehicle.position) + "，期望=" + str(office_vehicle_checkpoint))
 	assert(is_equal_approx(office.vehicle.current_speed, office_vehicle_checkpoint_speed), "办公室读取存档没有恢复驾驶中的载具速度")
 	assert(office.vehicle.driver == office.player, "办公室读取存档没有恢复驾驶状态")
 	assert(office.player.presentation_snapshot()["state"] == office.player.PresentationState.VEHICLE, "办公室读取驾驶存档后没有恢复玩家载具表现状态")

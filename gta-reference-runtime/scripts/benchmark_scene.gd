@@ -635,6 +635,23 @@ func process_input_frame(input_frame: InputFrame, delta: float) -> void:
 	trace.advance(delta)
 	if input_frame.move.length_squared() > 0.0 or input_frame.look.length_squared() > 0.0 or input_frame.sprint or input_frame.crouch or input_frame.interact or input_frame.vehicle_enter_exit or input_frame.restart or input_frame.load_checkpoint:
 		trace.record("input", input_frame.to_dict())
+	# 成功或失败后只保留暂停、重试和读取存档，禁止终态继续推进移动、
+	# 感知、巡逻、交互和车辆副作用，保证反馈与可重试状态一致。
+	if mission != null and mission.status != MissionState.Status.ACTIVE:
+		if input_frame.restart:
+			_reset_office_runtime_state()
+			trace.record("mission_restart", {})
+			audio_events.emit_event("mission_restart", {})
+		elif input_frame.load_checkpoint:
+			_load_office_checkpoint_from_input()
+		_update_hud()
+		return
+	# 读取存档是独立的状态恢复操作，不能先推进一帧移动、感知或载具，
+	# 也不能挂在 ACTIVE 分支的 elif 后面，否则正常游玩中永远不会执行。
+	if input_frame.load_checkpoint:
+		_load_office_checkpoint_from_input()
+		_update_hud()
+		return
 	if camera_rig != null and not typing_mode:
 		camera_rig.apply_look(input_frame.look)
 	if (vehicle == null or vehicle.driver == null) and not typing_mode:
@@ -695,43 +712,6 @@ func process_input_frame(input_frame: InputFrame, delta: float) -> void:
 			vehicle_lock = false
 		vehicle.apply_input(input_frame, delta)
 		_update_vehicle_audio(delta)
-
-	if mission.status == MissionState.Status.FAILED and input_frame.restart:
-		if typing_mode:
-			_exit_workstation_typing()
-		mission.restart()
-		perception.reset()
-		_clear_npc_search()
-		player.clear_failure_presentation()
-		failure_overlay.hide_failure()
-		player.global_position = Vector3(0.0, 1.0, 6.0)
-		trace.record("mission_restart", {})
-		audio_events.emit_event("mission_restart", {})
-	elif input_frame.restart and mission.status == MissionState.Status.SUCCESS:
-		if typing_mode:
-			_exit_workstation_typing()
-		mission.restart()
-		perception.reset()
-		_clear_npc_search()
-		player.clear_failure_presentation()
-		failure_overlay.hide_failure()
-		player.global_position = Vector3(0.0, 1.0, 6.0)
-		trace.record("mission_restart", {})
-		audio_events.emit_event("mission_restart", {})
-	elif input_frame.load_checkpoint:
-		if not save_store.load_checkpoint(mission, perception, player, camera_rig, vehicle, office_pack_id):
-			runtime_message = "读取失败：" + save_store.last_error
-			trace.record("checkpoint_load_failed", {"reason": save_store.last_error})
-			audio_events.emit_event("checkpoint_load_failed", {"reason": save_store.last_error})
-		else:
-			_clear_npc_search()
-			player.clear_failure_presentation()
-			if vehicle != null and vehicle.driver == player and player.has_method("trigger_presentation_action") and player.has_method("sync_presentation_state"):
-				player.trigger_presentation_action("vehicle")
-				player.sync_presentation_state()
-			failure_overlay.hide_failure()
-			trace.record("checkpoint_loaded", {"player_position": [player.global_position.x, player.global_position.y, player.global_position.z]})
-			audio_events.emit_event("checkpoint_loaded", {})
 
 	_update_hud()
 
@@ -944,6 +924,7 @@ func _add_generated_office_partition_visual() -> void:
 	var facade := MeshInstance3D.new()
 	facade.name = "原创写实办公室玻璃隔断立面候选"
 	facade.set_meta("visual_candidate", true)
+	facade.visible = _reference_visual_cards_enabled()
 	var mesh := QuadMesh.new()
 	mesh.size = Vector2(8.8, 4.4)
 	facade.mesh = mesh
@@ -964,6 +945,7 @@ func _add_generated_office_workstation_row_visual() -> void:
 	var facade := MeshInstance3D.new()
 	facade.name = "原创写实办公室连续工位立面候选"
 	facade.set_meta("visual_candidate", true)
+	facade.visible = _reference_visual_cards_enabled()
 	var mesh := QuadMesh.new()
 	mesh.size = Vector2(30.0, 10.0)
 	facade.mesh = mesh
@@ -988,6 +970,7 @@ func _add_generated_office_elevator_facade(parent: Node3D) -> void:
 	var facade := MeshInstance3D.new()
 	facade.name = "原创写实办公室电梯厅立面候选"
 	facade.set_meta("visual_candidate", true)
+	facade.visible = _reference_visual_cards_enabled()
 	var mesh := QuadMesh.new()
 	mesh.size = Vector2(3.2, 2.8)
 	facade.mesh = mesh
@@ -1396,6 +1379,75 @@ func _on_audio_volume_changed(volume_db: float) -> void:
 	audio_events.set_master_volume_db(volume_db)
 	settings_store.save_audio_settings(audio_events.enabled, audio_events.master_volume_db)
 
+func _load_office_checkpoint_from_input() -> void:
+	if not save_store.load_checkpoint(mission, perception, player, camera_rig, vehicle, office_pack_id):
+		runtime_message = "读取失败：" + save_store.last_error
+		trace.record("checkpoint_load_failed", {"reason": save_store.last_error})
+		audio_events.emit_event("checkpoint_load_failed", {"reason": save_store.last_error})
+		return
+	_clear_npc_search()
+	hallway_encounter_active = false
+	player.clear_failure_presentation()
+	if vehicle != null and vehicle.driver == player and player.has_method("trigger_presentation_action") and player.has_method("sync_presentation_state"):
+		player.trigger_presentation_action("vehicle")
+		player.sync_presentation_state()
+	if mission.status == MissionState.Status.FAILED:
+		player.trigger_presentation_action("fail")
+		failure_overlay.show_failure(mission.failure_reason)
+	else:
+		failure_overlay.hide_failure()
+	trace.record("checkpoint_loaded", {"player_position": [player.global_position.x, player.global_position.y, player.global_position.z], "status": mission.status})
+	audio_events.emit_event("checkpoint_loaded", {})
+
+func _reset_office_runtime_state() -> void:
+	if typing_mode:
+		_exit_workstation_typing()
+	mission.restart()
+	perception.reset()
+	_clear_npc_search()
+	hallway_patrol_phase = 0.0
+	hallway_encounter_active = false
+	runtime_message = ""
+	interaction_lock = false
+	vehicle_lock = false
+	for workstation in workstation_targets:
+		if workstation != null:
+			workstation.reset()
+	if objective_target != null:
+		objective_target.reset()
+	if vehicle != null:
+		if vehicle.driver != null:
+			vehicle.exit()
+		vehicle.global_position = Vector3(-6.9, 0.7, -5.0)
+		vehicle.rotation = Vector3.ZERO
+		vehicle.current_speed = 0.0
+		vehicle.steering_input = 0.0
+		vehicle.velocity = Vector3.ZERO
+	player.global_position = Vector3(0.0, 1.0, 6.0)
+	player.velocity = Vector3.ZERO
+	player.crouching = false
+	player.reset_stamina()
+	player.clear_failure_presentation()
+	player.sync_presentation_state()
+	if npc != null:
+		npc.global_position = npc_home_position
+		npc.rotation.y = npc_home_rotation_y
+	if hallway_npc != null:
+		hallway_npc.global_position = _hallway_route_start()
+	_reset_office_camera()
+	failure_overlay.hide_failure()
+
+func _reset_office_camera() -> void:
+	if camera_rig == null:
+		return
+	var runtime_config: Dictionary = office_pack.get("runtime", {})
+	var camera_config: Dictionary = runtime_config.get("camera", {})
+	camera_rig.set_follow_profile(float(camera_config.get("distance", 2.5)), float(camera_config.get("height", 1.7)))
+	var shoulder_offset = camera_config.get("shoulder_offset", [0.38, 0.0, 0.0])
+	if shoulder_offset is Array and shoulder_offset.size() == 3:
+		camera_rig.set_shoulder_offset(Vector3(float(shoulder_offset[0]), float(shoulder_offset[1]), float(shoulder_offset[2])))
+	camera_rig.set_orbit(float(camera_config.get("yaw_degrees", 0.0)), float(camera_config.get("pitch_degrees", -12.0)))
+
 func _can_npc_see_player() -> bool:
 	var observer := npc.global_position + Vector3.UP * 0.7
 	# 蹲伏降低暴露高度和有效距离，但不再直接免疫视线；视频中的
@@ -1722,6 +1774,9 @@ func _add_obstacle(position: Vector3, size: Vector3) -> void:
 
 func _candidate_visual_preview_enabled() -> bool:
 	return OS.get_environment("REFERENCE_ASSET_PREVIEW").strip_edges() == "1" or FileAccess.file_exists("res://content/full-candidate-preview.marker")
+
+func _reference_visual_cards_enabled() -> bool:
+	return _candidate_visual_preview_enabled() or OS.get_environment("REFERENCE_USE_ORIGINAL_ENVIRONMENT_BACKDROPS").strip_edges() == "1"
 
 func _video_backdrop_preview_enabled() -> bool:
 	return _candidate_visual_preview_enabled() and OS.get_environment("REFERENCE_GAMEPLAY_VIDEO_BACKDROP").strip_edges() == "1"

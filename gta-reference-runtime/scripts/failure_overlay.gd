@@ -13,6 +13,7 @@ func _ready() -> void:
 	visible = false
 
 func show_failure(reason: String) -> void:
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	if _reason != null:
 		_reason.text = "失败原因：" + reason
 	visible = true
@@ -22,6 +23,7 @@ func show_failure(reason: String) -> void:
 
 func hide_failure() -> void:
 	visible = false
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _build_ui() -> void:
 	var dimmer := ColorRect.new()

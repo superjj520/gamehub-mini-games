@@ -73,6 +73,12 @@ func apply_state(state_id: String) -> void:
 	_add_state_backdrop()
 	_apply_runtime_context_visuals()
 
+func _reference_backdrop_enabled() -> bool:
+	# 普通游玩必须保留真实三维空间。参考构图卡只允许在显式候选预览或
+	# 原创图形采集模式显示，不能因为“纯视觉”没有碰撞就遮住可操作空间。
+	return OS.get_environment("REFERENCE_ASSET_PREVIEW").strip_edges() == "1" \
+		or OS.get_environment("REFERENCE_USE_ORIGINAL_ENVIRONMENT_BACKDROPS").strip_edges() == "1"
+
 func apply_runtime_state(state_id: String, source: String = "runtime") -> void:
 	## 普通游玩状态入口；保留采集态与运行态共用同一套视觉合同。
 	apply_state(state_id)
@@ -504,6 +510,7 @@ func _add_state_backdrop() -> void:
 	backdrop.set_meta("asset_source", "project_original_generated_environment_draft")
 	backdrop.set_meta("office_scene_state", active_state)
 	backdrop.set_meta("backdrop_texture_path", texture_path)
+	backdrop.visible = _reference_backdrop_enabled()
 	state_root.add_child(backdrop)
 
 func _add_box(node_name: String, size: Vector3, at: Vector3, color: Color, roughness := 0.82, metallic := 0.0, emission := Color(0.0, 0.0, 0.0, 0.0), emission_energy := 0.0) -> MeshInstance3D:

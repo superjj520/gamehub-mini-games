@@ -153,7 +153,11 @@ func _find_probe_safe_position(pivot_global: Vector3, desired_global: Vector3, e
 		var candidate := pivot_global + camera_vector * (float(step) / float(steps))
 		if _probe_position_is_clear(candidate, excluded):
 			return candidate
-	return pivot_global + camera_vector.normalized() * collision_margin
+	# 隔断或桌角同时挡住所有探测点时，不能把镜头退回到几乎贴在
+	# 玩家胸口的碰撞余量位置；那会形成贴地、穿模式的“镜头失明”。
+	# 保留一个可读的最小第三人称距离，让玩家仍能看见角色和障碍边界。
+	var fallback_distance := minf(camera_vector.length(), maxf(1.25, collision_margin * 3.0))
+	return pivot_global + camera_vector.normalized() * fallback_distance
 
 func _probe_position_is_clear(position: Vector3, excluded: Array[RID]) -> bool:
 	if collision_probe_shape == null or get_world_3d() == null:
