@@ -161,7 +161,7 @@ func _build_ui() -> void:
 	controls_text.focus_mode = Control.FOCUS_ALL
 	controls_text.scroll_active = true
 	controls_text.visible = false
-	controls_text.text = "移动：WASD / 左摇杆\n镜头：方向键 / 右摇杆\n冲刺：Shift / 左摇杆按压    蹲伏：C / 手柄 B\n交互：E / 手柄 X    攻击或冲突动作：F / 手柄 RB    闪避：Space / 手柄 LB\n上下车：V / 手柄 Y\n重试：R / 手柄 A    读取检查点：L / 手柄 Back\n暂停：Esc / 手柄 Start"
+	controls_text.text = "移动：WASD / 左摇杆 / 屏幕左下摇杆\n镜头：方向键 / 右摇杆 / 屏幕右侧拖动\n蹲伏：C / 手柄 B / 屏幕蹲伏按钮\n交互：E / 手柄 X / 屏幕交互按钮\n重试：R / 手柄 A / 失败后的屏幕重试按钮\n暂停：Esc / 手柄 Start / 屏幕暂停按钮"
 	column.add_child(controls_text)
 	license_button = _make_button("第三方许可")
 	license_button.pressed.connect(_toggle_license_text)

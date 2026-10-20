@@ -14,6 +14,7 @@ const CameraRigClass = preload("res://scripts/third_person_camera.gd")
 const AudioEventRouterClass = preload("res://scripts/audio_event_router.gd")
 const PauseOverlayClass = preload("res://scripts/pause_overlay.gd")
 const FailureOverlayClass = preload("res://scripts/failure_overlay.gd")
+const MobileControlsClass = preload("res://scripts/mobile_controls.gd")
 const RuntimeCaptureClass = preload("res://scripts/runtime_capture.gd")
 const SettingsStoreClass = preload("res://scripts/settings_store.gd")
 const AssetRuntimeCatalogClass = preload("res://scripts/asset_runtime_catalog.gd")
@@ -89,6 +90,7 @@ var locomotion_audio_cooldown := 0.0
 var vehicle_audio_cooldown := 0.0
 var pause_overlay: PauseOverlay
 var failure_overlay: CanvasLayer
+var mobile_controls: MobileControls
 var runtime_message := ""
 var initialized := false
 var hallway_patrol_phase := 0.0
@@ -198,6 +200,7 @@ func _ready() -> void:
 	add_child(office_scene_visuals)
 	_build_player()
 	_build_hud()
+	_build_mobile_controls()
 	_apply_candidate_video_backdrop()
 	launch_checkpoint_pending = bool(launch_request.get("load_checkpoint", false))
 	mission.start()
@@ -228,6 +231,14 @@ func _physics_process(delta: float) -> void:
 	if reference_capture_mode:
 		return
 	var input_frame := InputFrameClass.from_keyboard()
+	if mobile_controls != null:
+		var touch_input := mobile_controls.consume_input()
+		if not touch_input.is_empty():
+			input_frame.move = (input_frame.move + touch_input.get("move", Vector2.ZERO)).limit_length(1.0)
+			input_frame.look += touch_input.get("look", Vector2.ZERO)
+			input_frame.crouch = input_frame.crouch or bool(touch_input.get("crouch", false))
+			input_frame.interact = input_frame.interact or bool(touch_input.get("interact", false))
+			input_frame.restart = input_frame.restart or bool(touch_input.get("restart", false))
 	input_frame.look += pending_camera_look
 	pending_camera_look = Vector2.ZERO
 	process_input_frame(input_frame, delta)
@@ -1162,6 +1173,20 @@ func _build_hud() -> void:
 	failure_overlay.menu_requested.connect(_return_to_launcher)
 	add_child(failure_overlay)
 
+func _build_mobile_controls() -> void:
+	var layer := CanvasLayer.new()
+	layer.name = "手机触控层"
+	layer.layer = 40
+	add_child(layer)
+	mobile_controls = MobileControlsClass.new()
+	mobile_controls.name = "手机触控操作"
+	mobile_controls.pause_requested.connect(_on_mobile_pause_requested)
+	layer.add_child(mobile_controls)
+
+func _on_mobile_pause_requested() -> void:
+	if pause_overlay != null and mission != null and mission.status == MissionState.Status.ACTIVE:
+		pause_overlay.toggle_pause()
+
 func _update_hud() -> void:
 	var clock := "%02d:%02d" % [mission.clock_minutes / 60, mission.clock_minutes % 60]
 	var state_text := "进行中"
@@ -1315,6 +1340,8 @@ func _radar_point_for_world(world_position: Vector3, max_distance := 18.0) -> Ve
 	)
 
 func _on_mission_state_changed(_previous_status: int, _current_status: int) -> void:
+	if mobile_controls != null:
+		mobile_controls.set_terminal_state(mission.status != MissionState.Status.ACTIVE)
 	if launch_checkpoint_pending:
 		return
 	trace.record("mission_state", {"status": mission.status, "reason": mission.failure_reason})
