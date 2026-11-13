@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>准点下班计划</title>
+  <style>
+    :root {
+      --ink: #182235;
+      --muted: #68758c;
+      --paper: #f4f6f8;
+      --line: #dce2e9;
+      --blue: #3478f6;
+      --red: #ec5b56;
+      --gold: #f2b94b;
+      --green: #30a46c;
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--ink); background:
+        radial-gradient(circle at 8% 10%, rgba(52,120,246,.10), transparent 32rem),
+        linear-gradient(135deg, #eef2f7, #dde5ee);
+      display: grid; place-items: center; padding: 22px;
+    }
+    .game-shell { width: min(1120px, 100%); }
+    .topbar { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin: 0 0 14px; }
+    h1 { margin: 0; font-size: clamp(25px, 4vw, 40px); letter-spacing: -.065em; }
+    .subtitle { color: var(--muted); margin: 7px 0 0; font-size: 14px; }
+    .legend { display: flex; gap: 8px; flex-wrap: wrap; justify-content: end; }
+    .legend span { border-radius: 99px; padding: 7px 10px; background: rgba(255,255,255,.76); border: 1px solid var(--line); color: var(--muted); font-size: 12px; font-weight: 700; }
+    .main-card { background: rgba(255,255,255,.82); border: 1px solid rgba(255,255,255,.9); box-shadow: 0 24px 70px rgba(45,67,94,.16); border-radius: 24px; overflow: hidden; }
+    .hud { display: grid; grid-template-columns: 1.2fr .95fr .95fr 1.45fr; gap: 1px; background: var(--line); border-bottom: 1px solid var(--line); }
+    .hud-card { background: rgba(255,255,255,.88); min-height: 78px; padding: 15px 18px; }
+    .hud-label { color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .09em; }
+    .hud-value { margin-top: 4px; font-size: 22px; font-weight: 850; letter-spacing: -.04em; }
+    #clock { color: var(--blue); }
+    .risk-track { display: flex; gap: 5px; margin-top: 10px; }
+    .risk-dot { width: 22px; height: 7px; border-radius: 99px; background: #e4e9ef; transition: background .2s; }
+    .risk-dot.on { background: var(--red); }
+    #tip { align-self: center; line-height: 1.35; font-size: 13px; color: #45536a; }
+    .stage { position: relative; background: #dce7ea; }
+    canvas { display: block; width: 100%; height: auto; max-height: min(69vh, 650px); object-fit: contain; touch-action: none; }
+    .message { position: absolute; left: 50%; top: 50%; width: min(420px, calc(100% - 32px)); transform: translate(-50%, -50%); background: rgba(20,29,44,.92); color: white; padding: 28px; border-radius: 20px; text-align: center; box-shadow: 0 16px 40px rgba(0,0,0,.3); }
+    .message[hidden] { display: none; }
+    .message .emoji { font-size: 38px; display: block; margin-bottom: 8px; }
+    .message h2 { font-size: 25px; margin: 0 0 8px; letter-spacing: -.04em; }
+    .message p { margin: 0 auto 18px; color: #cbd4df; font-size: 14px; line-height: 1.6; max-width: 335px; }
+    button { appearance: none; border: 0; cursor: pointer; font: inherit; font-weight: 800; padding: 11px 17px; border-radius: 10px; background: var(--gold); color: #392400; box-shadow: 0 3px 0 #bd8630; }
+    button:active { transform: translateY(2px); box-shadow: 0 1px 0 #bd8630; }
+    .help { color: var(--muted); padding: 13px 18px 15px; font-size: 12px; text-align: center; }
+    kbd { display: inline-block; font: inherit; font-weight: 800; color: var(--ink); background: white; border: 1px solid #cfd7e1; border-bottom-width: 2px; border-radius: 4px; padding: 1px 5px; }
+    @media (max-width: 720px) {
+      body { padding: 10px; align-items: start; }
+      .topbar { align-items: start; flex-direction: column; gap: 8px; }
+      .legend { justify-content: start; }
+      .main-card { border-radius: 18px; }
+      .hud { grid-template-columns: 1fr 1fr; }
+      .hud-card { min-height: 64px; padding: 11px 13px; }
+      .hud-card:last-child { grid-column: span 2; min-height: 51px; }
+      .hud-value { font-size: 19px; }
+      #tip { font-size: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main class="game-shell">
+    <header class="topbar">
+      <div><h1>准点下班计划</h1><p class="subtitle">18:00 前别让老板发现你已经收拾好包。</p></div>
+      <div class="legend"><span>🧑‍💼 你</span><span>👁️ 老板视野</span><span>🪴 隔断可躲藏</span></div>
+    </header>
+    <section class="main-card" aria-label="准点下班游戏">
+      <div class="hud">
+        <div class="hud-card"><div class="hud-label">办公室时钟</div><div class="hud-value" id="clock">17:45</div></div>
+        <div class="hud-card"><div class="hud-label">当前状态</div><div class="hud-value" id="status">待命</div></div>
+        <div class="hud-card"><div class="hud-label">怀疑值</div><div class="risk-track" aria-label="怀疑值"><i class="risk-dot"></i><i class="risk-dot"></i><i class="risk-dot"></i><i class="risk-dot"></i><i class="risk-dot"></i></div></div>
+        <div class="hud-card" id="tip">先在工位区躲好。时钟到 18:00 后，前往右侧大门打卡下班。</div>
+      </div>
+      <div class="stage">
+        <canvas id="game" width="1100" height="620" aria-label="办公室潜行场景"></canvas>
+        <section class="message" id="message">
+          <span class="emoji">🕔</span><h2>今天，准点下班</h2>
+          <p>在老板巡视时避开视线。到了 18:00，带着你的包从右侧门禁离开。</p>
+          <button id="start">开始行动</button>
+        </section>
+      </div>
+      <div class="help">移动：<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 或方向键　·　躲进工位隔断，等老板转身　·　手机也可直接按住画面移动</div>
+    </section>
+  </main>
+  <script>
+  (() => {
+    const canvas = document.querySelector('#game');
+    const ctx = canvas.getContext('2d');
+    const clockEl = document.querySelector('#clock');
+    const statusEl = document.querySelector('#status');
+    const tipEl = document.querySelector('#tip');
+    const dots = [...document.querySelectorAll('.risk-dot')];
+    const message = document.querySelector('#message');
+    const button = document.querySelector('#start');
+    const W = canvas.width, H = canvas.height;
+    const keys = new Set();
+    const walls = [
+      {x:80,y:92,w:160,h:22},{x:80,y:92,w:22,h:135},{x:218,y:92,w:22,h:135},
+      {x:340,y:92,w:175,h:22},{x:340,y:92,w:22,h:135},{x:493,y:92,w:22,h:135},
+      {x:630,y:88,w:188,h:22},{x:630,y:88,w:22,h:148},{x:796,y:88,w:22,h:148},
+      {x:146,y:352,w:205,h:24},{x:146,y:352,w:24,h:144},{x:327,y:352,w:24,h:144},
+      {x:465,y:350,w:215,h:24},{x:465,y:350,w:24,h:145},{x:656,y:350,w:24,h:145},
+      {x:790,y:350,w:170,h:24},{x:790,y:350,w:24,h:145},{x:936,y:350,w:24,h:145}
+    ];
+    const hideZones = [
+      {x:102,y:114,w:116,h:92},{x:362,y:114,w:131,h:92},{x:652,y:110,w:144,h:105},
+      {x:170,y:375,w:157,h:100},{x:489,y:374,w:167,h:101},{x:814,y:374,w:122,h:101}
+    ];
+    const state = {
+      running: false, ended: false, time: 0, suspicion: 0, seen: false,
+      player: {x:92, y:530, r:14}, boss: {x:900, y:264, r:20, dir: Math.PI, phase:0},
+      exit: {x:1016,y:270,w:50,h:104}, last: 0, touch: null
+    };
+    const clamp = (n,a,b) => Math.max(a, Math.min(b,n));
+    const rectHit = (x,y,r, box) => x+r > box.x && x-r < box.x+box.w && y+r > box.y && y-r < box.y+box.h;
+    function movePlayer(dx, dy) {
+      const p = state.player, nx = clamp(p.x + dx, p.r + 15, W-p.r-15), ny = clamp(p.y + dy, p.r + 15, H-p.r-15);
+      if (!walls.some(w => rectHit(nx, p.y, p.r, w))) p.x = nx;
+      if (!walls.some(w => rectHit(p.x, ny, p.r, w))) p.y = ny;
+    }
+    function insideHide(p) { return hideZones.some(z => p.x > z.x+14 && p.x < z.x+z.w-14 && p.y > z.y+14 && p.y < z.y+z.h-14); }
+    function rayBlocked(from, to) {
+      const steps = Math.ceil(Math.hypot(to.x-from.x, to.y-from.y)/12);
+      for (let i=1; i<steps; i++) { const x=from.x+(to.x-from.x)*i/steps, y=from.y+(to.y-from.y)*i/steps; if (walls.some(w => x>w.x && x<w.x+w.w && y>w.y && y<w.y+w.h)) return true; }
+      return false;
+    }
+    function bossSeesPlayer() {
+      const b=state.boss, p=state.player, dx=p.x-b.x, dy=p.y-b.y, dist=Math.hypot(dx,dy);
+      if (dist > 285 || insideHide(p) || rayBlocked(b,p)) return false;
+      let diff = Math.atan2(dy,dx)-b.dir; diff=Math.atan2(Math.sin(diff),Math.cos(diff));
+      return Math.abs(diff) < .62;
+    }
+    function updateHud() {
+      const mins = Math.min(15, Math.floor(state.time / 3400));
+      const totalMinutes = 45 + mins;
+      const hour = 17 + Math.floor(totalMinutes / 60);
+      const minute = totalMinutes % 60;
+      clockEl.textContent = String(hour).padStart(2,'0') + ':' + String(minute).padStart(2,'0');
+      clockEl.style.color = mins >= 15 ? 'var(--green)' : 'var(--blue)';
+      dots.forEach((d,i) => d.classList.toggle('on', i < Math.ceil(state.suspicion)));
+      if (!state.running) return;
+      if (state.seen) { statusEl.textContent='被盯上！'; statusEl.style.color='var(--red)'; tipEl.textContent='老板正在看你，快躲进最近的工位隔断。'; }
+      else if (mins >= 15) { statusEl.textContent='可以下班'; statusEl.style.color='var(--green)'; tipEl.textContent='18:00 到！去右侧门禁，今天你就是时间管理大师。'; }
+      else { statusEl.textContent=insideHide(state.player)?'安全躲藏':'观察路线'; statusEl.style.color=insideHide(state.player)?'var(--green)':'var(--ink)'; tipEl.textContent='距离 18:00 还差 ' + (15-mins) + ' 分钟，留意老板扭头的方向。'; }
+    }
+    function finish(won) {
+      state.running=false; state.ended=true; message.hidden=false;
+      message.innerHTML = won
+        ? '<span class="emoji">🎉</span><h2>准点下班成功！</h2><p>你避开了老板视线，在 18:00 打卡离场。今天的晚霞属于你。</p><button id="start">再来一局</button>'
+        : '<span class="emoji">😵</span><h2>被老板逮住了</h2><p>“这个点就收拾东西？” 明天再试一次，躲好再动。</p><button id="start">重新挑战</button>';
+      document.querySelector('#start').addEventListener('click', reset, {once:true});
+    }
+    function reset() {
+      state.running=true; state.ended=false; state.time=0; state.suspicion=0; state.seen=false; state.last=performance.now();
+      state.player={x:92,y:530,r:14}; state.boss={x:900,y:264,r:20,dir:Math.PI,phase:0}; message.hidden=true; updateHud(); requestAnimationFrame(loop);
+    }
+    function update(dt) {
+      state.time += dt; state.boss.phase += dt*.72;
+      state.boss.x = 825 + Math.cos(state.boss.phase*.44)*130;
+      state.boss.y = 270 + Math.sin(state.boss.phase*.95)*92;
+      state.boss.dir = Math.atan2(Math.cos(state.boss.phase*.95)*92*.95, -Math.sin(state.boss.phase*.44)*130*.44);
+      let dx=0,dy=0; if(keys.has('arrowup')||keys.has('w'))dy--; if(keys.has('arrowdown')||keys.has('s'))dy++; if(keys.has('arrowleft')||keys.has('a'))dx--; if(keys.has('arrowright')||keys.has('d'))dx++;
+      if(state.touch){ dx=state.touch.x; dy=state.touch.y; }
+      if(dx||dy){const n=Math.hypot(dx,dy); movePlayer(dx/n*dt*.16,dy/n*dt*.16);}
+      state.seen=bossSeesPlayer();
+      if(state.seen) state.suspicion=Math.min(5,state.suspicion+dt*.00115); else state.suspicion=Math.max(0,state.suspicion-dt*.00045);
+      if(state.suspicion>=5) finish(false);
+      if(state.time>=51000 && state.player.x>state.exit.x && state.player.y>state.exit.y && state.player.y<state.exit.y+state.exit.h) finish(true);
+      updateHud();
+    }
+    function drawOffice() {
+      ctx.clearRect(0,0,W,H); ctx.fillStyle='#dce7ea';ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#ccd9dd'; for(let x=0;x<W;x+=55) for(let y=0;y<H;y+=55) { ctx.fillRect(x+1,y+1,1,1); }
+      ctx.fillStyle='#c0cfd4';ctx.fillRect(0,0,W,58);ctx.fillRect(0,562,W,58);
+      ctx.fillStyle='#98acb2';ctx.fillRect(0,56,W,4);ctx.fillRect(0,558,W,4);
+      ctx.fillStyle='#6c7f88';ctx.fillRect(992,230,80,184);ctx.fillStyle='#e2f0f0';ctx.fillRect(1000,240,64,164);
+      ctx.fillStyle='#56717b';ctx.fillRect(1014,284,6,44);ctx.fillStyle='#f2b94b';ctx.fillRect(1021,301,8,8);
+      ctx.font='700 13px Inter, sans-serif';ctx.fillStyle='#55707a';ctx.fillText('门禁 / EXIT',989,218);
+      for(const z of hideZones){ ctx.fillStyle='#f5eee2';ctx.fillRect(z.x,z.y,z.w,z.h);ctx.fillStyle='#d3c3aa';ctx.fillRect(z.x+9,z.y+9,z.w-18,z.h-18);ctx.fillStyle='#eff6f7';ctx.fillRect(z.x+18,z.y+18,z.w-36,17);ctx.fillStyle='#697984';ctx.fillRect(z.x+29,z.y+39,z.w-58,4);ctx.fillStyle='#465661';ctx.fillRect(z.x+z.w-32,z.y+31,15,16);ctx.fillStyle='#69a86f';ctx.beginPath();ctx.arc(z.x+24,z.y+z.h-24,11,0,Math.PI*2);ctx.fill(); }
+      for(const w of walls){ctx.fillStyle='#7e9197';ctx.fillRect(w.x,w.y,w.w,w.h);ctx.fillStyle='#afc0c4';ctx.fillRect(w.x+3,w.y+3,w.w-6,4);}
+      ctx.fillStyle='#52656d';ctx.fillRect(510,252,150,20);ctx.fillStyle='#6d858d';ctx.fillRect(526,272,12,58);ctx.fillRect(632,272,12,58);ctx.fillStyle='#d7aa4b';ctx.beginPath();ctx.arc(584,241,18,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff5c8';ctx.fillRect(579,229,10,20);
+      ctx.font='700 14px Inter, sans-serif';ctx.fillStyle='#5e7178';ctx.fillText('茶水间',545,344);ctx.fillText('工位区',84,78);ctx.fillText('工位区',650,76);
+    }
+    function drawVision() { const b=state.boss;ctx.save();ctx.translate(b.x,b.y);ctx.rotate(b.dir);const g=ctx.createRadialGradient(0,0,20,0,0,285);g.addColorStop(0,'rgba(236,91,86,.28)');g.addColorStop(1,'rgba(236,91,86,0)');ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,285,-.62,.62);ctx.closePath();ctx.fill();ctx.restore(); }
+    function person(x,y,r,color,dir=0,label='') { ctx.save();ctx.translate(x,y);ctx.rotate(dir);ctx.fillStyle='rgba(24,34,53,.12)';ctx.beginPath();ctx.ellipse(0,r+9,r+5,5,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=color;ctx.fillRect(-r*.65,-r*.1,r*1.3,r*1.25);ctx.beginPath();ctx.arc(0,-r*.5,r*.67,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(r*.25,-r*.52,2.5,0,Math.PI*2);ctx.fill();ctx.restore();if(label){ctx.font='700 12px Inter,sans-serif';ctx.textAlign='center';ctx.fillStyle='#334155';ctx.fillText(label,x,y-r-20);ctx.textAlign='start';}}
+    function draw() { drawOffice(); drawVision(); person(state.boss.x,state.boss.y,20,'#ec5b56',state.boss.dir,'老板'); person(state.player.x,state.player.y,14,'#3478f6',0,'你'); if(state.seen){ctx.strokeStyle='rgba(236,91,86,.85)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(state.player.x,state.player.y,25+Math.sin(performance.now()/70)*3,0,Math.PI*2);ctx.stroke();} }
+    function loop(now){if(!state.running)return;const dt=Math.min(34,now-state.last);state.last=now;update(dt);draw();if(state.running)requestAnimationFrame(loop);}
+    document.addEventListener('keydown',e=>{ if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d','W','A','S','D'].includes(e.key)){e.preventDefault();keys.add(e.key.toLowerCase());}});
+    document.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
+    function touchMove(e){const r=canvas.getBoundingClientRect(), t=e.touches?e.touches[0]:e;const x=(t.clientX-r.left)/r.width*W, y=(t.clientY-r.top)/r.height*H;const dx=x-state.player.x,dy=y-state.player.y,n=Math.hypot(dx,dy)||1;state.touch={x:dx/n,y:dy/n};}
+    canvas.addEventListener('pointerdown',e=>{if(state.running){canvas.setPointerCapture(e.pointerId);touchMove(e);}});canvas.addEventListener('pointermove',e=>{if(e.buttons)touchMove(e);});canvas.addEventListener('pointerup',()=>state.touch=null);canvas.addEventListener('pointercancel',()=>state.touch=null);
+    button.addEventListener('click',reset); draw(); updateHud();
+  })();
+  </script>
+</body>
+</html>

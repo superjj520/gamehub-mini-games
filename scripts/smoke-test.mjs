@@ -5,7 +5,7 @@ import { chromium } from 'playwright';
 
 const root = process.cwd();
 const port = 4173;
-const pages = ['index.html', 'wheel-page.html', 'game-2048.html', 'leaderboard.html', 'builder-v2.html', 'play.html', 'create-v2.html', 'play-v2.html'];
+const pages = ['index.html', 'player-history.html', 'creator.html', 'wheel-page.html', 'game-2048.html', 'leaderboard.html', 'builder-v2.html', 'play.html', 'create-v2.html', 'play-v2.html'];
 const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
 
 const server = createServer(async (request, response) => {

@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>轮盘界面 · 改前 / 改后对照（可试射）</title>
+<style>
+/* ============================================================
+   轮盘界面 改前 / 改后 对照稿
+   - 同一份 DOM，靠 [data-v] 切两版结构，避免两份代码漂移
+   - 所有尺寸由 --disc 派生：改盘径 = 膛室/球/盘心一起等比
+   - 层级：L0 弹巢 → L1 读数 → L2 玩家 → L3 辅助文案
+   ============================================================ */
+
+:root{
+  --bg-deep:#0B0614;
+  --bg-mid:#1A0B2E;
+  --disc-base:#241335;
+  --disc-edge:rgba(138,107,174,.30);
+  --well:#0C0616;
+  --well-rim:rgba(138,107,174,.55);
+  --gold:#FFD24A;
+  --gold-hi:#FFF6D2;
+  --gold-lo:#7A4A08;
+  --gold-rim:#5C3A0A;
+  --pink:#FF2E9A;
+  --violet:#A855F7;
+  --pink-lt:#FF8BC1;
+  --violet-lt:#B36BFF;
+  --text:#F4EEFF;
+  --text-2:#B9A4D6;
+  --text-3:#7E6C97;
+  --danger:#FF2244;
+  --card:#1C0E2C;
+  --line:rgba(167,139,250,.16);
+  --ease-pop:cubic-bezier(.2,1.5,.4,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  margin:0;
+  background:
+    radial-gradient(900px 600px at 50% -10%, #1E0E36 0%, transparent 60%),
+    radial-gradient(700px 500px at 90% 110%, #17082a 0%, transparent 60%),
+    #06030C;
+  color:var(--text);
+  font-family:"SF Pro Display","PingFang SC","Inter",system-ui,-apple-system,sans-serif;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  min-height:100vh; padding:28px 16px 40px; gap:22px;
+}
+
+/* ---------- 顶部工具条（评审用，非产品 UI） ---------- */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.seg{display:flex;gap:2px;padding:3px;border-radius:12px;background:rgba(255,255,255,.04);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.seg button{
+  border:0;background:transparent;color:#B9A4D6;font:500 13px/1 inherit;
+  font-family:inherit;padding:9px 15px;border-radius:9px;cursor:pointer;
+  transition:background .18s var(--ease-out),color .18s;
+}
+.seg button:hover{color:#F4EEFF}
+.seg button.on{background:rgba(167,139,250,.18);color:#F4EEFF;box-shadow:inset 0 0 0 1px rgba(167,139,250,.35)}
+
+/* ---------- 手机框 ---------- */
+.phone{
+  position:relative;width:430px;height:932px;border-radius:44px;
+  background:#000;padding:10px;
+  box-shadow:0 40px 90px -30px #000, 0 0 0 1px rgba(255,255,255,.08);
+  overflow:hidden;
+}
+.app{
+  position:relative;width:100%;height:100%;border-radius:35px;overflow:hidden;
+  background:
+    radial-gradient(420px 320px at 50% 8%, #2A1046 0%, transparent 62%),
+    radial-gradient(300px 400px at 50% 105%, #170727 0%, transparent 60%),
+    linear-gradient(180deg,#0D0718 0%, #0B0614 55%, #090410 100%);
+  display:flex;flex-direction:column;
+  padding:calc(10px + env(safe-area-inset-top)) 20px calc(14px + env(safe-area-inset-bottom));
+  user-select:none;
+}
+/* 微弱扫描线：霓虹质感，但不进入读数区 */
+.app::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(180deg, rgba(255,255,255,.022) 0 1px, transparent 1px 3px);
+  mix-blend-mode:overlay;
+}
+
+/* ---------- 顶栏 ---------- */
+.topbar{position:relative;z-index:2;display:flex;align-items:center;gap:10px;height:44px;flex:0 0 auto}
+.icon-btn{
+  width:36px;height:36px;border-radius:12px;border:0;cursor:pointer;
+  background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px var(--line);
+  color:#C9B8E6;display:grid;place-items:center;
+}
+.icon-btn:hover{background:rgba(255,255,255,.09)}
+.room{display:flex;flex-direction:column;gap:2px;line-height:1}
+.room b{font-size:14px;font-weight:650;letter-spacing:.02em}
+.room span{font-size:11px;color:var(--text-3);letter-spacing:.06em}
+.badge-18{
+  margin-left:auto;font:700 10px/1 inherit;letter-spacing:.1em;color:#FFB4C6;
+  padding:5px 7px;border-radius:6px;background:rgba(255,34,68,.12);
+  box-shadow:inset 0 0 0 1px rgba(255,34,68,.35);
+}
+
+/* ---------- 弹巢区（L0：唯一主体） ---------- */
+.app[data-v="before"]{--disc:258px}
+.app[data-v="after"] {--disc:352px}
+.disc-zone{
+  position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;
+  flex:0 0 auto;margin-top:14px;
+}
+
+.disc{
+  position:relative;width:var(--disc);height:var(--disc);border-radius:50%;
+  background:
+    radial-gradient(circle at 34% 22%, rgba(150,116,198,.42), transparent 52%),
+    conic-gradient(from 0deg,
+      #2B1940 0deg, #3C2756 60deg, #241335 120deg,
+      #463065 180deg, #241335 240deg, #392550 300deg, #2B1940 360deg);
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,.16),
+    inset 0 -14px 30px rgba(0,0,0,.72),
+    inset 0 0 0 1px rgba(255,255,255,.05),
+    0 0 0 1px var(--disc-edge),
+    0 0 0 9px #120A1F,
+    0 0 0 10px rgba(138,107,174,.16),
+    0 26px 54px -14px rgba(0,0,0,.92),
+    0 0 64px rgba(168,85,247,.10);
+  transition:width .42s var(--ease-out), height .42s var(--ease-out);
+  display:grid;place-items:center;
+}
+/* 6 条机加工凹槽：定宽、等长、止于轮缘内侧 —— 让"这是个转轮"在 0.3 秒内读出来。
+   注意别用 repeating-conic-gradient 画：它会把凹槽画成外宽内窄的黑色裂缝。 */
+.groove{
+  position:absolute;left:50%;top:50%;z-index:1;
+  width:calc(var(--disc) * .0095);height:calc(var(--disc) * .23);
+  border-radius:99px;pointer-events:none;
+  transform:translate(-50%,-50%) rotate(var(--a,0deg)) translateY(calc(var(--disc) * -.335));
+  background:linear-gradient(180deg, transparent 0%, rgba(0,0,0,.34) 24%, rgba(0,0,0,.34) 76%, transparent 100%);
+  box-shadow:1px 0 0 rgba(255,255,255,.045);
+  filter:blur(1.1px);
+}
+/* 膛室压在凹槽之上，避免刻线穿进膛口 */
+.well{z-index:2}
+
+/* 中心轴：conic 渐变在圆心会露出接缝，用一枚棘轮盖遮掉；改后由盘心读数取代 */
+.pin{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;
+  width:calc(var(--disc) * .21);height:calc(var(--disc) * .21);border-radius:50%;
+  background:
+    radial-gradient(circle at 38% 30%, #3C2A55 0%, #241335 46%, #150B23 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(138,107,174,.35),
+    inset 0 4px 8px rgba(255,255,255,.06),
+    inset 0 -6px 12px rgba(0,0,0,.85),
+    0 2px 6px rgba(0,0,0,.6);
+}
+.pin::after{
+  content:"";position:absolute;inset:34%;border-radius:2px;
+  background:#0C0616;transform:rotate(30deg);
+  box-shadow:inset 0 0 3px #000, 0 1px 0 rgba(255,255,255,.08);
+}
+.app[data-v="after"] .pin{display:none}
+
+/* 膛室：半径 = 0.325 × 盘径，6 等分 */
+.well{
+  position:absolute;left:50%;top:50%;
+  width:calc(var(--disc) * .194);height:calc(var(--disc) * .194);
+  border-radius:50%;
+  transform:translate(-50%,-50%) rotate(var(--a,0deg)) translateY(calc(var(--disc) * -.325));
+  background:radial-gradient(circle at 50% 38%, #000 30%, #0B0514 100%);
+  box-shadow:
+    inset 0 8px 12px rgba(0,0,0,.96),
+    inset 0 -2px 3px rgba(138,107,174,.28),
+    0 0 0 1px var(--well-rim),
+    0 1px 0 rgba(255,255,255,.06);
+}
+/* 实弹：高光、暗面、描边、投影四件套把它"抬"出盘面 */
+.ball{
+  position:absolute;inset:13%;border-radius:50%;
+  background:radial-gradient(circle at 34% 26%,
+    #FFFDF2 0%, #FFF3C4 6%, var(--gold) 30%,
+    #F0B429 54%, #C98A12 76%, var(--gold-lo) 100%);
+  box-shadow:
+    0 0 0 1.5px var(--gold-rim),
+    inset 0 -8px 12px -6px rgba(60,32,0,.95),
+    0 5px 10px -2px rgba(0,0,0,.85),
+    0 0 11px rgba(255,210,74,.22);
+}
+/* 当前膛：粉光环。发光预算被压住 —— 对手是"开枪"按钮，不是它 */
+.well.current::after{
+  content:"";position:absolute;inset:-8px;border-radius:50%;
+  border:2px solid var(--pink);
+  box-shadow:0 0 10px rgba(255,46,154,.5), 0 0 22px rgba(255,46,154,.2);
+  animation:ringPulse 2.6s ease-in-out infinite;
+}
+@keyframes ringPulse{0%,100%{opacity:.95;transform:scale(1)}50%{opacity:.55;transform:scale(1.04)}}
+/* 已击发：形状与实弹彻底不同（色盲冗余） */
+.well.spent{
+  background:radial-gradient(circle at 50% 40%, #1A1724 0%, #0A0712 100%);
+  box-shadow:
+    inset 0 8px 12px rgba(0,0,0,.96),
+    inset 0 0 0 1px rgba(122,107,140,.45),
+    0 0 0 1px rgba(122,107,140,.28);
+}
+.well.spent::after{
+  content:"";position:absolute;inset:26%;border-radius:50%;
+  border:1.5px dashed rgba(150,134,168,.6);
+  background:radial-gradient(circle, rgba(70,66,84,.85) 0%, transparent 70%);
+}
+
+/* ---------- 盘心读数（L1：主体的读数，不是独立元素） ---------- */
+.hub{
+  position:relative;z-index:3;
+  width:calc(var(--disc) * .40);height:calc(var(--disc) * .40);border-radius:50%;
+  background:radial-gradient(circle at 40% 28%, #241339, #12081F 72%);
+  box-shadow:
+    inset 0 0 0 1px rgba(167,139,250,.22),
+    inset 0 9px 20px rgba(0,0,0,.92),
+    0 0 34px rgba(168,85,247,.14);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .2s var(--ease-out);
+}
+.app[data-v="before"] .hub{display:none}
+.hub-num{
+  display:flex;align-items:flex-start;
+  font-size:calc(var(--disc) * .175);font-weight:800;letter-spacing:-.035em;
+  line-height:1;font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg,var(--pink-lt) 0%,var(--violet-lt) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 12px rgba(179,107,255,.45));
+}
+.hub-num i{font-style:normal;font-size:.42em;font-weight:700;margin-top:.14em;margin-left:.05em;opacity:.9}
+
+/* ---------- 读数区 ---------- */
+.readout{
+  position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;
+  gap:6px;flex:0 0 auto;margin-top:12px;
+}
+.app[data-v="before"] .readout{gap:4px;margin-top:16px}
+
+/* 改前：盘下一个独立的大号数字，与盘抢同一块视觉中心 */
+.pct-big{
+  display:none;font-size:96px;font-weight:800;line-height:.9;letter-spacing:-.045em;
+  font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg,var(--pink-lt),var(--violet-lt));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 22px rgba(179,107,255,.5));
+}
+.app[data-v="before"] .pct-big{display:block}
+
+.cap{font-size:11px;font-weight:600;letter-spacing:.14em;color:var(--text-3)}
+.stat{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text-2)}
+.stat b{color:var(--text);font-weight:650;font-variant-numeric:tabular-nums}
+.stat .sep{color:#4A3A63}
+.pip{width:7px;height:7px;border-radius:50%;background:var(--gold);
+  box-shadow:0 0 0 1.5px var(--gold-rim),0 0 8px rgba(255,210,74,.5);display:inline-block}
+
+/* ---------- 玩家列表（L2：状态带） ---------- */
+.listhead{
+  position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;
+  margin-top:24px;flex:0 0 auto;
+}
+.listhead span{font-size:10.5px;font-weight:600;letter-spacing:.16em;color:var(--text-3)}
+.listhead .count{font-variant-numeric:tabular-nums;letter-spacing:.06em;color:#5B4A74}
+.players{position:relative;z-index:2;margin-top:9px;display:flex;flex-direction:column;gap:9px;flex:0 0 auto}
+.pcard{
+  position:relative;display:flex;align-items:center;gap:11px;height:58px;padding:0 12px;
+  border-radius:14px;
+  background:linear-gradient(90deg, rgba(28,14,44,.92), rgba(22,10,36,.72));
+  box-shadow:inset 0 0 0 1px rgba(167,139,250,.12);
+  transition:box-shadow .2s,background .2s;
+}
+.pcard.turn{
+  background:linear-gradient(90deg, rgba(168,85,247,.18), rgba(28,14,44,.6));
+  box-shadow:inset 0 0 0 1.5px rgba(179,107,255,.6), 0 0 22px -4px rgba(168,85,247,.5);
+}
+.pcard.turn::before{
+  content:"";position:absolute;left:-1px;top:14px;bottom:14px;width:3px;border-radius:3px;
+  background:linear-gradient(180deg,var(--pink),var(--violet));
+}
+.ava{
+  width:38px;height:38px;border-radius:50%;flex:0 0 auto;
+  display:grid;place-items:center;font-size:15px;font-weight:700;color:#1A0A26;
+  background:linear-gradient(140deg,#FFC9E0,#C4A6FF);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);
+  transition:filter .2s;
+}
+.pcard.hit .ava{filter:grayscale(1) brightness(.5)}
+.pname{font-size:14px;font-weight:600}
+.pcard.hit .pname{
+  color:#9A8AAE;text-decoration:line-through;
+  text-decoration-color:rgba(255,34,68,.9);text-decoration-thickness:1.5px;
+}
+.ptag{font-size:10px;color:var(--text-3);letter-spacing:.08em;margin-top:2px}
+.hearts{margin-left:auto;display:flex;gap:5px;align-items:center}
+.heart{width:14px;height:14px;display:block}
+.heart path{fill:#FF3D5E}
+.heart.off path{fill:#3A2A4E}
+.heart.break{animation:heartBreak .42s var(--ease-pop) forwards}
+@keyframes heartBreak{
+  0%{transform:scale(1) rotate(0)}
+  38%{transform:scale(1.45) rotate(-10deg);filter:drop-shadow(0 0 10px #FF2244)}
+  100%{transform:scale(0) rotate(24deg);opacity:0}
+}
+
+/* ---------- 底部动作区 ---------- */
+.actions{
+  position:relative;z-index:2;display:flex;gap:10px;margin-top:auto;padding-top:14px;
+  flex:0 0 auto;align-items:stretch;
+}
+.btn{
+  position:relative;border:0;cursor:pointer;font-family:inherit;color:var(--text);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  border-radius:14px;background:rgba(255,255,255,.045);
+  box-shadow:inset 0 0 0 1px rgba(167,139,250,.2);
+  transition:background .16s var(--ease-out),box-shadow .16s,transform .1s;
+  font-size:14px;font-weight:600;letter-spacing:.02em;
+}
+.btn:hover{background:rgba(255,255,255,.075)}
+.btn:active{transform:scale(.97)}
+.btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* 改前：三个按钮同高同宽，只靠颜色区分 —— 这就是"没有主次"的现场 */
+.app[data-v="before"] .actions .btn{flex:1;height:52px;border-radius:13px}
+.app[data-v="before"] .pct-big + .cap{margin-top:2px}
+
+/* 改后：两枚次级 ghost + 一枚危险主行动 */
+.app[data-v="after"] .btn--ghost{flex:0 0 auto;height:48px;padding:0 13px;font-size:13px;color:#D9CBEF}
+.app[data-v="after"] .btn--ghost .kbd{
+  font:600 10px/1 inherit;color:#8B77A8;padding:3px 5px;border-radius:5px;
+  box-shadow:inset 0 0 0 1px rgba(167,139,250,.25);
+}
+.app[data-v="after"] .btn--fire{
+  flex:1 1 auto;height:64px;font-size:17px;font-weight:750;letter-spacing:.14em;
+  color:#FFF2F5;
+  background:linear-gradient(180deg,#FF3A5B 0%,#C9103A 55%,#9E0A2C 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.32),
+    inset 0 -2px 0 rgba(0,0,0,.35),
+    0 10px 28px -10px rgba(255,34,68,.85),
+    0 0 0 1px rgba(255,92,120,.35);
+}
+.app[data-v="after"] .btn--fire:hover{filter:brightness(1.06)}
+/* 改前：一键即发，没有任何物理摩擦 */
+.app[data-v="before"] .btn--fire{
+  background:linear-gradient(180deg,#FF3B5C,#D6123A);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28), 0 8px 22px -8px rgba(255,34,68,.8);
+}
+/* 长按充能环：不是装饰，是防误触的摩擦 */
+.btn--fire .hold{
+  position:absolute;inset:-3px;border-radius:17px;pointer-events:none;opacity:0;
+  background:conic-gradient(from -90deg,#FFF 0 var(--p,0%),rgba(255,255,255,.10) var(--p,0%) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite:exclude;padding:3px;transition:opacity .12s;
+}
+.btn--fire.holding .hold{opacity:1}
+.btn--fire.holding{transform:scale(.985)}
+.fire-pips{display:flex;gap:4px;align-items:center}
+.fire-pips i{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px rgba(255,210,74,.7)}
+
+/* 只有真键盘设备才显示快捷键，触屏设备不出现 */
+@media (hover:none){ .kbd{display:none} }
+
+/* ---------- 中弹反馈层 ---------- */
+.fx{position:absolute;inset:0;pointer-events:none;z-index:9;display:grid;place-items:center}
+.flash{position:absolute;inset:0;background:#FFF3F6;opacity:0}
+.flash.go{animation:flash .16s ease-out}
+@keyframes flash{0%{opacity:0}18%{opacity:.85}100%{opacity:0}}
+.shock{
+  position:absolute;width:var(--disc);height:var(--disc);border-radius:50%;
+  border:8px solid rgba(255,46,154,.95);opacity:0;
+  box-shadow:0 0 40px rgba(255,46,154,.6);
+}
+.shock.go{animation:shock .5s cubic-bezier(.16,1,.3,1)}
+@keyframes shock{
+  0%{transform:scale(.6);opacity:1;border-width:12px}
+  60%{opacity:.45}
+  100%{transform:scale(2.3);opacity:0;border-width:1px}
+}
+/* "砰"直接长在盘心上：数字退场，结果登场 */
+.boom{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  z-index:5;pointer-events:none;
+  font-size:calc(var(--disc) * .18);font-weight:800;letter-spacing:.02em;
+  color:#FFF0F4;text-shadow:0 0 26px rgba(255,34,68,.95), 0 3px 0 rgba(120,8,32,.9);
+  opacity:0;white-space:nowrap;
+}
+.boom.go{animation:boom .95s cubic-bezier(.16,1,.3,1)}
+@keyframes boom{
+  0%{transform:translate(-50%,-50%) scale(.42);opacity:0;filter:blur(8px)}
+  18%{transform:translate(-50%,-50%) scale(1.14);opacity:1;filter:blur(0)}
+  50%{transform:translate(-50%,-50%) scale(1);opacity:1}
+  100%{transform:translate(-50%,-56%) scale(1.02);opacity:0}
+}
+/* 命中瞬间把盘心数字压到 12%，把舞台让给结果 */
+.app.hit .hub,.app.hit .pct-big{opacity:.04;transition:opacity .18s var(--ease-out)}
+
+/* 全场收暗：注意力强制压回盘面 */
+.app.hit .players,.app.hit .actions{filter:brightness(.5) saturate(.75);transition:filter .3s .1s}
+.shake{animation:shake .42s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{
+  10%,90%{transform:translate3d(-3px,1px,0)}
+  20%,80%{transform:translate3d(6px,-2px,0)}
+  30%,50%,70%{transform:translate3d(-8px,2px,0)}
+  40%,60%{transform:translate3d(8px,-1px,0)}
+}
+.pcard.bleed{box-shadow:inset 0 0 0 1.5px rgba(255,34,68,.75), 0 0 30px -6px rgba(255,34,68,.55)}
+.pcard.bleed::after{
+  content:"";position:absolute;inset:0;border-radius:14px;pointer-events:none;
+  background:linear-gradient(90deg, rgba(255,30,60,.18), transparent 62%);
+}
+
+/* 空膛：一声干"咔" */
+.clack{animation:clack .32s ease-out}
+@keyframes clack{0%{transform:scale(1)}35%{transform:scale(.995);filter:brightness(1.14)}100%{transform:scale(1)}}
+
+.hint{
+  position:absolute;left:50%;bottom:calc(98px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  z-index:8;font-size:11px;letter-spacing:.1em;color:#C6B6E0;
+  background:rgba(14,7,24,.88);padding:7px 12px;border-radius:999px;
+  box-shadow:inset 0 0 0 1px rgba(167,139,250,.28);
+  opacity:0;transition:opacity .2s;white-space:nowrap;
+}
+.hint.show{opacity:1}
+
+/* ---------- 评审说明 ---------- */
+.notes{max-width:640px;text-align:center;font-size:12.5px;line-height:1.75;color:#8C7BA6}
+.notes b{color:#C9B8E6;font-weight:600}
+
+/* 小屏浏览这份对照稿时整体缩放，不影响设计比例 */
+@media (max-width: 470px){
+  body{padding:14px 10px 20px;gap:14px}
+  .phone{transform:scale(.84);transform-origin:top center;margin-bottom:-150px}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="seg" id="versionSeg">
+    <button data-set="before" class="on">改前 · 现状</button>
+    <button data-set="after">改后 · 建议</button>
+  </div>
+  <div class="seg" id="testSeg">
+    <button id="btnFireLive">试射 · 实弹</button>
+    <button id="btnFireEmpty">试射 · 空膛</button>
+    <button id="btnReset">重置</button>
+  </div>
+</div>
+
+<div class="phone">
+  <div class="app" id="app" data-v="before">
+
+    <header class="topbar">
+      <button class="icon-btn" aria-label="退出房间">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="room"><b>房号 7742</b><span>第 3 轮 · 轮到你</span></div>
+      <span class="badge-18">18+</span>
+    </header>
+
+    <section class="disc-zone">
+      <div class="disc" id="disc" role="img" aria-label="弹巢：6 个膛室，2 发实弹，当前膛位为粉红光环">
+        <div class="pin" aria-hidden="true"></div>
+        <div class="hub" aria-hidden="true"><div class="hub-num">33<i>%</i></div></div>
+        <div class="boom" id="boom" aria-hidden="true">砰</div>
+      </div>
+    </section>
+
+    <section class="readout">
+      <div class="pct-big" aria-hidden="true">33%</div>
+      <div class="cap">下一枪命中概率</div>
+      <div class="stat">
+        <span>剩 <b>6</b> 发</span>
+        <span class="sep">·</span>
+        <span class="pip" aria-hidden="true"></span>
+        <span>实弹 <b>2</b> 颗</span>
+      </div>
+    </section>
+
+    <div class="listhead"><span>在场玩家</span><span class="count">3 / 4</span></div>
+
+    <section class="players" aria-label="玩家列表">
+      <div class="pcard turn" data-i="0">
+        <div class="ava">岚</div>
+        <div><div class="pname">阿岚</div><div class="ptag">本回合</div></div>
+        <div class="hearts">
+          <svg class="heart" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.7-9.6-9C.6 8.3 2.6 4.5 6.3 4.5c2.2 0 3.6 1.3 4.4 2.6h2.6c.8-1.3 2.2-2.6 4.4-2.6 3.7 0 5.7 3.8 3.9 7.5-2.1 4.3-9.6 9-9.6 9z"/></svg>
+          <svg class="heart" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.7-9.6-9C.6 8.3 2.6 4.5 6.3 4.5c2.2 0 3.6 1.3 4.4 2.6h2.6c.8-1.3 2.2-2.6 4.4-2.6 3.7 0 5.7 3.8 3.9 7.5-2.1 4.3-9.6 9-9.6 9z"/></svg>
+          <svg class="heart" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.7-9.6-9C.6 8.3 2.6 4.5 6.3 4.5c2.2 0 3.6 1.3 4.4 2.6h2.6c.8-1.3 2.2-2.6 4.4-2.6 3.7 0 5.7 3.8 3.9 7.5-2.1 4.3-9.6 9-9.6 9z"/></svg>
+        </div>
+      </div>
+      <div class="pcard" data-i="1">
+        <div class="ava">鹿</div>
+        <div><div class="pname">小鹿</div><div class="ptag">等待</div></div>
+        <div class="hearts">
+          <svg class="heart" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.7-9.6-9C.6 8.3 2.6 4.5 6.3 4.5c2.2 0 3.6 1.3 4.4 2.6h2.6c.8-1.3 2.2-2.6 4.4-2.6 3.7 0 5.7 3.8 3.9 7.5-2.1 4.3-9.6 9-9.6 9z"/></svg>
+          <svg class="heart" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.7-9.6-9C.6 8.3 2.6 4.5 6.3 4.5c2.2 0 3.6 1.3 4.4 2.6h2.6c.8-1.3 2.2-2.6 4.4-2.6 3.7 0 5.7 3.8 3.9 7.5-2.1 4.3-9.6 9-9.6 9z"/></svg>
+          <svg class="heart off" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.7-9.6-9C.6 8.3 2.6 4.5 6.3 4.5c2.2 0 3.6 1.3 4.4 2.6h2.6c.8-1.3 2.2-2.6 4.4-2.6 3.7 0 5.7 3.8 3.9 7.5-2.1 4.3-9.6 9-9.6 9z"/></svg>
+        </div>
+      </div>
+      <div class="pcard" data-i="2">
+        <div class="ava">K</div>
+        <div><div class="pname">Kiki</div><div class="ptag">等待</div></div>
+        <div class="hearts">
+          <svg class="heart" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.7-9.6-9C.6 8.3 2.6 4.5 6.3 4.5c2.2 0 3.6 1.3 4.4 2.6h2.6c.8-1.3 2.2-2.6 4.4-2.6 3.7 0 5.7 3.8 3.9 7.5-2.1 4.3-9.6 9-9.6 9z"/></svg>
+          <svg class="heart" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.7-9.6-9C.6 8.3 2.6 4.5 6.3 4.5c2.2 0 3.6 1.3 4.4 2.6h2.6c.8-1.3 2.2-2.6 4.4-2.6 3.7 0 5.7 3.8 3.9 7.5-2.1 4.3-9.6 9-9.6 9z"/></svg>
+          <svg class="heart" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.7-9.6-9C.6 8.3 2.6 4.5 6.3 4.5c2.2 0 3.6 1.3 4.4 2.6h2.6c.8-1.3 2.2-2.6 4.4-2.6 3.7 0 5.7 3.8 3.9 7.5-2.1 4.3-9.6 9-9.6 9z"/></svg>
+        </div>
+      </div>
+    </section>
+
+    <footer class="actions">
+      <button class="btn btn--ghost" id="btnSpin" aria-label="旋转弹仓">
+        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3.2-6.9"/><path d="M21 4v5h-5"/></svg>
+        转弹仓
+        <span class="kbd">R</span>
+      </button>
+      <button class="btn btn--ghost" id="btnAdd" aria-label="往弹仓里再加一颗实弹">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        加一颗
+      </button>
+      <button class="btn btn--fire" id="btnFire" aria-label="开枪，需长按 0.6 秒确认">
+        <span class="hold" aria-hidden="true"></span>
+        <span class="fire-pips" aria-hidden="true"><i></i><i></i></span>
+        开枪
+      </button>
+    </footer>
+
+    <div class="fx" aria-hidden="true">
+      <div class="flash" id="flash"></div>
+      <div class="shock" id="shock"></div>
+    </div>
+    <div class="hint" id="hint">长按 0.6 秒确认</div>
+  </div>
+</div>
+
+<div class="notes">
+  切 <b>改前 / 改后</b> 看同一份信息的两套层级；点 <b>试射</b> 看中弹反馈。
+  唯一的位移是那串百分数：从盘下的大字块，收进盘心 —— 视线落点因此从"数字"变成"枪"。
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var app    = document.getElementById('app');
+  var disc   = document.getElementById('disc');
+  var flash  = document.getElementById('flash');
+  var shock  = document.getElementById('shock');
+  var boom   = document.getElementById('boom');
+  var hint   = document.getElementById('hint');
+  var btnFire= document.getElementById('btnFire');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var N = 6;
+  var LIVE = [1, 4];
+  var CURRENT = 2;   // 当前待击发膛位，空膛后会移交给下一膛
+  var busy = false;
+
+  function build(){
+    Array.prototype.slice.call(disc.querySelectorAll('.well')).forEach(function(n){ n.remove(); });
+    for (var i = 0; i < N; i++){
+      var well = document.createElement('div');
+      well.className = 'well';
+      well.style.setProperty('--a', (i * (360 / N)) + 'deg');
+      well.dataset.i = i;
+      if (LIVE.indexOf(i) > -1){
+        var ball = document.createElement('div');
+        ball.className = 'ball';
+        well.appendChild(ball);
+      }
+      if (i === CURRENT) well.classList.add('current');
+      disc.appendChild(well);
+
+      // 凹槽落在两个膛室之间（膛室 0/60/120…，凹槽 30/90/150…）
+      var g = document.createElement('div');
+      g.className = 'groove';
+      g.style.setProperty('--a', (i * (360 / N) + 30) + 'deg');
+      disc.appendChild(g);
+    }
+  }
+  build();
+
+  document.getElementById('versionSeg').addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (!b) return;
+    Array.prototype.forEach.call(this.children, function(x){ x.classList.toggle('on', x === b); });
+    app.dataset.v = b.dataset.set;
+    reset();
+  });
+
+  function reset(){
+    busy = false;
+    app.classList.remove('shake','hit','clack');
+    document.querySelectorAll('.pcard').forEach(function(c){
+      c.classList.remove('hit','bleed');
+      var hs = c.querySelectorAll('.heart');
+      hs.forEach(function(h){ h.classList.remove('break'); h.style.opacity=''; });
+      if (hs[2]) hs[2].classList.remove('off');
+    });
+    flash.classList.remove('go');
+    shock.classList.remove('go');
+    boom.classList.remove('go');
+    disc.querySelectorAll('.well.spent').forEach(function(w){ w.classList.remove('spent'); });
+    disc.querySelectorAll('.well.current').forEach(function(w){ w.classList.remove('current'); });
+    CURRENT = 2;
+    var cur = disc.querySelector('.well[data-i="2"]'); if (cur) cur.classList.add('current');
+    hint.classList.remove('show');
+  }
+
+  function runShoot(isLive){
+    if (busy) return;
+    busy = true;
+    hint.classList.remove('show');
+    if (isLive) liveHit(); else emptyHit();
+  }
+
+  function liveHit(){
+    var card = document.querySelector('.pcard[data-i="0"]');
+    var hearts = card.querySelectorAll('.heart');
+    var last = hearts[2];
+
+    app.classList.add('hit');
+    if (!reduce) app.classList.add('shake');
+    flash.classList.add('go');
+    shock.classList.add('go');
+    boom.classList.add('go');
+
+    setTimeout(function(){
+      last.classList.add('break');
+      card.classList.add('hit','bleed');
+    }, reduce ? 0 : 120);
+
+    setTimeout(function(){
+      last.classList.add('off');
+      last.classList.remove('break');
+      last.style.opacity = '0';
+      app.classList.remove('shake');
+    }, 620);
+
+    setTimeout(function(){ busy = false; }, 1500);
+  }
+
+  function emptyHit(){
+    app.classList.add('clack');
+    var w = disc.querySelector('.well[data-i="' + CURRENT + '"]');
+    if (w){ w.classList.remove('current'); w.classList.add('spent'); }
+    // 光环必须移交：空膛后"我打到第几枪"的空间记忆不能断
+    setTimeout(function(){ moveCurrent(CURRENT + 1); }, reduce ? 0 : 180);
+    setTimeout(function(){
+      app.classList.remove('clack');
+      busy = false;
+    }, 460);
+  }
+
+  function moveCurrent(next){
+    disc.querySelectorAll('.well.current').forEach(function(n){ n.classList.remove('current'); });
+    CURRENT = ((next % N) + N) % N;
+    var w = disc.querySelector('.well[data-i="' + CURRENT + '"]');
+    if (w) w.classList.add('current');
+  }
+
+  var HOLD = 600, raf = 0, t0 = 0;
+
+  function startHold(e){
+    if (busy) return;
+    if (app.dataset.v === 'before'){ runShoot(true); return; }
+    e.preventDefault();
+    btnFire.classList.add('holding');
+    btnFire.style.setProperty('--p','0%');
+    t0 = performance.now();
+    step();
+  }
+  function step(){
+    var p = Math.min(1, (performance.now() - t0) / HOLD);
+    btnFire.style.setProperty('--p', (p*100).toFixed(1) + '%');
+    if (p >= 1){ cancelHold(); runShoot(true); return; }
+    raf = requestAnimationFrame(step);
+  }
+  function cancelHold(){
+    cancelAnimationFrame(raf);
+    btnFire.classList.remove('holding');
+    btnFire.style.setProperty('--p','0%');
+  }
+
+  btnFire.addEventListener('pointerdown', startHold);
+  btnFire.addEventListener('pointerup', function(){ if (app.dataset.v !== 'before') cancelHold(); });
+  btnFire.addEventListener('pointerleave', function(){ if (app.dataset.v !== 'before') cancelHold(); });
+  btnFire.addEventListener('pointercancel', cancelHold);
+  btnFire.addEventListener('keydown', function(e){
+    if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); startHold(e); }
+  });
+  btnFire.addEventListener('keyup', function(){ if (app.dataset.v !== 'before') cancelHold(); });
+
+  document.getElementById('btnFireLive').addEventListener('click', function(){ reset(); runShoot(true); });
+  document.getElementById('btnFireEmpty').addEventListener('click', function(){ reset(); runShoot(false); });
+  document.getElementById('btnReset').addEventListener('click', reset);
+
+  document.getElementById('btnSpin').addEventListener('click', function(){
+    disc.querySelectorAll('.well').forEach(function(w,i){
+      w.style.transition = 'transform .5s cubic-bezier(.16,1,.3,1)';
+      w.style.setProperty('--a', ((i*60) + 360) + 'deg');
+      setTimeout(function(){ w.style.transition = ''; }, 520);
+    });
+  });
+})();
+</script>
+</body>
+</html>
